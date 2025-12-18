@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comunalco - Розумний облік</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* --- ОСНОВНІ СТИЛІ --- */
+        :root {
+            --bg-dark: #050a14;
+            --bg-card: #0f172a;
+            --text-main: #e0e6ed;
+            --text-sec: #94a3b8;
+            --accent: #00f0ff;
+            --accent-glow: rgba(0, 240, 255, 0.6);
+            --gradient-btn: linear-gradient(90deg, #007cf0, #00dfd8);
+        }
+
+        * { box-sizing: border-box; }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            overflow-x: hidden; /* БЛОКУЄМО ГОРИЗОНТАЛЬНИЙ СКРОЛ */
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            scroll-behavior: smooth;
+        }
+
+        a { text-decoration: none; color: inherit; transition: 0.3s; }
+        ul { list-style: none; padding: 0; margin: 0; }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* --- ШАПКА (HEADER) --- */
+        header {
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            background: rgba(5, 10, 20, 0.95);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* --- ЛОГОТИП --- */
+        .logo-brand {
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            line-height: 1;
+        }
+
+        .text-white { color: #ffffff; }
+
+        .text-neon {
+            color: var(--accent);
+            text-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        /* Стилізована буква "О" */
+        .styled-o {
+            display: inline-block;
+            position: relative;
+            color: var(--accent);
+        }
+
+        .styled-o::after {
+            content: '';
+            position: absolute;
+            top: 53%; 
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 33%; 
+            height: 33%;
+            background-color: white;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #fff;
+            z-index: 2;
+        }
+
+        /* --- МЕНЮ --- */
+        nav ul {
+            display: flex;
+            gap: 20px;
+        }
+
+        nav a {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-sec);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        nav a:hover {
+            color: var(--accent);
+            text-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .btn-login {
+            padding: 10px 30px;
+            border: 2px solid var(--accent);
+            color: var(--accent);
+            border-radius: 8px;
+            font-weight: 800;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: rgba(0, 240, 255, 0.05);
+            white-space: nowrap;
+        }
+        
+        .btn-login:hover {
+            background: var(--accent);
+            color: #000;
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        /* --- ГОЛОВНИЙ ЕКРАН --- */
+        .hero {
+            padding: 50px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 80vh;
+        }
+
+        .hero-content {
+            flex: 1;
+            max-width: 600px;
+            z-index: 2;
+        }
+
+        h1 {
+            font-size: 3.2rem;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            font-weight: 900;
+        }
+        
+        h1 span {
+            color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            background-image: linear-gradient(90deg, #fff, var(--accent));
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            color: var(--text-sec);
+            margin-bottom: 30px;
+            line-height: 1.6;
+            max-width: 500px;
+        }
+
+        .btn-main {
+            display: inline-block;
+            background: var(--gradient-btn);
+            padding: 18px 45px;
+            border-radius: 50px;
+            font-weight: 800;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            box-shadow: 0 10px 30px rgba(0, 223, 216, 0.3);
+            color: #fff;
+            letter-spacing: 0.5px;
+        }
+
+        .hero-img {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .hero-img img {
+            width: 100%;
+            max-width: 550px;
+            mask-image: radial-gradient(circle, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%);
+            -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%);
+            mix-blend-mode: screen; 
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        /* --- СЕКЦІЇ --- */
+        section { padding: 80px 0; }
+        
+        .section-title {
+            text-align: center;
+            font-size: 2.2rem;
+            margin-bottom: 50px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .section-title span { color: var(--accent); }
+
+        /* --- ГРІД (ВИПРАВЛЕНО ДЛЯ МОБІЛЬНИХ) --- */
+        .grid-3 {
+            display: grid;
+            /* Зменшив мін. ширину з 320px до 280px, щоб не розпирало екран телефону */
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            background: var(--bg-card);
+            padding: 35px 25px;
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .card:hover {
+            border-color: var(--accent);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .card h3 { margin: 15px 0 10px 0; color: #fff; font-size: 1.2rem; }
+        .card p, .card li { color: var(--text-sec); line-height: 1.5; font-size: 0.95rem; }
+        .card-icon {
+            font-size: 2rem; margin-bottom: 15px; color: var(--accent);
+            background: rgba(0, 240, 255, 0.1); width: 60px; height: 60px;
+            display: flex; align-items: center; justify-content: center; border-radius: 12px;
+        }
+
+        /* --- ТАРИФИ --- */
+        .price-card {
+            background: var(--bg-card);
+            padding: 40px 30px;
+            border-radius: 20px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.05);
+            position: relative;
+            display: flex; flex-direction: column;
+        }
+        .price-card.popular { border-color: var(--accent); background: rgba(0, 240, 255, 0.03); }
+        .price { font-size: 2.5rem; font-weight: 900; margin: 20px 0; color: #fff; }
+        .price span { font-size: 1rem; color: var(--text-sec); font-weight: 400; }
+        .price-features { margin-bottom: 30px; color: var(--text-sec); text-align: left; list-style: none; padding: 0; flex: 1; }
+        .price-features li { margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+        .price-features li::before { content: "✔"; color: var(--accent); }
+        .badge { position: absolute; top: 15px; right: 15px; background: var(--accent); color: #000; font-weight: bold; font-size: 0.7rem; padding: 5px 10px; border-radius: 10px; }
+
+        /* --- ВСТАНОВЛЕННЯ --- */
+        .install-list { list-style: none; padding: 0; text-align: left; }
+        .install-list li { margin-bottom: 15px; display: flex; align-items: flex-start; gap: 12px; }
+        .install-list li::before { content: "👉"; color: var(--accent); flex-shrink: 0; margin-top: 2px; }
+        .install-text { flex: 1; display: block; }
+        .install-step { color: #fff; font-weight: 600; white-space: nowrap; }
+
+        /* --- КОНТАКТИ --- */
+        .contact-grid { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
+        .contact-btn {
+            display: flex; align-items: center; gap: 10px; padding: 15px 30px;
+            border-radius: 12px; font-weight: bold; background: var(--bg-card);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .contact-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+        footer {
+            background: #020408; padding: 40px 0; text-align: center;
+            border-top: 1px solid rgba(255,255,255,0.05); font-size: 0.8rem; color: var(--text-sec);
+        }
+
+        /* --- МОБІЛЬНА АДАПТАЦІЯ (КЛЮЧОВІ ВИПРАВЛЕННЯ) --- */
+        @media (max-width: 900px) {
+            h1 { font-size: 2.2rem; text-align: center; } /* Центруємо заголовок */
+            
+            /* Вирівнюємо весь блок Hero по центру */
+            .hero { flex-direction: column-reverse; text-align: center; padding-top: 20px; }
+            .hero-content { margin-top: 30px; width: 100%; display: flex; flex-direction: column; align-items: center; }
+            .hero p { margin: 0 auto 30px auto; max-width: 100%; text-align: center; }
+            
+            .nav-wrapper { 
+                flex-wrap: wrap; 
+                gap: 15px; 
+                justify-content: space-between; 
+            }
+            
+            .logo-text { font-size: 1.4rem; }
+
+            /* Меню прокручується горизонтально, але не розтягує сайт */
+            nav {
+                width: 100%; 
+                order: 3; 
+                margin-top: 10px; 
+                overflow-x: auto; 
+                padding-bottom: 5px;
+            }
+            nav ul { 
+                justify-content: space-between; /* Розподіляємо пункти рівномірно */
+                gap: 20px; 
+                white-space: nowrap; 
+                padding: 0 5px; 
+            }
+            
+            .btn-login { margin-left: 0; padding: 10px 20px; font-size: 0.9rem; }
+            
+            .hero-img img { max-width: 80%; }
+            
+            /* Адаптація списків */
+            .install-list span { display: block; }
+            .install-step { white-space: normal; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container nav-wrapper">
+            <a href="#" class="logo-brand">
+                <div class="logo-text">
+                    <span class="text-white">Комуналк</span><span class="text-neon"><span class="styled-o">О</span>блік</span>
+                </div>
+            </a>
+
+            <a href="app/index.html" class="btn-login">Увійти</a>
+
+            <nav>
+                <ul>
+                    <li><a href="#">Головна</a></li>
+                    <li><a href="#about">Функції</a></li>
+                    <li><a href="#pricing">Тарифи</a></li>
+                    <li><a href="#install" style="color:var(--accent)">Встановити</a></li>
+                    <li><a href="#contact">Контакти</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container" style="display: flex; flex-wrap: wrap; align-items: center; width: 100%;">
+            <div class="hero-content">
+                <h1>Цифровий облік <br><span>комунальних послуг</span></h1>
+                <p>
+                    Єдиний додаток для обліку квартир, автоматичного розрахунку МЗК та формування квитанцій. Безпечно, зручно та завжди під рукою.
+                </p>
+                <a href="app/index.html" class="btn-main">Спробувати безкоштовно</a>
+            </div>
+            <div class="hero-img">
+                <img src="hero-img.png" alt="App Visualization">
+            </div>
+        </div>
+    </section>
+
+    <section id="about">
+        <div class="container">
+            <h2 class="section-title">Чому <span>Comunalco?</span></h2>
+            <div class="grid-3">
+                <div class="card">
+                    <div class="card-icon">🏢</div>
+                    <h3>Мульти-об'єкти</h3>
+                    <p>Додавайте необмежену кількість об'єктів (будинків) та квартир. Створюйте групи та ведіть облік орендарів в одному місці.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">⚡</div>
+                    <h3>Гнучкі Тарифи</h3>
+                    <p>Налаштуйте ціни на світло (день/ніч), воду та газ. Додавайте власні фіксовані послуги, наприклад "Інтернет" чи "Охорона".</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🧮</div>
+                    <h3>Розумний МЗК</h3>
+                    <p>Система автоматично вираховує різницю між загальним лічильником та сумою квартир і справедливо розподіляє витрати.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">📄</div>
+                    <h3>Звіти та PDF</h3>
+                    <p>Формуйте професійні квитанції у форматі PDF або відправляйте короткі текстові звіти в месенджери за 1 клік.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🔒</div>
+                    <h3>Повна Приватність</h3>
+                    <p>Ми не зберігаємо ваші дані на серверах. Вся інформація зашифрована і зберігається локально на вашому пристрої.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">💾</div>
+                    <h3>Резервні копії</h3>
+                    <p>Легко створюйте бекап даних у файл, щоб перенести їх на інший телефон або зберегти на комп'ютері.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="pricing" style="background: rgba(255,255,255,0.02);">
+        <div class="container">
+            <h2 class="section-title">Тарифи</h2>
+            <div class="grid-3">
+                <div class="price-card">
+                    <h3>Start</h3>
+                    <div class="price">0 <span>грн</span></div>
+                    <ul class="price-features">
+                        <li>До 2 квартир</li>
+                        <li>Всі базові функції</li>
+                        <li>Без обмежень у часі</li>
+                    </ul>
+                    <a href="app/index.html" class="btn-login" style="display:block; margin-top:auto">Почати</a>
+                </div>
+                <div class="price-card popular">
+                    <div class="badge">ХІТ</div>
+                    <h3>Рантьє</h3>
+                    <div class="price">50 <span>грн/міс</span></div>
+                    <ul class="price-features">
+                        <li>До 10 квартир</li>
+                        <li>PDF квитанції</li>
+                        <li>Пріоритетна підтримка</li>
+                    </ul>
+                    <a href="app/index.html" class="btn-main" style="width:100%; font-size:1rem; padding:12px; margin-top:auto">Обрати</a>
+                </div>
+                <div class="price-card">
+                    <h3>PRO</h3>
+                    <div class="price">∞</div>
+                    <ul class="price-features">
+                        <li>Безліміт квартир</li>
+                        <li>Для ОСББ та бізнесу</li>
+                        <li>Lifetime ліцензія</li>
+                    </ul>
+                    <a href="app/index.html" class="btn-login" style="display:block; margin-top:auto">Деталі</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="install">
+        <div class="container">
+            <h2 class="section-title">Як <span>Встановити?</span></h2>
+            <div class="grid-3">
+                <div class="card">
+                    <div class="card-icon">🤖</div>
+                    <h3>Android</h3>
+                    <ul class="install-list">
+                        <li><span class="install-text">Відкрийте цей сайт у <strong>Chrome</strong>.</span></li>
+                        <li><span class="install-text">Натисніть три крапки (⋮) у верхньому правому куті.</span></li>
+                        <li><span class="install-text">Оберіть <span class="install-step">"Встановити додаток"</span>.</span></li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon">🍎</div>
+                    <h3>iPhone / iPad</h3>
+                    <ul class="install-list">
+                        <li><span class="install-text">Відкрийте цей сайт у <strong>Safari</strong>.</span></li>
+                        <li><span class="install-text">Натисніть кнопку "Поділитися" (квадрат зі стрілкою вгору).</span></li>
+                        <li><span class="install-text">Прокрутіть вниз і оберіть <span class="install-step">"На початковий екран"</span>.</span></li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon">💻</div>
+                    <h3>Windows / Mac</h3>
+                    <ul class="install-list">
+                        <li><span class="install-text">Відкрийте сайт у <strong>Chrome</strong> або <strong>Edge</strong>.</span></li>
+                        <li>
+                            <span class="install-text">
+                            У рядку адреси праворуч натисніть іконку:
+                            <br><br>Chrome: <span class="install-step">🖥️⬇ (Монітор зі стрілкою)</span>
+                            <br>Edge: &nbsp;&nbsp;&nbsp;<span class="install-step">➕ (Плюс)</span>
+                            </span>
+                        </li>
+                        <li><span class="install-text">Натисніть її та підтвердіть встановлення.</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact">
+        <div class="container" style="text-align: center;">
+            <h2 class="section-title">Зв'яжіться з <span>нами</span></h2>
+            <p style="color:var(--text-sec); margin-bottom:40px; max-width:600px; margin-left:auto; margin-right:auto;">
+                Маєте питання щодо роботи сервісу або пропозиції? Ми відповідаємо швидко.
+            </p>
+            <div class="contact-grid">
+                <a href="https://t.me/comunalco" target="_blank" class="contact-btn">
+                    <span style="font-size:1.2rem">✈️</span> Telegram Support
+                </a>
+                <a href="mailto:support@comunalco.com" class="contact-btn">
+                    <span style="font-size:1.2rem">✉️</span> support@comunalco.com
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>© 2025 Comunalco.com. Всі права захищені.</p>
+        </div>
+    </footer>
+
+</body>
+</html>
