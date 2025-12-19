@@ -71,9 +71,8 @@
             line-height: 1;
         }
         
-        /* Стиль для логотипу-картинки */
         .logo-icon-img {
-            height: 45px; /* Розмір лого */
+            height: 45px;
             width: auto;
             display: block;
             filter: drop-shadow(0 0 5px var(--accent-glow));
@@ -93,7 +92,6 @@
         nav a { font-size: 0.8rem; font-weight: 700; color: var(--text-sec); text-transform: uppercase; letter-spacing: 1px; position: relative; }
         nav a:hover { color: var(--accent); text-shadow: 0 0 10px var(--accent-glow); }
         
-        /* Клас активного пункту меню */
         nav a.active {
             color: var(--accent);
             text-shadow: 0 0 10px var(--accent-glow);
@@ -133,7 +131,7 @@
 
         .hero-media { flex: 1; display: flex; justify-content: center; position: relative; padding-left: 20px; }
         
-        /* Відео */
+        /* ВІДЕО */
         .hero-video {
             width: 100%;
             max-width: 550px;
@@ -142,6 +140,7 @@
             border: 1px solid rgba(0, 240, 255, 0.2);
             animation: float 6s ease-in-out infinite;
             background: #000; 
+            object-fit: cover; /* Щоб відео гарно заповнювало рамку */
         }
 
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
@@ -199,13 +198,18 @@
             border-top: 1px solid rgba(255,255,255,0.05); font-size: 0.8rem; color: var(--text-sec);
         }
 
+        /* --- АДАПТИВНІСТЬ (MOBILE) --- */
         @media (max-width: 900px) {
             h1 { font-size: 2.2rem; text-align: center; }
             
-            /* Мобільна версія: відео під текстом */
-            .hero { flex-direction: column; text-align: center; padding-top: 20px; }
+            /* ЖОРСТКО ставимо колонку, щоб відео було знизу */
+            .hero { 
+                flex-direction: column !important; 
+                text-align: center; 
+                padding-top: 20px; 
+            }
             
-            .hero-content { margin-top: 0; margin-bottom: 40px; width: 100%; display: flex; flex-direction: column; align-items: center; }
+            .hero-content { margin-top: 0; margin-bottom: 30px; width: 100%; display: flex; flex-direction: column; align-items: center; }
             .hero p { margin: 0 auto 30px auto; text-align: center; }
             
             .nav-wrapper { flex-wrap: wrap; gap: 15px; justify-content: space-between; }
@@ -216,8 +220,21 @@
             nav ul { justify-content: space-between; gap: 20px; white-space: nowrap; padding: 0 5px; }
             .btn-login { margin-left: 0; padding: 10px 20px; font-size: 0.9rem; }
             
-            .hero-media { padding-left: 0; }
-            .hero-video { max-width: 90%; }
+            /* ВИПРАВЛЕННЯ ДЛЯ ВІДЕО */
+            .hero-media { 
+                width: 100%; 
+                padding-left: 0; 
+                display: block; /* Забороняємо flex тут */
+                margin-top: 20px;
+            }
+            .hero-video { 
+                width: 100%; 
+                max-width: 100%; 
+                height: auto;
+                min-height: 200px; /* Мінімальна висота, щоб не зникало */
+                animation: none; 
+                box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            }
         }
     </style>
 </head>
@@ -255,7 +272,7 @@
             </div>
             
             <div class="hero-media">
-                <video class="hero-video" autoplay loop muted playsinline poster="poster-placeholder.jpg">
+                <video class="hero-video" autoplay loop muted playsinline poster="logo-c.png">
                     <source src="1766175525528.mp4" type="video/mp4">
                     Ваш браузер не підтримує відео.
                 </video>
@@ -424,7 +441,6 @@
                 sections.forEach(section => {
                     const sectionTop = section.offsetTop;
                     const sectionHeight = section.clientHeight;
-                    // Активація секції при скролі
                     if (pageYOffset >= (sectionTop - 150)) {
                         current = section.getAttribute('id');
                     }
