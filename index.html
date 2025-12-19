@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Comunalco - Розумний облік</title>
+    <title>Comunalco - Розумна система справедливого обліку</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
         /* --- ОСНОВНІ СТИЛІ --- */
@@ -23,7 +23,7 @@
             margin: 0;
             padding: 0;
             width: 100%;
-            overflow-x: hidden; /* БЛОКУЄМО ГОРИЗОНТАЛЬНИЙ СКРОЛ */
+            overflow-x: hidden;
             font-family: 'Montserrat', sans-serif;
             background-color: var(--bg-dark);
             color: var(--text-main);
@@ -40,7 +40,7 @@
             padding: 0 20px;
         }
 
-        /* --- ШАПКА (HEADER) --- */
+        /* --- ШАПКА --- */
         header {
             padding: 20px 0;
             border-bottom: 1px solid rgba(255,255,255,0.05);
@@ -57,7 +57,6 @@
             align-items: center;
         }
 
-        /* --- ЛОГОТИП --- */
         .logo-brand {
             text-decoration: none;
             display: flex;
@@ -72,179 +71,64 @@
         }
 
         .text-white { color: #ffffff; }
+        .text-neon { color: var(--accent); text-shadow: 0 0 15px var(--accent-glow); }
 
-        .text-neon {
-            color: var(--accent);
-            text-shadow: 0 0 15px var(--accent-glow);
-        }
-
-        /* Стилізована буква "О" */
-        .styled-o {
-            display: inline-block;
-            position: relative;
-            color: var(--accent);
-        }
-
+        .styled-o { display: inline-block; position: relative; color: var(--accent); }
         .styled-o::after {
-            content: '';
-            position: absolute;
-            top: 53%; 
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 33%; 
-            height: 33%;
-            background-color: white;
-            border-radius: 50%;
-            box-shadow: 0 0 8px #fff;
-            z-index: 2;
+            content: ''; position: absolute; top: 53%; left: 50%; transform: translate(-50%, -50%);
+            width: 33%; height: 33%; background-color: white; border-radius: 50%; box-shadow: 0 0 8px #fff; z-index: 2;
         }
 
         /* --- МЕНЮ --- */
-        nav ul {
-            display: flex;
-            gap: 20px;
-        }
-
-        nav a {
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: var(--text-sec);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        nav a:hover {
-            color: var(--accent);
-            text-shadow: 0 0 10px var(--accent-glow);
-        }
+        nav ul { display: flex; gap: 20px; }
+        nav a { font-size: 0.8rem; font-weight: 700; color: var(--text-sec); text-transform: uppercase; letter-spacing: 1px; }
+        nav a:hover { color: var(--accent); text-shadow: 0 0 10px var(--accent-glow); }
 
         .btn-login {
-            padding: 10px 30px;
-            border: 2px solid var(--accent);
-            color: var(--accent);
-            border-radius: 8px;
-            font-weight: 800;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            background: rgba(0, 240, 255, 0.05);
-            white-space: nowrap;
+            padding: 10px 30px; border: 2px solid var(--accent); color: var(--accent);
+            border-radius: 8px; font-weight: 800; font-size: 0.9rem; text-transform: uppercase;
+            letter-spacing: 1px; background: rgba(0, 240, 255, 0.05); white-space: nowrap;
         }
-        
-        .btn-login:hover {
-            background: var(--accent);
-            color: #000;
-            box-shadow: 0 0 20px var(--accent-glow);
-        }
+        .btn-login:hover { background: var(--accent); color: #000; box-shadow: 0 0 20px var(--accent-glow); }
 
         /* --- ГОЛОВНИЙ ЕКРАН --- */
-        .hero {
-            padding: 50px 0;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            min-height: 80vh;
-        }
+        .hero { padding: 50px 0; display: flex; align-items: center; justify-content: space-between; min-height: 80vh; }
+        .hero-content { flex: 1; max-width: 600px; z-index: 2; }
 
-        .hero-content {
-            flex: 1;
-            max-width: 600px;
-            z-index: 2;
-        }
+        h1 { font-size: 3.2rem; line-height: 1.1; margin-bottom: 20px; font-weight: 900; }
+        h1 span { color: transparent; -webkit-background-clip: text; background-clip: text; background-image: linear-gradient(90deg, #fff, var(--accent)); }
 
-        h1 {
-            font-size: 3.2rem;
-            line-height: 1.1;
-            margin-bottom: 20px;
-            font-weight: 900;
-        }
-        
-        h1 span {
-            color: transparent;
-            -webkit-background-clip: text;
-            background-clip: text;
-            background-image: linear-gradient(90deg, #fff, var(--accent));
-        }
-
-        .hero p {
-            font-size: 1.1rem;
-            color: var(--text-sec);
-            margin-bottom: 30px;
-            line-height: 1.6;
-            max-width: 500px;
-        }
+        .hero p { font-size: 1.1rem; color: var(--text-sec); margin-bottom: 30px; line-height: 1.6; max-width: 500px; }
 
         .btn-main {
-            display: inline-block;
-            background: var(--gradient-btn);
-            padding: 18px 45px;
-            border-radius: 50px;
-            font-weight: 800;
-            font-size: 1.1rem;
-            text-transform: uppercase;
-            box-shadow: 0 10px 30px rgba(0, 223, 216, 0.3);
-            color: #fff;
-            letter-spacing: 0.5px;
+            display: inline-block; background: var(--gradient-btn); padding: 18px 45px;
+            border-radius: 50px; font-weight: 800; font-size: 1.1rem; text-transform: uppercase;
+            box-shadow: 0 10px 30px rgba(0, 223, 216, 0.3); color: #fff; letter-spacing: 0.5px;
         }
 
-        .hero-img {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            position: relative;
-        }
-        
+        .hero-img { flex: 1; display: flex; justify-content: center; position: relative; }
         .hero-img img {
-            width: 100%;
-            max-width: 550px;
+            width: 100%; max-width: 550px; mix-blend-mode: screen; animation: float 6s ease-in-out infinite;
             mask-image: radial-gradient(circle, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%);
             -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%);
-            mix-blend-mode: screen; 
-            animation: float 6s ease-in-out infinite;
         }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
-        }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
 
         /* --- СЕКЦІЇ --- */
         section { padding: 80px 0; }
-        
-        .section-title {
-            text-align: center;
-            font-size: 2.2rem;
-            margin-bottom: 50px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
+        .section-title { text-align: center; font-size: 2.2rem; margin-bottom: 50px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
         .section-title span { color: var(--accent); }
 
-        /* --- ГРІД (ВИПРАВЛЕНО ДЛЯ МОБІЛЬНИХ) --- */
-        .grid-3 {
-            display: grid;
-            /* Зменшив мін. ширину з 320px до 280px, щоб не розпирало екран телефону */
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
-        }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
 
         .card {
-            background: var(--bg-card);
-            padding: 35px 25px;
-            border-radius: 16px;
-            border: 1px solid rgba(255,255,255,0.05);
-            transition: 0.3s;
-            position: relative;
-            overflow: hidden;
+            background: var(--bg-card); padding: 35px 25px; border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; position: relative; overflow: hidden;
         }
-        .card:hover {
-            border-color: var(--accent);
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
+        .card:hover { border-color: var(--accent); transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .card h3 { margin: 15px 0 10px 0; color: #fff; font-size: 1.2rem; }
-        .card p, .card li { color: var(--text-sec); line-height: 1.5; font-size: 0.95rem; }
+        .card p { color: var(--text-sec); line-height: 1.5; font-size: 0.95rem; }
         .card-icon {
             font-size: 2rem; margin-bottom: 15px; color: var(--accent);
             background: rgba(0, 240, 255, 0.1); width: 60px; height: 60px;
@@ -253,13 +137,8 @@
 
         /* --- ТАРИФИ --- */
         .price-card {
-            background: var(--bg-card);
-            padding: 40px 30px;
-            border-radius: 20px;
-            text-align: center;
-            border: 1px solid rgba(255,255,255,0.05);
-            position: relative;
-            display: flex; flex-direction: column;
+            background: var(--bg-card); padding: 40px 30px; border-radius: 20px;
+            text-align: center; border: 1px solid rgba(255,255,255,0.05); position: relative; display: flex; flex-direction: column;
         }
         .price-card.popular { border-color: var(--accent); background: rgba(0, 240, 255, 0.03); }
         .price { font-size: 2.5rem; font-weight: 900; margin: 20px 0; color: #fff; }
@@ -280,8 +159,7 @@
         .contact-grid { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
         .contact-btn {
             display: flex; align-items: center; gap: 10px; padding: 15px 30px;
-            border-radius: 12px; font-weight: bold; background: var(--bg-card);
-            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px; font-weight: bold; background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1);
         }
         .contact-btn:hover { border-color: var(--accent); color: var(--accent); }
 
@@ -290,45 +168,17 @@
             border-top: 1px solid rgba(255,255,255,0.05); font-size: 0.8rem; color: var(--text-sec);
         }
 
-        /* --- МОБІЛЬНА АДАПТАЦІЯ (КЛЮЧОВІ ВИПРАВЛЕННЯ) --- */
         @media (max-width: 900px) {
-            h1 { font-size: 2.2rem; text-align: center; } /* Центруємо заголовок */
-            
-            /* Вирівнюємо весь блок Hero по центру */
+            h1 { font-size: 2.2rem; text-align: center; }
             .hero { flex-direction: column-reverse; text-align: center; padding-top: 20px; }
             .hero-content { margin-top: 30px; width: 100%; display: flex; flex-direction: column; align-items: center; }
-            .hero p { margin: 0 auto 30px auto; max-width: 100%; text-align: center; }
-            
-            .nav-wrapper { 
-                flex-wrap: wrap; 
-                gap: 15px; 
-                justify-content: space-between; 
-            }
-            
+            .hero p { margin: 0 auto 30px auto; text-align: center; }
+            .nav-wrapper { flex-wrap: wrap; gap: 15px; justify-content: space-between; }
             .logo-text { font-size: 1.4rem; }
-
-            /* Меню прокручується горизонтально, але не розтягує сайт */
-            nav {
-                width: 100%; 
-                order: 3; 
-                margin-top: 10px; 
-                overflow-x: auto; 
-                padding-bottom: 5px;
-            }
-            nav ul { 
-                justify-content: space-between; /* Розподіляємо пункти рівномірно */
-                gap: 20px; 
-                white-space: nowrap; 
-                padding: 0 5px; 
-            }
-            
+            nav { width: 100%; order: 3; margin-top: 10px; overflow-x: auto; padding-bottom: 5px; }
+            nav ul { justify-content: space-between; gap: 20px; white-space: nowrap; padding: 0 5px; }
             .btn-login { margin-left: 0; padding: 10px 20px; font-size: 0.9rem; }
-            
             .hero-img img { max-width: 80%; }
-            
-            /* Адаптація списків */
-            .install-list span { display: block; }
-            .install-step { white-space: normal; }
         }
     </style>
 </head>
@@ -341,13 +191,11 @@
                     <span class="text-white">Комуналк</span><span class="text-neon"><span class="styled-o">О</span>блік</span>
                 </div>
             </a>
-
             <a href="app/index.html" class="btn-login">Увійти</a>
-
             <nav>
                 <ul>
                     <li><a href="#">Головна</a></li>
-                    <li><a href="#about">Функції</a></li>
+                    <li><a href="#about">Можливості</a></li>
                     <li><a href="#pricing">Тарифи</a></li>
                     <li><a href="#install" style="color:var(--accent)">Встановити</a></li>
                     <li><a href="#contact">Контакти</a></li>
@@ -359,66 +207,91 @@
     <section class="hero">
         <div class="container" style="display: flex; flex-wrap: wrap; align-items: center; width: 100%;">
             <div class="hero-content">
-                <h1>Цифровий облік <br><span>комунальних послуг</span></h1>
+                <h1>Цифровий облік <br><span>чесних розрахунків</span></h1>
                 <p>
-                    Єдиний додаток для обліку квартир, автоматичного розрахунку МЗК та формування квитанцій. Безпечно, зручно та завжди під рукою.
+                    Найзручніша система для розподілу витрат між орендарями, сусідами або партнерами по бізнесу. Точність у кожній цифрі.
                 </p>
                 <a href="app/index.html" class="btn-main">Спробувати безкоштовно</a>
             </div>
             <div class="hero-img">
-                <img src="hero-img.png" alt="App Visualization">
+                <img src="hero-img.png" alt="Comunalco Visualization">
             </div>
         </div>
     </section>
 
     <section id="about">
         <div class="container">
-            <h2 class="section-title">Чому <span>Comunalco?</span></h2>
+            <h2 class="section-title">Чому <span>Comunalco</span> — це вигідно?</h2>
             <div class="grid-3">
-                <div class="card">
-                    <div class="card-icon">🏢</div>
-                    <h3>Мульти-об'єкти</h3>
-                    <p>Додавайте необмежену кількість об'єктів (будинків) та квартир. Створюйте групи та ведіть облік орендарів в одному місці.</p>
-                </div>
-                <div class="card">
-                    <div class="card-icon">⚡</div>
-                    <h3>Гнучкі Тарифи</h3>
-                    <p>Налаштуйте ціни на світло (день/ніч), воду та газ. Додавайте власні фіксовані послуги, наприклад "Інтернет" чи "Охорона".</p>
-                </div>
+                
                 <div class="card">
                     <div class="card-icon">🧮</div>
                     <h3>Розумний МЗК</h3>
-                    <p>Система автоматично вираховує різницю між загальним лічильником та сумою квартир і справедливо розподіляє витрати.</p>
+                    <p>Додаток автоматично знаходить різницю між головним лічильником та сумою всіх маленьких. Ці спільні витрати система чесно ділить між усіма учасниками порівну.</p>
                 </div>
+
+                <div class="card">
+                    <div class="card-icon">🚀</div>
+                    <h3>Абсолютна Гнучкість</h3>
+                    <p>Використовуйте додаток для будь-чого! Перейменуйте «Об'єкт» на назву офісу чи гаража, а «Квартири» — на імена людей. Називайте видатки як забажаєте.</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon">🔋</div>
+                    <h3>100% Автономність</h3>
+                    <p>Програма працює прямо у вашому браузері без інтернету. Вносьте цифри навіть у підвалах чи під час блекауту — все буде працювати стабільно.</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon">⚡</div>
+                    <h3>Багатотарифний Облік</h3>
+                    <p>Легко рахуйте світло за тарифами «День/Ніч», воду та газ. Також ви можете додавати будь-які свої послуги: інтернет, охорону чи прибирання.</p>
+                </div>
+
                 <div class="card">
                     <div class="card-icon">📄</div>
-                    <h3>Звіти та PDF</h3>
-                    <p>Формуйте професійні квитанції у форматі PDF або відправляйте короткі текстові звіти в месенджери за 1 клік.</p>
+                    <h3>Професійні PDF-Рахунки</h3>
+                    <p>Створюйте гарні квитанції з усіма деталями розрахунку та вашими банківськими реквізитами. Професійний вигляд — довіра ваших клієнтів.</p>
                 </div>
+
                 <div class="card">
-                    <div class="card-icon">🔒</div>
-                    <h3>Повна Приватність</h3>
-                    <p>Ми не зберігаємо ваші дані на серверах. Вся інформація зашифрована і зберігається локально на вашому пристрої.</p>
+                    <div class="card-icon">💬</div>
+                    <h3>Миттєва Відправка</h3>
+                    <p>Не витрачайте час на переписування цифр вручну. Натисніть одну кнопку, і додаток сам відправить готовий розрахунок у Viber, Telegram чи WhatsApp.</p>
                 </div>
+
+                <div class="card" style="border-color: rgba(0, 240, 255, 0.3);">
+                    <div class="card-icon">📉</div>
+                    <h3>Контроль Боргів та Оплат</h3>
+                    <p>Все просто: якщо людина винна гроші — пишіть суму з плюсом <b>(+)</b>, і вона додасться до чека. Якщо людина переплатила наперед — пишіть суму з мінусом <b>(-)</b>.</p>
+                </div>
+
                 <div class="card">
-                    <div class="card-icon">💾</div>
-                    <h3>Резервні копії</h3>
-                    <p>Легко створюйте бекап даних у файл, щоб перенести їх на інший телефон або зберегти на комп'ютері.</p>
+                    <div class="card-icon">🛡️</div>
+                    <h3>Свобода та Безпека</h3>
+                    <p>Ваша база — це тільки ваша власність. Ви самі обираєте, куди зберегти копію (бекап): у пам'ять телефону, на флешку чи на власний Google Диск.</p>
                 </div>
+
+                <div class="card">
+                    <div class="card-icon">🗓️</div>
+                    <h3>Закриття Місяця</h3>
+                    <p>Коли місяць закінчився, натисніть кнопку — і всі вчорашні показники самі стануть «минулими», а суми оплат скинуться. Жодних помилок та плутанини.</p>
+                </div>
+
             </div>
         </div>
     </section>
 
     <section id="pricing" style="background: rgba(255,255,255,0.02);">
         <div class="container">
-            <h2 class="section-title">Тарифи</h2>
+            <h2 class="section-title">Тарифні <span>Плани</span></h2>
             <div class="grid-3">
                 <div class="price-card">
                     <h3>Start</h3>
                     <div class="price">0 <span>грн</span></div>
                     <ul class="price-features">
-                        <li>До 2 квартир</li>
-                        <li>Всі базові функції</li>
+                        <li>До 2 точок обліку</li>
+                        <li>Базовий розрахунок</li>
                         <li>Без обмежень у часі</li>
                     </ul>
                     <a href="app/index.html" class="btn-login" style="display:block; margin-top:auto">Почати</a>
@@ -428,18 +301,18 @@
                     <h3>Рантьє</h3>
                     <div class="price">50 <span>грн/міс</span></div>
                     <ul class="price-features">
-                        <li>До 10 квартир</li>
-                        <li>PDF квитанції</li>
-                        <li>Пріоритетна підтримка</li>
+                        <li>До 10 об'єктів</li>
+                        <li>PDF рахунки</li>
+                        <li>Технічна підтримка</li>
                     </ul>
                     <a href="app/index.html" class="btn-main" style="width:100%; font-size:1rem; padding:12px; margin-top:auto">Обрати</a>
                 </div>
                 <div class="price-card">
-                    <h3>PRO</h3>
+                    <h3>PRO / VIP</h3>
                     <div class="price">∞</div>
                     <ul class="price-features">
-                        <li>Безліміт квартир</li>
-                        <li>Для ОСББ та бізнесу</li>
+                        <li>Безліміт об'єктів</li>
+                        <li>Для бізнесу та ОСББ</li>
                         <li>Lifetime ліцензія</li>
                     </ul>
                     <a href="app/index.html" class="btn-login" style="display:block; margin-top:auto">Деталі</a>
@@ -456,35 +329,27 @@
                     <div class="card-icon">🤖</div>
                     <h3>Android</h3>
                     <ul class="install-list">
-                        <li><span class="install-text">Відкрийте цей сайт у <strong>Chrome</strong>.</span></li>
-                        <li><span class="install-text">Натисніть три крапки (⋮) у верхньому правому куті.</span></li>
+                        <li><span class="install-text">Відкрийте сайт у <strong>Chrome</strong>.</span></li>
+                        <li><span class="install-text">Натисніть три крапки (⋮) вгорі.</span></li>
                         <li><span class="install-text">Оберіть <span class="install-step">"Встановити додаток"</span>.</span></li>
                     </ul>
                 </div>
-
                 <div class="card">
                     <div class="card-icon">🍎</div>
                     <h3>iPhone / iPad</h3>
                     <ul class="install-list">
-                        <li><span class="install-text">Відкрийте цей сайт у <strong>Safari</strong>.</span></li>
-                        <li><span class="install-text">Натисніть кнопку "Поділитися" (квадрат зі стрілкою вгору).</span></li>
-                        <li><span class="install-text">Прокрутіть вниз і оберіть <span class="install-step">"На початковий екран"</span>.</span></li>
+                        <li><span class="install-text">Відкрийте сайт у <strong>Safari</strong>.</span></li>
+                        <li><span class="install-text">Натисніть кнопку "Поділитися" (квадрат зі стрілкою).</span></li>
+                        <li><span class="install-text">Оберіть <span class="install-step">"На початковий екран"</span>.</span></li>
                     </ul>
                 </div>
-
                 <div class="card">
                     <div class="card-icon">💻</div>
                     <h3>Windows / Mac</h3>
                     <ul class="install-list">
-                        <li><span class="install-text">Відкрийте сайт у <strong>Chrome</strong> або <strong>Edge</strong>.</span></li>
-                        <li>
-                            <span class="install-text">
-                            У рядку адреси праворуч натисніть іконку:
-                            <br><br>Chrome: <span class="install-step">🖥️⬇ (Монітор зі стрілкою)</span>
-                            <br>Edge: &nbsp;&nbsp;&nbsp;<span class="install-step">➕ (Плюс)</span>
-                            </span>
-                        </li>
-                        <li><span class="install-text">Натисніть її та підтвердіть встановлення.</span></li>
+                        <li><span class="install-text">У рядку адреси браузера натисніть:</span></li>
+                        <li><span class="install-text">Chrome: <span class="install-step">🖥️⬇ (Встановити)</span></span></li>
+                        <li><span class="install-text">Edge: <span class="install-step">➕ (Плюс)</span></span></li>
                     </ul>
                 </div>
             </div>
@@ -493,9 +358,9 @@
 
     <section id="contact">
         <div class="container" style="text-align: center;">
-            <h2 class="section-title">Зв'яжіться з <span>нами</span></h2>
+            <h2 class="section-title">Завжди на <span>зв'язку</span></h2>
             <p style="color:var(--text-sec); margin-bottom:40px; max-width:600px; margin-left:auto; margin-right:auto;">
-                Маєте питання щодо роботи сервісу або пропозиції? Ми відповідаємо швидко.
+                Маєте запитання або ідеї щодо нових функцій? Пишіть нам, ми швидко відповідаємо.
             </p>
             <div class="contact-grid">
                 <a href="https://t.me/comunalco" target="_blank" class="contact-btn">
