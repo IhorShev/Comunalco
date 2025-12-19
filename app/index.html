@@ -56,13 +56,11 @@
         /* UI Elements */
         .top-menu-bar { display: flex; justify-content: center; gap: 20px; font-size: 12px; font-weight: 700; color: var(--text-sec); margin-bottom: 15px; padding-top: 5px; text-transform: uppercase; letter-spacing: 1px; align-items: center; }
         .top-menu-bar span { cursor: pointer; display: flex; align-items: center; gap: 5px; }
-        
-        /* Кнопка теми в меню */
         .theme-toggle-btn { background: none; border: none; cursor: pointer; font-size: 16px; padding: 0; }
 
         .brand-header { display: flex; align-items: center; justify-content: center; margin: 5px 0 20px 0; }
         
-        /* Стиль текстового логотипа */
+        /* Стиль логотипа */
         .logo-brand-text {
             font-family: 'Montserrat', sans-serif;
             font-size: 28px;
@@ -88,7 +86,7 @@
         .nav-btn { font-size: 24px; color: var(--primary); padding: 5px; cursor: pointer; }
         .object-title { font-size: 16px; font-weight: 700; border: none; text-align: center; width: 100%; background: transparent; color: var(--text); text-transform: uppercase; font-family: 'Montserrat', sans-serif; }
         
-        .status-badge { font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 6px; text-transform: uppercase; display: inline-block; margin-top: 2px; background: var(--border); color: var(--text-sec); cursor: pointer; }
+        .status-badge { font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 6px; text-transform: uppercase; display: inline-block; background: var(--border); color: var(--text-sec); cursor: pointer; }
         .status-pro { background: linear-gradient(135deg, #0099ff, #0066cc); color: white; box-shadow: 0 2px 5px rgba(0,153,255,0.3); }
         .status-vip { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; box-shadow: 0 2px 5px rgba(245,158,11,0.3); }
 
@@ -154,16 +152,22 @@
 
     <div class="app-header">
         <div class="nav-btn" onclick="app.prevObject()">❮</div>
+        
         <div style="flex:1; text-align:center; position: relative;">
             <div style="display:flex; align-items:center; justify-content:center; gap:5px;">
                 <input type="text" id="object-title" class="object-title" value="Мій Об'єкт" onchange="app.updateObjectName(this.value)" placeholder="НАЗВА ОБ'ЄКТУ">
-                <span onclick="app.deleteObject()" style="color:var(--danger); cursor:pointer; font-size:16px;">🗑</span>
+                <span onclick="app.deleteObject()" style="color:var(--danger); cursor:pointer; font-size:16px;" title="Видалити об'єкт">🗑</span>
             </div>
-            <div id="status-badge" class="status-badge" onclick="app.openMenu('premium')">FREE</div>
+            
+            <div style="display:flex; align-items:center; justify-content:center; gap: 15px; margin-top: 4px;">
+                <div id="status-badge" class="status-badge" onclick="app.openMenu('premium')">FREE</div>
+                <div onclick="app.addObject()" style="cursor:pointer; color:var(--primary); font-weight:900; font-size:22px; line-height:12px;" title="Додати об'єкт">+</div>
+            </div>
         </div>
-        <div class="nav-btn" onclick="app.addObject()" title="Додати об'єкт">+</div>
+
         <div class="nav-btn" onclick="app.nextObject()">❯</div>
     </div>
+    
     <div id="main-content-wrapper">
         <details>
             <summary>⚙️ Тарифи та Реквізити</summary>
@@ -275,6 +279,7 @@
             <button id="btn-do-pay" class="btn btn-success" disabled onclick="app.processPayment()" style="margin-top:15px;">💳 Отримати ключ</button>
         </div>
     </div>
+
 <script>
 class App {
     constructor() {
@@ -336,7 +341,7 @@ class App {
             try { 
                 this.state = JSON.parse(d); 
                 if(!this.state.objects.length) this.state.objects=[this.createDefaultObject()];
-                // Migration for old versions (add custom_counters if missing)
+                // Migration for old versions
                 this.state.objects.forEach(o => {
                     o.groups.forEach(g => { if(!g.custom_counters) g.custom_counters = []; });
                     o.apartments.forEach(a => { if(!a.custom_counters) a.custom_counters = []; });
@@ -490,7 +495,6 @@ class App {
 
     // --- CUSTOM COUNTERS LOGIC ---
     renderCustomCounterRow(type, parentIdx, cIdx, cData) {
-        // type: 'group' or 'apt'
         return `
         <div class="counter-row">
             <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
@@ -772,6 +776,15 @@ class App {
 }
 const app = new App();
 </script>
+<script>
+    // Реєстрація Service Worker
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js')
+                .then(reg => console.log('SW Registered!', reg))
+                .catch(err => console.log('SW Error:', err));
+        });
+    }
+</script>
 </body>
 </html>
-
