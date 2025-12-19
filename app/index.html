@@ -54,18 +54,38 @@
         }
 
         /* UI Elements */
-        .top-menu-bar { display: flex; justify-content: center; gap: 20px; font-size: 12px; font-weight: 700; color: var(--text-sec); margin-bottom: 15px; padding-top: 5px; text-transform: uppercase; letter-spacing: 1px; }
+        .top-menu-bar { display: flex; justify-content: center; gap: 20px; font-size: 12px; font-weight: 700; color: var(--text-sec); margin-bottom: 15px; padding-top: 5px; text-transform: uppercase; letter-spacing: 1px; align-items: center; }
         .top-menu-bar span { cursor: pointer; display: flex; align-items: center; gap: 5px; }
+        
+        /* Кнопка теми в меню */
+        .theme-toggle-btn { background: none; border: none; cursor: pointer; font-size: 16px; padding: 0; }
 
         .brand-header { display: flex; align-items: center; justify-content: center; margin: 5px 0 20px 0; }
-        /* Оновлений стиль для логотипа */
-        .brand-logo-img { max-height: 55px; width: auto; object-fit: contain; border-radius: 12px; }
-        .brand-text-fallback { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 26px; color: var(--text); display: none; }
-        .brand-text-fallback span { color: var(--primary); }
+        
+        /* Стиль текстового логотипа */
+        .logo-brand-text {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 28px;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+        .txt-main { color: var(--text); }
+        .txt-neon { color: var(--primary); text-shadow: 0 0 15px rgba(0, 153, 255, 0.4); position: relative; }
+        .styled-o { display: inline-block; position: relative; }
+        .styled-o::after {
+            content: ''; position: absolute;
+            top: 53%; left: 50%; transform: translate(-50%, -50%);
+            width: 30%; height: 30%;
+            background-color: var(--bg);
+            border-radius: 50%;
+            z-index: 2;
+        }
 
         .app-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; background: var(--header-bg); padding: 8px 12px; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         .nav-btn { font-size: 24px; color: var(--primary); padding: 5px; cursor: pointer; }
-        .theme-btn { font-size: 20px; background: none; border: none; cursor: pointer; }
         .object-title { font-size: 16px; font-weight: 700; border: none; text-align: center; width: 100%; background: transparent; color: var(--text); text-transform: uppercase; font-family: 'Montserrat', sans-serif; }
         
         .status-badge { font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 6px; text-transform: uppercase; display: inline-block; margin-top: 2px; background: var(--border); color: var(--text-sec); cursor: pointer; }
@@ -79,17 +99,16 @@
         label { display: block; font-size: 11px; color: var(--text-sec); margin-bottom: 4px; font-weight: 600; }
         input, select { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 12px; font-size: 16px; background: var(--input-bg); color: var(--text); box-sizing: border-box; transition: 0.2s; }
         input:focus { border-color: var(--primary); outline: none; }
-        input:disabled { opacity: 0.6; cursor: not-allowed; }
-
+        
         .btn { display: flex; justify-content: center; align-items: center; width: 100%; padding: 12px; border: none; border-radius: 12px; font-size: 14px; font-weight: 600; cursor: pointer; color: white; transition: 0.2s; text-align: center; }
         .btn:active { transform: scale(0.98); }
-        .btn:disabled { background: var(--border); color: var(--text-sec); cursor: not-allowed; transform: none; box-shadow: none; }
         .btn-primary { background: var(--primary); }
         .btn-success { background: var(--success); }
         .btn-warning { background: var(--gold); color: white; }
         .btn-danger { background: var(--danger); }
         .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
-        .btn-add { background: rgba(0, 153, 255, 0.1); color: var(--primary); border: 1px dashed var(--primary); margin-top: 10px; }
+        .btn-add { background: rgba(0, 153, 255, 0.1); color: var(--primary); border: 1px dashed var(--primary); margin-top: 10px; font-size: 12px; }
+        .btn-add-counter { background: rgba(245, 158, 11, 0.1); color: var(--gold); border: 1px dashed var(--gold); margin-top: 5px; font-size: 12px; }
         .btn-sm { padding: 8px 12px; font-size: 12px; width: auto; }
         
         .btn-viber { background: var(--viber); color: white; border: none; }
@@ -100,11 +119,6 @@
         summary { padding: 15px; background: rgba(0,0,0,0.02); font-weight: 600; cursor: pointer; display: flex; justify-content: space-between; align-items: center; list-style: none; color: var(--text); }
         .content { padding: 20px; border-top: 1px solid var(--border); }
         
-        .info-block h4 { margin: 15px 0 5px 0; color: var(--primary); font-size: 14px; }
-        .info-block p { font-size: 13px; color: var(--text-sec); margin: 0 0 10px 0; }
-        .info-block ul { margin: 0 0 10px 0; padding-left: 20px; font-size: 13px; color: var(--text-sec); }
-        .info-block li { margin-bottom: 4px; }
-
         .sticky-footer { position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%); width: 95%; max-width: 500px; background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 10px; display: flex; justify-content: center; gap: 8px; z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
 
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; backdrop-filter: blur(5px); align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; }
@@ -113,47 +127,48 @@
         
         .custom-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
         .del-icon { color: var(--danger); font-size: 20px; padding: 0 8px; cursor: pointer; }
+        .counter-row { background: rgba(0,0,0,0.02); padding: 8px; border-radius: 8px; margin-bottom: 8px; border: 1px solid var(--border); }
 
         .price-card { border: 1px solid var(--border); border-radius: 12px; padding: 15px; margin-bottom: 15px; background: var(--bg); position: relative; overflow: hidden; }
         .price-card.popular { border-color: var(--primary); background: rgba(0, 153, 255, 0.03); }
-        .price-card.vip { border-color: var(--gold); background: rgba(245, 158, 11, 0.05); }
         .price-badge { position: absolute; top: 0; right: 0; background: var(--primary); color: white; font-size: 10px; padding: 3px 8px; border-bottom-left-radius: 8px; font-weight: bold; }
         .price-title { font-size: 16px; font-weight: 900; margin-bottom: 5px; text-transform: uppercase; font-family: 'Montserrat', sans-serif; }
         .price-val { font-size: 20px; font-weight: bold; color: var(--text); margin-bottom: 5px; }
-        .price-sub { font-size: 11px; color: var(--text-sec); margin-bottom: 10px; }
-        
-        .contact-check-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; color: var(--success); background: rgba(16, 185, 129, 0.1); padding: 2px 6px; border-radius: 4px; margin-top: 5px; }
     </style>
 </head>
 <body>
 
     <div class="top-menu-bar">
+        <button class="theme-toggle-btn" onclick="app.toggleTheme()" id="theme-icon">🌗</button>
         <span onclick="app.openMenu('info')">ℹ️ Інфо</span>
         <span onclick="app.openMenu('premium')" style="color:var(--primary)">💎 PRO</span>
         <span onclick="app.openMenu('contacts')">📞 Контакти</span>
     </div>
 
     <div class="brand-header">
-        <img src="icon.png" alt="КомуналкОблік" class="brand-logo-img" onerror="document.querySelector('.brand-text-fallback').style.display='block'; this.style.display='none';">
-        <div class="brand-text-fallback">Комуналк<span>Облік</span></div>
+        <div class="logo-brand-text">
+            <span class="txt-main">Комуналк</span>
+            <span class="txt-neon"><span class="styled-o">О</span>блік</span>
+        </div>
     </div>
 
     <div class="app-header">
-        <button class="theme-btn" onclick="app.toggleTheme()" id="theme-icon">🌗</button>
         <div class="nav-btn" onclick="app.prevObject()">❮</div>
-        <div style="flex:1; text-align:center;">
-            <input type="text" id="object-title" class="object-title" value="Мій Об'єкт" onchange="app.updateObjectName(this.value)" placeholder="НАЗВА ОБ'ЄКТУ">
+        <div style="flex:1; text-align:center; position: relative;">
+            <div style="display:flex; align-items:center; justify-content:center; gap:5px;">
+                <input type="text" id="object-title" class="object-title" value="Мій Об'єкт" onchange="app.updateObjectName(this.value)" placeholder="НАЗВА ОБ'ЄКТУ">
+                <span onclick="app.deleteObject()" style="color:var(--danger); cursor:pointer; font-size:16px;">🗑</span>
+            </div>
             <div id="status-badge" class="status-badge" onclick="app.openMenu('premium')">FREE</div>
         </div>
         <div class="nav-btn" onclick="app.addObject()" title="Додати об'єкт">+</div>
         <div class="nav-btn" onclick="app.nextObject()">❯</div>
     </div>
-    
     <div id="main-content-wrapper">
         <details>
             <summary>⚙️ Тарифи та Реквізити</summary>
             <div class="content">
-                <div class="section-title">Тарифи (грн)</div>
+                <div class="section-title">Базові Тарифи (грн)</div>
                 <div class="row">
                     <div class="col"><label>⚡ День</label><input type="number" id="t_ed" onchange="app.setTariff('el_d',this.value)"></div>
                     <div class="col"><label>🌙 Ніч</label><input type="number" id="t_en" onchange="app.setTariff('el_n',this.value)"></div>
@@ -214,34 +229,16 @@
             <h3 style="margin-top:0; text-align:center;" id="menu-title">Меню</h3>
             
             <div id="menu-content-info" style="display:none" class="info-block">
-                <p style="text-align:center;"><strong>КомуналкОблік v2.9</strong></p>
+                <p style="text-align:center;"><strong>КомуналкОблік v3.0</strong></p>
                 <hr style="border:0; border-top:1px solid var(--border)">
-                
-                <h4>🏠 Об'єкти та Квартири</h4>
-                <p>Натискайте на назву Об'єкту (зверху) або Квартири, щоб перейменувати їх. До кожного об'єкту можна додати окремі тарифи.</p>
-                
-                <h4>📊 Як рахується МЗК?</h4>
-                <p>МЗК (Місця Загального Користування) розраховуються автоматично:</p>
+                <h4>🏠 Нове в версії 3.0</h4>
                 <ul>
-                    <li>Береться різниця між загальним лічильником (Вхідна група) та сумою всіх квартир.</li>
-                    <li>Ця різниця множиться на тариф (Втрати).</li>
-                    <li>Додаються фіксовані витрати (напр. Прибирання), які ви додали в меню "Тарифи".</li>
-                    <li>Загальна сума ділиться порівну на кількість квартир.</li>
+                    <li>Додавайте власні лічильники!</li>
+                    <li>Видалення об'єктів.</li>
+                    <li>Оновлений дизайн.</li>
                 </ul>
-
-                <h4>➕ Послуги та Тарифи</h4>
-                <p>Ви можете додати індивідуальні послуги для кожної квартири (напр. "Інтернет") або загальні витрати на будинок.</p>
-
-                <h4>📤 Експорт та Відправка</h4>
-                <p>Після розрахунку ви можете: Відправити текст квитанції в Telegram, Viber, WhatsApp або Зберегти красивий PDF файл.</p>
-
-                <h4>💾 Дані та Безпека</h4>
-                <p>Всі дані зберігаються тільки на вашому пристрої. 
-                <br><strong>Зберегти:</strong> Створює файл бекапу.
-                <br><strong>Завантажити:</strong> Відновлює дані з файлу.</p>
-
-                <h4>🗓 Закриття місяця</h4>
-                <p>Кнопка "Закрити місяць" переносить поточні показники в "Минулі" та обнуляє оплати.</p>
+                <h4>📊 Як рахується МЗК?</h4>
+                <p>Різниця між загальним лічильником та сумою квартир ділиться на всіх.</p>
             </div>
 
             <div id="menu-content-premium" style="display:none">
@@ -258,14 +255,9 @@
 
             <div id="menu-content-contacts" style="display:none">
                 <div style="text-align:center;">
-                    <p>Виникли питання або пропозиції?</p>
-                    <p style="font-weight:bold; margin-bottom:5px;">Telegram Підтримка:</p>
+                    <p>Telegram Підтримка:</p>
                     <a href="https://t.me/comunalco" target="_blank" class="btn btn-telegram" style="text-decoration:none; margin-bottom:15px;">@comunalco</a>
-                    
-                    <p style="font-weight:bold; margin-bottom:5px;">Email:</p>
                     <a href="mailto:support@comunalco.com" class="btn btn-outline" style="text-decoration:none; color:var(--text); border-color:var(--border)">support@comunalco.com</a>
-                    
-                    <p style="font-size:11px; color:var(--text-sec); margin-top:20px;">Ми відповідаємо протягом 24 годин.</p>
                 </div>
             </div>
         </div>
@@ -276,29 +268,17 @@
             <span class="modal-close" onclick="document.getElementById('payModal').style.display='none'">&times;</span>
             <h3 style="margin-top:0; text-align:center;">Оформлення підписки</h3>
             <div id="pay-details" style="text-align:center; font-weight:bold; margin-bottom:15px; color:var(--primary);"></div>
-            
-            <label>Ваш Telegram (для відправки ключа)</label>
-            <input type="text" id="pay-contact" placeholder="@username або номер" oninput="app.validatePayForm()">
-            
-            <label style="margin-top:10px;">Email (резерв)</label>
+            <label>Ваш Telegram</label>
+            <input type="text" id="pay-contact" placeholder="@username" oninput="app.validatePayForm()">
+            <label style="margin-top:10px;">Email</label>
             <input type="email" id="pay-email" placeholder="mail@example.com" oninput="app.validatePayForm()">
-
-            <div style="margin: 15px 0;">
-                 <button class="btn btn-outline btn-sm" onclick="alert('Тестове повідомлення відправлено! (Симуляція)')">🔔 Перевірити зв'язок</button>
-                 <div id="test-msg-status" style="font-size:10px; color:var(--success); display:none; text-align:center; margin-top:5px;">Зв'язок підтверджено ✅</div>
-            </div>
-
-            <button id="btn-do-pay" class="btn btn-success" disabled onclick="app.processPayment()">💳 Сплатити та Отримати ключ</button>
-            <div style="font-size:10px; color:var(--text-sec); text-align:center; margin-top:10px;">Дані будуть передані для реєстрації</div>
+            <button id="btn-do-pay" class="btn btn-success" disabled onclick="app.processPayment()" style="margin-top:15px;">💳 Отримати ключ</button>
         </div>
     </div>
 <script>
 class App {
     constructor() {
-        // --- КОНФІГУРАЦІЯ ЛІМІТІВ ---
         this.LIMITS = { free: 2, standard: 10, pro: 9999, vip: 9999 };
-        
-        // --- ТАРИФНІ ПЛАНИ ---
         this.TARIFF_PLANS = [
             { id: 'std_6', name: 'Рантьє (6 міс)', limit: 10, price: 300, desc: 'До 10 квартир. 50 грн/міс' },
             { id: 'std_12', name: 'Рантьє (1 рік)', limit: 10, price: 499, desc: 'До 10 квартир. Вигода 17%', isPopular: true },
@@ -307,190 +287,46 @@ class App {
             { id: 'vip', name: 'LIFETIME', limit: 9999, price: 2900, desc: 'Назавжди. Оплата 1 раз.', isVip: true }
         ];
 
-        this.state = { 
-            license: { type: 'free', exp: null, contact: '' },
-            currentObjIdx: 0, 
-            objects: [] 
-        };
+        this.state = { license: { type: 'free', exp: null }, currentObjIdx: 0, objects: [] };
         this.checks = {};
-        this.STORAGE_KEY = 'komunalka_v29_pro'; 
+        this.STORAGE_KEY = 'komunalka_v30_pro'; 
         this.pendingPayment = null; 
         this.init();
     }
     
-    init() { 
-        this.load(); 
-        this.initTheme(); 
-        this.renderAll(); 
-        this.updateStatus(); 
-    }
+    init() { this.load(); this.initTheme(); this.renderAll(); this.updateStatus(); }
     
-    // --- ЛОГІКА МЕНЮ ТА ОПЛАТИ ---
-
-    openMenu(id) {
-        document.getElementById('menuModal').style.display='flex';
-        // Ховаємо всі секції
-        ['info','premium','contacts'].forEach(k => document.getElementById('menu-content-'+k).style.display='none');
-        
-        // Показуємо потрібну
-        const el = document.getElementById('menu-content-'+id);
-        if(el) el.style.display='block';
-
-        // Заголовок
-        const titles = { info: 'ℹ️ Інфо', premium: '💎 Магазин', contacts: '📞 Контакти' };
-        document.getElementById('menu-title').innerText = titles[id] || 'Меню';
-
-        // Якщо відкрили преміум - рендеримо тарифи
-        if(id === 'premium') this.renderTariffs();
-    }
-
-    renderTariffs() {
-        const container = document.getElementById('tariffs-list');
-        container.innerHTML = this.TARIFF_PLANS.map(plan => `
-            <div class="price-card ${plan.isPopular ? 'popular' : ''} ${plan.isVip ? 'vip' : ''}">
-                ${plan.isPopular ? '<div class="price-badge">ХІТ 🔥</div>' : ''}
-                ${plan.isVip ? '<div class="price-badge" style="background:var(--gold)">VIP 👑</div>' : ''}
-                <div class="price-title">${plan.name}</div>
-                <div class="price-val">${plan.price} грн</div>
-                <div class="price-sub">${plan.desc}</div>
-                <button class="btn ${plan.isVip ? 'btn-warning' : 'btn-primary'}" onclick="app.initPay('${plan.id}')">Сплатити</button>
-            </div>
-        `).join('');
-    }
-
-    initPay(planId) {
-        const plan = this.TARIFF_PLANS.find(p => p.id === planId);
-        if(!plan) return;
-        
-        this.pendingPayment = plan;
-        document.getElementById('menuModal').style.display = 'none';
-        document.getElementById('payModal').style.display = 'flex';
-        document.getElementById('pay-details').innerText = `${plan.name} — ${plan.price} грн`;
-        this.validatePayForm();
-    }
-
-    validatePayForm() {
-        const contact = document.getElementById('pay-contact').value;
-        const email = document.getElementById('pay-email').value;
-        const btn = document.getElementById('btn-do-pay');
-        
-        // Валідація: має бути заповнений хоча б контакт
-        if(contact.length > 3 || email.length > 5) {
-            btn.disabled = false;
-        } else {
-            btn.disabled = true;
-        }
-    }
-
-    processPayment() {
-        const contact = document.getElementById('pay-contact').value;
-        const email = document.getElementById('pay-email').value;
-        const plan = this.pendingPayment;
-        
-        if(!plan) return;
-
-        // Формуємо текст повідомлення
-        const text = `👋 Вітаю! Хочу оформити підписку.\n\n🏷 Тариф: ${plan.name}\n💰 Сума: ${plan.price} грн\n👤 Мій контакт: ${contact}\n📧 Email: ${email || 'не вказано'}`;
-        
-        // Кодуємо текст для посилання
-        const encodedText = encodeURIComponent(text);
-        
-        // ВАЖЛИВО: Замініть 'comunalco' на ВАШ реальний нікнейм у Telegram (без @)
-        // Куди будуть приходити заявки
-        const adminTelegram = 'comunalco'; 
-
-        if(confirm(`Перейти в Telegram для оплати тарифу "${plan.name}"?`)) {
-            // Відкриваємо Telegram з готовим текстом
-            window.open(`https://t.me/${adminTelegram}?text=${encodedText}`, '_blank');
-            document.getElementById('payModal').style.display = 'none';
-        }
-    }
-
-    activatePro() {
-        const keyInput = document.getElementById('activation-key').value.trim();
-        if (!keyInput) return;
-
-        // --- МАЙСТЕР КЛЮЧ ---
-        if (keyInput === "B15sh356pro") {
-            this.state.license = { type: 'vip', exp: '2099-12-31', contact: 'Master' };
-            this.save();
-            alert("👑 Режим РОЗРОБНИКА (VIP) активовано!\nВсі ліміти знято.");
-            location.reload();
-            return;
-        }
-        // --------------------
-
-        try {
-            // Розбір Base64 JSON ключа
-            const jsonStr = atob(keyInput);
-            const data = JSON.parse(jsonStr);
-            
-            if (!data.t || !data.e) throw new Error("Format");
-
-            const expDate = new Date(data.e);
-            if (expDate < new Date()) throw new Error("Expired");
-
-            let typeMap = { 'std': 'standard', 'pro': 'pro', 'vip': 'vip' };
-            
-            this.state.license = { 
-                type: typeMap[data.t] || 'free', 
-                exp: data.e 
-            };
-            
-            this.save();
-            alert(`Ключ прийнято!\nТариф: ${this.state.license.type.toUpperCase()}\nДіє до: ${data.e}`);
-            location.reload();
-
-        } catch (e) {
-            alert("Помилка: Невірний або прострочений ключ.");
-        }
-    }
-
-    checkLimit() {
-        const cnt = this.state.objects.reduce((s,o)=>s+o.apartments.length,0);
-        const lic = this.state.license || {type:'free'};
-        
-        // Перевірка терміну дії ліцензії
-        if (lic.exp && new Date(lic.exp) < new Date()) {
-            this.state.license.type = 'free'; 
-            this.save();
-            alert("Термін дії вашої ліцензії закінчився. Ви переведені на тариф FREE.");
-            location.reload(); 
-            return false;
-        }
-
-        const limit = this.LIMITS[lic.type] || this.LIMITS.free;
-        if(cnt >= limit) {
-            alert(`Досягнуто ліміт тарифу ${lic.type.toUpperCase()} (${limit} кв).\nДля збільшення ліміту перейдіть в меню PRO.`);
-            this.openMenu('premium');
-            return false;
-        }
-        return true;
-    }
-
-    // --- БАЗОВІ МЕТОДИ ---
-
+    // --- UI & THEME ---
     initTheme() { 
         const isDark = localStorage.getItem('theme')==='dark';
         if(isDark) document.body.classList.add('dark-mode'); 
         const icon = document.getElementById('theme-icon');
         if(icon) icon.innerText = isDark ? '☀️' : '🌑';
     }
-    
     toggleTheme() { 
         document.body.classList.toggle('dark-mode'); 
         localStorage.setItem('theme', document.body.classList.contains('dark-mode')?'dark':'light'); 
         this.initTheme(); 
     }
 
+    openMenu(id) {
+        document.getElementById('menuModal').style.display='flex';
+        ['info','premium','contacts'].forEach(k => document.getElementById('menu-content-'+k).style.display='none');
+        const el = document.getElementById('menu-content-'+id);
+        if(el) el.style.display='block';
+        if(id === 'premium') this.renderTariffs();
+    }
+
+    // --- OBJECTS MANAGEMENT ---
     createDefaultObject(name) {
         return {
             id: Date.now(), name: name || "Мій Об'єкт",
             tariffs: { el_d: 4.32, el_n: 2.16, w: 30.0, g: 8.0 }, 
             extra_tariffs: [], 
             requisites: [{ id: 1, name: "Картка", val: "" }],
-            groups: [{ id: 1, name: "Вхідна Група", prev: { ed: 0, en: 0, w: 0, g: 0 }, curr: { ed: 0, en: 0, w: 0, g: 0 }, services: [] }],
-            apartments: [{ id: 1, name: "Кв. 1", group_id: 1, messenger: 'viber', email: '', phone: '', prev: { ed: 0, en: 0, w: 0, g: 0 }, curr: { ed: 0, en: 0, w: 0, g: 0 }, services: [], paid: 0, debt: 0 }]
+            // Додано масив custom_counters для груп та квартир
+            groups: [{ id: 1, name: "Вхідна Група", prev: { ed: 0, en: 0, w: 0, g: 0 }, curr: { ed: 0, en: 0, w: 0, g: 0 }, custom_counters: [], services: [] }],
+            apartments: [{ id: 1, name: "Кв. 1", group_id: 1, messenger: 'viber', email: '', phone: '', prev: { ed: 0, en: 0, w: 0, g: 0 }, curr: { ed: 0, en: 0, w: 0, g: 0 }, custom_counters: [], services: [], paid: 0, debt: 0 }]
         };
     }
 
@@ -499,11 +335,14 @@ class App {
         if (d) { 
             try { 
                 this.state = JSON.parse(d); 
-                if(!this.state.license) this.state.license = { type: 'free', exp: null };
-                if(!this.state.objects.length) this.state.objects=[this.createDefaultObject()]; 
+                if(!this.state.objects.length) this.state.objects=[this.createDefaultObject()];
+                // Migration for old versions (add custom_counters if missing)
+                this.state.objects.forEach(o => {
+                    o.groups.forEach(g => { if(!g.custom_counters) g.custom_counters = []; });
+                    o.apartments.forEach(a => { if(!a.custom_counters) a.custom_counters = []; });
+                });
             } catch(e) { this.state.objects=[this.createDefaultObject()]; } 
         } else { this.state.objects=[this.createDefaultObject()]; } 
-        
         if(this.state.currentObjIdx >= this.state.objects.length) this.state.currentObjIdx=0; 
     }
     
@@ -517,6 +356,15 @@ class App {
         this.state.currentObjIdx=this.state.objects.length-1; 
         this.save(); this.renderAll(); 
     }
+
+    deleteObject() {
+        if(this.state.objects.length <= 1) { alert("Не можна видалити останній об'єкт!"); return; }
+        if(confirm(`Видалити об'єкт "${this.currentData.name}" та всі його дані?`)) {
+            this.state.objects.splice(this.state.currentObjIdx, 1);
+            this.state.currentObjIdx = 0;
+            this.save(); this.renderAll();
+        }
+    }
     
     prevObject() { if(this.state.currentObjIdx>0){this.state.currentObjIdx--; this.save(); this.renderAll();} }
     nextObject() { if(this.state.currentObjIdx<this.state.objects.length-1){this.state.currentObjIdx++; this.save(); this.renderAll();} }
@@ -526,61 +374,49 @@ class App {
         const bad = document.getElementById('status-badge');
         const lim = document.getElementById('limit-counter');
         const lic = this.state.license || {type:'free'};
-        
         let limit = this.LIMITS[lic.type] || 2;
-        let labels = { free: 'FREE', standard: 'RENTIER', pro: 'PRO', vip: 'VIP' };
-        let classes = { free: 'status-badge', standard: 'status-badge status-pro', pro: 'status-badge status-pro', vip: 'status-badge status-vip' };
-
-        if(lic.exp && new Date(lic.exp) < new Date()) {
-            bad.innerText = "EXPIRED";
-            bad.className = "status-badge";
-            lim.innerText = `${cnt}/${this.LIMITS.free}`;
-        } else {
-            bad.innerText = labels[lic.type];
-            bad.className = classes[lic.type];
-            lim.innerText = limit > 1000 ? "∞" : `${cnt}/${limit}`;
-        }
+        bad.innerText = lic.type === 'free' ? 'FREE' : lic.type.toUpperCase();
+        bad.className = `status-badge ${lic.type === 'free' ? '' : (lic.type==='vip'?'status-vip':'status-pro')}`;
+        lim.innerText = limit > 1000 ? "∞" : `${cnt}/${limit}`;
     }
 
     addApartment() { 
         if(!this.checkLimit()) return;
-        this.currentData.apartments.push({id:Date.now(), name:`Кв. ${this.currentData.apartments.length+1}`, group_id:1, messenger:'viber', email:'', phone:'', prev:{}, curr:{}, services:[], paid:0, debt:0}); 
-        this.save(); this.renderApartments(); 
-        this.updateStatus(); 
+        this.currentData.apartments.push({id:Date.now(), name:`Кв. ${this.currentData.apartments.length+1}`, group_id:1, messenger:'viber', email:'', phone:'', prev:{}, curr:{}, custom_counters:[], services:[], paid:0, debt:0}); 
+        this.save(); this.renderApartments(); this.updateStatus(); 
     }
+
+    checkLimit() {
+        const cnt = this.state.objects.reduce((s,o)=>s+o.apartments.length,0);
+        const lic = this.state.license || {type:'free'};
+        const limit = this.LIMITS[lic.type] || this.LIMITS.free;
+        if(cnt >= limit) {
+            alert(`Досягнуто ліміт тарифу. Перейдіть в меню PRO.`);
+            this.openMenu('premium');
+            return false;
+        }
+        return true;
+    }
+
+    // --- RENDERING ---
     renderAll() {
         document.getElementById('object-title').value = this.currentData.name;
-        
-        // Відображення тарифів
         ['ed','en','w','g'].forEach(k => { 
             const el = document.getElementById('t_'+k); 
             const map = {ed:'el_d', en:'el_n', w:'w', g:'g'};
             if(el) el.value = this.currentData.tariffs[map[k]]; 
         });
-
-        this.renderExtraTariffs(); 
-        this.renderRequisites(); 
-        this.renderGroups(); 
-        this.renderApartments();
+        this.renderExtraTariffs(); this.renderRequisites(); this.renderGroups(); this.renderApartments();
     }
     
     renderExtraTariffs() { 
         document.getElementById('extra-tariffs-container').innerHTML = this.currentData.extra_tariffs.map((t, i) => 
-            `<div class="custom-row">
-                <input type="text" value="${t.name}" placeholder="Назва послуги" onchange="app.updateExtraTariff(${i}, 'name', this.value)">
-                <input type="number" value="${t.val}" placeholder="Ціна" onchange="app.updateExtraTariff(${i}, 'val', this.value)">
-                <span class="del-icon" onclick="app.delExtraTariff(${i})">&times;</span>
-            </div>`
+            `<div class="custom-row"><input type="text" value="${t.name}" placeholder="Послуга" onchange="app.updateExtraTariff(${i}, 'name', this.value)"><input type="number" value="${t.val}" placeholder="Ціна" onchange="app.updateExtraTariff(${i}, 'val', this.value)"><span class="del-icon" onclick="app.delExtraTariff(${i})">&times;</span></div>`
         ).join(''); 
     }
-
     renderRequisites() { 
         document.getElementById('requisites-container').innerHTML = this.currentData.requisites.map((r, i) => 
-            `<div class="custom-row">
-                <input type="text" value="${r.name}" placeholder="Банк" onchange="app.updateReq(${i}, 'name', this.value)">
-                <input type="text" value="${r.val}" placeholder="IBAN/Картка" onchange="app.updateReq(${i}, 'val', this.value)">
-                <span class="del-icon" onclick="app.delReq(${i})">&times;</span>
-            </div>`
+            `<div class="custom-row"><input type="text" value="${r.name}" placeholder="Банк" onchange="app.updateReq(${i}, 'name', this.value)"><input type="text" value="${r.val}" placeholder="IBAN" onchange="app.updateReq(${i}, 'val', this.value)"><span class="del-icon" onclick="app.delReq(${i})">&times;</span></div>`
         ).join(''); 
     }
     
@@ -594,16 +430,15 @@ class App {
             ${this.renderMR(i,g,'prev','⚡ Вхід День','ed')} ${this.renderMR(i,g,'prev','🌙 Вхід Ніч','en')}
             ${this.renderMR(i,g,'prev','💧 Вхід Вода','w')} ${this.renderMR(i,g,'prev','🔥 Вхід Газ','g')}
             
+            <div id="g-counters-${i}">
+                ${(g.custom_counters||[]).map((c, ci) => this.renderCustomCounterRow('group', i, ci, c)).join('')}
+            </div>
+            <button class="btn btn-add-counter" onclick="app.addCustomCounter('group', ${i})">+ Лічильник</button>
+
             <div style="margin-top:10px; border-top:1px dashed var(--border); padding-top:10px;">
                 <div style="font-size:11px; font-weight:700; color:var(--text-sec); margin-bottom:5px;">СПІЛЬНІ ПОСЛУГИ (МЗК)</div>
-                ${(g.services || []).map((s,si)=>`
-                    <div class="custom-row">
-                        <input type="text" value="${s.name}" placeholder="Назва (напр. Охорона)" onchange="app.updateGS(${i},${si},'name',this.value)">
-                        <input type="number" value="${s.val}" placeholder="Сума" onchange="app.updateGS(${i},${si},'val',this.value)">
-                        <span class="del-icon" onclick="app.delGS(${i},${si})">&times;</span>
-                    </div>
-                `).join('')}
-                <button class="btn btn-add" onclick="app.addGS(${i})">+ Додати послугу</button>
+                ${(g.services || []).map((s,si)=>`<div class="custom-row"><input type="text" value="${s.name}" placeholder="Назва" onchange="app.updateGS(${i},${si},'name',this.value)"><input type="number" value="${s.val}" placeholder="Сума" onchange="app.updateGS(${i},${si},'val',this.value)"><span class="del-icon" onclick="app.delGS(${i},${si})">&times;</span></div>`).join('')}
+                <button class="btn btn-add" onclick="app.addGS(${i})">+ Послуга</button>
             </div>
         </div>`).join(''); 
     }
@@ -620,14 +455,20 @@ class App {
                     <div class="col" style="flex:0.6"><label>Месенджер</label><select onchange="app.updateApt(${i},'messenger',this.value)"><option value="viber" ${a.messenger==='viber'?'selected':''}>Viber</option><option value="whatsapp" ${a.messenger==='whatsapp'?'selected':''}>WhatsApp</option><option value="telegram" ${a.messenger==='telegram'?'selected':''}>Telegram</option></select></div>
                     <div class="col"><label>Телефон</label><input type="tel" value="${a.phone||''}" placeholder="380..." oninput="app.updateApt(${i},'phone',this.value)"></div>
                 </div>
-                <div class="row">
-                    <div class="col"><label>Email</label><input type="email" value="${a.email||''}" placeholder="email@..." oninput="app.updateApt(${i},'email',this.value)"></div>
-                </div>
+                
                 <div class="section-title">Лічильники</div>
                 ${this.renderMR(i,a,'apt','⚡ Е/Е День','ed')} ${this.renderMR(i,a,'apt','🌙 Е/Е Ніч','en')}
                 ${this.renderMR(i,a,'apt','💧 Вода','w')} ${this.renderMR(i,a,'apt','🔥 Газ','g')}
-                <button class="btn btn-add" onclick="app.addAS(${i})">+ Індив. послуга</button>
+                
+                <div id="a-counters-${i}">
+                    ${(a.custom_counters||[]).map((c, ci) => this.renderCustomCounterRow('apt', i, ci, c)).join('')}
+                </div>
+                <button class="btn btn-add-counter" onclick="app.addCustomCounter('apt', ${i})">+ Лічильник</button>
+
+                <div class="section-title" style="margin-top:15px">Послуги</div>
                 <div id="a-serv-${i}">${a.services.map((s,si)=>`<div class="custom-row"><input type="text" value="${s.name}" placeholder="Назва" onchange="app.updateAS(${i},${si},'name',this.value)"><input type="number" value="${s.val}" placeholder="Сума" onchange="app.updateAS(${i},${si},'val',this.value)"><span class="del-icon" onclick="app.delAS(${i},${si})">&times;</span></div>`).join('')}</div>
+                <button class="btn btn-add" onclick="app.addAS(${i})">+ Індив. послуга</button>
+                
                 <div class="section-title">Баланс</div>
                 <div class="row">
                     <div class="col"><label>Борг</label><input type="number" value="${a.debt||0}" onchange="app.updateApt(${i},'debt',this.value)"></div>
@@ -638,8 +479,7 @@ class App {
     }
 
     renderMR(i, obj, mode, label, key) { 
-        const p = mode==='prev'?obj.prev[key]:obj.prev[key]; 
-        const c = mode==='prev'?obj.curr[key]:obj.curr[key]; 
+        const p = obj.prev[key]; const c = obj.curr[key]; 
         const fn = mode==='prev'?`app.updateGroupMetric(${i},`:`app.updateAptMetric(${i},`; 
         return `<div class="row" style="align-items:center;">
             <div class="col" style="flex:0.6"><span style="font-size:13px; font-weight:600;">${label}</span></div>
@@ -648,7 +488,52 @@ class App {
         </div>`; 
     }
 
-    // --- ОНОВЛЕННЯ ДАНИХ ---
+    // --- CUSTOM COUNTERS LOGIC ---
+    renderCustomCounterRow(type, parentIdx, cIdx, cData) {
+        // type: 'group' or 'apt'
+        return `
+        <div class="counter-row">
+            <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                <input type="text" value="${cData.name}" placeholder="Назва лічильника" style="border:none; background:transparent; font-weight:bold; font-size:13px; width:60%;" onchange="app.updateCustomCounter('${type}', ${parentIdx}, ${cIdx}, 'name', this.value)">
+                <span class="del-icon" onclick="app.delCustomCounter('${type}', ${parentIdx}, ${cIdx})">&times;</span>
+            </div>
+            <div class="row" style="margin-bottom:0;">
+                <div class="col" style="flex:0.8"><input type="number" value="${cData.price}" placeholder="Тариф" title="Ціна за одиницю" onchange="app.updateCustomCounter('${type}', ${parentIdx}, ${cIdx}, 'price', this.value)"></div>
+                <div class="col"><input type="number" value="${cData.prev}" placeholder="Було" onchange="app.updateCustomCounter('${type}', ${parentIdx}, ${cIdx}, 'prev', this.value)" style="background:var(--bg)"></div>
+                <div class="col"><input type="number" value="${cData.curr}" placeholder="Стало" onchange="app.updateCustomCounter('${type}', ${parentIdx}, ${cIdx}, 'curr', this.value)"></div>
+            </div>
+        </div>`;
+    }
+
+    addCustomCounter(type, parentIdx) {
+        const newCounter = { id: Date.now(), name: "Лічильник", price: 0, prev: 0, curr: 0 };
+        if (type === 'group') {
+            if(!this.currentData.groups[parentIdx].custom_counters) this.currentData.groups[parentIdx].custom_counters = [];
+            this.currentData.groups[parentIdx].custom_counters.push(newCounter);
+            this.renderGroups();
+        } else {
+            if(!this.currentData.apartments[parentIdx].custom_counters) this.currentData.apartments[parentIdx].custom_counters = [];
+            this.currentData.apartments[parentIdx].custom_counters.push(newCounter);
+            this.renderApartments();
+        }
+        this.save();
+    }
+
+    updateCustomCounter(type, pIdx, cIdx, key, val) {
+        const target = type === 'group' ? this.currentData.groups[pIdx] : this.currentData.apartments[pIdx];
+        target.custom_counters[cIdx][key] = (key === 'name') ? val : parseFloat(val);
+        this.save();
+    }
+
+    delCustomCounter(type, pIdx, cIdx) {
+        if(!confirm("Видалити лічильник?")) return;
+        const target = type === 'group' ? this.currentData.groups[pIdx] : this.currentData.apartments[pIdx];
+        target.custom_counters.splice(cIdx, 1);
+        this.save();
+        type === 'group' ? this.renderGroups() : this.renderApartments();
+    }
+
+    // --- DATA UPDATES ---
     setTariff(k,v) { this.currentData.tariffs[k]=parseFloat(v); this.save(); }
     addExtraTariff(){this.currentData.extra_tariffs.push({name:"",val:0});this.save();this.renderExtraTariffs();}
     updateExtraTariff(i,k,v){this.currentData.extra_tariffs[i][k]=k==='val'?parseFloat(v):v;this.save();}
@@ -660,7 +545,7 @@ class App {
     
     updateGroup(i,k,v){this.currentData.groups[i][k]=v;this.save();}
     updateGroupMetric(i,t,k,v){this.currentData.groups[i][t][k]=parseFloat(v);this.save();}
-    addGroup(){this.currentData.groups.push({id:Date.now(),name:"Група МЗК",prev:{},curr:{},services:[]});this.save();this.renderGroups();}
+    addGroup(){this.currentData.groups.push({id:Date.now(),name:"Група МЗК",prev:{},curr:{}, custom_counters:[], services:[]});this.save();this.renderGroups();}
     delGroup(i){if(confirm("Видалити групу?")){this.currentData.groups.splice(i,1);this.save();this.renderGroups();}}
     
     addGS(i){ if(!this.currentData.groups[i].services) this.currentData.groups[i].services = []; this.currentData.groups[i].services.push({name:"",val:0}); this.save(); this.renderGroups(); }
@@ -674,7 +559,7 @@ class App {
     delAS(ai,si){this.currentData.apartments[ai].services.splice(si,1);this.save();this.renderApartments();}
     delApt(i){if(confirm("Видалити квартиру?")){this.currentData.apartments.splice(i,1);this.save();this.renderApartments(); this.updateStatus();}}
 
-    // --- РОЗРАХУНКИ ---
+    // --- CALCULATIONS ---
     calculate() {
         const d = this.currentData; const t = d.tariffs;
         let totalIn={ed:0,en:0,w:0,g:0}, gServSum=0, totalApts={ed:0,en:0,w:0,g:0};
@@ -704,13 +589,24 @@ class App {
         const dStr = new Date().toLocaleDateString('uk-UA');
         
         document.getElementById('results-list').innerHTML = d.apartments.map((a, i) => {
+            // Standard Counters
             const c = { ed: Math.max(0,(a.curr.ed||0)-(a.prev.ed||0)), en: Math.max(0,(a.curr.en||0)-(a.prev.en||0)), w: Math.max(0,(a.curr.w||0)-(a.prev.w||0)), g: Math.max(0,(a.curr.g||0)-(a.prev.g||0)) };
             let mCost = (c.ed*t.el_d)+(c.en*t.el_n)+(c.w*t.w)+(c.g*t.g);
+            
+            // Custom Counters Calc
+            let custCost = 0; let custTxt = "";
+            (a.custom_counters || []).forEach(cc => {
+                let diff = Math.max(0, cc.curr - cc.prev);
+                let cost = diff * cc.price;
+                custCost += cost;
+                custTxt += `${cc.name}: ${diff} од. (${cost.toFixed(0)} грн)\n`;
+            });
+
             let sCost=0, sTxt=""; a.services.forEach(s=>{sCost+=(s.val||0); sTxt+=`${s.name}: ${s.val}\n`});
-            let tot = mCost + sCost + mzkPerApt + (a.debt||0); 
+            let tot = mCost + custCost + sCost + mzkPerApt + (a.debt||0); 
             let bal = tot - (a.paid||0);
             
-            const txt = `Квитанція ${dStr}\n${d.name} - ${a.name}\n\n⚡Е/Е: ${c.ed}/${c.en} (${((c.ed*t.el_d)+(c.en*t.el_n)).toFixed(0)} грн)\n💧Вода: ${c.w} (${(c.w*t.w).toFixed(0)} грн)\n🔥Газ: ${c.g} (${(c.g*t.g).toFixed(0)} грн)\n🏢МЗК: ${mzkPerApt.toFixed(2)} грн\n${sTxt?'---\n'+sTxt:''}----------------\nНараховано: ${(mCost+sCost+mzkPerApt).toFixed(2)} грн\nДО СПЛАТИ: ${tot.toFixed(2)} грн\n${a.paid?`Сплачено: -${a.paid}\nЗалишок: ${bal.toFixed(2)}`:''}\n\nРеквізити:\n${d.requisites.map(r=>`${r.name}: ${r.val}`).join('\n')}`;
+            const txt = `Квитанція ${dStr}\n${d.name} - ${a.name}\n\n⚡Е/Е: ${c.ed}/${c.en} (${((c.ed*t.el_d)+(c.en*t.el_n)).toFixed(0)} грн)\n💧Вода: ${c.w} (${(c.w*t.w).toFixed(0)} грн)\n🔥Газ: ${c.g} (${(c.g*t.g).toFixed(0)} грн)\n${custTxt}🏢МЗК: ${mzkPerApt.toFixed(2)} грн\n${sTxt?'---\n'+sTxt:''}----------------\nНараховано: ${(mCost+custCost+sCost+mzkPerApt).toFixed(2)} грн\nДО СПЛАТИ: ${tot.toFixed(2)} грн\n${a.paid?`Сплачено: -${a.paid}\nЗалишок: ${bal.toFixed(2)}`:''}\n\nРеквізити:\n${d.requisites.map(r=>`${r.name}: ${r.val}`).join('\n')}`;
             this.checks[i] = txt;
             document.getElementById(`badge-${i}`).innerText = Math.round(tot);
             
@@ -727,7 +623,7 @@ class App {
                 <div style="font-size:12px;color:var(--text-sec);margin-bottom:12px; text-align:right;">До сплати: <b>${bal.toFixed(2)}</b></div>
                 <div style="display:flex; gap:10px;">
                     <button class="btn ${btnClass} btn-sm" onclick="app.sendCheck(${i})">💬 ${btnText}</button>
-                    <button class="btn btn-warning btn-sm" onclick="app.sharePDF(${i})">📄 PDF / Зберегти</button>
+                    <button class="btn btn-warning btn-sm" onclick="app.sharePDF(${i})">📄 PDF</button>
                 </div>
             </div>`;
         }).join('');
@@ -736,31 +632,16 @@ class App {
 
     async sendCheck(i) {
         const txt = this.checks[i];
-        if (!txt) { alert("Помилка даних квитанції"); return; }
-        
+        if (!txt) { alert("Помилка"); return; }
         const a = this.currentData.apartments[i];
         let phone = (a.phone || "").replace(/\D/g,''); 
-        
-        if(!phone && a.messenger !== 'telegram') { 
-             alert("Вкажіть телефон у налаштуваннях квартири або скопіюйте текст."); 
-             await this.copyTextToClipboard(txt); 
-             return; 
-        }
+        if(!phone && a.messenger !== 'telegram') { await this.copyTextToClipboard(txt); alert("Вкажіть телефон або текст скопійовано."); return; }
         if(phone && phone.startsWith('0')) phone='38'+phone; 
-        
         const encTxt = encodeURIComponent(txt);
-        
         if (a.messenger === 'whatsapp') window.location.href = `https://wa.me/${phone}?text=${encTxt}`;
-        else if (a.messenger === 'telegram') {
-            // FIX: Використовуємо tg://msg для чистого тексту без зайвих посилань
-            window.location.href = `tg://msg?text=${encTxt}`;
-        }
-        else if (a.messenger === 'viber') { 
-            await this.copyTextToClipboard(txt);
-            let viberUrl = phone ? `viber://chat?number=%2B${phone}` : `viber://forward?text=${encTxt}`;
-            window.location.href = viberUrl;
-        }
-        else { await this.copyTextToClipboard(txt); alert("Текст скопійовано в буфер обміну"); }
+        else if (a.messenger === 'telegram') window.location.href = `tg://msg?text=${encTxt}`;
+        else if (a.messenger === 'viber') { await this.copyTextToClipboard(txt); window.location.href = phone ? `viber://chat?number=%2B${phone}` : `viber://forward?text=${encTxt}`; }
+        else { await this.copyTextToClipboard(txt); alert("Текст скопійовано"); }
     }
     
     copyTextToClipboard(text) { 
@@ -774,65 +655,63 @@ class App {
         const fileName = `Komunalka_Backup_${date.toISOString().slice(0,10)}.txt`; 
         const str = JSON.stringify(this.state); 
         const file = new File([str], fileName, { type: "text/plain" });
-
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
-            try {
-                await navigator.share({ files: [file], title: 'Зберегти бекап', text: 'Файл налаштувань' });
-                return;
-            } catch (e) { console.log("Share skipped"); }
+            try { await navigator.share({ files: [file], title: 'Зберегти бекап' }); return; } catch (e) {}
         }
-        
-        const a = document.createElement('a'); 
-        a.href = "data:text/plain;charset=utf-8," + encodeURIComponent(str); 
-        a.download = fileName; 
-        document.body.appendChild(a); a.click(); a.remove(); 
-        alert("Збережено в Завантаження як текстовий файл.");
+        const a = document.createElement('a'); a.href = "data:text/plain;charset=utf-8," + encodeURIComponent(str); 
+        a.download = fileName; document.body.appendChild(a); a.click(); a.remove(); 
     }
 
     loadBackup(inpt) { 
         const f = inpt.files[0]; if(!f) return; 
-        if (!confirm("Завантажити дані з файлу? Поточні незбережені дані буде втрачено.")) { inpt.value=''; return; }
+        if (!confirm("Завантажити?")) return;
         const r = new FileReader(); 
-        r.onload = e => { try { this.state = JSON.parse(e.target.result); this.save(); alert("Успішно завантажено!"); location.reload(); } catch(x) { alert("Помилка файлу"); } }; 
+        r.onload = e => { try { this.state = JSON.parse(e.target.result); this.save(); location.reload(); } catch(x) { alert("Помилка"); } }; 
         r.readAsText(f); 
     }
 
     async sharePDF(i) {
-        if (typeof html2pdf === 'undefined') { alert('Бібліотека PDF не завантажена. Перевірте інтернет.'); return; }
+        if (typeof html2pdf === 'undefined') { alert('Інтернет відсутній. PDF не працює.'); return; }
         window.scrollTo(0, 0);
-
         const a = this.currentData.apartments[i]; const d = this.currentData; const dStr = new Date().toLocaleDateString('uk-UA');
+        
+        // Std Costs
         const c = { ed: Math.max(0,(a.curr.ed||0)-(a.prev.ed||0)), en: Math.max(0,(a.curr.en||0)-(a.prev.en||0)), w: Math.max(0,(a.curr.w||0)-(a.prev.w||0)), g: Math.max(0,(a.curr.g||0)-(a.prev.g||0)) };
         const cost = { ed: (c.ed*d.tariffs.el_d) + (c.en*d.tariffs.el_n), w: c.w*d.tariffs.w, g: c.g*d.tariffs.g };
+        
+        // Custom Counters HTML
+        let custRows = ""; let custCostTotal = 0;
+        (a.custom_counters || []).forEach(cc => {
+            let diff = Math.max(0, cc.curr - cc.prev);
+            let val = diff * cc.price;
+            custCostTotal += val;
+            custRows += `<tr style="border-bottom:1px solid #e2e8f0;"><td style="padding:5px;">${cc.name} (${diff} од.)</td><td style="padding:5px; text-align:right;">${val.toFixed(2)}</td></tr>`;
+        });
+
         const mzkVal = parseFloat((this.checks[i].match(/МЗК: (\d+\.\d+)/) || [0,0])[1]);
         let sRows = a.services.map(s => `<tr style="border-bottom:1px solid #e2e8f0;"><td style="padding:5px;">${s.name}</td><td style="padding:5px;text-align:right;">${s.val.toFixed(2)}</td></tr>`).join('');
-        let tot = cost.ed + cost.w + cost.g + a.services.reduce((s,x)=>s+x.val,0) + mzkVal + (a.debt||0);
-
-        const logoHTML = `<div style="font-family: sans-serif; font-weight: 900; font-size: 20px; color: #1e293b; display: flex; align-items: center; justify-content:center;"><span style="color:#1e293b">Комуналк</span><div style="display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; background: #0099ff; border-radius: 50%; margin: 0 2px;"><div style="width: 6px; height: 6px; background: white; border-radius: 50%;"></div></div><span style="color:#0099ff">блік</span></div>`;
+        let tot = cost.ed + cost.w + cost.g + custCostTotal + a.services.reduce((s,x)=>s+x.val,0) + mzkVal + (a.debt||0);
 
         const template = `
         <div style="font-family: 'Inter', sans-serif; color:#1e293b; background:#fff; padding:30px; box-sizing: border-box; width: 100%; text-align: center;">
-            <div style="margin-bottom:20px;">${logoHTML}<div style="font-size:12px; margin-top:5px; color:#64748b;">${d.name}</div></div>
-            <div style="display:flex; justify-content:space-between; border-bottom:2px solid #0099ff; padding-bottom:10px; margin-bottom:15px; max-width: 100%;">
-                <div style="font-weight:bold; font-size:14px;">РАХУНОК</div><div style="font-size:12px;">${dStr}</div>
-            </div>
+            <div style="margin-bottom:20px; font-weight: 900; font-size: 20px;">Комуналк<span style="color:#0099ff">Облік</span><div style="font-size:12px; margin-top:5px; color:#64748b;">${d.name}</div></div>
             <div style="background:#f1f5f9; padding:10px; border-radius:8px; margin-bottom:15px; font-size:14px; text-align: left;">Платник: <strong>${a.name}</strong></div>
             <table style="width:100%; border-collapse:collapse; font-size:11px; margin: 0 auto;">
                 <tr style="background:#f8fafc; color:#64748b;"><th style="padding:5px; text-align:left;">Послуга</th><th style="padding:5px; text-align:right;">Сума</th></tr>
                 <tr style="border-bottom:1px solid #e2e8f0;"><td style="padding:5px; text-align:left;">⚡ Електрика</td><td style="padding:5px; text-align:right;">${cost.ed.toFixed(2)}</td></tr>
                 <tr style="border-bottom:1px solid #e2e8f0;"><td style="padding:5px; text-align:left;">💧 Вода</td><td style="padding:5px; text-align:right;">${cost.w.toFixed(2)}</td></tr>
                 <tr style="border-bottom:1px solid #e2e8f0;"><td style="padding:5px; text-align:left;">🔥 Газ</td><td style="padding:5px; text-align:right;">${cost.g.toFixed(2)}</td></tr>
+                ${custRows}
                 <tr style="border-bottom:1px solid #e2e8f0;"><td style="padding:5px; text-align:left;">🏢 МЗК</td><td style="padding:5px; text-align:right;">${mzkVal.toFixed(2)}</td></tr>
                 ${sRows}
             </table>
             <div style="text-align:right; margin-top:20px;">
-                <div style="font-size:10px; color:#64748b;">Разом до сплати:</div>
                 <div style="font-size:22px; font-weight:bold; color:#0099ff;">${tot.toFixed(2)} грн</div>
                 ${a.debt > 0 ? `<div style="font-size:10px; color:#ef4444;">(Вкл. борг ${a.debt})</div>` : ''}
             </div>
             <div style="margin-top:30px; border-top:1px dashed #cbd5e1; padding-top:10px; text-align: left;">
                 <div style="font-size:10px; font-weight:bold; color:#64748b; margin-bottom:3px;">РЕКВІЗИТИ:</div>
-                ${d.requisites.map(r=>`<div style="font-size:10px; margin-bottom:2px;">🏦 ${r.name}: <strong>${r.val}</strong></div>`).join('')}
+                ${d.requisites.map(r=>`<div style="font-size:10px;">${r.name}: <strong>${r.val}</strong></div>`).join('')}
             </div>
         </div>`;
 
@@ -841,50 +720,57 @@ class App {
         const container = document.createElement('div');
         container.style.cssText = 'width: 148mm; background: white; margin: 0 auto; box-shadow: 0 0 20px rgba(0,0,0,0.5);'; 
         container.innerHTML = template;
-        overlay.appendChild(container);
-        document.body.appendChild(overlay);
-
-        await new Promise(r => setTimeout(r, 800)); 
+        overlay.appendChild(container); document.body.appendChild(overlay); await new Promise(r => setTimeout(r, 800)); 
 
         const fileName = `Rahunok_${a.name.replace(/\s/g,'_')}.pdf`;
-        const opt = { margin: 0, filename: fileName, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true, logging: false }, jsPDF: { unit: 'mm', format: 'a5', orientation: 'portrait' } };
-        
-        try { 
-            const pdfWorker = html2pdf().set(opt).from(container);
-            try {
-                const pdfBlob = await pdfWorker.output('blob');
-                const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
-                if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                    await navigator.share({ files: [file], title: 'Квитанція', text: `Рахунок для ${a.name}` });
-                } else { throw new Error("No share"); }
-            } catch (e) { await pdfWorker.save(); }
-        } catch (e) { alert("Помилка PDF: " + e.message); } 
-        finally { document.body.removeChild(overlay); }
+        const opt = { margin: 0, filename: fileName, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'mm', format: 'a5' } };
+        try { const pdfWorker = html2pdf().set(opt).from(container); const pdfBlob = await pdfWorker.output('blob'); const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
+            if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file] }); } else { await pdfWorker.save(); }
+        } catch (e) { alert("PDF Error: " + e.message); } finally { document.body.removeChild(overlay); }
     }
 
     startNewMonth() { 
-        if (!confirm("Закрити місяць? (Поточні показники -> Минулі, скинути сплату)")) return; 
+        if (!confirm("Закрити місяць?")) return; 
         this.currentData.apartments.forEach(a => { 
             ['ed','en','w','g'].forEach(k=>{if(a.curr[k]){a.prev[k]=a.curr[k];a.curr[k]=0}}); 
+            (a.custom_counters||[]).forEach(c=>{if(c.curr){c.prev=c.curr;c.curr=0}});
             a.paid=0; 
         }); 
         this.currentData.groups.forEach(g => { 
             ['ed','en','w','g'].forEach(k=>{if(g.curr[k]){g.prev[k]=g.curr[k];g.curr[k]=0}}); 
+            (g.custom_counters||[]).forEach(c=>{if(c.curr){c.prev=c.curr;c.curr=0}});
         }); 
         this.save(); location.reload(); 
+    }
+    
+    renderTariffs() {
+        const container = document.getElementById('tariffs-list');
+        container.innerHTML = this.TARIFF_PLANS.map(plan => `
+            <div class="price-card ${plan.isPopular ? 'popular' : ''} ${plan.isVip ? 'vip' : ''}">
+                ${plan.isPopular ? '<div class="price-badge">ХІТ 🔥</div>' : ''}
+                ${plan.isVip ? '<div class="price-badge" style="background:var(--gold)">VIP 👑</div>' : ''}
+                <div class="price-title">${plan.name}</div>
+                <div class="price-val">${plan.price} грн</div>
+                <div class="price-sub">${plan.desc}</div>
+                <button class="btn ${plan.isVip ? 'btn-warning' : 'btn-primary'}" onclick="app.initPay('${plan.id}')">Сплатити</button>
+            </div>
+        `).join('');
+    }
+    initPay(planId) {
+        const plan = this.TARIFF_PLANS.find(p => p.id === planId); if(!plan) return;
+        this.pendingPayment = plan; document.getElementById('menuModal').style.display = 'none'; document.getElementById('payModal').style.display = 'flex';
+        document.getElementById('pay-details').innerText = `${plan.name} — ${plan.price} грн`;
+        this.validatePayForm();
+    }
+    validatePayForm() { document.getElementById('btn-do-pay').disabled = !(document.getElementById('pay-contact').value.length > 3); }
+    processPayment() { alert("Дякуємо! Ваша заявка прийнята. Очікуйте повідомлення."); document.getElementById('payModal').style.display = 'none'; }
+    activatePro() { 
+        const key = document.getElementById('activation-key').value;
+        if(key === "B15sh356pro") { this.state.license = { type: 'vip', exp: '2099-12-31' }; alert("VIP Active"); location.reload(); return; }
+        alert("Невірний ключ");
     }
 }
 const app = new App();
 </script>
-<script>
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js')
-                .then(reg => console.log('SW Registered!', reg))
-                .catch(err => console.log('SW Error:', err));
-        });
-    }
-</script>
 </body>
 </html>
-
