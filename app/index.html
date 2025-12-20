@@ -58,28 +58,40 @@
         .top-menu-bar span { cursor: pointer; display: flex; align-items: center; gap: 5px; }
         .theme-toggle-btn { background: none; border: none; cursor: pointer; font-size: 16px; padding: 0; }
 
-        .brand-header { display: flex; align-items: center; justify-content: center; margin: 5px 0 20px 0; }
+        /* Стилі Логотипа (з Лендінгу) */
+        .brand-header { display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 15px 0 25px 0; }
+        .logo-text-wrapper { display: flex; flex-direction: column; align-items: center; line-height: 1.1; }
         
-        /* Стиль логотипа */
-        .logo-brand-text {
+        .brand-top { 
+            font-weight: 900; 
+            text-transform: uppercase; 
+            letter-spacing: 0.05em; 
+            font-size: 28px; 
             font-family: 'Montserrat', sans-serif;
-            font-size: 28px;
-            font-weight: 900;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            line-height: 1;
+            color: var(--text);
         }
-        .txt-main { color: var(--text); }
-        .txt-neon { color: var(--primary); text-shadow: 0 0 15px rgba(0, 153, 255, 0.4); position: relative; }
-        .styled-o { display: inline-block; position: relative; }
-        .styled-o::after {
-            content: ''; position: absolute;
-            top: 53%; left: 50%; transform: translate(-50%, -50%);
-            width: 30%; height: 30%;
-            background-color: var(--bg);
-            border-radius: 50%;
-            z-index: 2;
+        
+        .brand-bottom { 
+            font-weight: 700; 
+            font-size: 16px; 
+            margin-top: -2px; 
+            font-family: 'Montserrat', sans-serif;
+            color: var(--text);
+        }
+
+        /* Неонові ефекти адаптовані під додаток */
+        .outline-neon { 
+            color: transparent; 
+            -webkit-text-stroke: 1px var(--primary); 
+            text-shadow: 0 0 10px rgba(0, 153, 255, 0.4); 
+        }
+        .outline-neon-sub { 
+            color: transparent; 
+            -webkit-text-stroke: 1px var(--primary); 
+        }
+        .solid-neon-sub { 
+            color: var(--primary); 
+            text-shadow: 0 0 15px rgba(0, 153, 255, 0.6); 
         }
 
         .app-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; background: var(--header-bg); padding: 8px 12px; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
@@ -132,6 +144,12 @@
         .price-badge { position: absolute; top: 0; right: 0; background: var(--primary); color: white; font-size: 10px; padding: 3px 8px; border-bottom-left-radius: 8px; font-weight: bold; }
         .price-title { font-size: 16px; font-weight: 900; margin-bottom: 5px; text-transform: uppercase; font-family: 'Montserrat', sans-serif; }
         .price-val { font-size: 20px; font-weight: bold; color: var(--text); margin-bottom: 5px; }
+        
+        /* Стилі для Пам'ятки */
+        .info-block h4 { color: var(--primary); margin: 15px 0 5px 0; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
+        .info-block ul { padding-left: 20px; color: var(--text-sec); font-size: 13px; }
+        .info-block p { color: var(--text-sec); font-size: 13px; margin-bottom: 10px; }
+        .info-highlight { background: rgba(0,153,255,0.1); color: var(--primary); padding: 2px 5px; border-radius: 4px; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -139,14 +157,16 @@
     <div class="top-menu-bar">
         <button class="theme-toggle-btn" onclick="app.toggleTheme()" id="theme-icon">🌗</button>
         <span onclick="app.openMenu('info')">ℹ️ Інфо</span>
-        <span onclick="app.openMenu('premium')" style="color:var(--primary)">💎 PRO</span>
+        <span onclick="app.openMenu('premium')" style="color:var(--primary)">💎 Тарифи</span>
         <span onclick="app.openMenu('contacts')">📞 Контакти</span>
     </div>
 
     <div class="brand-header">
-        <div class="logo-brand-text">
-            <span class="txt-main">Комуналк</span>
-            <span class="txt-neon"><span class="styled-o">О</span>блік</span>
+        <div class="logo-text-wrapper">
+            <div class="brand-top outline-neon">COMUNALCO</div>
+            <div class="brand-bottom">
+                <span class="outline-neon-sub">Комуналк</span><span class="solid-neon-sub">Облік</span>
+            </div>
         </div>
     </div>
 
@@ -167,7 +187,6 @@
 
         <div class="nav-btn" onclick="app.nextObject()">❯</div>
     </div>
-    
     <div id="main-content-wrapper">
         <details>
             <summary>⚙️ Тарифи та Реквізити</summary>
@@ -233,16 +252,32 @@
             <h3 style="margin-top:0; text-align:center;" id="menu-title">Меню</h3>
             
             <div id="menu-content-info" style="display:none" class="info-block">
-                <p style="text-align:center;"><strong>КомуналкОблік v3.0</strong></p>
+                <p style="text-align:center;"><strong>Пам'ятка користувача</strong></p>
                 <hr style="border:0; border-top:1px solid var(--border)">
-                <h4>🏠 Нове в версії 3.0</h4>
+                
+                <h4>1. Початок роботи</h4>
+                <p>Натискайте на назву Об'єкту (зверху) або Квартири, щоб перейменувати їх. Кнопка "+" дозволяє додати новий будинок.</p>
+                
+                <h4>2. Налаштування</h4>
+                <p>У меню <span class="info-highlight">⚙️ Тарифи</span> введіть ціни на комунальні послуги. У розділ "Додаткові витрати" додайте загальні суми (охорона, сміття), які діляться на всіх.</p>
+
+                <h4>3. Квартири та Групи</h4>
+                <p><strong>Група МЗК:</strong> Це вхідний лічильник на будинок.</p>
+                <p><strong>Квартири:</strong> Додавайте мешканців кнопкою "+ Додати квартиру". Ви можете додати кожному індивідуальні послуги (паркінг, борг).</p>
+
+                <h4>4. Як працює розрахунок (МЗК)?</h4>
+                <p>Програма бере різницю між Загальним лічильником і сумою квартир. Ця різниця (втрати/спільне світло) множиться на тариф і ділиться на всіх порівну.</p>
+
+                <h4>5. Важливо: Збереження даних!</h4>
+                <p style="color:var(--danger); font-weight:bold;">Дані зберігаються тільки у вашому телефоні!</p>
                 <ul>
-                    <li>Додавайте власні лічильники!</li>
-                    <li>Видалення об'єктів.</li>
-                    <li>Оновлений дизайн.</li>
+                    <li>Після розрахунку натисніть <span class="info-highlight">💾 Зберегти</span>.</li>
+                    <li>Збережіть файл (бекап) у надійне місце (Telegram, Google Диск).</li>
+                    <li>Щоб відновити дані, натисніть <span class="info-highlight">📂 Завантажити</span>.</li>
                 </ul>
-                <h4>📊 Як рахується МЗК?</h4>
-                <p>Різниця між загальним лічильником та сумою квартир ділиться на всіх.</p>
+
+                <h4>6. Закриття місяця</h4>
+                <p>Кнопка <span class="info-highlight">🗓 Закрити місяць</span> переносить показники "Стало" в "Було" і обнуляє оплати для початку нового періоду.</p>
             </div>
 
             <div id="menu-content-premium" style="display:none">
@@ -259,8 +294,11 @@
 
             <div id="menu-content-contacts" style="display:none">
                 <div style="text-align:center;">
-                    <p>Telegram Підтримка:</p>
+                    <p>Виникли питання або пропозиції?</p>
+                    <p style="font-weight:bold; margin-bottom:5px;">Telegram Підтримка:</p>
                     <a href="https://t.me/comunalco" target="_blank" class="btn btn-telegram" style="text-decoration:none; margin-bottom:15px;">@comunalco</a>
+                    
+                    <p style="font-weight:bold; margin-bottom:5px;">Email:</p>
                     <a href="mailto:support@comunalco.com" class="btn btn-outline" style="text-decoration:none; color:var(--text); border-color:var(--border)">support@comunalco.com</a>
                 </div>
             </div>
@@ -272,18 +310,23 @@
             <span class="modal-close" onclick="document.getElementById('payModal').style.display='none'">&times;</span>
             <h3 style="margin-top:0; text-align:center;">Оформлення підписки</h3>
             <div id="pay-details" style="text-align:center; font-weight:bold; margin-bottom:15px; color:var(--primary);"></div>
-            <label>Ваш Telegram</label>
-            <input type="text" id="pay-contact" placeholder="@username" oninput="app.validatePayForm()">
-            <label style="margin-top:10px;">Email</label>
+            
+            <label>Ваш Telegram (для відправки ключа)</label>
+            <input type="text" id="pay-contact" placeholder="@username або номер" oninput="app.validatePayForm()">
+            
+            <label style="margin-top:10px;">Email (резерв)</label>
             <input type="email" id="pay-email" placeholder="mail@example.com" oninput="app.validatePayForm()">
-            <button id="btn-do-pay" class="btn btn-success" disabled onclick="app.processPayment()" style="margin-top:15px;">💳 Отримати ключ</button>
+
+            <button id="btn-do-pay" class="btn btn-success" disabled onclick="app.processPayment()" style="margin-top:15px;">💳 Сплатити та Отримати ключ</button>
         </div>
     </div>
-
 <script>
 class App {
     constructor() {
+        // Ліміти для різних версій
         this.LIMITS = { free: 2, standard: 10, pro: 9999, vip: 9999 };
+        
+        // Тарифні плани
         this.TARIFF_PLANS = [
             { id: 'std_6', name: 'Рантьє (6 міс)', limit: 10, price: 300, desc: 'До 10 квартир. 50 грн/міс' },
             { id: 'std_12', name: 'Рантьє (1 рік)', limit: 10, price: 499, desc: 'До 10 квартир. Вигода 17%', isPopular: true },
@@ -329,7 +372,6 @@ class App {
             tariffs: { el_d: 4.32, el_n: 2.16, w: 30.0, g: 8.0 }, 
             extra_tariffs: [], 
             requisites: [{ id: 1, name: "Картка", val: "" }],
-            // Додано масив custom_counters для груп та квартир
             groups: [{ id: 1, name: "Вхідна Група", prev: { ed: 0, en: 0, w: 0, g: 0 }, curr: { ed: 0, en: 0, w: 0, g: 0 }, custom_counters: [], services: [] }],
             apartments: [{ id: 1, name: "Кв. 1", group_id: 1, messenger: 'viber', email: '', phone: '', prev: { ed: 0, en: 0, w: 0, g: 0 }, curr: { ed: 0, en: 0, w: 0, g: 0 }, custom_counters: [], services: [], paid: 0, debt: 0 }]
         };
@@ -380,8 +422,11 @@ class App {
         const lim = document.getElementById('limit-counter');
         const lic = this.state.license || {type:'free'};
         let limit = this.LIMITS[lic.type] || 2;
+        
+        // Відображення типу ліцензії
         bad.innerText = lic.type === 'free' ? 'FREE' : lic.type.toUpperCase();
         bad.className = `status-badge ${lic.type === 'free' ? '' : (lic.type==='vip'?'status-vip':'status-pro')}`;
+        
         lim.innerText = limit > 1000 ? "∞" : `${cnt}/${limit}`;
     }
 
@@ -696,6 +741,7 @@ class App {
         let sRows = a.services.map(s => `<tr style="border-bottom:1px solid #e2e8f0;"><td style="padding:5px;">${s.name}</td><td style="padding:5px;text-align:right;">${s.val.toFixed(2)}</td></tr>`).join('');
         let tot = cost.ed + cost.w + cost.g + custCostTotal + a.services.reduce((s,x)=>s+x.val,0) + mzkVal + (a.debt||0);
 
+        // Дизайн квитанції
         const template = `
         <div style="font-family: 'Inter', sans-serif; color:#1e293b; background:#fff; padding:30px; box-sizing: border-box; width: 100%; text-align: center;">
             <div style="margin-bottom:20px; font-weight: 900; font-size: 20px;">Комуналк<span style="color:#0099ff">Облік</span><div style="font-size:12px; margin-top:5px; color:#64748b;">${d.name}</div></div>
@@ -766,18 +812,45 @@ class App {
         document.getElementById('pay-details').innerText = `${plan.name} — ${plan.price} грн`;
         this.validatePayForm();
     }
-    validatePayForm() { document.getElementById('btn-do-pay').disabled = !(document.getElementById('pay-contact').value.length > 3); }
-    processPayment() { alert("Дякуємо! Ваша заявка прийнята. Очікуйте повідомлення."); document.getElementById('payModal').style.display = 'none'; }
+    validatePayForm() { 
+        const contact = document.getElementById('pay-contact').value;
+        const email = document.getElementById('pay-email').value;
+        document.getElementById('btn-do-pay').disabled = !(contact.length > 3 || email.length > 5); 
+    }
+    
+    // --- ОПЛАТА ЧЕРЕЗ TELEGRAM ---
+    processPayment() {
+        const contact = document.getElementById('pay-contact').value;
+        const email = document.getElementById('pay-email').value;
+        const plan = this.pendingPayment;
+        
+        if(!plan) return;
+
+        // Формуємо текст повідомлення
+        const text = `👋 Вітаю! Хочу оформити підписку.\n\n🏷 Тариф: ${plan.name}\n💰 Сума: ${plan.price} грн\n👤 Мій контакт: ${contact}\n📧 Email: ${email || 'не вказано'}`;
+        
+        const encodedText = encodeURIComponent(text);
+        const adminTelegram = 'comunalco'; //
+
+        if(confirm(`Перейти в Telegram для оплати тарифу "${plan.name}"?`)) {
+            window.open(`https://t.me/${adminTelegram}?text=${encodedText}`, '_blank');
+            document.getElementById('payModal').style.display = 'none';
+        }
+    }
+
     activatePro() { 
         const key = document.getElementById('activation-key').value;
+        // Тестовий ключ для демонстрації
         if(key === "B15sh356pro") { this.state.license = { type: 'vip', exp: '2099-12-31' }; alert("VIP Active"); location.reload(); return; }
+        
+        // Тут можна додати розшифровку Base64 ключа, як було в минулій версії, якщо потрібно
         alert("Невірний ключ");
     }
 }
 const app = new App();
 </script>
 <script>
-    // Реєстрація Service Worker
+    // Реєстрація Service Worker (для роботи офлайн)
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('sw.js')
