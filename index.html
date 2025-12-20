@@ -16,9 +16,9 @@
             --accent-glow: rgba(0, 240, 255, 0.6);
             --gradient-btn: linear-gradient(90deg, #007cf0, #00dfd8);
             
-            /* Нові кольори для логотипу */
-            --neon-outline: #67e8f9; /* Блакитний контур */
-            --neon-solid: #2dd4bf;   /* Бірюзова заливка */
+            /* Неонові кольори логотипу */
+            --neon-outline: #67e8f9;
+            --neon-solid: #2dd4bf;
         }
 
         * { box-sizing: border-box; }
@@ -46,7 +46,7 @@
 
         /* --- ШАПКА --- */
         header {
-            padding: 15px 0; /* Трохи зменшив відступи, бо логотип став вищим */
+            padding: 10px 0;
             border-bottom: 1px solid rgba(255,255,255,0.05);
             background: rgba(5, 10, 20, 0.95);
             position: sticky;
@@ -61,46 +61,57 @@
             align-items: center;
         }
 
-        /* --- НОВИЙ ЛОГОТИП --- */
+        /* --- ЛОГОТИП (ТЕКСТ + КАРТИНКА) --- */
         .logo-brand {
             text-decoration: none;
             display: flex;
-            flex-direction: column; /* Текст один під одним */
-            align-items: center;    /* Центрування */
+            /* ДЕСКТОП: Вертикально (текст зверху, картинка знизу) */
+            flex-direction: column; 
+            align-items: center;
+            position: relative;
+        }
+
+        .logo-text-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             line-height: 1.1;
         }
 
-        /* Верхній рядок: COMUNALCO */
+        /* Картинка логотипу (іконка) */
+        .logo-icon-img {
+            width: 35px; /* Розмір логотипу на ПК */
+            height: auto;
+            margin-top: 5px; /* Відступ зверху від тексту */
+            filter: drop-shadow(0 0 5px var(--accent)); /* Неонове світіння картинки */
+        }
+
+        /* Текстова частина */
         .brand-top {
             font-weight: 900;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            /* Адаптивний розмір: від 24px на мобільному до 32px на десктопі */
             font-size: clamp(1.5rem, 2.5vw, 2rem);
         }
 
-        /* Нижній рядок: КомуналкОблік */
         .brand-bottom {
             font-weight: 700;
-            /* Розмір менший (~60% від верхнього) */
             font-size: clamp(0.8rem, 1.5vw, 1.2rem);
-            margin-top: -2px; /* Трохи підтягуємо вгору */
+            margin-top: -2px;
         }
 
-        /* Стиль контуру (Outline) - для COMUNALCO та Комуналк */
+        /* Неонові ефекти тексту */
         .outline-neon, .outline-neon-sub {
-            color: transparent; /* Прозора середина */
-            -webkit-text-stroke: 1px var(--neon-outline); /* Тонкий блакитний контур */
-            text-shadow: 0 0 10px rgba(103, 232, 249, 0.4); /* Легке світіння */
+            color: transparent;
+            -webkit-text-stroke: 1px var(--neon-outline);
+            text-shadow: 0 0 10px rgba(103, 232, 249, 0.4);
         }
 
-        /* Стиль заливки (Solid) - для Облік */
         .solid-neon-sub {
-            color: var(--neon-solid); /* Повна заливка бірюзовим */
-            text-shadow: 0 0 15px rgba(45, 212, 191, 0.6); /* Яскраве світіння */
+            color: var(--neon-solid);
+            text-shadow: 0 0 15px rgba(45, 212, 191, 0.6);
         }
 
-        /* Ефект при наведенні на лого */
         .logo-brand:hover .outline-neon {
             text-shadow: 0 0 20px rgba(103, 232, 249, 0.8);
             transition: 0.3s;
@@ -119,8 +130,19 @@
         .btn-login:hover { background: var(--accent); color: #000; box-shadow: 0 0 20px var(--accent-glow); }
 
         /* --- ГОЛОВНИЙ ЕКРАН --- */
-        .hero { padding: 50px 0; display: flex; align-items: center; justify-content: space-between; min-height: 80vh; }
-        .hero-content { flex: 1; max-width: 600px; z-index: 2; }
+        .hero { 
+            padding: 50px 0; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            min-height: 80vh; 
+        }
+        
+        .hero-content { 
+            flex: 1; 
+            max-width: 600px; 
+            z-index: 2; 
+        }
 
         h1 { font-size: 3.2rem; line-height: 1.1; margin-bottom: 20px; font-weight: 900; }
         h1 span { color: transparent; -webkit-background-clip: text; background-clip: text; background-image: linear-gradient(90deg, #fff, var(--accent)); }
@@ -133,14 +155,24 @@
             box-shadow: 0 10px 30px rgba(0, 223, 216, 0.3); color: #fff; letter-spacing: 0.5px;
         }
 
-        .hero-img { flex: 1; display: flex; justify-content: center; position: relative; }
-        .hero-img img {
-            width: 100%; max-width: 550px; mix-blend-mode: screen; animation: float 6s ease-in-out infinite;
-            mask-image: radial-gradient(circle, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%);
-            -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%);
+        /* ВІДЕО БЛОК */
+        .hero-media { 
+            flex: 1; 
+            display: flex; 
+            justify-content: center; 
+            position: relative;
         }
-
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+        
+        .hero-video {
+            width: 100%;
+            max-width: 550px;
+            border-radius: 20px;
+            /* Легке світіння навколо відео */
+            box-shadow: 0 0 40px rgba(0, 240, 255, 0.15);
+            /* Маска для плавних країв (опціонально, можна прибрати) */
+            -webkit-mask-image: radial-gradient(circle, white 70%, transparent 100%);
+            mask-image: radial-gradient(circle, white 70%, transparent 100%);
+        }
 
         /* --- СЕКЦІЇ --- */
         section { padding: 80px 0; }
@@ -195,18 +227,45 @@
             border-top: 1px solid rgba(255,255,255,0.05); font-size: 0.8rem; color: var(--text-sec);
         }
 
+        /* --- АДАПТИВНІСТЬ (МОБІЛЬНИЙ) --- */
         @media (max-width: 900px) {
-            h1 { font-size: 2.2rem; text-align: center; }
-            .hero { flex-direction: column-reverse; text-align: center; padding-top: 20px; }
-            .hero-content { margin-top: 30px; width: 100%; display: flex; flex-direction: column; align-items: center; }
-            .hero p { margin: 0 auto 30px auto; text-align: center; }
-            .nav-wrapper { flex-wrap: wrap; gap: 15px; justify-content: space-between; }
             
-            /* На мобільному меню може з'їжджати вниз, це ок */
+            /* ЛОГОТИП НА МОБІЛЬНОМУ: Горизонтально */
+            .logo-brand {
+                flex-direction: row; /* Текст зліва, картинка справа */
+                gap: 15px; /* Відступ між текстом і картинкою */
+            }
+            .logo-icon-img {
+                margin-top: 0;
+                width: 40px; /* Трохи більша іконка для балансу */
+            }
+            
+            /* ГОЛОВНИЙ ЕКРАН НА МОБІЛЬНОМУ */
+            .hero { 
+                flex-direction: column; /* Текст зверху, Відео знизу */
+                text-align: center; 
+                padding-top: 20px; 
+            }
+            .hero-content { 
+                margin-top: 10px; 
+                width: 100%; 
+                display: flex; 
+                flex-direction: column; 
+                align-items: center; 
+                margin-bottom: 40px; /* Відступ від кнопки до відео */
+            }
+            .hero p { margin: 0 auto 30px auto; text-align: center; }
+            
+            /* МЕНЮ */
+            .nav-wrapper { flex-wrap: wrap; gap: 15px; justify-content: space-between; }
+            h1 { font-size: 2.2rem; text-align: center; }
             nav { width: 100%; order: 3; margin-top: 10px; overflow-x: auto; padding-bottom: 5px; }
             nav ul { justify-content: space-between; gap: 20px; white-space: nowrap; padding: 0 5px; }
             .btn-login { margin-left: 0; padding: 10px 20px; font-size: 0.9rem; }
-            .hero-img img { max-width: 80%; }
+            
+            /* Відео на всю ширину мобільного */
+            .hero-media { width: 100%; }
+            .hero-video { max-width: 90%; }
         }
     </style>
 </head>
@@ -215,12 +274,13 @@
     <header>
         <div class="container nav-wrapper">
             <a href="#" class="logo-brand">
-                <div class="brand-top outline-neon">
-                    COMUNALCO
+                <div class="logo-text-wrapper">
+                    <div class="brand-top outline-neon">COMUNALCO</div>
+                    <div class="brand-bottom">
+                        <span class="outline-neon-sub">Комуналк</span><span class="solid-neon-sub">Облік</span>
+                    </div>
                 </div>
-                <div class="brand-bottom">
-                    <span class="outline-neon-sub">Комуналк</span><span class="solid-neon-sub">Облік</span>
-                </div>
+                <img src="logo.png" alt="Logo" class="logo-icon-img">
             </a>
             
             <a href="app/index.html" class="btn-login">Увійти</a>
@@ -237,7 +297,7 @@
     </header>
 
     <section class="hero">
-        <div class="container" style="display: flex; flex-wrap: wrap; align-items: center; width: 100%;">
+        <div class="container" style="display: flex; flex-wrap: wrap; align-items: center; width: 100%; justify-content: space-between;">
             <div class="hero-content">
                 <h1>Цифровий облік <br><span>чесних розрахунків</span></h1>
                 <p>
@@ -245,8 +305,12 @@
                 </p>
                 <a href="app/index.html" class="btn-main">Спробувати безкоштовно</a>
             </div>
-            <div class="hero-img">
-                <img src="hero-img.png" alt="Comunalco Visualization">
+
+            <div class="hero-media">
+                <video class="hero-video" autoplay muted loop playsinline>
+                    <source src="1766175525528.mp4" type="video/mp4">
+                    Ваш браузер не підтримує відео.
+                </video>
             </div>
         </div>
     </section>
