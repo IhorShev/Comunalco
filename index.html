@@ -15,6 +15,10 @@
             --accent: #00f0ff;
             --accent-glow: rgba(0, 240, 255, 0.6);
             --gradient-btn: linear-gradient(90deg, #007cf0, #00dfd8);
+            
+            /* Нові кольори для логотипу */
+            --neon-outline: #67e8f9; /* Блакитний контур */
+            --neon-solid: #2dd4bf;   /* Бірюзова заливка */
         }
 
         * { box-sizing: border-box; }
@@ -42,7 +46,7 @@
 
         /* --- ШАПКА --- */
         header {
-            padding: 15px 0;
+            padding: 15px 0; /* Трохи зменшив відступи, бо логотип став вищим */
             border-bottom: 1px solid rgba(255,255,255,0.05);
             background: rgba(5, 10, 20, 0.95);
             position: sticky;
@@ -57,55 +61,55 @@
             align-items: center;
         }
 
+        /* --- НОВИЙ ЛОГОТИП --- */
         .logo-brand {
             text-decoration: none;
             display: flex;
-            align-items: center;
-            gap: 12px; 
+            flex-direction: column; /* Текст один під одним */
+            align-items: center;    /* Центрування */
+            line-height: 1.1;
         }
 
-        .logo-text {
-            font-size: 1.8rem;
+        /* Верхній рядок: COMUNALCO */
+        .brand-top {
             font-weight: 900;
-            letter-spacing: 0.5px;
-            line-height: 1;
-        }
-        
-        .logo-icon-img {
-            height: 45px;
-            width: auto;
-            display: block;
-            filter: drop-shadow(0 0 5px var(--accent-glow));
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            /* Адаптивний розмір: від 24px на мобільному до 32px на десктопі */
+            font-size: clamp(1.5rem, 2.5vw, 2rem);
         }
 
-        .text-white { color: #ffffff; }
-        .text-neon { color: var(--accent); text-shadow: 0 0 15px var(--accent-glow); }
+        /* Нижній рядок: КомуналкОблік */
+        .brand-bottom {
+            font-weight: 700;
+            /* Розмір менший (~60% від верхнього) */
+            font-size: clamp(0.8rem, 1.5vw, 1.2rem);
+            margin-top: -2px; /* Трохи підтягуємо вгору */
+        }
 
-        .styled-o { display: inline-block; position: relative; color: var(--accent); }
-        .styled-o::after {
-            content: ''; position: absolute; top: 53%; left: 50%; transform: translate(-50%, -50%);
-            width: 33%; height: 33%; background-color: white; border-radius: 50%; box-shadow: 0 0 8px #fff; z-index: 2;
+        /* Стиль контуру (Outline) - для COMUNALCO та Комуналк */
+        .outline-neon, .outline-neon-sub {
+            color: transparent; /* Прозора середина */
+            -webkit-text-stroke: 1px var(--neon-outline); /* Тонкий блакитний контур */
+            text-shadow: 0 0 10px rgba(103, 232, 249, 0.4); /* Легке світіння */
+        }
+
+        /* Стиль заливки (Solid) - для Облік */
+        .solid-neon-sub {
+            color: var(--neon-solid); /* Повна заливка бірюзовим */
+            text-shadow: 0 0 15px rgba(45, 212, 191, 0.6); /* Яскраве світіння */
+        }
+
+        /* Ефект при наведенні на лого */
+        .logo-brand:hover .outline-neon {
+            text-shadow: 0 0 20px rgba(103, 232, 249, 0.8);
+            transition: 0.3s;
         }
 
         /* --- МЕНЮ --- */
         nav ul { display: flex; gap: 20px; }
-        nav a { font-size: 0.8rem; font-weight: 700; color: var(--text-sec); text-transform: uppercase; letter-spacing: 1px; position: relative; }
+        nav a { font-size: 0.8rem; font-weight: 700; color: var(--text-sec); text-transform: uppercase; letter-spacing: 1px; }
         nav a:hover { color: var(--accent); text-shadow: 0 0 10px var(--accent-glow); }
-        
-        nav a.active {
-            color: var(--accent);
-            text-shadow: 0 0 10px var(--accent-glow);
-        }
-        nav a.active::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: var(--accent);
-            box-shadow: 0 0 10px var(--accent);
-        }
 
         .btn-login {
             padding: 10px 30px; border: 2px solid var(--accent); color: var(--accent);
@@ -115,23 +119,8 @@
         .btn-login:hover { background: var(--accent); color: #000; box-shadow: 0 0 20px var(--accent-glow); }
 
         /* --- ГОЛОВНИЙ ЕКРАН --- */
-        .hero { 
-            padding: 50px 0; 
-            min-height: 80vh; 
-            display: flex;
-            align-items: center;
-        }
-
-        /* Стиль контейнера Hero перенесений в CSS для контролю на мобільному */
-        .hero-container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            width: 100%;
-        }
-
-        .hero-content { flex: 1; max-width: 600px; z-index: 2; min-width: 300px; }
+        .hero { padding: 50px 0; display: flex; align-items: center; justify-content: space-between; min-height: 80vh; }
+        .hero-content { flex: 1; max-width: 600px; z-index: 2; }
 
         h1 { font-size: 3.2rem; line-height: 1.1; margin-bottom: 20px; font-weight: 900; }
         h1 span { color: transparent; -webkit-background-clip: text; background-clip: text; background-image: linear-gradient(90deg, #fff, var(--accent)); }
@@ -144,18 +133,11 @@
             box-shadow: 0 10px 30px rgba(0, 223, 216, 0.3); color: #fff; letter-spacing: 0.5px;
         }
 
-        .hero-media { flex: 1; display: flex; justify-content: center; position: relative; padding-left: 20px; min-width: 300px; }
-        
-        /* ВІДЕО */
-        .hero-video {
-            width: 100%;
-            max-width: 550px;
-            border-radius: 20px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
-            border: 1px solid rgba(0, 240, 255, 0.2);
-            animation: float 6s ease-in-out infinite;
-            background: #000; 
-            object-fit: cover;
+        .hero-img { flex: 1; display: flex; justify-content: center; position: relative; }
+        .hero-img img {
+            width: 100%; max-width: 550px; mix-blend-mode: screen; animation: float 6s ease-in-out infinite;
+            mask-image: radial-gradient(circle, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%);
+            -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%);
         }
 
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
@@ -213,52 +195,18 @@
             border-top: 1px solid rgba(255,255,255,0.05); font-size: 0.8rem; color: var(--text-sec);
         }
 
-        /* --- АДАПТИВНІСТЬ (MOBILE) --- */
         @media (max-width: 900px) {
             h1 { font-size: 2.2rem; text-align: center; }
-            
-            /* Важливе виправлення для мобільного */
-            .hero-container {
-                flex-direction: column !important; /* Елементи один під одним */
-                text-align: center;
-            }
-            
-            .hero { padding-top: 20px; align-items: flex-start; }
-            
-            .hero-content { 
-                margin-top: 0; 
-                margin-bottom: 30px; 
-                width: 100%; 
-                max-width: 100%; /* Дозволяємо на всю ширину */
-                display: flex; 
-                flex-direction: column; 
-                align-items: center; 
-            }
-            
+            .hero { flex-direction: column-reverse; text-align: center; padding-top: 20px; }
+            .hero-content { margin-top: 30px; width: 100%; display: flex; flex-direction: column; align-items: center; }
             .hero p { margin: 0 auto 30px auto; text-align: center; }
-            
             .nav-wrapper { flex-wrap: wrap; gap: 15px; justify-content: space-between; }
-            .logo-text { font-size: 1.4rem; }
-            .logo-icon-img { height: 35px; }
-
+            
+            /* На мобільному меню може з'їжджати вниз, це ок */
             nav { width: 100%; order: 3; margin-top: 10px; overflow-x: auto; padding-bottom: 5px; }
             nav ul { justify-content: space-between; gap: 20px; white-space: nowrap; padding: 0 5px; }
             .btn-login { margin-left: 0; padding: 10px 20px; font-size: 0.9rem; }
-            
-            /* ВІДЕО НА МОБІЛЬНОМУ */
-            .hero-media { 
-                width: 100% !important; /* Примусово 100% ширини */
-                padding-left: 0; 
-                display: block; 
-                margin-top: 20px;
-            }
-            .hero-video { 
-                width: 100% !important;
-                max-width: 100%; 
-                height: auto;
-                animation: none; /* Без анімації, щоб не стрибало */
-                box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            }
+            .hero-img img { max-width: 80%; }
         }
     </style>
 </head>
@@ -267,26 +215,29 @@
     <header>
         <div class="container nav-wrapper">
             <a href="#" class="logo-brand">
-                <div class="logo-text">
-                    <span class="text-white">Комуналк</span><span class="text-neon"><span class="styled-o">О</span>блік</span>
+                <div class="brand-top outline-neon">
+                    COMUNALCO
                 </div>
-                <img src="logo-c.png" alt="C" class="logo-icon-img">
+                <div class="brand-bottom">
+                    <span class="outline-neon-sub">Комуналк</span><span class="solid-neon-sub">Облік</span>
+                </div>
             </a>
+            
             <a href="app/index.html" class="btn-login">Увійти</a>
-            <nav id="main-nav">
+            <nav>
                 <ul>
-                    <li><a href="#home" class="nav-link active">Головна</a></li>
-                    <li><a href="#about" class="nav-link">Можливості</a></li>
-                    <li><a href="#pricing" class="nav-link">Тарифи</a></li>
-                    <li><a href="#install" class="nav-link">Встановити</a></li>
-                    <li><a href="#contact" class="nav-link">Контакти</a></li>
+                    <li><a href="#">Головна</a></li>
+                    <li><a href="#about">Можливості</a></li>
+                    <li><a href="#pricing">Тарифи</a></li>
+                    <li><a href="#install" style="color:var(--accent)">Встановити</a></li>
+                    <li><a href="#contact">Контакти</a></li>
                 </ul>
             </nav>
         </div>
     </header>
 
-    <section class="hero" id="home">
-        <div class="container hero-container">
+    <section class="hero">
+        <div class="container" style="display: flex; flex-wrap: wrap; align-items: center; width: 100%;">
             <div class="hero-content">
                 <h1>Цифровий облік <br><span>чесних розрахунків</span></h1>
                 <p>
@@ -294,12 +245,8 @@
                 </p>
                 <a href="app/index.html" class="btn-main">Спробувати безкоштовно</a>
             </div>
-            
-            <div class="hero-media">
-                <video class="hero-video" autoplay loop muted playsinline poster="logo-c.png">
-                    <source src="1766175525528.mp4" type="video/mp4">
-                    Ваш браузер не підтримує відео.
-                </video>
+            <div class="hero-img">
+                <img src="hero-img.png" alt="Comunalco Visualization">
             </div>
         </div>
     </section>
@@ -308,51 +255,61 @@
         <div class="container">
             <h2 class="section-title">Чому <span>Comunalco</span> — це вигідно?</h2>
             <div class="grid-3">
+                
                 <div class="card">
                     <div class="card-icon">🧮</div>
                     <h3>Розумний МЗК</h3>
                     <p>Додаток автоматично знаходить різницю між головним лічильником та сумою всіх маленьких. Ці спільні витрати система чесно ділить між усіма учасниками порівну.</p>
                 </div>
+
                 <div class="card">
                     <div class="card-icon">🚀</div>
                     <h3>Абсолютна Гнучкість</h3>
                     <p>Використовуйте додаток для будь-чого! Перейменуйте «Об'єкт» на назву офісу чи гаража, а «Квартири» — на імена людей. Називайте видатки як забажаєте.</p>
                 </div>
+
                 <div class="card">
                     <div class="card-icon">🔋</div>
                     <h3>100% Автономність</h3>
                     <p>Програма працює прямо у вашому браузері без інтернету. Вносьте цифри навіть у підвалах чи під час блекауту — все буде працювати стабільно.</p>
                 </div>
+
                 <div class="card">
                     <div class="card-icon">⚡</div>
                     <h3>Багатотарифний Облік</h3>
                     <p>Легко рахуйте світло за тарифами «День/Ніч», воду та газ. Також ви можете додавати будь-які свої послуги: інтернет, охорону чи прибирання.</p>
                 </div>
+
                 <div class="card">
                     <div class="card-icon">📄</div>
                     <h3>Професійні PDF-Рахунки</h3>
                     <p>Створюйте гарні квитанції з усіма деталями розрахунку та вашими банківськими реквізитами. Професійний вигляд — довіра ваших клієнтів.</p>
                 </div>
+
                 <div class="card">
                     <div class="card-icon">💬</div>
                     <h3>Миттєва Відправка</h3>
                     <p>Не витрачайте час на переписування цифр вручну. Натисніть одну кнопку, і додаток сам відправить готовий розрахунок у Viber, Telegram чи WhatsApp.</p>
                 </div>
+
                 <div class="card" style="border-color: rgba(0, 240, 255, 0.3);">
                     <div class="card-icon">📉</div>
                     <h3>Контроль Боргів та Оплат</h3>
                     <p>Все просто: якщо людина винна гроші — пишіть суму з плюсом <b>(+)</b>, і вона додасться до чека. Якщо людина переплатила наперед — пишіть суму з мінусом <b>(-)</b>.</p>
                 </div>
+
                 <div class="card">
                     <div class="card-icon">🛡️</div>
                     <h3>Свобода та Безпека</h3>
                     <p>Ваша база — це тільки ваша власність. Ви самі обираєте, куди зберегти копію (бекап): у пам'ять телефону, на флешку чи на власний Google Диск.</p>
                 </div>
+
                 <div class="card">
                     <div class="card-icon">🗓️</div>
                     <h3>Закриття Місяця</h3>
                     <p>Коли місяць закінчився, натисніть кнопку — і всі вчорашні показники самі стануть «минулими», а суми оплат скинуться. Жодних помилок та плутанини.</p>
                 </div>
+
             </div>
         </div>
     </section>
@@ -454,31 +411,5 @@
         </div>
     </footer>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const sections = document.querySelectorAll('section');
-            const navLinks = document.querySelectorAll('.nav-link');
-
-            window.addEventListener('scroll', () => {
-                let current = '';
-                
-                sections.forEach(section => {
-                    const sectionTop = section.offsetTop;
-                    const sectionHeight = section.clientHeight;
-                    if (pageYOffset >= (sectionTop - 150)) {
-                        current = section.getAttribute('id');
-                    }
-                });
-
-                navLinks.forEach(link => {
-                    link.classList.remove('active');
-                    if (link.getAttribute('href').includes(current)) {
-                        link.classList.add('active');
-                    }
-                });
-            });
-        });
-    </script>
 </body>
 </html>
-
