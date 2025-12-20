@@ -33,7 +33,7 @@
             color: var(--text-main);
             scroll-behavior: smooth;
             
-            /* ❗ ВАЖЛИВО: Компенсація висоти фіксованого меню */
+            /* Компенсація висоти фіксованого меню */
             padding-top: 100px; 
         }
 
@@ -51,18 +51,14 @@
         header {
             padding: 10px 0;
             border-bottom: 1px solid rgba(255,255,255,0.05);
-            /* Напівпрозорий темний фон */
             background: rgba(5, 10, 20, 0.85); 
-            
-            /* ❗ ЗМІНИ ДЛЯ ФІКСАЦІЇ */
-            position: fixed; /* Прибиваємо до верху */
+            position: fixed; 
             top: 0;
             left: 0;
-            width: 100%; /* Розтягуємо на всю ширину */
-            
+            width: 100%; 
             z-index: 1000;
-            backdrop-filter: blur(15px); /* Ефект розмиття фону (матове скло) */
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5); /* Тінь для відділення від контенту */
+            backdrop-filter: blur(15px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
         }
 
         .nav-wrapper {
@@ -75,7 +71,7 @@
         .logo-brand {
             text-decoration: none;
             display: flex;
-            flex-direction: column; /* ДЕСКТОП: Вертикально */
+            flex-direction: column;
             align-items: center;
             position: relative;
         }
@@ -87,7 +83,6 @@
             line-height: 1.1;
         }
 
-        /* Картинка логотипу (іконка) */
         .logo-icon-img {
             width: 35px;
             height: auto;
@@ -95,7 +90,6 @@
             filter: drop-shadow(0 0 5px var(--accent));
         }
 
-        /* Текстова частина */
         .brand-top {
             font-weight: 900;
             text-transform: uppercase;
@@ -109,7 +103,6 @@
             margin-top: -2px;
         }
 
-        /* Неонові ефекти тексту */
         .outline-neon, .outline-neon-sub {
             color: transparent;
             -webkit-text-stroke: 1px var(--neon-outline);
@@ -140,7 +133,6 @@
         
         .nav-link:hover { color: var(--accent); text-shadow: 0 0 10px var(--accent-glow); }
         
-        /* Клас для активного пункту меню */
         .nav-link.active {
             color: var(--accent);
             text-shadow: 0 0 15px var(--accent-glow);
@@ -168,16 +160,20 @@
             padding: 50px 0; 
             display: flex; 
             align-items: center; 
-            justify-content: space-between; 
+            
+            /* ❗ ВИПРАВЛЕНО: Центруємо контент замість розкидання по краях */
+            justify-content: center; 
+            gap: 60px; /* Відступ між текстом і відео */
+            
             min-height: 80vh; 
             flex-wrap: nowrap;
         }
         
         .hero-content { 
-            flex: 1; 
-            max-width: 600px; 
+            flex: 1; /* Гнучка ширина */
+            max-width: 550px; /* Обмежуємо ширину тексту, щоб він був компактнішим */
             z-index: 2; 
-            padding-right: 20px;
+            /* padding-right прибрали, бо тепер є gap */
         }
 
         h1 { font-size: 3.2rem; line-height: 1.1; margin-bottom: 20px; font-weight: 900; }
@@ -195,7 +191,7 @@
         .hero-media { 
             flex: 1; 
             display: flex; 
-            justify-content: center; 
+            justify-content: center; /* Центруємо саме відео в його блоці */
             position: relative;
             max-width: 550px;
         }
@@ -262,9 +258,6 @@
         /* --- АДАПТИВНІСТЬ (МОБІЛЬНИЙ) --- */
         @media (max-width: 900px) {
             
-            /* Компенсація висоти меню на мобільному може бути меншою, але 100px норм */
-            
-            /* ЛОГОТИП НА МОБІЛЬНОМУ */
             .logo-brand {
                 flex-direction: row; 
                 gap: 15px;
@@ -274,27 +267,26 @@
                 width: 40px; 
             }
             
-            /* ГОЛОВНИЙ ЕКРАН НА МОБІЛЬНОМУ */
             .hero { 
                 flex-direction: column; 
                 text-align: center; 
                 padding-top: 20px;
                 flex-wrap: wrap; 
+                gap: 40px; /* Зменшуємо відступ на мобільному */
             }
             
             .hero-content { 
-                padding-right: 0;
+                max-width: 100%; /* На мобільному на всю ширину */
                 margin-top: 10px; 
                 width: 100%; 
                 display: flex; 
                 flex-direction: column; 
                 align-items: center; 
-                margin-bottom: 40px; 
+                margin-bottom: 0; /* Контролюється через gap */
             }
             
             .hero p { margin: 0 auto 30px auto; text-align: center; }
             
-            /* ВІДЕО НА ВЕСЬ ЕКРАН */
             .hero-media { 
                 width: 100%; 
                 max-width: 100%; 
@@ -303,7 +295,6 @@
                 width: 100%; 
             }
             
-            /* МЕНЮ */
             .nav-wrapper { flex-wrap: wrap; gap: 15px; justify-content: space-between; }
             h1 { font-size: 2.2rem; text-align: center; }
             nav { width: 100%; order: 3; margin-top: 10px; overflow-x: auto; padding-bottom: 5px; }
@@ -513,10 +504,8 @@
         window.addEventListener('scroll', () => {
             let current = '';
 
-            // Визначаємо, яка секція зараз на екрані
             sections.forEach(section => {
                 const sectionTop = section.offsetTop;
-                // Враховуємо висоту шапки (100px), щоб перемикання було точним
                 if (pageYOffset >= (sectionTop - 150)) {
                     current = section.getAttribute('id');
                 }
