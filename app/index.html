@@ -58,41 +58,14 @@
         .top-menu-bar span { cursor: pointer; display: flex; align-items: center; gap: 5px; }
         .theme-toggle-btn { background: none; border: none; cursor: pointer; font-size: 16px; padding: 0; }
 
-        /* Стилі Логотипа (з Лендінгу) */
+        /* Стилі Логотипа */
         .brand-header { display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 15px 0 25px 0; }
         .logo-text-wrapper { display: flex; flex-direction: column; align-items: center; line-height: 1.1; }
-        
-        .brand-top { 
-            font-weight: 900; 
-            text-transform: uppercase; 
-            letter-spacing: 0.05em; 
-            font-size: 28px; 
-            font-family: 'Montserrat', sans-serif;
-            color: var(--text);
-        }
-        
-        .brand-bottom { 
-            font-weight: 700; 
-            font-size: 16px; 
-            margin-top: -2px; 
-            font-family: 'Montserrat', sans-serif;
-            color: var(--text);
-        }
-
-        /* Неонові ефекти адаптовані під додаток */
-        .outline-neon { 
-            color: transparent; 
-            -webkit-text-stroke: 1px var(--primary); 
-            text-shadow: 0 0 10px rgba(0, 153, 255, 0.4); 
-        }
-        .outline-neon-sub { 
-            color: transparent; 
-            -webkit-text-stroke: 1px var(--primary); 
-        }
-        .solid-neon-sub { 
-            color: var(--primary); 
-            text-shadow: 0 0 15px rgba(0, 153, 255, 0.6); 
-        }
+        .brand-top { font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em; font-size: 28px; font-family: 'Montserrat', sans-serif; color: var(--text); }
+        .brand-bottom { font-weight: 700; font-size: 16px; margin-top: -2px; font-family: 'Montserrat', sans-serif; color: var(--text); }
+        .outline-neon { color: transparent; -webkit-text-stroke: 1px var(--primary); text-shadow: 0 0 10px rgba(0, 153, 255, 0.4); }
+        .outline-neon-sub { color: transparent; -webkit-text-stroke: 1px var(--primary); }
+        .solid-neon-sub { color: var(--primary); text-shadow: 0 0 15px rgba(0, 153, 255, 0.6); }
 
         .app-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; background: var(--header-bg); padding: 8px 12px; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         .nav-btn { font-size: 24px; color: var(--primary); padding: 5px; cursor: pointer; }
@@ -145,11 +118,14 @@
         .price-title { font-size: 16px; font-weight: 900; margin-bottom: 5px; text-transform: uppercase; font-family: 'Montserrat', sans-serif; }
         .price-val { font-size: 20px; font-weight: bold; color: var(--text); margin-bottom: 5px; }
         
-        /* Стилі для Пам'ятки */
         .info-block h4 { color: var(--primary); margin: 15px 0 5px 0; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
         .info-block ul { padding-left: 20px; color: var(--text-sec); font-size: 13px; }
         .info-block p { color: var(--text-sec); font-size: 13px; margin-bottom: 10px; }
         .info-highlight { background: rgba(0,153,255,0.1); color: var(--primary); padding: 2px 5px; border-radius: 4px; font-weight: bold; }
+        
+        /* New buttons for order */
+        .btn-order-tg { background: #229ED9; color: white; margin-bottom: 10px; }
+        .btn-order-email { background: transparent; border: 2px solid #cbd5e1; color: var(--text); }
     </style>
 </head>
 <body>
@@ -187,6 +163,7 @@
 
         <div class="nav-btn" onclick="app.nextObject()">❯</div>
     </div>
+
     <div id="main-content-wrapper">
         <details>
             <summary>⚙️ Тарифи та Реквізити</summary>
@@ -311,13 +288,21 @@
             <h3 style="margin-top:0; text-align:center;">Оформлення підписки</h3>
             <div id="pay-details" style="text-align:center; font-weight:bold; margin-bottom:15px; color:var(--primary);"></div>
             
-            <label>Ваш Telegram (для відправки ключа)</label>
-            <input type="text" id="pay-contact" placeholder="@username або номер" oninput="app.validatePayForm()">
-            
-            <label style="margin-top:10px;">Email (резерв)</label>
-            <input type="email" id="pay-email" placeholder="mail@example.com" oninput="app.validatePayForm()">
+            <p style="font-size:12px; color:var(--text-sec); margin-bottom:15px; text-align:center;">
+                Оберіть спосіб замовлення. Ми надішлемо вам реквізити та ключ активації.
+            </p>
 
-            <button id="btn-do-pay" class="btn btn-success" disabled onclick="app.processPayment()" style="margin-top:15px;">💳 Сплатити та Отримати ключ</button>
+            <label>Ваш контакт (Telegram / Viber / Email)</label>
+            <input type="text" id="pay-contact" placeholder="@username або +380..." oninput="app.validatePayForm()">
+            
+            <div style="display:flex; flex-direction:column; gap:10px; margin-top:20px;">
+                <button id="btn-pay-tg" class="btn btn-order-tg" disabled onclick="app.processPayment('telegram')">
+                    📨 Замовити через Telegram
+                </button>
+                <button id="btn-pay-email" class="btn btn-order-email" disabled onclick="app.processPayment('email')">
+                    📧 Замовити через Email
+                </button>
+            </div>
         </div>
     </div>
 <script>
@@ -339,6 +324,10 @@ class App {
         this.checks = {};
         this.STORAGE_KEY = 'komunalka_v30_pro'; 
         this.pendingPayment = null; 
+        
+        // 🛑 ВАШЕ ПОСИЛАННЯ НА GOOGLE SCRIPT 🛑
+        this.API_URL = "https://script.google.com/macros/s/AKfycbyfjf7vStURsAu2Ef_9LADFQoNlTycadgCmtaZzwIF7Y5iNA8IZE8KGnlmzsBSY_QKK/exec";
+        
         this.init();
     }
     
@@ -383,7 +372,7 @@ class App {
             try { 
                 this.state = JSON.parse(d); 
                 if(!this.state.objects.length) this.state.objects=[this.createDefaultObject()];
-                // Migration for old versions
+                // Migration logic if needed
                 this.state.objects.forEach(o => {
                     o.groups.forEach(g => { if(!g.custom_counters) g.custom_counters = []; });
                     o.apartments.forEach(a => { if(!a.custom_counters) a.custom_counters = []; });
@@ -423,10 +412,8 @@ class App {
         const lic = this.state.license || {type:'free'};
         let limit = this.LIMITS[lic.type] || 2;
         
-        // Відображення типу ліцензії
         bad.innerText = lic.type === 'free' ? 'FREE' : lic.type.toUpperCase();
         bad.className = `status-badge ${lic.type === 'free' ? '' : (lic.type==='vip'?'status-vip':'status-pro')}`;
-        
         lim.innerText = limit > 1000 ? "∞" : `${cnt}/${limit}`;
     }
 
@@ -538,7 +525,6 @@ class App {
         </div>`; 
     }
 
-    // --- CUSTOM COUNTERS LOGIC ---
     renderCustomCounterRow(type, parentIdx, cIdx, cData) {
         return `
         <div class="counter-row">
@@ -638,11 +624,9 @@ class App {
         const dStr = new Date().toLocaleDateString('uk-UA');
         
         document.getElementById('results-list').innerHTML = d.apartments.map((a, i) => {
-            // Standard Counters
             const c = { ed: Math.max(0,(a.curr.ed||0)-(a.prev.ed||0)), en: Math.max(0,(a.curr.en||0)-(a.prev.en||0)), w: Math.max(0,(a.curr.w||0)-(a.prev.w||0)), g: Math.max(0,(a.curr.g||0)-(a.prev.g||0)) };
             let mCost = (c.ed*t.el_d)+(c.en*t.el_n)+(c.w*t.w)+(c.g*t.g);
             
-            // Custom Counters Calc
             let custCost = 0; let custTxt = "";
             (a.custom_counters || []).forEach(cc => {
                 let diff = Math.max(0, cc.curr - cc.prev);
@@ -724,11 +708,9 @@ class App {
         window.scrollTo(0, 0);
         const a = this.currentData.apartments[i]; const d = this.currentData; const dStr = new Date().toLocaleDateString('uk-UA');
         
-        // Std Costs
         const c = { ed: Math.max(0,(a.curr.ed||0)-(a.prev.ed||0)), en: Math.max(0,(a.curr.en||0)-(a.prev.en||0)), w: Math.max(0,(a.curr.w||0)-(a.prev.w||0)), g: Math.max(0,(a.curr.g||0)-(a.prev.g||0)) };
         const cost = { ed: (c.ed*d.tariffs.el_d) + (c.en*d.tariffs.el_n), w: c.w*d.tariffs.w, g: c.g*d.tariffs.g };
         
-        // Custom Counters HTML
         let custRows = ""; let custCostTotal = 0;
         (a.custom_counters || []).forEach(cc => {
             let diff = Math.max(0, cc.curr - cc.prev);
@@ -741,7 +723,6 @@ class App {
         let sRows = a.services.map(s => `<tr style="border-bottom:1px solid #e2e8f0;"><td style="padding:5px;">${s.name}</td><td style="padding:5px;text-align:right;">${s.val.toFixed(2)}</td></tr>`).join('');
         let tot = cost.ed + cost.w + cost.g + custCostTotal + a.services.reduce((s,x)=>s+x.val,0) + mzkVal + (a.debt||0);
 
-        // Дизайн квитанції
         const template = `
         <div style="font-family: 'Inter', sans-serif; color:#1e293b; background:#fff; padding:30px; box-sizing: border-box; width: 100%; text-align: center;">
             <div style="margin-bottom:20px; font-weight: 900; font-size: 20px;">Комуналк<span style="color:#0099ff">Облік</span><div style="font-size:12px; margin-top:5px; color:#64748b;">${d.name}</div></div>
@@ -802,62 +783,116 @@ class App {
                 <div class="price-title">${plan.name}</div>
                 <div class="price-val">${plan.price} грн</div>
                 <div class="price-sub">${plan.desc}</div>
-                <button class="btn ${plan.isVip ? 'btn-warning' : 'btn-primary'}" onclick="app.initPay('${plan.id}')">Сплатити</button>
+                <button class="btn ${plan.isVip ? 'btn-warning' : 'btn-primary'}" onclick="app.initPay('${plan.id}')">Замовити</button>
             </div>
         `).join('');
     }
+    
     initPay(planId) {
         const plan = this.TARIFF_PLANS.find(p => p.id === planId); if(!plan) return;
-        this.pendingPayment = plan; document.getElementById('menuModal').style.display = 'none'; document.getElementById('payModal').style.display = 'flex';
+        this.pendingPayment = plan; 
+        document.getElementById('menuModal').style.display = 'none'; 
+        document.getElementById('payModal').style.display = 'flex';
         document.getElementById('pay-details').innerText = `${plan.name} — ${plan.price} грн`;
         this.validatePayForm();
     }
+    
     validatePayForm() { 
-        const contact = document.getElementById('pay-contact').value;
-        const email = document.getElementById('pay-email').value;
-        document.getElementById('btn-do-pay').disabled = !(contact.length > 3 || email.length > 5); 
+        const contact = document.getElementById('pay-contact').value.trim();
+        const isValid = contact.length >= 3; 
+        document.getElementById('btn-pay-tg').disabled = !isValid;
+        document.getElementById('btn-pay-email').disabled = !isValid;
     }
     
-    // --- ОПЛАТА ЧЕРЕЗ TELEGRAM ---
-    processPayment() {
+    // --- ОНОВЛЕНА ЛОГІКА ОПЛАТИ ---
+    processPayment(method) {
         const contact = document.getElementById('pay-contact').value;
-        const email = document.getElementById('pay-email').value;
         const plan = this.pendingPayment;
-        
         if(!plan) return;
 
-        // Формуємо текст повідомлення
-        const text = `👋 Вітаю! Хочу оформити підписку.\n\n🏷 Тариф: ${plan.name}\n💰 Сума: ${plan.price} грн\n👤 Мій контакт: ${contact}\n📧 Email: ${email || 'не вказано'}`;
-        
+        const text = `👋 Вітаю! Хочу оформити підписку.\n\n🏷 Тариф: ${plan.name}\n💰 Сума: ${plan.price} грн\n👤 Мій контакт: ${contact}`;
         const encodedText = encodeURIComponent(text);
-        const adminTelegram = 'comunalco'; //
 
-        if(confirm(`Перейти в Telegram для оплати тарифу "${plan.name}"?`)) {
-            window.open(`https://t.me/${adminTelegram}?text=${encodedText}`, '_blank');
-            document.getElementById('payModal').style.display = 'none';
+        if (method === 'telegram') {
+            // Відкриває бота або ваш акаунт і вставляє текст
+            window.open(`https://t.me/comunalco?text=${encodedText}`, '_blank');
+        } 
+        else if (method === 'email') {
+            // Відкриває пошту
+            window.open(`mailto:support@comunalco.com?subject=Замовлення&body=${encodedText}`, '_self');
         }
+        document.getElementById('payModal').style.display = 'none';
     }
 
-    activatePro() { 
-        const key = document.getElementById('activation-key').value;
-        // Тестовий ключ для демонстрації
-        if(key === "B15sh356pro") { this.state.license = { type: 'vip', exp: '2099-12-31' }; alert("VIP Active"); location.reload(); return; }
+    async activatePro() { 
+        const keyInput = document.getElementById('activation-key').value.trim();
+        const btn = document.querySelector('#menu-content-premium button');
         
-        // Тут можна додати розшифровку Base64 ключа, як було в минулій версії, якщо потрібно
-        alert("Невірний ключ");
+        if(!keyInput) return;
+
+        // Генерація Fingerprint (Захист від очищення кешу)
+        let deviceId = localStorage.getItem('device_id');
+        if(!deviceId) {
+            const screenInfo = `${window.screen.width}x${window.screen.height}`;
+            const platform = navigator.platform || "unknown";
+            let str = screenInfo + platform + navigator.userAgent.length;
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                hash = ((hash << 5) - hash) + str.charCodeAt(i);
+                hash |= 0;
+            }
+            const shortHash = Math.abs(hash).toString(16).toUpperCase().substr(0,5);
+            let osPrefix = "Dev";
+            if(/iPhone|iPad/.test(navigator.userAgent)) osPrefix = "iOS";
+            else if(/Android/.test(navigator.userAgent)) osPrefix = "And";
+            else if(/Win/.test(navigator.userAgent)) osPrefix = "Win";
+            
+            deviceId = `${osPrefix}_${shortHash}`;
+            localStorage.setItem('device_id', deviceId);
+        }
+
+        btn.disabled = true; btn.innerText = "⏳";
+
+        try {
+            const res = await fetch(`${this.API_URL}?action=check&key=${encodeURIComponent(keyInput)}&deviceId=${deviceId}&ver=3.0`);
+            const data = await res.json();
+
+            if(data.result === 'success') {
+                let typeMap = { 'std_6': 'standard', 'std_12': 'standard', 'pro_6': 'pro', 'pro_12': 'pro', 'vip': 'vip' };
+                let userType = typeMap[data.plan] || (data.plan.includes('pro')?'pro':(data.plan==='vip'?'vip':'standard'));
+                
+                this.state.license = { type: userType, exp: data.exp };
+                this.save();
+                alert(`✅ Активовано!\nПлан: ${userType.toUpperCase()}\nПристрій: ${deviceId}`);
+                location.reload();
+            } else {
+                alert("❌ " + data.msg);
+            }
+        } catch(e) {
+            alert("Помилка з'єднання");
+        } finally {
+            btn.disabled = false; btn.innerText = "OK";
+        }
     }
 }
 const app = new App();
-</script>
-<script>
-    // Реєстрація Service Worker (для роботи офлайн)
+
+// --- ТРЕКІНГ ЗАПУСКІВ ---
+window.addEventListener('load', () => {
+    // Реєстрація Service Worker
     if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js')
-                .then(reg => console.log('SW Registered!', reg))
-                .catch(err => console.log('SW Error:', err));
-        });
+        navigator.serviceWorker.register('sw.js').catch(err => console.log('SW Err'));
     }
+
+    // Трекінг
+    if(!localStorage.getItem('install_tracked')) {
+        const TRACK_URL = "https://script.google.com/macros/s/AKfycbyfjf7vStURsAu2Ef_9LADFQoNlTycadgCmtaZzwIF7Y5iNA8IZE8KGnlmzsBSY_QKK/exec";
+        fetch(TRACK_URL + '?action=install', { mode: 'no-cors' })
+            .then(() => localStorage.setItem('install_tracked', 'true'))
+            .catch(e => console.log('Track err'));
+    }
+});
 </script>
 </body>
 </html>
+	
