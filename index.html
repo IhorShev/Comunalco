@@ -85,7 +85,7 @@
             align-items: center;
         }
 
-        /* --- ЛОГОТИП (Оновлено) --- */
+        /* --- ЛОГОТИП (Оновлено для ідеального круга) --- */
         .logo-brand {
             text-decoration: none;
             display: flex;
@@ -102,13 +102,27 @@
         }
 
         .logo-icon-img {
-            width: 55px; /* Трохи збільшив, щоб було краще видно */
-            height: auto;
-            margin-top: 0;
+            width: 60px;   /* Фіксована ширина */
+            height: 60px;  /* Фіксована висота (однакова з шириною для круга) */
+            object-fit: cover; /* Заповнює область картинкою */
             
-            /* МАГІЯ ТРАФАРЕТУ: робить чорний фон картинки прозорим */
+            /* ГОЛОВНЕ: робимо з квадрата коло */
+            border-radius: 50%;
+            
+            /* Прибираємо чорний фон (робимо його прозорим) */
             mix-blend-mode: screen; 
-            filter: contrast(1.1) brightness(1.1); /* Трохи підсвічує */
+            
+            /* Підсилюємо чорний колір фону (щоб він точно зник) і додаємо світіння */
+            filter: contrast(1.5) brightness(0.9) drop-shadow(0 0 5px var(--accent-glow));
+            
+            margin-top: 0;
+            flex-shrink: 0; /* Забороняє стискати логотип */
+            transition: transform 0.3s ease;
+        }
+        
+        /* Ефект при наведенні на логотип */
+        .logo-brand:hover .logo-icon-img {
+            transform: scale(1.1);
         }
 
         .brand-top {
@@ -293,7 +307,8 @@
                 margin-bottom: 5px;
             }
             .logo-icon-img {
-                width: 45px; 
+                width: 50px; 
+                height: 50px;
             }
             .logo-text-wrapper {
                 align-items: center; 
