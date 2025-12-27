@@ -85,7 +85,7 @@
             align-items: center;
         }
 
-        /* --- ЛОГОТИП (Оновлено: без квадрата) --- */
+        /* --- ЛОГОТИП (Оновлено) --- */
         .logo-brand {
             text-decoration: none;
             display: flex;
@@ -102,15 +102,13 @@
         }
 
         .logo-icon-img {
-            width: 45px;
+            width: 55px; /* Трохи збільшив, щоб було краще видно */
             height: auto;
             margin-top: 0;
             
-            /* 1. Прибрали drop-shadow, щоб не було світіння квадратом */
-            
-            /* 2. Додали цей режим: він робить чорний фон картинки прозорим. 
-               Логотип стане чистим, як напис поруч. */
+            /* МАГІЯ ТРАФАРЕТУ: робить чорний фон картинки прозорим */
             mix-blend-mode: screen; 
+            filter: contrast(1.1) brightness(1.1); /* Трохи підсвічує */
         }
 
         .brand-top {
@@ -295,7 +293,7 @@
                 margin-bottom: 5px;
             }
             .logo-icon-img {
-                width: 40px; 
+                width: 45px; 
             }
             .logo-text-wrapper {
                 align-items: center; 
@@ -366,13 +364,16 @@
         <div class="container nav-wrapper">
             
             <a href="#" class="logo-brand">
+                
+                <img src="logo.png" alt="Comunalco Logo" class="logo-icon-img">
+                
                 <div class="logo-text-wrapper">
                     <div class="brand-top outline-neon">COMUNALCO</div>
                     <div class="brand-bottom">
                         <span class="outline-neon-sub">Комуналк</span><span class="solid-neon-sub">Облік</span>
                     </div>
                 </div>
-                <img src="logo.png" alt="Comunalco Logo" class="logo-icon-img">
+                
             </a>
             
             <div class="nav-right-group">
