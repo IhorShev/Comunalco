@@ -3,8 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Comunalco - Розумна система справедливого обліку</title>
+    
+    <title>Comunalco — Простий облік комуналки та лічильників онлайн</title>
+    <meta name="description" content="Безкоштовний додаток для обліку комунальних послуг. Розрахунок МЗК, світло, вода, газ. Формування PDF-квитанцій для орендарів та ОСББ. Працює без інтернету.">
+    <meta name="keywords" content="облік комуналки, лічильники, комунальні послуги, розрахунок квартплати, програма для ОСББ, комунальний калькулятор, Comunalco">
+    <meta name="author" content="Comunalco Team">
+
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Comunalco">
+    <meta property="og:url" content="https://comunalco.com/">
+    <meta property="og:title" content="Comunalco — Твоя комуналка під контролем">
+    <meta property="og:description" content="Забудь про зошити. Внось показники, діли витрати та формуй квитанції за секунди.">
+    <meta property="og:image" content="https://comunalco.com/hero-img.png">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
+    
     <style>
         /* --- ОСНОВНІ СТИЛІ --- */
         :root {
@@ -34,7 +46,14 @@
             scroll-behavior: smooth;
             
             /* Компенсація висоти фіксованого меню */
-            padding-top: 100px; 
+            padding-top: 80px; 
+        }
+
+        /* Глобальне правило для картинок */
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
         }
 
         a { text-decoration: none; color: inherit; transition: 0.3s; }
@@ -51,7 +70,7 @@
         header {
             padding: 10px 0;
             border-bottom: 1px solid rgba(255,255,255,0.05);
-            background: rgba(5, 10, 20, 0.85); 
+            background: rgba(5, 10, 20, 0.90); 
             position: fixed; 
             top: 0;
             left: 0;
@@ -63,43 +82,42 @@
 
         .nav-wrapper {
             display: flex;
-            justify-content: space-between;
+            justify-content: space-between; /* Розводить Лого вліво, а Меню вправо */
             align-items: center;
         }
 
-        /* --- ЛОГОТИП (ТЕКСТ + КАРТИНКА) --- */
+        /* --- ЛОГОТИП (ОНОВЛЕНО) --- */
         .logo-brand {
             text-decoration: none;
             display: flex;
-            flex-direction: column;
-            align-items: center;
+            align-items: center; /* Картинка і текст по центру вертикально */
+            gap: 15px; /* Відступ між картинкою і текстом */
             position: relative;
+        }
+
+        .logo-icon-img {
+            width: 45px; /* Трохи збільшив, щоб пасувало до двох рядків тексту */
+            height: auto;
+            filter: drop-shadow(0 0 5px var(--accent));
         }
 
         .logo-text-wrapper {
             display: flex;
             flex-direction: column;
-            align-items: center;
+            align-items: flex-start; /* Вирівнювання тексту по лівому краю */
             line-height: 1.1;
-        }
-
-        .logo-icon-img {
-            width: 35px;
-            height: auto;
-            margin-top: 5px;
-            filter: drop-shadow(0 0 5px var(--accent));
         }
 
         .brand-top {
             font-weight: 900;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            font-size: clamp(1.5rem, 2.5vw, 2rem);
+            font-size: 1.4rem; /* Оптимізований розмір */
         }
 
         .brand-bottom {
             font-weight: 700;
-            font-size: clamp(0.8rem, 1.5vw, 1.2rem);
+            font-size: 0.9rem;
             margin-top: -2px;
         }
 
@@ -119,7 +137,13 @@
             transition: 0.3s;
         }
 
-        /* --- МЕНЮ --- */
+        /* --- ПРАВА ЧАСТИНА (Меню + Кнопка) --- */
+        .nav-right-group {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
         nav ul { display: flex; gap: 20px; }
         
         .nav-link { 
@@ -160,20 +184,16 @@
             padding: 50px 0; 
             display: flex; 
             align-items: center; 
-            
-            /* ❗ ВИПРАВЛЕНО: Центруємо контент замість розкидання по краях */
             justify-content: center; 
             gap: 60px; /* Відступ між текстом і відео */
-            
             min-height: 80vh; 
             flex-wrap: nowrap;
         }
         
         .hero-content { 
-            flex: 1; /* Гнучка ширина */
-            max-width: 550px; /* Обмежуємо ширину тексту, щоб він був компактнішим */
+            flex: 1; 
+            max-width: 550px; 
             z-index: 2; 
-            /* padding-right прибрали, бо тепер є gap */
         }
 
         h1 { font-size: 3.2rem; line-height: 1.1; margin-bottom: 20px; font-weight: 900; }
@@ -191,7 +211,7 @@
         .hero-media { 
             flex: 1; 
             display: flex; 
-            justify-content: center; /* Центруємо саме відео в його блоці */
+            justify-content: center; 
             position: relative;
             max-width: 550px;
         }
@@ -258,31 +278,48 @@
         /* --- АДАПТИВНІСТЬ (МОБІЛЬНИЙ) --- */
         @media (max-width: 900px) {
             
+            .nav-wrapper { 
+                flex-wrap: wrap; 
+                justify-content: center; 
+                gap: 15px; 
+            }
+
             .logo-brand {
-                flex-direction: row; 
-                gap: 15px;
+                justify-content: center;
+                width: 100%;
+                margin-bottom: 5px;
             }
             .logo-icon-img {
-                margin-top: 0;
                 width: 40px; 
             }
+            .logo-text-wrapper {
+                align-items: center; /* Центруємо текст лого на мобільному */
+            }
             
+            /* Групуємо меню і кнопку для мобільного */
+            .nav-right-group {
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+
             .hero { 
                 flex-direction: column; 
                 text-align: center; 
                 padding-top: 20px;
                 flex-wrap: wrap; 
-                gap: 40px; /* Зменшуємо відступ на мобільному */
+                gap: 40px; 
             }
             
             .hero-content { 
-                max-width: 100%; /* На мобільному на всю ширину */
+                max-width: 100%; 
                 margin-top: 10px; 
                 width: 100%; 
                 display: flex; 
                 flex-direction: column; 
                 align-items: center; 
-                margin-bottom: 0; /* Контролюється через gap */
+                margin-bottom: 0; 
             }
             
             .hero p { margin: 0 auto 30px auto; text-align: center; }
@@ -295,11 +332,29 @@
                 width: 100%; 
             }
             
-            .nav-wrapper { flex-wrap: wrap; gap: 15px; justify-content: space-between; }
             h1 { font-size: 2.2rem; text-align: center; }
-            nav { width: 100%; order: 3; margin-top: 10px; overflow-x: auto; padding-bottom: 5px; }
-            nav ul { justify-content: space-between; gap: 20px; white-space: nowrap; padding: 0 5px; }
-            .btn-login { margin-left: 0; padding: 10px 20px; font-size: 0.9rem; }
+            
+            /* Меню прокручується горизонтально на маленьких екранах */
+            nav { 
+                width: 100%; 
+                order: 3; /* Меню в самому низу шапки */
+                overflow-x: auto; 
+                padding-bottom: 5px; 
+            }
+            nav ul { 
+                justify-content: space-between; 
+                gap: 20px; 
+                white-space: nowrap; 
+                padding: 0 5px; 
+            }
+            
+            /* Кнопка Увійти */
+            .btn-login { 
+                margin: 0 auto;
+                order: 2; /* Кнопка над меню */
+                padding: 10px 40px; 
+                font-size: 0.9rem; 
+            }
         }
     </style>
 </head>
@@ -307,26 +362,30 @@
 
     <header>
         <div class="container nav-wrapper">
+            
             <a href="#" class="logo-brand">
+                <img src="logo.png" alt="Comunalco Logo" class="logo-icon-img">
                 <div class="logo-text-wrapper">
                     <div class="brand-top outline-neon">COMUNALCO</div>
                     <div class="brand-bottom">
                         <span class="outline-neon-sub">Комуналк</span><span class="solid-neon-sub">Облік</span>
                     </div>
                 </div>
-                <img src="logo.png" alt="Logo" class="logo-icon-img">
             </a>
             
-            <a href="app/index.html" class="btn-login">Увійти</a>
-            <nav>
-                <ul>
-                    <li><a href="#" class="nav-link active">Головна</a></li>
-                    <li><a href="#about" class="nav-link">Можливості</a></li>
-                    <li><a href="#pricing" class="nav-link">Тарифи</a></li>
-                    <li><a href="#install" class="nav-link">Встановити</a></li>
-                    <li><a href="#contact" class="nav-link">Контакти</a></li>
-                </ul>
-            </nav>
+            <div class="nav-right-group">
+                <a href="app/index.html" class="btn-login">Увійти</a>
+                <nav>
+                    <ul>
+                        <li><a href="#" class="nav-link active">Головна</a></li>
+                        <li><a href="#about" class="nav-link">Можливості</a></li>
+                        <li><a href="#pricing" class="nav-link">Тарифи</a></li>
+                        <li><a href="#install" class="nav-link">Встановити</a></li>
+                        <li><a href="#contact" class="nav-link">Контакти</a></li>
+                    </ul>
+                </nav>
+            </div>
+
         </div>
     </header>
 
@@ -506,6 +565,7 @@
 
             sections.forEach(section => {
                 const sectionTop = section.offsetTop;
+                // Компенсація висоти фіксованого меню
                 if (pageYOffset >= (sectionTop - 150)) {
                     current = section.getAttribute('id');
                 }
