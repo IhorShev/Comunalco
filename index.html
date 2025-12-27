@@ -46,10 +46,9 @@
             scroll-behavior: smooth;
             
             /* Компенсація висоти фіксованого меню */
-            padding-top: 80px; 
+            padding-top: 100px; 
         }
 
-        /* Глобальне правило для картинок */
         img {
             max-width: 100%;
             height: auto;
@@ -82,37 +81,43 @@
 
         .nav-wrapper {
             display: flex;
-            justify-content: space-between; /* Розводить Лого вліво, а Меню вправо */
+            justify-content: space-between;
             align-items: center;
         }
 
-        /* --- ЛОГОТИП (ОНОВЛЕНО) --- */
+        /* --- ЛОГОТИП (Оновлено: без квадрата) --- */
         .logo-brand {
             text-decoration: none;
             display: flex;
-            align-items: center; /* Картинка і текст по центру вертикально */
-            gap: 15px; /* Відступ між картинкою і текстом */
+            align-items: center; 
+            gap: 15px; 
             position: relative;
-        }
-
-        .logo-icon-img {
-            width: 45px; /* Трохи збільшив, щоб пасувало до двох рядків тексту */
-            height: auto;
-            filter: drop-shadow(0 0 5px var(--accent));
         }
 
         .logo-text-wrapper {
             display: flex;
             flex-direction: column;
-            align-items: flex-start; /* Вирівнювання тексту по лівому краю */
+            align-items: flex-start;
             line-height: 1.1;
+        }
+
+        .logo-icon-img {
+            width: 45px;
+            height: auto;
+            margin-top: 0;
+            
+            /* 1. Прибрали drop-shadow, щоб не було світіння квадратом */
+            
+            /* 2. Додали цей режим: він робить чорний фон картинки прозорим. 
+               Логотип стане чистим, як напис поруч. */
+            mix-blend-mode: screen; 
         }
 
         .brand-top {
             font-weight: 900;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            font-size: 1.4rem; /* Оптимізований розмір */
+            font-size: 1.4rem; 
         }
 
         .brand-bottom {
@@ -137,7 +142,7 @@
             transition: 0.3s;
         }
 
-        /* --- ПРАВА ЧАСТИНА (Меню + Кнопка) --- */
+        /* --- ПРАВА ЧАСТИНА --- */
         .nav-right-group {
             display: flex;
             align-items: center;
@@ -185,7 +190,7 @@
             display: flex; 
             align-items: center; 
             justify-content: center; 
-            gap: 60px; /* Відступ між текстом і відео */
+            gap: 60px; 
             min-height: 80vh; 
             flex-wrap: nowrap;
         }
@@ -293,10 +298,9 @@
                 width: 40px; 
             }
             .logo-text-wrapper {
-                align-items: center; /* Центруємо текст лого на мобільному */
+                align-items: center; 
             }
             
-            /* Групуємо меню і кнопку для мобільного */
             .nav-right-group {
                 width: 100%;
                 justify-content: center;
@@ -334,10 +338,9 @@
             
             h1 { font-size: 2.2rem; text-align: center; }
             
-            /* Меню прокручується горизонтально на маленьких екранах */
             nav { 
                 width: 100%; 
-                order: 3; /* Меню в самому низу шапки */
+                order: 3; 
                 overflow-x: auto; 
                 padding-bottom: 5px; 
             }
@@ -348,10 +351,9 @@
                 padding: 0 5px; 
             }
             
-            /* Кнопка Увійти */
             .btn-login { 
                 margin: 0 auto;
-                order: 2; /* Кнопка над меню */
+                order: 2; 
                 padding: 10px 40px; 
                 font-size: 0.9rem; 
             }
@@ -364,13 +366,13 @@
         <div class="container nav-wrapper">
             
             <a href="#" class="logo-brand">
-                <img src="logo.png" alt="Comunalco Logo" class="logo-icon-img">
                 <div class="logo-text-wrapper">
                     <div class="brand-top outline-neon">COMUNALCO</div>
                     <div class="brand-bottom">
                         <span class="outline-neon-sub">Комуналк</span><span class="solid-neon-sub">Облік</span>
                     </div>
                 </div>
+                <img src="logo.png" alt="Comunalco Logo" class="logo-icon-img">
             </a>
             
             <div class="nav-right-group">
@@ -565,7 +567,6 @@
 
             sections.forEach(section => {
                 const sectionTop = section.offsetTop;
-                // Компенсація висоти фіксованого меню
                 if (pageYOffset >= (sectionTop - 150)) {
                     current = section.getAttribute('id');
                 }
