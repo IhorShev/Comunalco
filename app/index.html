@@ -740,7 +740,7 @@ async sharePDF(i) {
         const cost = { ed: (c.ed*d.tariffs.el_d) + (c.en*d.tariffs.el_n), w: c.w*d.tariffs.w, g: c.g*d.tariffs.g };
         
         // Лічильники
-        let custRows = ""; let custCostTotal = 0;
+        var custRows = ""; let custCostTotal = 0;
         (a.custom_counters || []).forEach(cc => {
             let diff = Math.max(0, cc.curr - cc.prev);
             let val = diff * cc.price;
@@ -1203,6 +1203,7 @@ window.addEventListener('load', () => {
 </html>
 
 	
+
 
 
 
