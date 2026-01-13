@@ -814,10 +814,10 @@ async sharePDF(i) {
         // але можемо порівняти суму грошей, якщо б мали історію. 
         // Поки що зробимо візуалізацію простою: якщо споживання > 0, то показуємо.
         
-        const getArrow = (val) => {
-            // Тут можна буде додати логіку порівняння з минулим місяцем
-            return val > 0 ? `<span style="color:#ef4444; font-size:10px;">▲</span>` : `<span style="color:#10b981; font-size:10px;">−</span>`;
-        };
+        function getArrow(val) {
+    // Тут можна буде додати логіку порівняння з минулим місяцем
+    return val > 0 ? `<span style="color:#ef4444; font-size:10px;">▲</span>` : `<span style="color:#10b981; font-size:10px;">▼</span>`;
+}
 
         // Лічильники користувача
         let custRows = ""; 
@@ -1203,6 +1203,7 @@ window.addEventListener('load', () => {
 </html>
 
 	
+
 
 
 
