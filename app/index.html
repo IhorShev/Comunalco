@@ -820,8 +820,8 @@ async sharePDF(i) {
 }
 
         // Лічильники користувача
-        let custRows = ""; 
-        let custCostTotal = 0;
+        var custRows = "";
+var custCostTotal = 0;
         (a.custom_counters || []).forEach(cc => {
             let diff = Math.max(0, cc.curr - cc.prev);
             let val = diff * cc.price;
@@ -1203,6 +1203,7 @@ window.addEventListener('load', () => {
 </html>
 
 	
+
 
 
 
