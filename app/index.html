@@ -1111,8 +1111,10 @@ window.addEventListener('load', () => {
             .then(() => localStorage.setItem('install_tracked', 'true'))
             .catch(e => console.log('Track err'));
     }
-});
-<script type="module">
+   });
+  </script>
+
+  <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
   import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
@@ -1203,6 +1205,7 @@ window.addEventListener('load', () => {
 </html>
 
 	
+
 
 
 
