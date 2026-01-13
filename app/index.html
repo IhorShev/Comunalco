@@ -1048,14 +1048,12 @@ window.addEventListener('load', () => {
             .catch(e => console.log('Track err'));
     }
 });
-</script>
 <script type="module">
-  // Імпортуємо правильні модулі для Входу та Бази даних (а не тільки аналітику)
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-  import { getDatabase, ref, set, onValue, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+  import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-  // ТВОЇ КЛЮЧІ (Я їх вже вписав сюди)
+  // 👇👇👇 ТВОЇ КЛЮЧІ ЗАЛИШАЮТЬСЯ ТІ САМІ 👇👇👇
   const firebaseConfig = {
     apiKey: "AIzaSyDWFMF95PiGQmclQPkvvb7gvvkZT_lzMCI",
     authDomain: "comunalco-7f29f.firebaseapp.com",
@@ -1067,83 +1065,73 @@ window.addEventListener('load', () => {
     measurementId: "G-L50LMQFZP8"
   };
 
-  // Ініціалізація
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getDatabase(app);
   const provider = new GoogleAuthProvider();
 
-  // Глобальна змінна для App
   window.currentUser = null;
+  // Прапорець, щоб не зациклити збереження
+  let isReceivingData = false;
 
-  // 1. Функція входу (викликається з кнопки "Вхід")
   window.googleLogin = () => {
     if (window.currentUser) {
-        if(confirm("Вийти з акаунту?")) {
-            signOut(auth).then(() => alert("Ви вийшли"));
-        }
+        if(confirm("Вийти з акаунту?")) signOut(auth).then(() => alert("Ви вийшли"));
     } else {
-        signInWithPopup(auth, provider)
-            .then((result) => {
-                console.log("Login success:", result.user.email);
-            }).catch((error) => {
-                alert("Помилка входу: " + error.message);
-            });
+        signInWithPopup(auth, provider).catch((error) => alert("Помилка: " + error.message));
     }
   };
 
-  // 2. Функція збереження в хмару (викликається з App.save())
+  // Функція збереження в хмару
   window.cloudSave = (data) => {
-      if(!window.currentUser) return;
-      // Зберігаємо в гілку users/UID
-      set(ref(db, 'users/' + window.currentUser.uid), data);
-      console.log("Data synced to cloud");
+      // Якщо ми саме зараз отримуємо дані з хмари, то не треба їх відправляти назад
+      if(isReceivingData || !window.currentUser) return;
+      
+      set(ref(db, 'users/' + window.currentUser.uid), data)
+        .then(() => console.log("☁️ Saved to cloud"))
+        .catch(e => console.error(e));
   };
 
-  // 3. Слідкуємо за статусом (хто зайшов?)
   onAuthStateChanged(auth, (user) => {
     const btn = document.getElementById('auth-btn');
-    
     if (user) {
-      // Юзер увійшов
       window.currentUser = user;
       if(btn) {
-          btn.innerText = `🟢 ${user.displayName.split(' ')[0]}`; // Показуємо ім'я
+          btn.innerText = `🟢 ${user.displayName.split(' ')[0]}`;
           btn.style.borderColor = 'var(--success)';
       }
-      
-      // Перевіряємо, чи є збережені дані в хмарі
+
+      // 🔥 ГОЛОВНА ЗМІНА: onValue замість get 🔥
+      // Ця функція спрацьовує САМА щоразу, коли хтось міняє базу (навіть з іншого пристрою)
       const userRef = ref(db, 'users/' + user.uid);
-      get(userRef).then((snapshot) => {
+      
+      onValue(userRef, (snapshot) => {
         if (snapshot.exists()) {
-            // Знайшли дані в хмарі!
             const cloudData = snapshot.val();
-            // Тут можна додати логіку запитання, але поки просто завантажимо в консоль
-            console.log("Found cloud data!", cloudData);
             
-            // Якщо локальні дані пусті (новий телефон), завантажуємо з хмари
-            if(window.app && (!window.app.state.objects || window.app.state.objects.length <= 1)) {
-                 if(confirm("Завантажити ваші збережені дані з хмари?")) {
-                     window.app.state = cloudData;
-                     window.app.save(); 
-                     window.app.renderAll();
-                     alert("Дані відновлено!");
-                 }
+            // Ставимо прапорець "Зараз йде оновлення", щоб не спрацював save()
+            isReceivingData = true; 
+            
+            console.log("🔄 Прийшли нові дані з хмари!");
+            
+            // Оновлюємо дані в додатку
+            if(window.app) {
+                window.app.state = cloudData;
+                // Зберігаємо в локальну пам'ять телефону, щоб не зникло без інтернету
+                localStorage.setItem(window.app.STORAGE_KEY, JSON.stringify(cloudData));
+                // Перемальовуємо екран
+                window.app.renderAll(); 
+                window.app.updateStatus();
             }
-        } else {
-            // Це новий юзер, завантажуємо його поточні дані в хмару
-            console.log("Uploading initial data...");
-            window.cloudSave(window.app.state);
+            
+            // Знімаємо прапорець через 0.5 сек
+            setTimeout(() => { isReceivingData = false; }, 500);
         }
       });
 
     } else {
-      // Юзер вийшов
       window.currentUser = null;
-      if(btn) {
-          btn.innerText = "👤 Вхід";
-          btn.style.borderColor = 'var(--primary)';
-      }
+      if(btn) { btn.innerText = "👤 Вхід"; btn.style.borderColor = 'var(--primary)'; }
     }
   });
 </script>
@@ -1151,4 +1139,5 @@ window.addEventListener('load', () => {
 </html>
 
 	
+
 
