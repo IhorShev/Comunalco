@@ -132,6 +132,7 @@
 
     <div class="top-menu-bar">
         <button class="theme-toggle-btn" onclick="app.toggleTheme()" id="theme-icon">🌗</button>
+        <span id="auth-btn" onclick="window.googleLogin()" style="border: 1px solid var(--primary); padding: 2px 8px; border-radius: 8px; color: var(--primary);">👤 Вхід</span>
         <span onclick="app.openMenu('info')">ℹ️ Інфо</span>
         <span onclick="app.openMenu('premium')" style="color:var(--primary)">💎 Тарифи</span>
         <span onclick="app.openMenu('contacts')">📞 Контакти</span>
@@ -382,7 +383,27 @@ class App {
         if(this.state.currentObjIdx >= this.state.objects.length) this.state.currentObjIdx=0; 
     }
     
-    save() { localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.state)); this.updateStatus(); }
+   save() { 
+        // 1. Зберігаємо локально (як і раніше)
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.state)); 
+        this.updateStatus(); 
+        
+        // 2. Якщо є інтернет і юзер залогінений — відправляємо в хмару
+        if (window.currentUser && window.cloudSave) {
+            window.cloudSave(this.state);
+            // Візуальний ефект: кнопка входу покаже "Збережено"
+            const btn = document.getElementById('auth-btn');
+            if(btn) {
+                let originalText = btn.innerText;
+                btn.innerText = "☁️ Збережено";
+                setTimeout(() => {
+                    // Повертаємо ім'я користувача, якщо воно було
+                    if(window.currentUser) btn.innerText = `🟢 ${window.currentUser.displayName.split(' ')[0]}`;
+                    else btn.innerText = "👤 Вхід";
+                }, 1500);
+            }
+        }
+    }
     get currentData() { return this.state.objects[this.state.currentObjIdx]; }
     
     updateObjectName(v) { this.currentData.name = v; this.save(); }
@@ -893,6 +914,105 @@ window.addEventListener('load', () => {
     }
 });
 </script>
+<script type="module">
+  // Імпортуємо правильні модулі для Входу та Бази даних (а не тільки аналітику)
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import { getDatabase, ref, set, onValue, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+  // ТВОЇ КЛЮЧІ (Я їх вже вписав сюди)
+  const firebaseConfig = {
+    apiKey: "AIzaSyDWFMF95PiGQmclQPkvvb7gvvkZT_lzMCI",
+    authDomain: "comunalco-7f29f.firebaseapp.com",
+    databaseURL: "https://comunalco-7f29f-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "comunalco-7f29f",
+    storageBucket: "comunalco-7f29f.firebasestorage.app",
+    messagingSenderId: "157109120062",
+    appId: "1:157109120062:web:112cf7680fb68ac3bab56f",
+    measurementId: "G-L50LMQFZP8"
+  };
+
+  // Ініціалізація
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getDatabase(app);
+  const provider = new GoogleAuthProvider();
+
+  // Глобальна змінна для App
+  window.currentUser = null;
+
+  // 1. Функція входу (викликається з кнопки "Вхід")
+  window.googleLogin = () => {
+    if (window.currentUser) {
+        if(confirm("Вийти з акаунту?")) {
+            signOut(auth).then(() => alert("Ви вийшли"));
+        }
+    } else {
+        signInWithPopup(auth, provider)
+            .then((result) => {
+                console.log("Login success:", result.user.email);
+            }).catch((error) => {
+                alert("Помилка входу: " + error.message);
+            });
+    }
+  };
+
+  // 2. Функція збереження в хмару (викликається з App.save())
+  window.cloudSave = (data) => {
+      if(!window.currentUser) return;
+      // Зберігаємо в гілку users/UID
+      set(ref(db, 'users/' + window.currentUser.uid), data);
+      console.log("Data synced to cloud");
+  };
+
+  // 3. Слідкуємо за статусом (хто зайшов?)
+  onAuthStateChanged(auth, (user) => {
+    const btn = document.getElementById('auth-btn');
+    
+    if (user) {
+      // Юзер увійшов
+      window.currentUser = user;
+      if(btn) {
+          btn.innerText = `🟢 ${user.displayName.split(' ')[0]}`; // Показуємо ім'я
+          btn.style.borderColor = 'var(--success)';
+      }
+      
+      // Перевіряємо, чи є збережені дані в хмарі
+      const userRef = ref(db, 'users/' + user.uid);
+      get(userRef).then((snapshot) => {
+        if (snapshot.exists()) {
+            // Знайшли дані в хмарі!
+            const cloudData = snapshot.val();
+            // Тут можна додати логіку запитання, але поки просто завантажимо в консоль
+            console.log("Found cloud data!", cloudData);
+            
+            // Якщо локальні дані пусті (новий телефон), завантажуємо з хмари
+            if(window.app && (!window.app.state.objects || window.app.state.objects.length <= 1)) {
+                 if(confirm("Завантажити ваші збережені дані з хмари?")) {
+                     window.app.state = cloudData;
+                     window.app.save(); 
+                     window.app.renderAll();
+                     alert("Дані відновлено!");
+                 }
+            }
+        } else {
+            // Це новий юзер, завантажуємо його поточні дані в хмару
+            console.log("Uploading initial data...");
+            window.cloudSave(window.app.state);
+        }
+      });
+
+    } else {
+      // Юзер вийшов
+      window.currentUser = null;
+      if(btn) {
+          btn.innerText = "👤 Вхід";
+          btn.style.borderColor = 'var(--primary)';
+      }
+    }
+  });
+</script>
 </body>
 </html>
+
 	
