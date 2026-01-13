@@ -724,61 +724,196 @@ class App {
         r.readAsText(f); 
     }
 
-    async sharePDF(i) {
-        if (typeof html2pdf === 'undefined') { alert('Інтернет відсутній. PDF не працює.'); return; }
-        window.scrollTo(0, 0);
-        const a = this.currentData.apartments[i]; const d = this.currentData; const dStr = new Date().toLocaleDateString('uk-UA');
+   async sharePDF(i) {
+        // Перевірка бібліотеки
+        if (typeof html2pdf === 'undefined') { alert('Помилка: Бібліотека PDF не завантажилась. Перевірте інтернет.'); return; }
         
-        const c = { ed: Math.max(0,(a.curr.ed||0)-(a.prev.ed||0)), en: Math.max(0,(a.curr.en||0)-(a.prev.en||0)), w: Math.max(0,(a.curr.w||0)-(a.prev.w||0)), g: Math.max(0,(a.curr.g||0)-(a.prev.g||0)) };
-        const cost = { ed: (c.ed*d.tariffs.el_d) + (c.en*d.tariffs.el_n), w: c.w*d.tariffs.w, g: c.g*d.tariffs.g };
+        const a = this.currentData.apartments[i]; 
+        const d = this.currentData; 
+        const dStr = new Date().toLocaleDateString('uk-UA');
         
-        let custRows = ""; let custCostTotal = 0;
+        // Розрахунки
+        const c = { 
+            ed: Math.max(0,(a.curr.ed||0)-(a.prev.ed||0)), 
+            en: Math.max(0,(a.curr.en||0)-(a.prev.en||0)), 
+            w: Math.max(0,(a.curr.w||0)-(a.prev.w||0)), 
+            g: Math.max(0,(a.curr.g||0)-(a.prev.g||0)) 
+        };
+        const cost = { 
+            ed: (c.ed*d.tariffs.el_d) + (c.en*d.tariffs.el_n), 
+            w: c.w*d.tariffs.w, 
+            g: c.g*d.tariffs.g 
+        };
+        
+        // --- ЛОГІКА СТРІЛОЧОК (Аналітика споживання) ---
+        // Порівнюємо поточне споживання (c.ed) з минулим (яке ми, на жаль, не зберігаємо окремо в цій версії, 
+        // але можемо порівняти суму грошей, якщо б мали історію. 
+        // Поки що зробимо візуалізацію простою: якщо споживання > 0, то показуємо.
+        
+        const getArrow = (val) => {
+            // Тут можна буде додати логіку порівняння з минулим місяцем
+            return val > 0 ? `<span style="color:#ef4444; font-size:10px;">▲</span>` : `<span style="color:#10b981; font-size:10px;">−</span>`;
+        };
+
+        // Лічильники користувача
+        let custRows = ""; 
+        let custCostTotal = 0;
         (a.custom_counters || []).forEach(cc => {
             let diff = Math.max(0, cc.curr - cc.prev);
             let val = diff * cc.price;
             custCostTotal += val;
-            custRows += `<tr style="border-bottom:1px solid #e2e8f0;"><td style="padding:5px;">${cc.name} (${diff} од.)</td><td style="padding:5px; text-align:right;">${val.toFixed(2)}</td></tr>`;
+            custRows += `
+            <tr style="border-bottom:1px solid #e2e8f0;">
+                <td style="padding:8px; color:#334155;">${cc.name}</td>
+                <td style="padding:8px; text-align:center;">${diff}</td>
+                <td style="padding:8px; text-align:center;">${cc.price}</td>
+                <td style="padding:8px; text-align:right; font-weight:bold;">${val.toFixed(2)}</td>
+            </tr>`;
         });
 
-        const mzkVal = parseFloat((this.checks[i].match(/МЗК: (\d+\.\d+)/) || [0,0])[1]);
-        let sRows = a.services.map(s => `<tr style="border-bottom:1px solid #e2e8f0;"><td style="padding:5px;">${s.name}</td><td style="padding:5px;text-align:right;">${s.val.toFixed(2)}</td></tr>`).join('');
+        // МЗК та послуги
+        const mzkVal = parseFloat((this.checks[i]?.match(/МЗК: (\d+\.\d+)/) || [0,0])[1]);
+        let sRows = a.services.map(s => `
+            <tr style="border-bottom:1px solid #e2e8f0;">
+                <td style="padding:8px; color:#334155;" colspan="3">${s.name}</td>
+                <td style="padding:8px; text-align:right; font-weight:bold;">${s.val.toFixed(2)}</td>
+            </tr>`).join('');
+            
         let tot = cost.ed + cost.w + cost.g + custCostTotal + a.services.reduce((s,x)=>s+x.val,0) + mzkVal + (a.debt||0);
+        let toPay = tot - (a.paid || 0);
 
+        // --- ШАБЛОН PDF (HTML) ---
         const template = `
-        <div style="font-family: 'Inter', sans-serif; color:#1e293b; background:#fff; padding:30px; box-sizing: border-box; width: 100%; text-align: center;">
-            <div style="margin-bottom:20px; font-weight: 900; font-size: 20px;">Комуналк<span style="color:#0099ff">Облік</span><div style="font-size:12px; margin-top:5px; color:#64748b;">${d.name}</div></div>
-            <div style="background:#f1f5f9; padding:10px; border-radius:8px; margin-bottom:15px; font-size:14px; text-align: left;">Платник: <strong>${a.name}</strong></div>
-            <table style="width:100%; border-collapse:collapse; font-size:11px; margin: 0 auto;">
-                <tr style="background:#f8fafc; color:#64748b;"><th style="padding:5px; text-align:left;">Послуга</th><th style="padding:5px; text-align:right;">Сума</th></tr>
-                <tr style="border-bottom:1px solid #e2e8f0;"><td style="padding:5px; text-align:left;">⚡ Електрика</td><td style="padding:5px; text-align:right;">${cost.ed.toFixed(2)}</td></tr>
-                <tr style="border-bottom:1px solid #e2e8f0;"><td style="padding:5px; text-align:left;">💧 Вода</td><td style="padding:5px; text-align:right;">${cost.w.toFixed(2)}</td></tr>
-                <tr style="border-bottom:1px solid #e2e8f0;"><td style="padding:5px; text-align:left;">🔥 Газ</td><td style="padding:5px; text-align:right;">${cost.g.toFixed(2)}</td></tr>
-                ${custRows}
-                <tr style="border-bottom:1px solid #e2e8f0;"><td style="padding:5px; text-align:left;">🏢 МЗК</td><td style="padding:5px; text-align:right;">${mzkVal.toFixed(2)}</td></tr>
-                ${sRows}
-            </table>
-            <div style="text-align:right; margin-top:20px;">
-                <div style="font-size:22px; font-weight:bold; color:#0099ff;">${tot.toFixed(2)} грн</div>
-                ${a.debt > 0 ? `<div style="font-size:10px; color:#ef4444;">(Вкл. борг ${a.debt})</div>` : ''}
+        <div style="font-family: 'Inter', sans-serif; color:#1e293b; background:#fff; padding:40px; box-sizing: border-box; width: 100%;">
+            
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px; border-bottom: 2px solid #0099ff; padding-bottom:20px;">
+                <div>
+                    <div style="font-weight: 900; font-size: 24px; text-transform:uppercase; letter-spacing:1px;">Comunalco</div>
+                    <div style="font-size:12px; color:#64748b; margin-top:5px;">Система обліку</div>
+                </div>
+                <div style="text-align:right;">
+                    <div style="font-size:14px; font-weight:bold;">${d.name}</div>
+                    <div style="font-size:12px; color:#64748b;">${dStr}</div>
+                </div>
             </div>
-            <div style="margin-top:30px; border-top:1px dashed #cbd5e1; padding-top:10px; text-align: left;">
-                <div style="font-size:10px; font-weight:bold; color:#64748b; margin-bottom:3px;">РЕКВІЗИТИ:</div>
-                ${d.requisites.map(r=>`<div style="font-size:10px;">${r.name}: <strong>${r.val}</strong></div>`).join('')}
+
+            <div style="background:#f8fafc; padding:15px; border-radius:12px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <div style="font-size:10px; color:#64748b; text-transform:uppercase; font-weight:bold;">Платник</div>
+                    <div style="font-size:18px; font-weight:bold; color:#0f172a;">${a.name}</div>
+                </div>
+                <div style="text-align:right;">
+                    <div style="font-size:10px; color:#64748b; text-transform:uppercase; font-weight:bold;">До сплати</div>
+                    <div style="font-size:24px; font-weight:900; color:#0099ff;">${toPay.toFixed(2)} <span style="font-size:14px; color:#64748b;">грн</span></div>
+                </div>
+            </div>
+
+            <table style="width:100%; border-collapse:collapse; font-size:12px; margin-bottom:30px;">
+                <tr style="background:#0f172a; color:#fff;">
+                    <th style="padding:10px; text-align:left; border-top-left-radius:8px;">Послуга</th>
+                    <th style="padding:10px; text-align:center;">Спожито</th>
+                    <th style="padding:10px; text-align:center;">Тариф</th>
+                    <th style="padding:10px; text-align:right; border-top-right-radius:8px;">Сума (грн)</th>
+                </tr>
+                
+                ${c.ed > 0 || c.en > 0 ? `
+                <tr style="border-bottom:1px solid #e2e8f0;">
+                    <td style="padding:8px;">⚡ Електрика</td>
+                    <td style="padding:8px; text-align:center;">${c.ed} / ${c.en}</td>
+                    <td style="padding:8px; text-align:center;">${d.tariffs.el_d} / ${d.tariffs.el_n}</td>
+                    <td style="padding:8px; text-align:right; font-weight:bold;">${cost.ed.toFixed(2)}</td>
+                </tr>` : ''}
+
+                ${c.w > 0 ? `
+                <tr style="border-bottom:1px solid #e2e8f0;">
+                    <td style="padding:8px;">💧 Вода</td>
+                    <td style="padding:8px; text-align:center;">${c.w} м³</td>
+                    <td style="padding:8px; text-align:center;">${d.tariffs.w}</td>
+                    <td style="padding:8px; text-align:right; font-weight:bold;">${cost.w.toFixed(2)}</td>
+                </tr>` : ''}
+
+                ${c.g > 0 ? `
+                <tr style="border-bottom:1px solid #e2e8f0;">
+                    <td style="padding:8px;">🔥 Газ</td>
+                    <td style="padding:8px; text-align:center;">${c.g} м³</td>
+                    <td style="padding:8px; text-align:center;">${d.tariffs.g}</td>
+                    <td style="padding:8px; text-align:right; font-weight:bold;">${cost.g.toFixed(2)}</td>
+                </tr>` : ''}
+
+                ${custRows}
+
+                <tr style="border-bottom:1px solid #e2e8f0; background:rgba(255, 255, 0, 0.05);">
+                    <td style="padding:8px; color:#b45309;" colspan="3">🏢 МЗК (Спільні витрати)</td>
+                    <td style="padding:8px; text-align:right; font-weight:bold; color:#b45309;">${mzkVal.toFixed(2)}</td>
+                </tr>
+
+                ${sRows}
+
+                ${a.debt > 0 ? `
+                <tr style="border-bottom:1px solid #e2e8f0; color:#ef4444;">
+                    <td style="padding:8px;" colspan="3">❗️ Борг за минулий період</td>
+                    <td style="padding:8px; text-align:right; font-weight:bold;">${a.debt.toFixed(2)}</td>
+                </tr>` : ''}
+                
+                ${a.paid > 0 ? `
+                <tr style="border-bottom:1px solid #e2e8f0; color:#10b981;">
+                    <td style="padding:8px;" colspan="3">✅ Сплачено</td>
+                    <td style="padding:8px; text-align:right; font-weight:bold;">-${a.paid.toFixed(2)}</td>
+                </tr>` : ''}
+            </table>
+
+            <div style="border: 1px dashed #cbd5e1; padding:15px; border-radius:8px; background:#f8fafc;">
+                <div style="font-size:10px; font-weight:bold; color:#64748b; margin-bottom:5px; text-transform:uppercase;">Реквізити для оплати:</div>
+                ${d.requisites.map(r=>`
+                    <div style="font-size:12px; margin-bottom:3px; font-family:monospace;">
+                        ${r.name}: <strong style="background:#e2e8f0; padding:2px 5px; border-radius:4px;">${r.val}</strong>
+                    </div>
+                `).join('')}
+            </div>
+            
+            <div style="margin-top:20px; text-align:center; font-size:10px; color:#94a3b8;">
+                Згенеровано сервісом Comunalco.com
             </div>
         </div>`;
 
+        // Генерація
         const overlay = document.createElement('div');
-        overlay.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #555; z-index: 99999; display: flex; justify-content: center; overflow: auto; padding: 20px;';
+        overlay.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #333; z-index: 99999; display: flex; justify-content: center; overflow: auto; padding: 20px;';
+        
         const container = document.createElement('div');
-        container.style.cssText = 'width: 148mm; background: white; margin: 0 auto; box-shadow: 0 0 20px rgba(0,0,0,0.5);'; 
+        container.style.cssText = 'width: 148mm; background: white; margin: auto; box-shadow: 0 0 20px rgba(0,0,0,0.5); min-height: 210mm;'; 
         container.innerHTML = template;
-        overlay.appendChild(container); document.body.appendChild(overlay); await new Promise(r => setTimeout(r, 800)); 
+        
+        overlay.appendChild(container); 
+        document.body.appendChild(overlay); 
+        
+        // Чекаємо рендер
+        await new Promise(r => setTimeout(r, 1000));
 
-        const fileName = `Rahunok_${a.name.replace(/\s/g,'_')}.pdf`;
-        const opt = { margin: 0, filename: fileName, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'mm', format: 'a5' } };
-        try { const pdfWorker = html2pdf().set(opt).from(container); const pdfBlob = await pdfWorker.output('blob'); const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
-            if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file] }); } else { await pdfWorker.save(); }
-        } catch (e) { alert("PDF Error: " + e.message); } finally { document.body.removeChild(overlay); }
+        const fileName = `Rahunok_${a.name.replace(/\s/g,'_')}_${Date.now()}.pdf`;
+        const opt = { 
+            margin: 0, 
+            filename: fileName, 
+            image: { type: 'jpeg', quality: 1.0 }, 
+            html2canvas: { scale: 2, useCORS: true }, 
+            jsPDF: { unit: 'mm', format: 'a5', orientation: 'portrait' } 
+        };
+
+        try { 
+            const pdfWorker = html2pdf().set(opt).from(container); 
+            const pdfBlob = await pdfWorker.output('blob'); 
+            const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
+            
+            if (navigator.canShare && navigator.canShare({ files: [file] })) { 
+                await navigator.share({ files: [file] }); 
+            } else { 
+                await pdfWorker.save(); 
+            }
+        } catch (e) { 
+            alert("Помилка PDF: " + e.message); 
+        } finally { 
+            document.body.removeChild(overlay); 
+        }
     }
 
     startNewMonth() { 
@@ -1016,3 +1151,4 @@ window.addEventListener('load', () => {
 </html>
 
 	
+
