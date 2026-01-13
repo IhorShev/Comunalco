@@ -724,142 +724,66 @@ class App {
         r.readAsText(f); 
     }
 
-   async sharePDF(i) {
+async sharePDF(i) {
         if (typeof html2pdf === 'undefined') { alert('Помилка: Бібліотека PDF не завантажилась.'); return; }
         
         const a = this.currentData.apartments[i]; 
         const d = this.currentData; 
         const dStr = new Date().toLocaleDateString('uk-UA');
         
-        // Перевірка: Це точно мобільний пристрій?
-        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        // 🔥 ВИЗНАЧАЄМО ПРИСТРІЙ 🔥
+        // Якщо це НЕ Android і НЕ iPhone - значить це комп'ютер
+        const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-        // --- РОЗРАХУНКИ ---
-        const c = { 
-            ed: Math.max(0,(a.curr.ed||0)-(a.prev.ed||0)), 
-            en: Math.max(0,(a.curr.en||0)-(a.prev.en||0)), 
-            w: Math.max(0,(a.curr.w||0)-(a.prev.w||0)), 
-            g: Math.max(0,(a.curr.g||0)-(a.prev.g||0)) 
-        };
-        const cost = { 
-            ed: (c.ed*d.tariffs.el_d) + (c.en*d.tariffs.el_n), 
-            w: c.w*d.tariffs.w, 
-            g: c.g*d.tariffs.g 
-        };
+        // ... РОЗРАХУНКИ (ті самі, що були) ...
+        const c = { ed: Math.max(0,(a.curr.ed||0)-(a.prev.ed||0)), en: Math.max(0,(a.curr.en||0)-(a.prev.en||0)), w: Math.max(0,(a.curr.w||0)-(a.prev.w||0)), g: Math.max(0,(a.curr.g||0)-(a.prev.g||0)) };
+        const cost = { ed: (c.ed*d.tariffs.el_d) + (c.en*d.tariffs.el_n), w: c.w*d.tariffs.w, g: c.g*d.tariffs.g };
         
         // Лічильники
-        let custRows = ""; 
-        let custCostTotal = 0;
+        let custRows = ""; let custCostTotal = 0;
         (a.custom_counters || []).forEach(cc => {
             let diff = Math.max(0, cc.curr - cc.prev);
             let val = diff * cc.price;
             custCostTotal += val;
-            custRows += `
-            <tr style="border-bottom:1px solid #e2e8f0;">
-                <td style="padding:8px;">${cc.name}</td>
-                <td style="padding:8px; text-align:center;">${diff}</td>
-                <td style="padding:8px; text-align:center;">${cc.price}</td>
-                <td style="padding:8px; text-align:right;">${val.toFixed(2)}</td>
-            </tr>`;
+            custRows += `<tr style="border-bottom:1px solid #e2e8f0;"><td style="padding:8px;">${cc.name}</td><td style="padding:8px; text-align:center;">${diff}</td><td style="padding:8px; text-align:center;">${cc.price}</td><td style="padding:8px; text-align:right;">${val.toFixed(2)}</td></tr>`;
         });
 
-        // МЗК
         const mzkVal = parseFloat((this.checks[i]?.match(/МЗК: (\d+\.\d+)/) || [0,0])[1]);
-        
-        // Послуги
-        let sRows = a.services.map(s => `
-            <tr style="border-bottom:1px solid #e2e8f0;">
-                <td style="padding:8px;" colspan="3">${s.name}</td>
-                <td style="padding:8px; text-align:right;">${s.val.toFixed(2)}</td>
-            </tr>`).join('');
-            
+        let sRows = a.services.map(s => `<tr style="border-bottom:1px solid #e2e8f0;"><td style="padding:8px;" colspan="3">${s.name}</td><td style="padding:8px; text-align:right;">${s.val.toFixed(2)}</td></tr>`).join('');
         let tot = cost.ed + cost.w + cost.g + custCostTotal + a.services.reduce((s,x)=>s+x.val,0) + mzkVal + (a.debt||0);
         let toPay = tot - (a.paid || 0);
 
         // --- ДИЗАЙН ---
         const template = `
         <div style="font-family: 'Inter', sans-serif; color:#1e293b; background:#fff; padding:40px; box-sizing: border-box; width: 100%;">
-            
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom: 2px solid #0099ff; padding-bottom:15px;">
                 <div style="font-weight: 900; font-size: 24px; color:#0f172a;">COMUNALCO</div>
-                <div style="text-align:right;">
-                    <div style="font-weight:bold;">${d.name}</div>
-                    <div style="font-size:12px; color:#64748b;">${dStr}</div>
-                </div>
+                <div style="text-align:right;"><div style="font-weight:bold;">${d.name}</div><div style="font-size:12px; color:#64748b;">${dStr}</div></div>
             </div>
-
             <div style="background:#f1f5f9; padding:15px; border-radius:10px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center;">
-                <div>
-                    <div style="font-size:10px; color:#64748b; text-transform:uppercase;">Квартира</div>
-                    <div style="font-size:18px; font-weight:bold;">${a.name}</div>
-                </div>
-                <div style="text-align:right;">
-                    <div style="font-size:10px; color:#64748b; text-transform:uppercase;">До сплати</div>
-                    <div style="font-size:26px; font-weight:900; color:#0099ff;">${toPay.toFixed(2)} <span style="font-size:16px;">грн</span></div>
-                </div>
+                <div><div style="font-size:10px; color:#64748b; text-transform:uppercase;">Квартира</div><div style="font-size:18px; font-weight:bold;">${a.name}</div></div>
+                <div style="text-align:right;"><div style="font-size:10px; color:#64748b; text-transform:uppercase;">До сплати</div><div style="font-size:26px; font-weight:900; color:#0099ff;">${toPay.toFixed(2)} <span style="font-size:16px;">грн</span></div></div>
             </div>
-
             <table style="width:100%; border-collapse:collapse; font-size:12px; margin-bottom:20px;">
-                <tr style="background:#0f172a; color:#fff;">
-                    <th style="padding:8px; text-align:left; border-top-left-radius:6px;">Послуга</th>
-                    <th style="padding:8px; text-align:center;">Спожито</th>
-                    <th style="padding:8px; text-align:center;">Тариф</th>
-                    <th style="padding:8px; text-align:right; border-top-right-radius:6px;">Сума</th>
-                </tr>
-                
-                ${c.ed > 0 || c.en > 0 ? `
-                <tr style="border-bottom:1px solid #e2e8f0;">
-                    <td style="padding:8px;">⚡ Електрика</td>
-                    <td style="padding:8px; text-align:center;">${c.ed} / ${c.en}</td>
-                    <td style="padding:8px; text-align:center;">${d.tariffs.el_d}/${d.tariffs.el_n}</td>
-                    <td style="padding:8px; text-align:right;">${cost.ed.toFixed(2)}</td>
-                </tr>` : ''}
-
-                ${c.w > 0 ? `
-                <tr style="border-bottom:1px solid #e2e8f0;">
-                    <td style="padding:8px;">💧 Вода</td>
-                    <td style="padding:8px; text-align:center;">${c.w} м³</td>
-                    <td style="padding:8px; text-align:center;">${d.tariffs.w}</td>
-                    <td style="padding:8px; text-align:right;">${cost.w.toFixed(2)}</td>
-                </tr>` : ''}
-
-                ${c.g > 0 ? `
-                <tr style="border-bottom:1px solid #e2e8f0;">
-                    <td style="padding:8px;">🔥 Газ</td>
-                    <td style="padding:8px; text-align:center;">${c.g} м³</td>
-                    <td style="padding:8px; text-align:center;">${d.tariffs.g}</td>
-                    <td style="padding:8px; text-align:right;">${cost.g.toFixed(2)}</td>
-                </tr>` : ''}
-
+                <tr style="background:#0f172a; color:#fff;"><th style="padding:8px; text-align:left;">Послуга</th><th style="padding:8px; text-align:center;">Спожито</th><th style="padding:8px; text-align:center;">Тариф</th><th style="padding:8px; text-align:right;">Сума</th></tr>
+                ${c.ed > 0 || c.en > 0 ? `<tr style="border-bottom:1px solid #e2e8f0;"><td style="padding:8px;">⚡ Електрика</td><td style="padding:8px; text-align:center;">${c.ed} / ${c.en}</td><td style="padding:8px; text-align:center;">${d.tariffs.el_d}/${d.tariffs.el_n}</td><td style="padding:8px; text-align:right;">${cost.ed.toFixed(2)}</td></tr>` : ''}
+                ${c.w > 0 ? `<tr style="border-bottom:1px solid #e2e8f0;"><td style="padding:8px;">💧 Вода</td><td style="padding:8px; text-align:center;">${c.w} м³</td><td style="padding:8px; text-align:center;">${d.tariffs.w}</td><td style="padding:8px; text-align:right;">${cost.w.toFixed(2)}</td></tr>` : ''}
+                ${c.g > 0 ? `<tr style="border-bottom:1px solid #e2e8f0;"><td style="padding:8px;">🔥 Газ</td><td style="padding:8px; text-align:center;">${c.g} м³</td><td style="padding:8px; text-align:center;">${d.tariffs.g}</td><td style="padding:8px; text-align:right;">${cost.g.toFixed(2)}</td></tr>` : ''}
                 ${custRows}
-
-                <tr style="border-bottom:1px solid #e2e8f0; background:#fffbeb;">
-                    <td style="padding:8px; color:#b45309;" colspan="3">🏢 МЗК (Спільні)</td>
-                    <td style="padding:8px; text-align:right; font-weight:bold; color:#b45309;">${mzkVal.toFixed(2)}</td>
-                </tr>
-
+                <tr style="border-bottom:1px solid #e2e8f0; background:#fffbeb;"><td style="padding:8px; color:#b45309;" colspan="3">🏢 МЗК (Спільні)</td><td style="padding:8px; text-align:right; font-weight:bold; color:#b45309;">${mzkVal.toFixed(2)}</td></tr>
                 ${sRows}
-                
                 ${a.debt > 0 ? `<tr style="color:#ef4444;"><td colspan="3" style="padding:8px;">❗️ Борг</td><td style="padding:8px; text-align:right;">${a.debt.toFixed(2)}</td></tr>` : ''}
                 ${a.paid > 0 ? `<tr style="color:#10b981;"><td colspan="3" style="padding:8px;">✅ Сплачено</td><td style="padding:8px; text-align:right;">-${a.paid.toFixed(2)}</td></tr>` : ''}
             </table>
-
-            <div style="border: 1px dashed #cbd5e1; padding:12px; border-radius:8px;">
-                <div style="font-size:10px; font-weight:bold; color:#64748b; margin-bottom:5px;">РЕКВІЗИТИ:</div>
-                ${d.requisites.map(r=>`<div style="font-size:12px; margin-bottom:2px;">${r.name}: <strong>${r.val}</strong></div>`).join('')}
-            </div>
-            
-            <div style="text-align:center; font-size:10px; color:#94a3b8; margin-top:20px;">Згенеровано Comunalco</div>
+            <div style="border: 1px dashed #cbd5e1; padding:12px; border-radius:8px;"><div style="font-size:10px; font-weight:bold; color:#64748b; margin-bottom:5px;">РЕКВІЗИТИ:</div>${d.requisites.map(r=>`<div style="font-size:12px; margin-bottom:2px;">${r.name}: <strong>${r.val}</strong></div>`).join('')}</div>
         </div>`;
 
-        // Генерація PDF
+        // Генерація
         const overlay = document.createElement('div');
         overlay.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #333; z-index: 99999; display: flex; justify-content: center; overflow: auto; padding: 20px;';
-        
         const container = document.createElement('div');
         container.style.cssText = 'width: 148mm; background: white; margin: auto; box-shadow: 0 0 20px rgba(0,0,0,0.5); min-height: 210mm;'; 
         container.innerHTML = template;
-        
         overlay.appendChild(container); document.body.appendChild(overlay); 
         await new Promise(r => setTimeout(r, 1000));
 
@@ -871,12 +795,11 @@ class App {
             const pdfBlob = await pdfWorker.output('blob'); 
             const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
             
-            // 🔥 ВИПРАВЛЕНА ЛОГІКА 🔥
-            // Вікно "Поділитися" відкриється ТІЛЬКИ на телефоні
+            // 🔥 ЗАЛІЗНА ЛОГІКА ДЛЯ WINDOWS 🔥
             if (isMobile && navigator.canShare && navigator.canShare({ files: [file] })) { 
                 await navigator.share({ files: [file] }); 
             } else { 
-                // На Ноутбуці файл просто скачається
+                // Якщо це не телефон - ТІЛЬКИ СКАЧУВАННЯ
                 await pdfWorker.save(); 
             }
         } catch (e) { 
@@ -1194,7 +1117,6 @@ window.addEventListener('load', () => {
   import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
   import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-  // 👇👇👇 ТВОЇ КЛЮЧІ ЗАЛИШАЮТЬСЯ ТІ САМІ 👇👇👇
   const firebaseConfig = {
     apiKey: "AIzaSyDWFMF95PiGQmclQPkvvb7gvvkZT_lzMCI",
     authDomain: "comunalco-7f29f.firebaseapp.com",
@@ -1212,61 +1134,62 @@ window.addEventListener('load', () => {
   const provider = new GoogleAuthProvider();
 
   window.currentUser = null;
-  // Прапорець, щоб не зациклити збереження
-  let isReceivingData = false;
+  let isRestoring = false; // Прапорець "Зараз йде відновлення"
 
   window.googleLogin = () => {
     if (window.currentUser) {
-        if(confirm("Вийти з акаунту?")) signOut(auth).then(() => alert("Ви вийшли"));
+        if(confirm("Вийти?")) signOut(auth).then(() => location.reload());
     } else {
-        signInWithPopup(auth, provider).catch((error) => alert("Помилка: " + error.message));
+        signInWithPopup(auth, provider).catch(e => alert(e.message));
     }
   };
 
-  // Функція збереження в хмару
+  // ФУНКЦІЯ ЗБЕРЕЖЕННЯ (З ЗАХИСТОМ)
   window.cloudSave = (data) => {
-      // Якщо ми саме зараз отримуємо дані з хмари, то не треба їх відправляти назад
-      if(isReceivingData || !window.currentUser) return;
+      // 1. Якщо юзера немає — стоп.
+      // 2. Якщо зараз йде процес відновлення з хмари — стоп (щоб не перезаписати хмару пустотою).
+      if(!window.currentUser || isRestoring) return;
       
+      // 3. Захист від дурня: якщо випадково намагаємось зберегти "голий" об'єкт, а в хмарі було багато
+      if(data.objects.length === 1 && data.objects[0].apartments.length === 1) {
+          // Це виглядає як пустий дефолтний стан. Не зберігаємо його автоматично, поки не переконаємось.
+          console.log("Auto-save skipped: Data looks empty/default.");
+          return;
+      }
+
       set(ref(db, 'users/' + window.currentUser.uid), data)
-        .then(() => console.log("☁️ Saved to cloud"))
+        .then(() => console.log("☁️ Saved"))
         .catch(e => console.error(e));
   };
 
   onAuthStateChanged(auth, (user) => {
     const btn = document.getElementById('auth-btn');
+    
     if (user) {
       window.currentUser = user;
-      if(btn) {
-          btn.innerText = `🟢 ${user.displayName.split(' ')[0]}`;
-          btn.style.borderColor = 'var(--success)';
-      }
+      if(btn) { btn.innerText = `🟢 ${user.displayName.split(' ')[0]}`; btn.style.borderColor = 'var(--success)'; }
 
-      // 🔥 ГОЛОВНА ЗМІНА: onValue замість get 🔥
-      // Ця функція спрацьовує САМА щоразу, коли хтось міняє базу (навіть з іншого пристрою)
+      // 🔥 ВІДНОВЛЕННЯ ДАНИХ 🔥
       const userRef = ref(db, 'users/' + user.uid);
       
       onValue(userRef, (snapshot) => {
         if (snapshot.exists()) {
             const cloudData = snapshot.val();
             
-            // Ставимо прапорець "Зараз йде оновлення", щоб не спрацював save()
-            isReceivingData = true; 
-            
-            console.log("🔄 Прийшли нові дані з хмари!");
-            
-            // Оновлюємо дані в додатку
-            if(window.app) {
+            // Якщо локальні дані відрізняються від хмарних — беремо хмарні!
+            // Особливо якщо локально у нас "пусто", а в хмарі є квартири.
+            if (window.app) {
+                console.log("🔄 ВІДНОВЛЮЮ ДАНІ З ХМАРИ...");
+                isRestoring = true; // Блокуємо збереження на секунду
+                
                 window.app.state = cloudData;
-                // Зберігаємо в локальну пам'ять телефону, щоб не зникло без інтернету
                 localStorage.setItem(window.app.STORAGE_KEY, JSON.stringify(cloudData));
-                // Перемальовуємо екран
                 window.app.renderAll(); 
                 window.app.updateStatus();
+                
+                // Знімаємо блокування
+                setTimeout(() => { isRestoring = false; }, 2000);
             }
-            
-            // Знімаємо прапорець через 0.5 сек
-            setTimeout(() => { isReceivingData = false; }, 500);
         }
       });
 
@@ -1280,6 +1203,7 @@ window.addEventListener('load', () => {
 </html>
 
 	
+
 
 
 
