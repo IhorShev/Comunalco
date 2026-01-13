@@ -836,7 +836,7 @@ var custCostTotal = 0;
         });
 
         // МЗК та послуги
-        const mzkVal = parseFloat((this.checks[i]?.match(/МЗК: (\d+\.\d+)/) || [0,0])[1]);
+        var mzkVal = parseFloat((this.checks[i]?.match(/МЗК: (\d+\.\d+) /) || [0,0])[1]);
         let sRows = a.services.map(s => `
             <tr style="border-bottom:1px solid #e2e8f0;">
                 <td style="padding:8px; color:#334155;" colspan="3">${s.name}</td>
@@ -1203,6 +1203,7 @@ window.addEventListener('load', () => {
 </html>
 
 	
+
 
 
 
