@@ -525,7 +525,7 @@ class App {
                 <button class="btn btn-add-counter" onclick="app.addCustomCounter('apt', ${i})">+ Лічильник</button>
 
                 <div class="section-title" style="margin-top:15px">Послуги</div>
-                <div id="a-serv-${i}">${a.services.map((s,si)=>`<div class="custom-row"><input type="text" value="${s.name}" placeholder="Назва" onchange="app.updateAS(${i},${si},'name',this.value)"><input type="number" value="${s.val}" placeholder="Сума" onchange="app.updateAS(${i},${si},'val',this.value)"><span class="del-icon" onclick="app.delAS(${i},${si})">&times;</span></div>`).join('')}</div>
+                <div id="a-serv-${i}">${(a.services||[]).map((s,si)=>`<div class="custom-row">
                 <button class="btn btn-add" onclick="app.addAS(${i})">+ Індив. послуга</button>
                 
                 <div class="section-title">Баланс</div>
@@ -1038,6 +1038,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
