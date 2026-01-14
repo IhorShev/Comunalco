@@ -602,16 +602,40 @@ class App {
     }
 
     renderMR(i, obj, mode, label, key) { 
-        const p = obj.prev[key]; const c = obj.curr[key]; 
+        const p = parseFloat(obj.prev[key] || 0); 
+        const c = parseFloat(obj.curr[key] || 0); 
         const fn = mode==='prev'?`app.updateGroupMetric(${i},`:`app.updateAptMetric(${i},`; 
+        
+        // --- РОЗУМНА АНАЛІТИКА (Різниця) ---
+        let diffHtml = '';
+        if (c > 0) {
+            let diff = c - p;
+            if (diff > 0) diffHtml = `<div style="font-size:10px; color:var(--primary); font-weight:800; text-align:right; margin-top:2px;">(+${diff})</div>`;
+            else if (diff < 0) diffHtml = `<div style="font-size:10px; color:var(--danger); font-weight:800; text-align:right; margin-top:2px;">(${diff})</div>`;
+        }
+
         return `<div class="row" style="align-items:center;">
             <div class="col" style="flex:0.6"><span style="font-size:13px; font-weight:600;">${label}</span></div>
             <div class="col"><input type="number" placeholder="Було" value="${p||0}" onchange="${fn}'prev','${key}',this.value)" style="background:var(--bg)"></div>
-            <div class="col"><input type="number" placeholder="Стало" value="${c||0}" onchange="${fn}'curr','${key}',this.value)"></div>
+            <div class="col">
+                <input type="number" placeholder="Стало" value="${c||0}" onchange="${fn}'curr','${key}',this.value)">
+                ${diffHtml}
+            </div>
         </div>`; 
     }
 
     renderCustomCounterRow(type, parentIdx, cIdx, cData) {
+        const p = parseFloat(cData.prev || 0);
+        const c = parseFloat(cData.curr || 0);
+        
+        // --- РОЗУМНА АНАЛІТИКА ДЛЯ ЛІЧИЛЬНИКІВ ---
+        let diffHtml = '';
+        if (c > 0) {
+            let diff = c - p;
+            if (diff > 0) diffHtml = `<div style="font-size:10px; color:var(--primary); font-weight:800; text-align:right; margin-top:2px;">(+${diff})</div>`;
+            else if (diff < 0) diffHtml = `<div style="font-size:10px; color:var(--danger); font-weight:800; text-align:right; margin-top:2px;">(${diff})</div>`;
+        }
+
         return `
         <div class="counter-row">
             <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
@@ -621,7 +645,10 @@ class App {
             <div class="row" style="margin-bottom:0;">
                 <div class="col" style="flex:0.8"><input type="number" value="${cData.price}" placeholder="Тариф" title="Ціна за одиницю" onchange="app.updateCustomCounter('${type}', ${parentIdx}, ${cIdx}, 'price', this.value)"></div>
                 <div class="col"><input type="number" value="${cData.prev}" placeholder="Було" onchange="app.updateCustomCounter('${type}', ${parentIdx}, ${cIdx}, 'prev', this.value)" style="background:var(--bg)"></div>
-                <div class="col"><input type="number" value="${cData.curr}" placeholder="Стало" onchange="app.updateCustomCounter('${type}', ${parentIdx}, ${cIdx}, 'curr', this.value)"></div>
+                <div class="col">
+                    <input type="number" value="${cData.curr}" placeholder="Стало" onchange="app.updateCustomCounter('${type}', ${parentIdx}, ${cIdx}, 'curr', this.value)">
+                    ${diffHtml}
+                </div>
             </div>
         </div>`;
     }
@@ -1108,6 +1135,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
