@@ -978,10 +978,20 @@ class App {
         alert(`✅ Місяць закрито!\nЗвіт збережено в Архів. Всього записів: ${this.currentData.history.length}`);
         location.reload(); 
     }
-    renderHistory() {
+   renderHistory() {
+        // 1. Шукаємо елементи в HTML
         const list = document.getElementById('history-list');
+        const modal = document.getElementById('historyModal');
+
+        // 2. ДІАГНОСТИКА: Якщо HTML-вікно загубилося
+        if (!list || !modal) {
+            alert("⚠️ Помилка структури!\n\nПрограма не знайшла вікно 'historyModal' в HTML коді.\nМожливо, ви вставили його не туди (потрібно після payModal).");
+            return;
+        }
+
         const h = this.currentData.history || [];
         
+        // 3. Малюємо список
         if (h.length === 0) {
             list.innerHTML = `<div style="text-align:center; padding:30px; color:var(--text-sec); opacity:0.7;">
                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:10px;"><circle cx="12" cy="12" r="10"/><path d="M16 16s-1.5-2-4-2c-3.6 0-4.6 2-4.6 2"/></svg>
@@ -1013,8 +1023,11 @@ class App {
             }).join('');
         }
         
-        const menuM = document.getElementById('menuModal'); if(menuM) menuM.style.display='none';
-        document.getElementById('historyModal').style.display = 'flex';
+        // 4. Відкриваємо вікно
+        const menuM = document.getElementById('menuModal'); 
+        if(menuM) menuM.style.display = 'none';
+        
+        modal.style.display = 'flex';
     }
 
     loadHistoryItem(index) {
@@ -1031,16 +1044,16 @@ class App {
         document.getElementById('historyModal').style.display = 'none';
         
         const title = document.getElementById('object-title');
-        title.value = `📜 АРХІВ: ${item.monthName}`;
-        title.disabled = true;
-        title.style.background = "var(--gold)"; 
-        title.style.color = "#000";
-        title.style.fontWeight = "bold";
+        if(title) {
+            title.value = `📜 АРХІВ: ${item.monthName}`;
+            title.disabled = true;
+            title.style.background = "var(--gold)"; 
+            title.style.color = "#000";
+            title.style.fontWeight = "bold";
+        }
         
-        const updateBtn = document.querySelector('.desktop-only span[title="Оновити"]');
-        if(updateBtn) updateBtn.style.display = 'none';
         alert("Ви в минулому! 🕰\nЩоб повернутися в сьогодення — оновіть сторінку.");
-    }
+    } 
     renderTariffs() {
         const container = document.getElementById('tariffs-list');
         container.innerHTML = this.TARIFF_PLANS.map(plan => `
@@ -1248,6 +1261,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
