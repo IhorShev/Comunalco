@@ -425,6 +425,7 @@ class App {
     }
 
     openMenu(id) {
+        if (id === 'history') { this.renderHistory(); return; }
         document.getElementById('menuModal').style.display='flex';
         ['info','premium','contacts'].forEach(k => document.getElementById('menu-content-'+k).style.display='none');
         const el = document.getElementById('menu-content-'+id);
@@ -1232,6 +1233,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
