@@ -915,17 +915,39 @@ class App {
     }
 
     startNewMonth() { 
-        if (!confirm("Закрити місяць?")) return; 
+        if (!confirm("⚠️ Закрити місяць?\n\n1. Поточні квитанції будуть збережені в Історію.\n2. Поля будуть очищені для нового місяця.")) return; 
+
+        // 1. Перевіряємо, чи є куди складати історію
+        if (!this.currentData.history) this.currentData.history = [];
+
+        // 2. Робимо "Зліпок" (Snapshot) поточних даних
+        const snapshot = {
+            id: Date.now(),
+            date: new Date().toLocaleDateString('uk-UA'),
+            monthName: new Date().toLocaleString('uk-UA', { month: 'long', year: 'numeric' }),
+            apartments: JSON.parse(JSON.stringify(this.currentData.apartments)), // Копіюємо квартири
+            groups: JSON.parse(JSON.stringify(this.currentData.groups || [])),   // Копіюємо групи
+            tariffs: { ...this.currentData.tariffs }                             // Копіюємо тарифи на той момент
+        };
+
+        // 3. Додаємо в архів (найновіші зверху)
+        this.currentData.history.unshift(snapshot);
+
+        // 4. Очищаємо поля для нового місяця (Стандартна процедура)
         this.currentData.apartments.forEach(a => { 
             ['ed','en','w','g'].forEach(k=>{if(a.curr[k]){a.prev[k]=a.curr[k];a.curr[k]=0}}); 
             (a.custom_counters||[]).forEach(c=>{if(c.curr){c.prev=c.curr;c.curr=0}});
             a.paid=0; 
         }); 
-        this.currentData.groups.forEach(g => { 
+        (this.currentData.groups || []).forEach(g => { 
             ['ed','en','w','g'].forEach(k=>{if(g.curr[k]){g.prev[k]=g.curr[k];g.curr[k]=0}}); 
             (g.custom_counters||[]).forEach(c=>{if(c.curr){c.prev=c.curr;c.curr=0}});
         }); 
-        this.save(); location.reload(); 
+
+        // 5. Зберігаємо і перезавантажуємо
+        this.save(); 
+        alert(`✅ Місяць закрито!\nЗвіт збережено в Архів. Всього записів: ${this.currentData.history.length}`);
+        location.reload(); 
     }
     
     renderTariffs() {
@@ -1135,6 +1157,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
