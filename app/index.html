@@ -428,7 +428,7 @@ class App {
     }
 
     openMenu(id) {
-        alert("Сигнал отримано: " + id);
+        
         // 1. Перевірка: Якщо натиснули "Історія"
         if (id === 'history') { 
             if (this.renderHistory) this.renderHistory(); 
@@ -448,7 +448,92 @@ class App {
         
         if(id === 'premium') this.renderTariffs();
     }
+    renderHistory() {
+        // 1. Спробуємо знайти вікно та список
+        let modal = document.getElementById('historyModal');
+        let list = document.getElementById('history-list');
 
+        // 2. АВТО-РЕМОНТ: Якщо вікна немає в HTML, створюємо його програмно!
+        if (!modal) {
+            console.log("🛠 Відновлення вікна історії...");
+            const modalHTML = `
+            <div id="historyModal" class="modal-overlay" style="display:none; justify-content:center; align-items:center; z-index: 3000;">
+                <div class="modal-card" style="width:95%; max-width:500px; max-height:85vh; overflow-y:auto; display:flex; flex-direction:column;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:10px;">
+                        <div style="font-size:18px; font-weight:800; display:flex; align-items:center; gap:10px;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/></svg>
+                            Архів Квитанцій
+                        </div>
+                        <span class="close-btn" onclick="document.getElementById('historyModal').style.display='none'" style="font-size:28px; cursor:pointer;">&times;</span>
+                    </div>
+                    <div id="history-list" style="display:flex; flex-direction:column; gap:10px;"></div>
+                </div>
+            </div>`;
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            modal = document.getElementById('historyModal');
+            list = document.getElementById('history-list');
+        }
+
+        // 3. Заповнюємо даними
+        const h = this.currentData.history || [];
+        
+        if (h.length === 0) {
+            list.innerHTML = `<div style="text-align:center; padding:30px; color:var(--text-sec); opacity:0.7;">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:10px;"><circle cx="12" cy="12" r="10"/><path d="M16 16s-1.5-2-4-2c-3.6 0-4.6 2-4.6 2"/></svg>
+                <br>Архів поки що порожній.<br>Закрийте поточний місяць.
+            </div>`;
+        } else {
+            list.innerHTML = h.map((item, i) => {
+                let total = 0;
+                (item.apartments || []).forEach(a => {
+                    const c = { ed: (a.curr.ed||0)-(a.prev.ed||0), en: (a.curr.en||0)-(a.prev.en||0), w: (a.curr.w||0)-(a.prev.w||0), g: (a.curr.g||0)-(a.prev.g||0) };
+                    const t = item.tariffs;
+                    total += (c.ed*(t.el_d||0))+(c.en*(t.el_n||0))+(c.w*(t.w||0))+(c.g*(t.g||0));
+                });
+                return `
+                <div class="card" style="border-left:4px solid var(--text-sec); padding:15px; margin-bottom:10px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <div style="font-weight:800; font-size:16px;">${item.monthName}</div>
+                            <div style="font-size:11px; color:var(--text-sec); margin-top:4px;">📅 ${item.date} • 🏠 ${item.apartments.length} кв.</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div style="font-weight:bold; font-size:15px; color:var(--primary);">~${total.toFixed(0)} грн</div>
+                            <button class="btn btn-sm btn-outline" onclick="app.loadHistoryItem(${i})" style="margin-top:6px; font-size:11px; padding: 4px 10px;">👁 Переглянути</button>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+        
+        // 4. Перемикання вікон
+        const menuM = document.getElementById('menuModal'); 
+        if(menuM) menuM.style.display = 'none';
+        modal.style.display = 'flex';
+    }
+
+    loadHistoryItem(index) {
+        if(!confirm("⚠️ Режим ПЕРЕГЛЯДУ архіву.\nЗміни тут не зберігаються.\nОновіть сторінку для виходу.")) return;
+        
+        const item = this.currentData.history[index];
+        const tempState = JSON.parse(JSON.stringify(this.state));
+        tempState.objects[this.state.currentObjIdx].apartments = item.apartments;
+        tempState.objects[this.state.currentObjIdx].groups = item.groups;
+        tempState.objects[this.state.currentObjIdx].tariffs = item.tariffs;
+        
+        this.currentData = tempState.objects[this.state.currentObjIdx];
+        this.renderAll();
+        document.getElementById('historyModal').style.display = 'none';
+        
+        const title = document.getElementById('object-title');
+        if(title) {
+            title.value = `📜 АРХІВ: ${item.monthName}`;
+            title.disabled = true;
+            title.style.background = "var(--gold)"; 
+            title.style.color = "#000";
+        }
+        alert("Ви в минулому! 🕰\nОновіть сторінку (F5), щоб повернутися.");
+    }
     // --- OBJECTS MANAGEMENT ---
     createDefaultObject(name) {
         return {
@@ -1262,6 +1347,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
