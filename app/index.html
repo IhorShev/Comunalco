@@ -468,12 +468,12 @@ class App {
     }
     
     renderExtraTariffs() { 
-        document.getElementById('extra-tariffs-container').innerHTML = this.currentData.extra_tariffs.map((t, i) => 
+        document.getElementById('extra-tariffs-container').innerHTML = (this.currentData.extra_tariffs || []).map((t, i) => 
             `<div class="custom-row"><input type="text" value="${t.name}" placeholder="Послуга" onchange="app.updateExtraTariff(${i}, 'name', this.value)"><input type="number" value="${t.val}" placeholder="Ціна" onchange="app.updateExtraTariff(${i}, 'val', this.value)"><span class="del-icon" onclick="app.delExtraTariff(${i})">&times;</span></div>`
         ).join(''); 
     }
     renderRequisites() { 
-        document.getElementById('requisites-container').innerHTML = this.currentData.requisites.map((r, i) => 
+        document.getElementById('requisites-container').innerHTML = (this.currentData.requisites || []).map((r, i) => 
             `<div class="custom-row"><input type="text" value="${r.name}" placeholder="Банк" onchange="app.updateReq(${i}, 'name', this.value)"><input type="text" value="${r.val}" placeholder="IBAN" onchange="app.updateReq(${i}, 'val', this.value)"><span class="del-icon" onclick="app.delReq(${i})">&times;</span></div>`
         ).join(''); 
     }
@@ -621,7 +621,8 @@ class App {
         const d = this.currentData; const t = d.tariffs;
         let totalIn={ed:0,en:0,w:0,g:0}, gServSum=0, totalApts={ed:0,en:0,w:0,g:0};
         
-        d.groups.forEach(g => { 
+        // Захист для груп
+        (d.groups || []).forEach(g => { 
             totalIn.ed += Math.max(0,(g.curr.ed||0)-(g.prev.ed||0)); 
             totalIn.en += Math.max(0,(g.curr.en||0)-(g.prev.en||0)); 
             totalIn.w += Math.max(0,(g.curr.w||0)-(g.prev.w||0)); 
@@ -629,23 +630,25 @@ class App {
             if(g.services) g.services.forEach(s => gServSum += (s.val||0));
         });
         
-        d.apartments.forEach(a => { 
+        // Захист для квартир
+        (d.apartments || []).forEach(a => { 
             totalApts.ed += Math.max(0,(a.curr.ed||0)-(a.prev.ed||0)); 
             totalApts.en += Math.max(0,(a.curr.en||0)-(a.prev.en||0)); 
             totalApts.w += Math.max(0,(a.curr.w||0)-(a.prev.w||0)); 
             totalApts.g += Math.max(0,(a.curr.g||0)-(a.prev.g||0)); 
         });
         
-        d.extra_tariffs.forEach(et => gServSum += (et.val || 0));
+        // 🔥 ЗАХИСТ ТУТ (щоб не було помилки з 'map')
+        (d.extra_tariffs || []).forEach(et => gServSum += (et.val || 0));
 
         let mzk = { ed: Math.max(0,totalIn.ed-totalApts.ed), en: Math.max(0,totalIn.en-totalApts.en), w: Math.max(0,totalIn.w-totalApts.w), g: Math.max(0,totalIn.g-totalApts.g) };
         let mzkCost = (mzk.ed*t.el_d) + (mzk.en*t.el_n) + (mzk.w*t.w) + (mzk.g*t.g) + gServSum;
-        let mzkPerApt = d.apartments.length ? mzkCost/d.apartments.length : 0;
+        let mzkPerApt = (d.apartments || []).length ? mzkCost/d.apartments.length : 0;
         
         document.getElementById('mzk-info').innerHTML = `<div>МЗК Всього: <b>${mzkCost.toFixed(2)}</b> грн | На квартиру: <b>${mzkPerApt.toFixed(2)}</b> грн</div>`;
         const dStr = new Date().toLocaleDateString('uk-UA');
         
-        document.getElementById('results-list').innerHTML = d.apartments.map((a, i) => {
+        document.getElementById('results-list').innerHTML = (d.apartments || []).map((a, i) => {
             const c = { ed: Math.max(0,(a.curr.ed||0)-(a.prev.ed||0)), en: Math.max(0,(a.curr.en||0)-(a.prev.en||0)), w: Math.max(0,(a.curr.w||0)-(a.prev.w||0)), g: Math.max(0,(a.curr.g||0)-(a.prev.g||0)) };
             let mCost = (c.ed*t.el_d)+(c.en*t.el_n)+(c.w*t.w)+(c.g*t.g);
             
@@ -657,13 +660,16 @@ class App {
                 custTxt += `${cc.name}: ${diff} од. (${cost.toFixed(0)} грн)\n`;
             });
 
-            let sCost=0, sTxt=""; a.services.forEach(s=>{sCost+=(s.val||0); sTxt+=`${s.name}: ${s.val}\n`});
+            let sCost=0, sTxt=""; (a.services || []).forEach(s=>{sCost+=(s.val||0); sTxt+=`${s.name}: ${s.val}\n`});
             let tot = mCost + custCost + sCost + mzkPerApt + (a.debt||0); 
             let bal = tot - (a.paid||0);
             
-            const txt = `Квитанція ${dStr}\n${d.name} - ${a.name}\n\n⚡Е/Е: ${c.ed}/${c.en} (${((c.ed*t.el_d)+(c.en*t.el_n)).toFixed(0)} грн)\n💧Вода: ${c.w} (${(c.w*t.w).toFixed(0)} грн)\n🔥Газ: ${c.g} (${(c.g*t.g).toFixed(0)} грн)\n${custTxt}🏢МЗК: ${mzkPerApt.toFixed(2)} грн\n${sTxt?'---\n'+sTxt:''}----------------\nНараховано: ${(mCost+custCost+sCost+mzkPerApt).toFixed(2)} грн\nДО СПЛАТИ: ${tot.toFixed(2)} грн\n${a.paid?`Сплачено: -${a.paid}\nЗалишок: ${bal.toFixed(2)}`:''}\n\nРеквізити:\n${d.requisites.map(r=>`${r.name}: ${r.val}`).join('\n')}`;
+            const requisitesTxt = (d.requisites || []).map(r=>`${r.name}: ${r.val}`).join('\n');
+
+            const txt = `Квитанція ${dStr}\n${d.name} - ${a.name}\n\n⚡Е/Е: ${c.ed}/${c.en} (${((c.ed*t.el_d)+(c.en*t.el_n)).toFixed(0)} грн)\n💧Вода: ${c.w} (${(c.w*t.w).toFixed(0)} грн)\n🔥Газ: ${c.g} (${(c.g*t.g).toFixed(0)} грн)\n${custTxt}🏢МЗК: ${mzkPerApt.toFixed(2)} грн\n${sTxt?'---\n'+sTxt:''}----------------\nНараховано: ${(mCost+custCost+sCost+mzkPerApt).toFixed(2)} грн\nДО СПЛАТИ: ${tot.toFixed(2)} грн\n${a.paid?`Сплачено: -${a.paid}\nЗалишок: ${bal.toFixed(2)}`:''}\n\nРеквізити:\n${requisitesTxt}`;
             this.checks[i] = txt;
-            document.getElementById(`badge-${i}`).innerText = Math.round(tot);
+            const badge = document.getElementById(`badge-${i}`);
+            if(badge) badge.innerText = Math.round(tot);
             
             let btnClass = 'btn-outline', btnText = 'Скопіювати';
             if(a.messenger === 'viber') { btnClass = 'btn-viber'; btnText = 'Viber'; }
@@ -683,7 +689,7 @@ class App {
             </div>`;
         }).join('');
         document.getElementById('resultModal').style.display='flex';
-    }
+        }
 
     async sendCheck(i) {
         const txt = this.checks[i];
@@ -1038,6 +1044,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
