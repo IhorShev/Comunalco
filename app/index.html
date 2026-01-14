@@ -126,17 +126,81 @@
         /* New buttons for order */
         .btn-order-tg { background: #229ED9; color: white; margin-bottom: 10px; }
         .btn-order-email { background: transparent; border: 2px solid #cbd5e1; color: var(--text); }
+        /* --- АДАПТИВНЕ МЕНЮ (PRO версія) --- */
+    .top-menu-bar { 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        position: relative;
+        padding: 10px 0; /* Трохи повітря зверху і знизу */
+    }
+
+    /* Стилі для гарної іконки теми */
+    .theme-icon-svg {
+        width: 24px; height: 24px;
+        stroke: var(--text); /* Колір підлаштується під тему */
+        fill: none;
+        stroke-width: 2;
+        stroke-linecap: round; 
+        stroke-linejoin: round;
+        transition: transform 0.3s ease;
+    }
+    .theme-icon-svg:hover { transform: rotate(15deg); } /* Ефект при наведенні */
+
+    /* Логіка: Показувати/Ховати */
+    .desktop-only { display: none !important; }
+    .mobile-only { display: flex !important; }
+    
+    /* НАЛАШТУВАННЯ ДЛЯ НОУТБУКІВ (Ширина більше 768px) */
+    @media (min-width: 768px) {
+        .desktop-only { display: flex !important; align-items: center; gap: 15px; }
+        .mobile-only { display: none !important; }
+    }
     </style>
 </head>
 <body>
 
     <div class="top-menu-bar">
-        <button class="theme-toggle-btn" onclick="app.toggleTheme()" id="theme-icon">🌗</button>
-        <span id="auth-btn" onclick="window.googleLogin()" style="border: 1px solid var(--primary); padding: 2px 8px; border-radius: 8px; color: var(--primary);">👤 Вхід</span>
-        <span onclick="app.openMenu('info')">ℹ️ Інфо</span>
-        <span onclick="app.openMenu('premium')" style="color:var(--primary)">💎 Тарифи</span>
-        <span onclick="app.openMenu('contacts')">📞 Контакти</span>
+    
+    <div style="display:flex; align-items:center; gap:12px;">
+        <button onclick="app.toggleTheme()" style="background:none; border:none; cursor:pointer; padding:0; display:flex; align-items:center;" title="Змінити тему">
+            <svg class="theme-icon-svg" viewBox="0 0 24 24">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+        </button>
+
+        <span id="auth-btn" onclick="window.googleLogin()" style="border: 1px solid var(--primary); padding: 5px 12px; border-radius: 20px; color: var(--primary); font-size: 13px; font-weight:bold; cursor:pointer; display:flex; align-items:center; gap:5px; transition:0.2s;">
+            👤 <span id="user-name-display">Вхід</span>
+        </span>
     </div>
+
+    <div style="display:flex; align-items:center;">
+        
+        <div class="desktop-only">
+            <span onclick="window.location.reload()" style="cursor:pointer; font-weight:bold; font-size:14px; display:flex; align-items:center; gap:5px;" title="Оновити">
+                🔄 Оновити
+            </span>
+            <span onclick="app.openMenu('premium')" style="color:var(--primary); font-weight:bold; cursor:pointer; font-size:14px;">💎 Тарифи</span>
+            <span onclick="app.openMenu('info')" style="cursor:pointer; font-size:14px;">ℹ️ Інфо</span>
+            <span onclick="app.openMenu('contacts')" style="cursor:pointer; font-size:14px;">📞 Контакти</span>
+        </div>
+
+        <div class="mobile-only" style="align-items:center; gap:18px;">
+            <span onclick="window.location.reload()" style="cursor:pointer; font-size:20px;" title="Оновити дані">🔄</span>
+            
+            <button onclick="document.getElementById('mobile-dropdown').style.display = document.getElementById('mobile-dropdown').style.display==='block'?'none':'block'" style="background:none; border:none; cursor:pointer; font-size:28px; color:var(--text); padding:0; display:flex; align-items:center;">
+                ☰
+            </button>
+        </div>
+    </div>
+
+    <div id="mobile-dropdown" style="display:none; position:absolute; top:55px; right:0; background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:5px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index:2000; min-width:180px; text-align:left;">
+        <div onclick="app.openMenu('premium'); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; border-bottom:1px solid var(--border); cursor:pointer; font-weight:bold; color:var(--primary); display:flex; gap:10px;">💎 Тарифи</div>
+        <div onclick="app.openMenu('info'); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; border-bottom:1px solid var(--border); cursor:pointer; display:flex; gap:10px;">ℹ️ Інфо</div>
+        <div onclick="app.openMenu('contacts'); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; cursor:pointer; display:flex; gap:10px;">📞 Контакти</div>
+    </div>
+
+</div>
 
     <div class="brand-header">
         <div class="logo-text-wrapper">
@@ -1044,6 +1108,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
