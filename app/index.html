@@ -666,7 +666,6 @@ class App {
             const t = h.tariffs;
 
             if (targetId === 'group') {
-                // --- ЯКЩО ОБРАНО ГРУПУ ---
                 (h.groups || []).forEach(g => {
                     let diff = { ed: (g.curr.ed||0)-(g.prev.ed||0), en: (g.curr.en||0)-(g.prev.en||0), w: (g.curr.w||0)-(g.prev.w||0), g: (g.curr.g||0)-(g.prev.g||0) };
                     cost.el += (diff.ed * t.el_d) + (diff.en * t.el_n);
@@ -677,7 +676,6 @@ class App {
                 });
                 (h.extra_tariffs||[]).forEach(e => cost.serv += (e.val||0));
             } else {
-                // --- ЯКЩО ОБРАНО КВАРТИРУ ---
                 const apt = h.apartments.find(a => a.id == targetId);
                 if (apt) {
                     let diff = { ed: (apt.curr.ed||0)-(apt.prev.ed||0), en: (apt.curr.en||0)-(apt.prev.en||0), w: (apt.curr.w||0)-(apt.prev.w||0), g: (apt.curr.g||0)-(apt.prev.g||0) };
@@ -691,23 +689,47 @@ class App {
             dEl.push(cost.el); dW.push(cost.w); dG.push(cost.g); dServ.push(cost.serv); dCust.push(cost.cust);
         });
 
+        // Колір тексту для теми
+        const textColor = document.body.classList.contains('dark-mode') ? '#ffffff' : '#1e293b';
+
         this.myChartInstance = new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: labels,
                 datasets: [
-                    { label: 'Електрика ⚡', data: dEl, backgroundColor: '#f59e0b', stack: '0' },
-                    { label: 'Вода 💧', data: dW, backgroundColor: '#3b82f6', stack: '0' },
-                    { label: 'Газ 🔥', data: dG, backgroundColor: '#ef4444', stack: '0' },
-                    { label: 'Лічильники 🔢', data: dCust, backgroundColor: '#10b981', stack: '0' },
-                    { label: 'Послуги (Інтернет/МЗК)', data: dServ, backgroundColor: '#64748b', stack: '0' }
+                    { label: 'Електрика ⚡', data: dEl, backgroundColor: '#f59e0b', borderRadius: 4 },
+                    { label: 'Вода 💧', data: dW, backgroundColor: '#3b82f6', borderRadius: 4 },
+                    { label: 'Газ 🔥', data: dG, backgroundColor: '#ef4444', borderRadius: 4 },
+                    { label: 'Лічильники 🔢', data: dCust, backgroundColor: '#10b981', borderRadius: 4 },
+                    { label: 'Послуги', data: dServ, backgroundColor: '#64748b', borderRadius: 4 }
                 ]
             },
             options: {
                 responsive: true, 
                 maintainAspectRatio: false,
-                plugins: { legend: { position: 'bottom' } },
-                scales: { x: { stacked: true }, y: { stacked: true } }
+                plugins: { 
+                    legend: { position: 'bottom', labels: { color: textColor } },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': ' + context.raw + ' грн'; // Додаємо "грн"
+                            }
+                        }
+                    }
+                },
+                scales: { 
+                    x: { ticks: { color: textColor } },
+                    y: { 
+                        beginAtZero: true, 
+                        ticks: { color: textColor },
+                        title: { 
+                            display: true, 
+                            text: 'Сума (грн)',
+                            color: textColor,
+                            font: { size: 10, weight: 'bold' }
+                        }
+                    } 
+                }
             }
         });
     }
@@ -1377,6 +1399,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
