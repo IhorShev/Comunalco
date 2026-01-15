@@ -199,6 +199,9 @@
             <div onclick="app.openMenu('history'); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; border-bottom:1px solid var(--border); cursor:pointer; display:flex; align-items:center; gap:10px;">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/></svg> Історія
             </div>
+            <div onclick="app.openCharts(); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; border-bottom:1px solid var(--border); cursor:pointer; display:flex; align-items:center; gap:10px;">
+             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg> Графіки
+        </div>
             <div onclick="app.openMenu('info'); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; border-bottom:1px solid var(--border); cursor:pointer; display:flex; gap:10px;">ℹ️ Інфо</div>
             <div onclick="app.openMenu('contacts'); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; cursor:pointer; display:flex; gap:10px;">📞 Контакти</div>
         </div>
@@ -1262,6 +1265,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
