@@ -911,6 +911,11 @@ class App {
     }
 
     renderMR(i, obj, mode, label, key) { 
+        // 🔥 АВТО-РЕМОНТ ДАНИХ (ЗАХИСТ ВІД ЗБОЇВ) 🔥
+        if (!obj.prev) obj.prev = {ed:0, en:0, w:0, g:0};
+        if (!obj.curr) obj.curr = {ed:0, en:0, w:0, g:0};
+        // -----------------------------------------------
+
         const p = parseFloat(obj.prev[key] || 0);
         const c = parseFloat(obj.curr[key] || 0); 
         const fn = mode==='prev'?`app.updateGroupMetric(${i},`:`app.updateAptMetric(${i},`; 
@@ -936,14 +941,16 @@ class App {
                 else lastObj = (lastMonth.groups || []).find(g => g.id === obj.id);
 
                 if (lastObj) {
+                    // Захист і тут
+                    if (!lastObj.prev) lastObj.prev = {ed:0, en:0, w:0, g:0};
+                    if (!lastObj.curr) lastObj.curr = {ed:0, en:0, w:0, g:0};
+
                     const lastCons = (lastObj.curr[key] || 0) - (lastObj.prev[key] || 0);
                     const delta = currentCons - lastCons; // Різниця споживання
                     
                     if (delta > 0) {
-                        // Спожили більше (Погано) -> Червона стрілка вгору
                         trendHtml = `<div class="trend-indicator trend-up"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg> ${Math.abs(delta)}</div>`;
                     } else if (delta < 0) {
-                        // Спожили менше (Добре) -> Зелена стрілка вниз
                         trendHtml = `<div class="trend-indicator trend-down"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M19 12l-7 7-7-7"/></svg> ${Math.abs(delta)}</div>`;
                     } else {
                         trendHtml = `<div class="trend-indicator trend-neutral">=</div>`;
@@ -1506,6 +1513,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
