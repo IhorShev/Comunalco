@@ -659,8 +659,10 @@ class App {
 
     updateChart() {
         // 1. Читаємо налаштування з екрану
-        const targetId = document.getElementById('chart-selector').value;
-        const chartType = document.getElementById('chart-type').value; // 'bar' або 'line'
+        const selector = document.getElementById('chart-selector');
+        const targetId = selector ? selector.value : 'group';
+        const typeSelect = document.getElementById('chart-type');
+        const chartType = typeSelect ? typeSelect.value : 'bar';
 
         const ctx = document.getElementById('mainChart').getContext('2d');
         if (this.myChartInstance) this.myChartInstance.destroy();
@@ -668,19 +670,34 @@ class App {
         // 2. Готуємо дані (12 місяців)
         const historyData = (this.currentData.history || []).slice(0, 12).reverse();
         const labels = historyData.map(h => h.monthName);
+        
+        // Масиви для ГРОШЕЙ (d = data)
         let dEl = [], dW = [], dG = [], dServ = [], dCust = [];
+        // Масиви для КІЛЬКОСТІ (q = quantity)
+        let qEl = [], qW = [], qG = [], qCust = [];
 
         historyData.forEach(h => {
             let cost = { el: 0, w: 0, g: 0, serv: 0, cust: 0 };
+            let quant = { el: 0, w: 0, g: 0, cust: 0 }; 
             const t = h.tariffs;
 
             if (targetId === 'group') {
                 (h.groups || []).forEach(g => {
                     let diff = { ed: (g.curr.ed||0)-(g.prev.ed||0), en: (g.curr.en||0)-(g.prev.en||0), w: (g.curr.w||0)-(g.prev.w||0), g: (g.curr.g||0)-(g.prev.g||0) };
+                    
                     cost.el += (diff.ed * t.el_d) + (diff.en * t.el_n);
                     cost.w += diff.w * t.w;
                     cost.g += diff.g * t.g;
-                    (g.custom_counters||[]).forEach(c => cost.cust += ((c.curr||0)-(c.prev||0))*c.price);
+                    
+                    quant.el += diff.ed + diff.en;
+                    quant.w += diff.w;
+                    quant.g += diff.g;
+
+                    (g.custom_counters||[]).forEach(c => {
+                        let q = (c.curr||0)-(c.prev||0);
+                        cost.cust += q * c.price;
+                        quant.cust += q;
+                    });
                     (g.services||[]).forEach(s => cost.serv += (s.val||0));
                 });
                 (h.extra_tariffs||[]).forEach(e => cost.serv += (e.val||0));
@@ -688,28 +705,49 @@ class App {
                 const apt = h.apartments.find(a => a.id == targetId);
                 if (apt) {
                     let diff = { ed: (apt.curr.ed||0)-(apt.prev.ed||0), en: (apt.curr.en||0)-(apt.prev.en||0), w: (apt.curr.w||0)-(apt.prev.w||0), g: (apt.curr.g||0)-(apt.prev.g||0) };
+                    
                     cost.el += (diff.ed * t.el_d) + (diff.en * t.el_n);
                     cost.w += diff.w * t.w;
                     cost.g += diff.g * t.g;
-                    (apt.custom_counters||[]).forEach(c => cost.cust += ((c.curr||0)-(c.prev||0))*c.price);
+                    
+                    quant.el += diff.ed + diff.en;
+                    quant.w += diff.w;
+                    quant.g += diff.g;
+
+                    (apt.custom_counters||[]).forEach(c => {
+                        let q = (c.curr||0)-(c.prev||0);
+                        cost.cust += q * c.price;
+                        quant.cust += q;
+                    });
                     (apt.services||[]).forEach(s => cost.serv += (s.val||0));
                 }
             }
             dEl.push(cost.el); dW.push(cost.w); dG.push(cost.g); dServ.push(cost.serv); dCust.push(cost.cust);
+            qEl.push(quant.el); qW.push(quant.w); qG.push(quant.g); qCust.push(quant.cust);
         });
 
-        // 3. Налаштовуємо кольори теми
         const isDark = document.body.classList.contains('dark-mode');
         const textColor = isDark ? '#ffffff' : '#1e293b';
         const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
 
-        // 4. Формуємо конфігурацію залежно від типу
-        let chartConfig = {
+        let datasets = [
+            { label: 'Електрика ⚡', data: dEl, quantity: qEl, unit: 'кВт', backgroundColor: '#f59e0b', borderColor: '#f59e0b' },
+            { label: 'Вода 💧', data: dW, quantity: qW, unit: 'м³', backgroundColor: '#3b82f6', borderColor: '#3b82f6' },
+            { label: 'Газ 🔥', data: dG, quantity: qG, unit: 'м³', backgroundColor: '#ef4444', borderColor: '#ef4444' },
+            { label: 'Лічильники 🔢', data: dCust, quantity: qCust, unit: 'од.', backgroundColor: '#10b981', borderColor: '#10b981', hidden: chartType==='line' },
+            { label: 'Послуги', data: dServ, quantity: [], unit: '', backgroundColor: '#64748b', borderColor: '#64748b', hidden: chartType==='line' }
+        ];
+
+        datasets.forEach(d => {
+            d.borderRadius = 4;      
+            d.tension = 0.4;         
+            d.borderWidth = 3;       
+            d.pointRadius = 4;       
+        });
+
+        this.myChartInstance = new Chart(ctx, {
             type: chartType,
-            data: {
-                labels: labels,
-                datasets: []
-            },
+            data: { labels: labels, datasets: datasets },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
@@ -717,40 +755,39 @@ class App {
                 plugins: {
                     legend: { position: 'bottom', labels: { color: textColor, usePointStyle: true } },
                     tooltip: {
-                        callbacks: { label: (c) => ' ' + c.dataset.label + ': ' + c.raw + ' грн' },
-                        backgroundColor: 'rgba(0,0,0,0.8)',
+                        backgroundColor: 'rgba(0,0,0,0.9)',
                         padding: 10,
-                        cornerRadius: 8
+                        cornerRadius: 8,
+                        titleFont: { size: 14, weight: 'bold' },
+                        bodyFont: { size: 13 },
+                        callbacks: {
+                            label: function(c) {
+                                let val = c.raw.toFixed(2); 
+                                let qty = c.dataset.quantity ? c.dataset.quantity[c.dataIndex] : 0; 
+                                let unit = c.dataset.unit || '';
+                                
+                                if (qty > 0 && unit) return ` ${c.dataset.label}: ${qty} ${unit} / ${val} грн`;
+                                return ` ${c.dataset.label}: ${val} грн`;
+                            },
+                            footer: (items) => {
+                                let sum = 0;
+                                items.forEach(i => sum += i.raw);
+                                return 'Всього: ' + sum.toFixed(2) + ' грн';
+                            }
+                        }
                     }
                 },
                 scales: {
                     x: { ticks: { color: textColor }, grid: { color: gridColor, drawBorder: false } },
-                    y: { beginAtZero: true, ticks: { color: textColor }, grid: { color: gridColor, drawBorder: false }, title: { display: true, text: 'Сума (грн)', color: textColor } }
+                    y: { 
+                        beginAtZero: true, 
+                        ticks: { color: textColor }, 
+                        grid: { color: gridColor, drawBorder: false }, 
+                        title: { display: true, text: 'Сума (грн)', color: textColor } 
+                    }
                 }
             }
-        };
-
-        if (chartType === 'bar') {
-            // --- НАЛАШТУВАННЯ ДЛЯ СТОВПЧИКІВ ---
-            chartConfig.data.datasets = [
-                { label: 'Електрика ⚡', data: dEl, backgroundColor: '#f59e0b', borderRadius: 4 },
-                { label: 'Вода 💧', data: dW, backgroundColor: '#3b82f6', borderRadius: 4 },
-                { label: 'Газ 🔥', data: dG, backgroundColor: '#ef4444', borderRadius: 4 },
-                { label: 'Лічильники 🔢', data: dCust, backgroundColor: '#10b981', borderRadius: 4 },
-                { label: 'Послуги', data: dServ, backgroundColor: '#64748b', borderRadius: 4 }
-            ];
-        } else {
-            // --- НАЛАШТУВАННЯ ДЛЯ ЛІНІЙ (КРИВІ) ---
-            chartConfig.data.datasets = [
-                { label: 'Електрика ⚡', data: dEl, borderColor: '#f59e0b', backgroundColor: '#f59e0b', tension: 0.4, borderWidth: 3, pointRadius: 4 },
-                { label: 'Вода 💧', data: dW, borderColor: '#3b82f6', backgroundColor: '#3b82f6', tension: 0.4, borderWidth: 3, pointRadius: 4 },
-                { label: 'Газ 🔥', data: dG, borderColor: '#ef4444', backgroundColor: '#ef4444', tension: 0.4, borderWidth: 3, pointRadius: 4 },
-                { label: 'Лічильники 🔢', data: dCust, borderColor: '#10b981', backgroundColor: '#10b981', tension: 0.4, borderWidth: 3, pointRadius: 4, hidden: true },
-                { label: 'Послуги', data: dServ, borderColor: '#64748b', backgroundColor: '#64748b', tension: 0.4, borderWidth: 3, pointRadius: 4, hidden: true }
-            ];
-        }
-
-        this.myChartInstance = new Chart(ctx, chartConfig);
+        });
     }
     // --- КІНЕЦЬ ГРАФІКІВ ---
     renderExtraTariffs() { 
@@ -1418,6 +1455,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
