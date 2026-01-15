@@ -630,44 +630,44 @@ class App {
         this.renderExtraTariffs(); this.renderRequisites(); this.renderGroups(); this.renderApartments();
     }
 
-    // --- ПОЧАТОК ГРАФІКІВ ---
+    // --- ПОЧАТОК ГРАФІКІВ (Гібридна версія) ---
     openCharts() {
         const modal = document.getElementById('chartModal');
-        // Перевірка історії
         if (!this.currentData.history || this.currentData.history.length === 0) {
-            alert("Історія порожня! Закрийте хоча б один місяць, щоб бачити графіки.");
+            alert("Історія порожня! Закрийте хоча б один місяць.");
             return;
         }
 
-        // Наповнюємо список (Група + Квартири)
+        // Наповнюємо список об'єктів
         const selector = document.getElementById('chart-selector');
         let opts = `<option value="group">🏢 Вхідна Група (МЗК + Квартири)</option>`;
-        this.currentData.apartments.forEach((a, i) => {
+        this.currentData.apartments.forEach((a) => {
             opts += `<option value="${a.id}">🏠 ${a.name}</option>`;
         });
         selector.innerHTML = opts;
         selector.value = 'group';
+        
+        // Скидаємо тип на "Стовпчики" при відкритті
+        document.getElementById('chart-type').value = 'bar';
 
-        // Закриваємо інші меню
         const menuM = document.getElementById('menuModal'); if(menuM) menuM.style.display='none';
         const mobM = document.getElementById('mobile-dropdown'); if(mobM) mobM.style.display='none';
-        
-        // Відкриваємо графік
         modal.style.display = 'flex';
         
-        // Малюємо (з маленькою затримкою, щоб вікно встигло відкритись)
-        setTimeout(() => this.updateChart('group'), 100);
+        setTimeout(() => this.updateChart(), 100);
     }
 
-    updateChart(targetId) {
+    updateChart() {
+        // 1. Читаємо налаштування з екрану
+        const targetId = document.getElementById('chart-selector').value;
+        const chartType = document.getElementById('chart-type').value; // 'bar' або 'line'
+
         const ctx = document.getElementById('mainChart').getContext('2d');
         if (this.myChartInstance) this.myChartInstance.destroy();
 
-        // БЕРЕМО 12 МІСЯЦІВ (РІК)
+        // 2. Готуємо дані (12 місяців)
         const historyData = (this.currentData.history || []).slice(0, 12).reverse();
         const labels = historyData.map(h => h.monthName);
-
-        // Дані для стовпчиків
         let dEl = [], dW = [], dG = [], dServ = [], dCust = [];
 
         historyData.forEach(h => {
@@ -698,49 +698,59 @@ class App {
             dEl.push(cost.el); dW.push(cost.w); dG.push(cost.g); dServ.push(cost.serv); dCust.push(cost.cust);
         });
 
-        // Колір тексту для теми
-        const textColor = document.body.classList.contains('dark-mode') ? '#ffffff' : '#1e293b';
+        // 3. Налаштовуємо кольори теми
+        const isDark = document.body.classList.contains('dark-mode');
+        const textColor = isDark ? '#ffffff' : '#1e293b';
+        const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
 
-        this.myChartInstance = new Chart(ctx, {
-            type: 'bar',
+        // 4. Формуємо конфігурацію залежно від типу
+        let chartConfig = {
+            type: chartType,
             data: {
                 labels: labels,
-                datasets: [
-                    { label: 'Електрика ⚡', data: dEl, backgroundColor: '#f59e0b', borderRadius: 4 },
-                    { label: 'Вода 💧', data: dW, backgroundColor: '#3b82f6', borderRadius: 4 },
-                    { label: 'Газ 🔥', data: dG, backgroundColor: '#ef4444', borderRadius: 4 },
-                    { label: 'Лічильники 🔢', data: dCust, backgroundColor: '#10b981', borderRadius: 4 },
-                    { label: 'Послуги', data: dServ, backgroundColor: '#64748b', borderRadius: 4 }
-                ]
+                datasets: []
             },
             options: {
-                responsive: true, 
+                responsive: true,
                 maintainAspectRatio: false,
-                plugins: { 
-                    legend: { position: 'bottom', labels: { color: textColor } },
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { position: 'bottom', labels: { color: textColor, usePointStyle: true } },
                     tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return context.dataset.label + ': ' + context.raw + ' грн'; // Додаємо "грн"
-                            }
-                        }
+                        callbacks: { label: (c) => ' ' + c.dataset.label + ': ' + c.raw + ' грн' },
+                        backgroundColor: 'rgba(0,0,0,0.8)',
+                        padding: 10,
+                        cornerRadius: 8
                     }
                 },
-                scales: { 
-                    x: { ticks: { color: textColor } },
-                    y: { 
-                        beginAtZero: true, 
-                        ticks: { color: textColor },
-                        title: { 
-                            display: true, 
-                            text: 'Сума (грн)',
-                            color: textColor,
-                            font: { size: 10, weight: 'bold' }
-                        }
-                    } 
+                scales: {
+                    x: { ticks: { color: textColor }, grid: { color: gridColor, drawBorder: false } },
+                    y: { beginAtZero: true, ticks: { color: textColor }, grid: { color: gridColor, drawBorder: false }, title: { display: true, text: 'Сума (грн)', color: textColor } }
                 }
             }
-        });
+        };
+
+        if (chartType === 'bar') {
+            // --- НАЛАШТУВАННЯ ДЛЯ СТОВПЧИКІВ ---
+            chartConfig.data.datasets = [
+                { label: 'Електрика ⚡', data: dEl, backgroundColor: '#f59e0b', borderRadius: 4 },
+                { label: 'Вода 💧', data: dW, backgroundColor: '#3b82f6', borderRadius: 4 },
+                { label: 'Газ 🔥', data: dG, backgroundColor: '#ef4444', borderRadius: 4 },
+                { label: 'Лічильники 🔢', data: dCust, backgroundColor: '#10b981', borderRadius: 4 },
+                { label: 'Послуги', data: dServ, backgroundColor: '#64748b', borderRadius: 4 }
+            ];
+        } else {
+            // --- НАЛАШТУВАННЯ ДЛЯ ЛІНІЙ (КРИВІ) ---
+            chartConfig.data.datasets = [
+                { label: 'Електрика ⚡', data: dEl, borderColor: '#f59e0b', backgroundColor: '#f59e0b', tension: 0.4, borderWidth: 3, pointRadius: 4 },
+                { label: 'Вода 💧', data: dW, borderColor: '#3b82f6', backgroundColor: '#3b82f6', tension: 0.4, borderWidth: 3, pointRadius: 4 },
+                { label: 'Газ 🔥', data: dG, borderColor: '#ef4444', backgroundColor: '#ef4444', tension: 0.4, borderWidth: 3, pointRadius: 4 },
+                { label: 'Лічильники 🔢', data: dCust, borderColor: '#10b981', backgroundColor: '#10b981', tension: 0.4, borderWidth: 3, pointRadius: 4, hidden: true },
+                { label: 'Послуги', data: dServ, borderColor: '#64748b', backgroundColor: '#64748b', tension: 0.4, borderWidth: 3, pointRadius: 4, hidden: true }
+            ];
+        }
+
+        this.myChartInstance = new Chart(ctx, chartConfig);
     }
     // --- КІНЕЦЬ ГРАФІКІВ ---
     renderExtraTariffs() { 
@@ -1408,6 +1418,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
