@@ -844,26 +844,30 @@ class App {
     }
     
     renderGroups() { 
+        // Використовуємо <details open> замість <div class="card">
         document.getElementById('groups-container').innerHTML = this.currentData.groups.map((g, i) => `
-        <div class="card" style="border-left: 4px solid var(--text-sec);">
-            <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-weight:700;">
-                <span contenteditable="true" onblur="app.updateGroup(${i},'name',this.innerText)" style="border-bottom:1px dashed var(--border)">${g.name}</span>
+        <details open class="card" style="border-left: 4px solid var(--text-sec); padding: 0; overflow: hidden;">
+            <summary style="padding: 15px; background: rgba(0,0,0,0.03); display: flex; justify-content: space-between; align-items: center;">
+                <span contenteditable="true" onclick="event.preventDefault()" onblur="app.updateGroup(${i},'name',this.innerText)" style="font-weight:700; border-bottom:1px dashed var(--border); cursor:text;">${g.name}</span>
                 <span class="del-icon" onclick="app.delGroup(${i})">&times;</span>
-            </div>
-            ${this.renderMR(i,g,'prev','⚡ Вхід День','ed')} ${this.renderMR(i,g,'prev','🌙 Вхід Ніч','en')}
-            ${this.renderMR(i,g,'prev','💧 Вхід Вода','w')} ${this.renderMR(i,g,'prev','🔥 Вхід Газ','g')}
+            </summary>
             
-            <div id="g-counters-${i}">
-                ${(g.custom_counters||[]).map((c, ci) => this.renderCustomCounterRow('group', i, ci, c)).join('')}
-            </div>
-            <button class="btn btn-add-counter" onclick="app.addCustomCounter('group', ${i})">+ Лічильник</button>
+            <div style="padding: 15px;">
+                ${this.renderMR(i,g,'prev','⚡ Вхід День','ed')} ${this.renderMR(i,g,'prev','🌙 Вхід Ніч','en')}
+                ${this.renderMR(i,g,'prev','💧 Вхід Вода','w')} ${this.renderMR(i,g,'prev','🔥 Вхід Газ','g')}
+                
+                <div id="g-counters-${i}">
+                    ${(g.custom_counters||[]).map((c, ci) => this.renderCustomCounterRow('group', i, ci, c)).join('')}
+                </div>
+                <button class="btn btn-add-counter" onclick="app.addCustomCounter('group', ${i})">+ Лічильник</button>
 
-            <div style="margin-top:10px; border-top:1px dashed var(--border); padding-top:10px;">
-                <div style="font-size:11px; font-weight:700; color:var(--text-sec); margin-bottom:5px;">СПІЛЬНІ ПОСЛУГИ (МЗК)</div>
-                ${(g.services || []).map((s,si)=>`<div class="custom-row"><input type="text" value="${s.name}" placeholder="Назва" onchange="app.updateGS(${i},${si},'name',this.value)"><input type="number" value="${s.val}" placeholder="Сума" onchange="app.updateGS(${i},${si},'val',this.value)"><span class="del-icon" onclick="app.delGS(${i},${si})">&times;</span></div>`).join('')}
-                <button class="btn btn-add" onclick="app.addGS(${i})">+ Послуга</button>
+                <div style="margin-top:10px; border-top:1px dashed var(--border); padding-top:10px;">
+                    <div style="font-size:11px; font-weight:700; color:var(--text-sec); margin-bottom:5px;">СПІЛЬНІ ПОСЛУГИ (МЗК)</div>
+                    ${(g.services || []).map((s,si)=>`<div class="custom-row"><input type="text" value="${s.name}" placeholder="Назва" onchange="app.updateGS(${i},${si},'name',this.value)"><input type="number" value="${s.val}" placeholder="Сума" onchange="app.updateGS(${i},${si},'val',this.value)"><span class="del-icon" onclick="app.delGS(${i},${si})">&times;</span></div>`).join('')}
+                    <button class="btn btn-add" onclick="app.addGS(${i})">+ Послуга</button>
+                </div>
             </div>
-        </div>`).join(''); 
+        </details>`).join(''); 
     }
 
     renderApartments() { 
@@ -1504,6 +1508,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
