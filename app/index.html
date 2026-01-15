@@ -365,7 +365,28 @@
             <div id="history-list" style="margin-top:20px; display:flex; flex-direction:column; gap:10px;"></div>
         </div>
     </div>
+<div id="chartModal" class="modal" style="z-index: 3100;">
+    <div class="modal-content" style="width: 95%; max-width: 600px; background: var(--card);">
+        <span class="modal-close" onclick="document.getElementById('chartModal').style.display='none'">&times;</span>
+        <h3 style="margin-top:0; text-align:center;">📊 Аналітика (12 міс)</h3>
+        
+        <div style="margin-bottom:20px;">
+            <label style="font-size:12px; color:var(--text-sec); margin-bottom:5px; display:block;">Що аналізуємо?</label>
+            <select id="chart-selector" onchange="app.updateChart(this.value)" style="width:100%; padding:10px; font-weight:bold; background:var(--input-bg); color:var(--text); border:1px solid var(--border); border-radius:12px;">
+                <option value="group">🏢 Весь Об'єкт (Вхідна група)</option>
+            </select>
+        </div>
 
+        <div style="position: relative; height:40vh; min-height: 300px; width:100%;">
+            <canvas id="mainChart"></canvas>
+        </div>
+        
+        <div style="font-size:11px; color:var(--text-sec); text-align:center; margin-top:15px;">
+            * Сірий колір = Інтернет, Прибирання та інші послуги
+        </div>
+    </div>
+</div>
+    
 <script>
 class App {
     constructor() {
@@ -1265,6 +1286,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
