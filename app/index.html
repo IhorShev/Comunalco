@@ -52,7 +52,29 @@
             -webkit-tap-highlight-color: transparent;
             line-height: 1.4;
         }
+/* --- СТИЛІ РЕЖИМУ АРХІВУ --- */
+    body.archive-mode { 
+        border: 4px solid var(--gold); 
+        border-radius: 0; 
+        position: relative;
+    }
+    body.archive-mode::before {
+        content: "📜 РЕЖИМ ПЕРЕГЛЯДУ АРХІВУ (Тільки читання)";
+        position: fixed; top: 0; left: 0; width: 100%;
+        background: var(--gold); color: #000;
+        text-align: center; font-weight: 900; font-size: 11px;
+        z-index: 9999; padding: 4px 0; letter-spacing: 1px; text-transform: uppercase;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
 
+    /* --- СТИЛІ АНАЛІТИКИ (СТРІЛКИ) --- */
+    .trend-indicator { 
+        display: flex; align-items: center; justify-content: flex-end; 
+        gap: 4px; font-size: 10px; font-weight: 800; margin-top: 3px; 
+    }
+    .trend-up { color: var(--danger); }   /* Виросло - погано */
+    .trend-down { color: var(--success); } /* Впало - добре */
+    .trend-neutral { color: var(--text-sec); opacity: 0.5; }
         /* UI Elements */
         .top-menu-bar { display: flex; justify-content: center; gap: 20px; font-size: 12px; font-weight: 700; color: var(--text-sec); margin-bottom: 15px; padding-top: 5px; text-transform: uppercase; letter-spacing: 1px; align-items: center; }
         .top-menu-bar span { cursor: pointer; display: flex; align-items: center; gap: 5px; }
@@ -1175,3 +1197,4 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
