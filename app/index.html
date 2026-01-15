@@ -872,7 +872,7 @@ class App {
 
     renderApartments() { 
         document.getElementById('apartments-container').innerHTML = (this.currentData.apartments || []).map((a, i) => { 
-            return `<details style="border-left: 4px solid var(--primary)">
+            return `<details open style="border-left: 4px solid var(--primary)">
             <summary>
                 <div>🚪 <span contenteditable="true" onclick="event.preventDefault()" onblur="app.updateApt(${i},'name',this.innerText)" style="font-weight:700">${a.name}</span> <span style="font-size:12px; opacity:0.7" id="badge-${i}"></span></div>
                 <span class="del-icon" onclick="app.delApt(${i})">&times;</span>
@@ -1508,6 +1508,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
