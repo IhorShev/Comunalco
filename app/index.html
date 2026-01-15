@@ -460,9 +460,13 @@ class App {
     }
 
     loadHistoryItem(index) {
-        if(!confirm("⚠️ Режим ПЕРЕГЛЯДУ архіву.\nЗміни тут не зберігаються.\nОновіть сторінку для виходу.")) return;
+        if(!confirm("⚠️ Увага! Режим ПЕРЕГЛЯДУ архіву.\nЗміни тут не зберігаються.\nОновіть сторінку для виходу.")) return;
         
         const item = this.currentData.history[index];
+        
+        // Вмикаємо візуальний режим архіву
+        document.body.classList.add('archive-mode'); 
+        
         const tempState = JSON.parse(JSON.stringify(this.state));
         tempState.objects[this.state.currentObjIdx].apartments = item.apartments;
         tempState.objects[this.state.currentObjIdx].groups = item.groups;
@@ -479,7 +483,9 @@ class App {
             title.style.background = "var(--gold)"; 
             title.style.color = "#000";
         }
-        alert("Ви в минулому! 🕰\nОновіть сторінку (F5), щоб повернутися.");
+        
+        const updateBtn = document.querySelector('.desktop-only span[title="Оновити"]');
+        if(updateBtn) updateBtn.style.display = 'none';
     }
 
     createDefaultObject(name) {
@@ -1197,4 +1203,5 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
