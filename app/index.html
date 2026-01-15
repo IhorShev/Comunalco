@@ -160,6 +160,57 @@
             .desktop-only { display: flex !important; align-items: center; gap: 15px; }
             .mobile-only { display: none !important; }
         }
+        /* --- ДЕСКТОПНИЙ РЕЖИМ (Шахматний порядок) --- */
+    @media (min-width: 992px) {
+        /* Головний контейнер стає сіткою з 2 колонок */
+        #main-content-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* 50% на 50% */
+            gap: 25px; /* Відступ між колонками */
+            max-width: 1200px; /* Обмеження ширини для гігантських екранів */
+            margin: 0 auto;
+            align-items: start; /* Щоб блоки не розтягувались по висоті */
+        }
+
+        /* 1. ТАРИФИ - Ліва колонка */
+        #main-content-wrapper > details {
+            grid-column: 1 / 2;
+            margin-bottom: 0;
+        }
+
+        /* 2. ГРУПИ - Права колонка */
+        #groups-container {
+            grid-column: 2 / 3;
+            grid-row: 1; /* Починати з першого рядка, навпроти тарифів */
+        }
+
+        /* Кнопка "Додати групу" - теж справа, під групами */
+        #main-content-wrapper > div:nth-of-type(2) {
+            grid-column: 2 / 3;
+            margin-top: 0 !important;
+            margin-bottom: 20px !important;
+            text-align: right !important; /* Кнопку притиснемо вправо */
+        }
+
+        /* 3. КВАРТИРИ - Займають всю ширину, але всередині теж стають у 2 колонки */
+        #apartments-container {
+            grid-column: 1 / -1; /* Розтягнутись на всю ширину (ліво+право) */
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Дві квартири в ряд */
+            gap: 25px;
+            padding-top: 20px;
+            border-top: 2px dashed var(--border); /* Розділювач */
+        }
+
+        /* Кнопка "Додати квартиру" - по центру знизу */
+        #main-content-wrapper > div:last-child {
+            grid-column: 1 / -1;
+        }
+        
+        /* Робимо поля вводу компактнішими на ПК */
+        input { font-size: 14px; padding: 8px; }
+        .card, details { box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    }
     </style>
 </head>
 <body>
@@ -1455,6 +1506,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
