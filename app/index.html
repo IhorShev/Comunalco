@@ -160,56 +160,47 @@
             .desktop-only { display: flex !important; align-items: center; gap: 15px; }
             .mobile-only { display: none !important; }
         }
-        /* --- ДЕСКТОПНИЙ РЕЖИМ (Шахматний порядок) --- */
+        /* --- ДЕСКТОПНИЙ РЕЖИМ (Розумна Сітка: 3 в ряд) --- */
     @media (min-width: 992px) {
-        /* Головний контейнер стає сіткою з 2 колонок */
         #main-content-wrapper {
             display: grid;
-            grid-template-columns: 1fr 1fr; /* 50% на 50% */
-            gap: 25px; /* Відступ між колонками */
-            max-width: 1200px; /* Обмеження ширини для гігантських екранів */
+            /* Магія: Мінімум 350px. Якщо влазить 3 - буде 3. Якщо видалили - розтягнеться. */
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); 
+            gap: 20px;
+            max-width: 1600px; /* Широкий екран */
             margin: 0 auto;
-            align-items: start; /* Щоб блоки не розтягувались по висоті */
+            align-items: start;
         }
 
-        /* 1. ТАРИФИ - Ліва колонка */
-        #main-content-wrapper > details {
-            grid-column: 1 / 2;
-            margin-bottom: 0;
-        }
-
-        /* 2. ГРУПИ - Права колонка */
+        /* Цей трюк змушує дітей контейнера (групи) ставати в загальну сітку */
         #groups-container {
-            grid-column: 2 / 3;
-            grid-row: 1; /* Починати з першого рядка, навпроти тарифів */
+            display: contents; 
         }
 
-        /* Кнопка "Додати групу" - теж справа, під групами */
+        /* Кнопка "Додати групу" стає "Карткою" в кінці списку груп */
         #main-content-wrapper > div:nth-of-type(2) {
-            grid-column: 2 / 3;
-            margin-top: 0 !important;
-            margin-bottom: 20px !important;
-            text-align: right !important; /* Кнопку притиснемо вправо */
+            display: flex; align-items: center; justify-content: center;
+            min-height: 100px;
         }
 
-        /* 3. КВАРТИРИ - Займають всю ширину, але всередині теж стають у 2 колонки */
+        /* Блок Квартир - завжди з нового рядка і на всю ширину */
         #apartments-container {
-            grid-column: 1 / -1; /* Розтягнутись на всю ширину (ліво+право) */
+            grid-column: 1 / -1; /* Зайняти весь рядок */
             display: grid;
-            grid-template-columns: 1fr 1fr; /* Дві квартири в ряд */
-            gap: 25px;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); /* Теж 3 в ряд */
+            gap: 20px;
             padding-top: 20px;
-            border-top: 2px dashed var(--border); /* Розділювач */
+            margin-top: 10px;
+            border-top: 2px dashed var(--border);
         }
 
-        /* Кнопка "Додати квартиру" - по центру знизу */
+        /* Кнопка "Додати квартиру" - по центру знизу на всю ширину */
         #main-content-wrapper > div:last-child {
             grid-column: 1 / -1;
         }
         
-        /* Робимо поля вводу компактнішими на ПК */
+        /* Робимо поля компактнішими */
         input { font-size: 14px; padding: 8px; }
-        .card, details { box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
     }
     </style>
 </head>
@@ -1513,6 +1504,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
