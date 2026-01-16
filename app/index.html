@@ -1024,13 +1024,15 @@ class App {
         
         const msg = `👋 Вітаємо!\nВам надано доступ до об'єкту в системі "КомуналкОблік".\n\n🏢 Об'єкт: ${this.currentData.name}\n🔑 Рівень доступу: ${aptNameForMsg} (${roleName})\n\nДля входу:\n1. Перейди за посиланням: ${link}\n2. Натисніть кнопку "Вхід" (через Google)\n3. Використайте пошту: ${email}`;
 
-        if(confirm(`Користувача успішно додано!\n\nНадіслати йому офіційне запрошення?`)) {
-            if (navigator.share) {
-                navigator.share({ title: 'Запрошення', text: msg, url: link }).catch(e => console.log('Share canceled'));
-            } else {
-                this.copyTextToClipboard(msg);
-                alert("Текст запрошення скопійовано!\nНадішліть його користувачу (Viber/Telegram).");
-            }
+        // --- РОЗУМНА ВІДПРАВКА ---
+        // Якщо це мобільний телефон - використовуємо рідне меню
+        if (navigator.share && /Android|iPhone|iPad/i.test(navigator.userAgent)) {
+             if(confirm(`Користувача додано! Відкрити месенджер?`)) {
+                 navigator.share({ title: 'Запрошення', text: msg, url: link }).catch(e => console.log('Share canceled'));
+             }
+        } else {
+            // Якщо це НОУТБУК - відкриваємо наше нове вікно
+            this.openShareModal(msg);
         }
     }
 
@@ -1782,6 +1784,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
