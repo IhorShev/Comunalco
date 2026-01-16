@@ -1542,55 +1542,106 @@ class App {
         </div>`;
     }
 
-    // --- PDF ГЕНЕРАЦІЯ ТА ВІДПРАВКА (FIXED) ---
+    // --- TURBO-ВІДПРАВКА (Ctrl+V) ---
     async sharePDF(i) {
-        if (typeof html2pdf === 'undefined') { alert('Помилка: Бібліотека PDF ще завантажується.'); return; }
+        if (typeof html2pdf === 'undefined') { alert('Зачекайте, система готує інструменти...'); return; }
         
         const apt = this.currentData.apartments[i];
+        const month = new Date().toLocaleDateString('uk-UA', { month: 'long', year: 'numeric' });
         
-        // Створюємо елемент
+        // 1. Створюємо "невидиму" квитанцію (білий фон обов'язковий)
         const element = document.createElement('div');
         element.innerHTML = this.renderReceiptHTML(i);
-        element.style.width = '100%'; 
+        element.style.width = '595px'; // Ширина А4
         element.style.position = 'fixed'; 
         element.style.left = '-9999px';
+        element.style.top = '0';
+        element.style.background = 'white'; 
+        element.style.zIndex = '9999';
         document.body.appendChild(element);
 
-        const opt = {
-            margin: 0,
-            filename: `Receipt_${apt.name}_${new Date().toISOString().slice(0,10)}.pdf`,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2 },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
+        const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
 
-        html2pdf().set(opt).from(element).output('blob').then((blob) => {
-            const file = new File([blob], opt.filename, { type: 'application/pdf' });
-            
-            // Текст для месенджера
-            const month = new Date().toLocaleDateString('uk-UA', { month: 'long', year: 'numeric' });
-            const msg = `🧾 Квитанція: ${apt.name}\n📅 ${month}\n\nФайл квитанції додано окремо.`;
-
-            // Мобільний
-            if (navigator.canShare && navigator.canShare({ files: [file] }) && /Android|iPhone|iPad/i.test(navigator.userAgent)) {
-                navigator.share({ files: [file], title: 'Квитанція', text: msg }).catch(err => console.log('Share closed', err));
+        try {
+            // === ВАРІАНТ А: МОБІЛЬНИЙ (Файл PDF) ===
+            if (isMobile && navigator.canShare) {
+                const opt = {
+                    margin: 0,
+                    filename: `Receipt_${apt.name}.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                };
+                
+                const blob = await html2pdf().set(opt).from(element).output('blob');
+                const file = new File([blob], opt.filename, { type: 'application/pdf' });
+                const msg = `🧾 Квитанція: ${apt.name}\n📅 ${month}`;
+                
+                await navigator.share({ files: [file], title: 'Квитанція', text: msg });
             } 
-            // Ноутбук
+            
+            // === ВАРІАНТ Б: НОУТБУК (Картинка в буфер + Ctrl+V) ===
             else {
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = opt.filename;
-                link.click();
+                // Генеруємо зображення
+                const worker = html2pdf().from(element).set({ html2canvas: { scale: 2 } });
+                const imgBlob = await worker.outputImg('blob');
 
-                this.openShareModal(msg);
-                setTimeout(() => alert("📥 PDF-файл завантажено!\nПеретягніть його у чат."), 1000);
+                // Кладемо в буфер
+                try {
+                    const item = new ClipboardItem({ "image/png": imgBlob });
+                    await navigator.clipboard.write([item]);
+                    
+                    // --- 1. ВІЗУАЛЬНЕ ПОВІДОМЛЕННЯ (TOAST) ---
+                    const toast = document.createElement('div');
+                    toast.innerHTML = `
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <span style="font-size:24px;">📸</span>
+                            <div>
+                                <div style="font-weight:bold; font-size:14px;">Квитанцію скопійовано!</div>
+                            </div>
+                        </div>
+                    `;
+                    toast.style.cssText = "position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:#1e293b; color:white; padding:12px 20px; border-radius:12px; z-index:10000; box-shadow:0 10px 25px rgba(0,0,0,0.3); animation: fadeInUp 0.3s ease-out;";
+                    document.body.appendChild(toast);
+                    setTimeout(() => { toast.style.opacity='0'; setTimeout(()=>toast.remove(), 500) }, 3000);
+
+                    // --- 2. ВІДКРИВАЄМО ВІКНО З НОВОЮ ІНСТРУКЦІЄЮ ---
+                    const msg = `🧾 Квитанція: ${apt.name} (${month})`;
+                    this.openShareModal(msg);
+
+                    const instruction = document.querySelector('#shareModal p');
+                    const textArea = document.getElementById('share-text-area');
+                    
+                    // 👇 ВАШ ТЕКСТ ТУТ 👇
+                    if(instruction) {
+                        instruction.innerHTML = `
+                            <div style="background:#ecfdf5; border:1px solid #10b981; padding:10px; border-radius:8px; color:#065f46; font-size:13px; margin-bottom:10px; text-align:left;">
+                                ✅ <b>Квитанція вже у буфері!</b><br>
+                                1. Відкрийте месенджер.<br>
+                                2. Виберіть отримувача.<br>
+                                3. Натисніть <b>Ctrl + V</b>.
+                            </div>
+                            Оберіть месенджер:
+                        `;
+                    }
+                    if(textArea) {
+                        textArea.value = msg + "\n(Спочатку вставте картинку Ctrl+V, потім цей текст)";
+                        navigator.clipboard.writeText(msg); 
+                    }
+
+                } catch (clipboardErr) {
+                    console.error(clipboardErr);
+                    alert("Браузер блокує буфер. Спробуйте вручну.");
+                    worker.save(`Receipt_${apt.name}.pdf`);
+                }
             }
-            document.body.removeChild(element);
-        }).catch(err => {
+
+        } catch (err) {
             console.error(err);
-            alert("Помилка PDF");
+            alert("Помилка: " + err.message);
+        } finally {
             document.body.removeChild(element);
-        });
+        }
     }
     startNewMonth() { 
         if (!confirm("⚠️ Закрити місяць?\n\n1. Поточні квитанції будуть збережені в Історію.\n2. Поля будуть очищені для нового місяця.")) return;
@@ -1826,6 +1877,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
