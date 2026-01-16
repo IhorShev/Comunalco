@@ -1404,6 +1404,41 @@ class App {
         document.body.appendChild(ta); ta.select(); 
         document.execCommand('copy'); document.body.removeChild(ta);
     }
+    // --- ШЕРИНГ (ДЛЯ НОУТБУКА) ---
+    openShareModal(text) {
+        const textArea = document.getElementById('share-text-area');
+        if(textArea) textArea.value = text;
+        
+        const encoded = encodeURIComponent(text);
+        
+        // Telegram (Web/Desktop)
+        const btnTg = document.getElementById('btn-share-tg');
+        if(btnTg) btnTg.href = `https://t.me/share/url?url=${encodeURIComponent('https://comunalco.com')}&text=${encoded}`;
+        
+        // Viber (PC App)
+        const btnVb = document.getElementById('btn-share-vb');
+        if(btnVb) btnVb.href = `viber://forward?text=${encoded}`;
+        
+        // WhatsApp (Web)
+        const btnWa = document.getElementById('btn-share-wa');
+        if(btnWa) btnWa.href = `https://wa.me/?text=${encoded}`;
+
+        // Відкриваємо
+        document.getElementById('shareModal').style.display = 'flex';
+    }
+
+    copyFromModal() {
+        const copyText = document.getElementById("share-text-area");
+        copyText.select();
+        copyText.setSelectionRange(0, 99999); 
+        document.execCommand("copy");
+        
+        // Ефект натискання
+        const btn = document.querySelector('#shareModal .btn-primary');
+        const oldText = btn.innerText;
+        btn.innerText = "✅ Скопійовано!";
+        setTimeout(() => btn.innerText = oldText, 2000);
+    }
 
     async downloadBackup() { 
         const date = new Date();
@@ -1747,6 +1782,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
