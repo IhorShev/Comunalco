@@ -483,6 +483,50 @@
         </div>
     </div>
 </div>
+<div id="accessModal" class="modal" style="z-index: 3200;">
+    <div class="modal-content" style="max-width: 500px;">
+        <span class="modal-close" onclick="document.getElementById('accessModal').style.display='none'">&times;</span>
+        <h3 style="margin-top:0; text-align:center;">👥 Команда та Доступ</h3>
+        
+        <div style="background: var(--bg); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px dashed var(--primary);">
+            <label style="color:var(--primary);">➕ Додати користувача</label>
+            <input type="email" id="new-user-email" placeholder="email@gmail.com" style="margin-bottom:10px;">
+            
+            <label>Оберіть роль:</label>
+            <div class="role-selector">
+                <div class="role-card selected" onclick="app.selectRole(this, 'manager')">
+                    <span class="role-icon">🛠</span>
+                    <span class="role-name">Менеджер</span>
+                    <span class="role-desc">Повний доступ (Вхід+Квартири)</span>
+                </div>
+                <div class="role-card" onclick="app.selectRole(this, 'tenant')">
+                    <span class="role-icon">🏠</span>
+                    <span class="role-name">Орендар</span>
+                    <span class="role-desc">Тільки своя квартира</span>
+                </div>
+                <div class="role-card" onclick="app.selectRole(this, 'viewer')">
+                    <span class="role-icon">👀</span>
+                    <span class="role-name">Гість</span>
+                    <span class="role-desc">Тільки перегляд (без змін)</span>
+                </div>
+            </div>
+
+            <div id="apt-selector-block" style="display:none; margin-bottom:10px;">
+                <label>До якої квартири?</label>
+                <select id="access-apt-select"></select>
+            </div>
+
+            <button class="btn btn-primary" onclick="app.grantUserAccess()">Надіслати запрошення ➔</button>
+        </div>
+
+        <div class="section-title">Користувачі з доступом</div>
+        <div id="users-list-container">
+            </div>
+        <div style="font-size:10px; color:var(--text-sec); text-align:center; margin-top:10px;">
+            * Власник (Ви) маєте доступ до всього за замовчуванням.
+        </div>
+    </div>
+</div>
     
 <script>
 class App {
@@ -1554,6 +1598,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
