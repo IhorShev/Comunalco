@@ -76,6 +76,38 @@
     .trend-up { color: var(--danger); }   /* Виросло - погано */
     .trend-down { color: var(--success); } /* Впало - добре */
     .trend-neutral { color: var(--text-sec); opacity: 0.5; }
+        /* --- СТИЛІ ЦЕНТРУ ДОСТУПУ (CRM) --- */
+    .role-selector { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin-bottom: 15px; }
+    .role-card { 
+        background: var(--bg); border: 2px solid var(--border); border-radius: 12px; 
+        padding: 10px; text-align: center; cursor: pointer; transition: 0.2s; position: relative; overflow: hidden;
+    }
+    .role-card:hover { transform: translateY(-2px); border-color: var(--text-sec); }
+    .role-card.selected { border-color: var(--primary); background: rgba(0, 153, 255, 0.05); }
+    .role-card.selected::after {
+        content: "✔"; position: absolute; top: 2px; right: 5px; color: var(--primary); font-weight: bold; font-size: 12px;
+    }
+    
+    .role-icon { font-size: 24px; margin-bottom: 5px; display: block; }
+    .role-name { font-weight: 800; font-size: 11px; text-transform: uppercase; display: block; margin-bottom: 3px; }
+    .role-desc { font-size: 9px; color: var(--text-sec); line-height: 1.2; display: block; }
+
+    .user-list-item { 
+        display: flex; align-items: center; justify-content: space-between; 
+        padding: 12px; background: var(--bg); border: 1px solid var(--border); 
+        border-radius: 12px; margin-bottom: 8px;
+    }
+    .user-avatar { 
+        width: 32px; height: 32px; background: var(--border); border-radius: 50%; 
+        display: flex; align-items: center; justify-content: center; font-size: 14px; margin-right: 10px;
+    }
+    .user-role-badge { 
+        font-size: 9px; font-weight: 800; text-transform: uppercase; padding: 2px 6px; border-radius: 4px; 
+        background: var(--text-sec); color: white; margin-left: auto; margin-right: 10px;
+    }
+    .role-manager { background: var(--viber); } /* Фіолетовий */
+    .role-tenant { background: var(--success); } /* Зелений */
+    .role-viewer { background: var(--text-sec); } /* Сірий */
         /* UI Elements */
         .top-menu-bar { display: flex; justify-content: center; gap: 20px; font-size: 12px; font-weight: 700; color: var(--text-sec); margin-bottom: 15px; padding-top: 5px; text-transform: uppercase; letter-spacing: 1px; align-items: center; }
         .top-menu-bar span { cursor: pointer; display: flex; align-items: center; gap: 5px; }
@@ -1516,6 +1548,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
