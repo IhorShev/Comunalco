@@ -1542,17 +1542,17 @@ class App {
         </div>`;
     }
 
-    // --- TURBO-ВІДПРАВКА (Ctrl+V) ---
+    // --- TURBO-ВІДПРАВКА (FIXED CANVAS) ---
     async sharePDF(i) {
         if (typeof html2pdf === 'undefined') { alert('Зачекайте, система готує інструменти...'); return; }
         
         const apt = this.currentData.apartments[i];
         const month = new Date().toLocaleDateString('uk-UA', { month: 'long', year: 'numeric' });
         
-        // 1. Створюємо "невидиму" квитанцію (білий фон обов'язковий)
+        // 1. Створюємо "невидиму" квитанцію
         const element = document.createElement('div');
         element.innerHTML = this.renderReceiptHTML(i);
-        element.style.width = '595px'; // Ширина А4
+        element.style.width = '595px'; // А4
         element.style.position = 'fixed'; 
         element.style.left = '-9999px';
         element.style.top = '0';
@@ -1582,63 +1582,63 @@ class App {
             
             // === ВАРІАНТ Б: НОУТБУК (Картинка в буфер + Ctrl+V) ===
             else {
-                // Генеруємо зображення
-                const worker = html2pdf().from(element).set({ html2canvas: { scale: 2 } });
-                const imgBlob = await worker.outputImg('blob');
+                // 👇 ВИПРАВЛЕНО: Використовуємо toCanvas замість outputImg
+                // Це найнадійніший метод отримати картинку
+                const canvas = await html2pdf().set({ html2canvas: { scale: 2 } }).from(element).toCanvas();
 
-                // Кладемо в буфер
-                try {
-                    const item = new ClipboardItem({ "image/png": imgBlob });
-                    await navigator.clipboard.write([item]);
-                    
-                    // --- 1. ВІЗУАЛЬНЕ ПОВІДОМЛЕННЯ (TOAST) ---
-                    const toast = document.createElement('div');
-                    toast.innerHTML = `
-                        <div style="display:flex; align-items:center; gap:10px;">
-                            <span style="font-size:24px;">📸</span>
-                            <div>
-                                <div style="font-weight:bold; font-size:14px;">Квитанцію скопійовано!</div>
+                // Конвертуємо Canvas у Blob (стандартний метод браузера)
+                canvas.toBlob(async (blob) => {
+                    try {
+                        const item = new ClipboardItem({ "image/png": blob });
+                        await navigator.clipboard.write([item]);
+                        
+                        // --- TOAST (Спливашка) ---
+                        const toast = document.createElement('div');
+                        toast.innerHTML = `
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <span style="font-size:24px;">📸</span>
+                                <div>
+                                    <div style="font-weight:bold; font-size:14px;">Квитанцію скопійовано!</div>
+                                </div>
                             </div>
-                        </div>
-                    `;
-                    toast.style.cssText = "position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:#1e293b; color:white; padding:12px 20px; border-radius:12px; z-index:10000; box-shadow:0 10px 25px rgba(0,0,0,0.3); animation: fadeInUp 0.3s ease-out;";
-                    document.body.appendChild(toast);
-                    setTimeout(() => { toast.style.opacity='0'; setTimeout(()=>toast.remove(), 500) }, 3000);
-
-                    // --- 2. ВІДКРИВАЄМО ВІКНО З НОВОЮ ІНСТРУКЦІЄЮ ---
-                    const msg = `🧾 Квитанція: ${apt.name} (${month})`;
-                    this.openShareModal(msg);
-
-                    const instruction = document.querySelector('#shareModal p');
-                    const textArea = document.getElementById('share-text-area');
-                    
-                    // 👇 ВАШ ТЕКСТ ТУТ 👇
-                    if(instruction) {
-                        instruction.innerHTML = `
-                            <div style="background:#ecfdf5; border:1px solid #10b981; padding:10px; border-radius:8px; color:#065f46; font-size:13px; margin-bottom:10px; text-align:left;">
-                                ✅ <b>Квитанція вже у буфері!</b><br>
-                                1. Відкрийте месенджер.<br>
-                                2. Виберіть отримувача.<br>
-                                3. Натисніть <b>Ctrl + V</b>.
-                            </div>
-                            Оберіть месенджер:
                         `;
-                    }
-                    if(textArea) {
-                        textArea.value = msg + "\n(Спочатку вставте картинку Ctrl+V, потім цей текст)";
-                        navigator.clipboard.writeText(msg); 
-                    }
+                        toast.style.cssText = "position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:#1e293b; color:white; padding:12px 20px; border-radius:12px; z-index:10000; box-shadow:0 10px 25px rgba(0,0,0,0.3); animation: fadeInUp 0.3s ease-out;";
+                        document.body.appendChild(toast);
+                        setTimeout(() => { toast.style.opacity='0'; setTimeout(()=>toast.remove(), 500) }, 3000);
 
-                } catch (clipboardErr) {
-                    console.error(clipboardErr);
-                    alert("Браузер блокує буфер. Спробуйте вручну.");
-                    worker.save(`Receipt_${apt.name}.pdf`);
-                }
+                        // --- ВІКНО З ІНСТРУКЦІЄЮ ---
+                        const msg = `🧾 Квитанція: ${apt.name} (${month})`;
+                        this.openShareModal(msg);
+
+                        const instruction = document.querySelector('#shareModal p');
+                        const textArea = document.getElementById('share-text-area');
+                        
+                        if(instruction) {
+                            instruction.innerHTML = `
+                                <div style="background:#ecfdf5; border:1px solid #10b981; padding:10px; border-radius:8px; color:#065f46; font-size:13px; margin-bottom:10px; text-align:left;">
+                                    ✅ <b>Квитанція вже у буфері!</b><br>
+                                    1. Відкрийте месенджер.<br>
+                                    2. Виберіть отримувача.<br>
+                                    3. Натисніть <b>Ctrl + V</b>.
+                                </div>
+                                Оберіть месенджер:
+                            `;
+                        }
+                        if(textArea) {
+                            textArea.value = msg + "\n(Спочатку вставте картинку Ctrl+V, потім цей текст)";
+                            navigator.clipboard.writeText(msg); 
+                        }
+
+                    } catch (clipboardErr) {
+                        console.error(clipboardErr);
+                        alert("Не вдалося скопіювати картинку. Браузер блокує доступ.");
+                    }
+                });
             }
 
         } catch (err) {
             console.error(err);
-            alert("Помилка: " + err.message);
+            alert("Помилка генерації: " + err.message);
         } finally {
             document.body.removeChild(element);
         }
@@ -1877,6 +1877,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
