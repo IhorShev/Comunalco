@@ -1005,11 +1005,11 @@ class App {
         const users = this.currentData.users || [];
 
         if (users.length === 0) {
-            list.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-sec); font-size:13px;">Поки що тільки ви маєте доступ.<br>Додайте менеджера або орендаря.</div>`;
+            list.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-sec); font-size:13px;">Поки що тільки ви маєте доступ.<br>Додайте менеджера або мешканця.</div>`;
             return;
         }
 
-        const roleNames = { 'manager': '🛠 Менеджер', 'tenant': '🏠 Орендар', 'viewer': '👀 Гість' };
+        const roleNames = { 'manager': '🛠 Менеджер', 'tenant': '🏠 Мешканець', 'viewer': '👀 Гість' };
         const roleClasses = { 'manager': 'role-manager', 'tenant': 'role-tenant', 'viewer': 'role-viewer' };
 
         list.innerHTML = users.map(u => `
@@ -1704,6 +1704,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
