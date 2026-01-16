@@ -1542,7 +1542,7 @@ class App {
         </div>`;
     }
 
-    // --- TURBO-ВІДПРАВКА (FIXED FETCH) ---
+    // --- TURBO-ВІДПРАВКА (FIXED PNG) ---
     async sharePDF(i) {
         if (typeof html2pdf === 'undefined') { alert('Зачекайте, система готує інструменти...'); return; }
         
@@ -1562,20 +1562,20 @@ class App {
 
         const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
 
-        // Налаштування для PDF/IMG
-        const opt = {
-            margin: 0,
-            filename: `Receipt_${apt.name}.pdf`,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
-
         try {
             // === ВАРІАНТ А: МОБІЛЬНИЙ (Файл PDF) ===
             if (isMobile && navigator.canShare) {
-                const blob = await html2pdf().set(opt).from(element).output('blob');
-                const file = new File([blob], opt.filename, { type: 'application/pdf' });
+                // Налаштування для мобільного (легкий файл)
+                const optMobile = {
+                    margin: 0,
+                    filename: `Receipt_${apt.name}.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 }, // JPEG для економії
+                    html2canvas: { scale: 2, useCORS: true },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                };
+
+                const blob = await html2pdf().set(optMobile).from(element).output('blob');
+                const file = new File([blob], optMobile.filename, { type: 'application/pdf' });
                 const msg = `🧾 Квитанція: ${apt.name}\n📅 ${month}`;
                 
                 await navigator.share({ files: [file], title: 'Квитанція', text: msg });
@@ -1583,14 +1583,23 @@ class App {
             
             // === ВАРІАНТ Б: НОУТБУК (Картинка в буфер + Ctrl+V) ===
             else {
-                // 👇 НОВИЙ МЕТОД: Отримуємо тег IMG, а не canvas/blob
-                const imgElement = await html2pdf().set(opt).from(element).outputImg('img');
+                // Налаштування для ПК (ТІЛЬКИ PNG для буфера!)
+                const optPC = {
+                    margin: 0,
+                    filename: `Receipt_${apt.name}.png`,
+                    image: { type: 'png', quality: 1 }, // PNG обов'язково!
+                    html2canvas: { scale: 2, useCORS: true },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                };
+
+                // Отримуємо тег IMG
+                const imgElement = await html2pdf().set(optPC).from(element).outputImg('img');
                 
-                // Перетворюємо картинку (Base64) у Blob через fetch (це найнадійніший спосіб)
+                // Перетворюємо у Blob
                 const res = await fetch(imgElement.src);
                 const blob = await res.blob();
 
-                // Кладемо в буфер
+                // Кладемо в буфер (Тепер типи співпадуть: PNG = PNG)
                 try {
                     const item = new ClipboardItem({ "image/png": blob });
                     await navigator.clipboard.write([item]);
@@ -1634,11 +1643,10 @@ class App {
 
                 } catch (clipboardErr) {
                     console.error(clipboardErr);
-                    // Якщо буфер не спрацював - просто скачуємо картинку
                     alert("Браузер блокує буфер. Картинка збережеться як файл.");
                     const link = document.createElement('a');
                     link.href = imgElement.src;
-                    link.download = `Receipt_${apt.name}.jpg`;
+                    link.download = `Receipt_${apt.name}.png`;
                     link.click();
                 }
             }
@@ -1884,6 +1892,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
