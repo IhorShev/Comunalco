@@ -527,6 +527,30 @@
         </div>
     </div>
 </div>
+    <div id="shareModal" class="modal" style="z-index: 4000;">
+    <div class="modal-content" style="max-width: 400px; text-align:center;">
+        <span class="modal-close" onclick="document.getElementById('shareModal').style.display='none'">&times;</span>
+        <h3 style="margin-top:0;">📤 Відправити повідомлення</h3>
+        <p style="font-size:12px; color:var(--text-sec); margin-bottom:15px;">Оберіть месенджер для відправки:</p>
+        
+        <textarea id="share-text-area" style="width:100%; height:100px; padding:10px; border-radius:12px; border:1px solid var(--border); background:var(--bg); color:var(--text); font-size:12px; margin-bottom:20px; resize:none;" readonly></textarea>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <a id="btn-share-tg" href="#" target="_blank" class="btn btn-telegram" style="text-decoration:none; display:flex; justify-content:center; align-items:center;">
+                Telegram ✈️
+            </a>
+            <a id="btn-share-vb" href="#" target="_blank" class="btn btn-viber" style="text-decoration:none; display:flex; justify-content:center; align-items:center;">
+                Viber 💜
+            </a>
+            <a id="btn-share-wa" href="#" target="_blank" class="btn btn-whatsapp" style="text-decoration:none; display:flex; justify-content:center; align-items:center;">
+                WhatsApp 💚
+            </a>
+            <button onclick="app.copyFromModal()" class="btn btn-primary">
+                📋 Копіювати
+            </button>
+        </div>
+    </div>
+</div>
     
 <script>
 class App {
@@ -1723,6 +1747,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
