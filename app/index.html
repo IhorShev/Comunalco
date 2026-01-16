@@ -1463,93 +1463,135 @@ class App {
         r.readAsText(f); 
     }
 
-    // --- PDF ГЕНЕРАЦІЯ (FIXED) ---
-    async sharePDF(i) {
-        if (typeof html2pdf === 'undefined') { alert('Помилка: Бібліотека PDF не завантажилась.'); return; }
-        
+    // --- ГЕНЕРАЦІЯ HTML КВИТАНЦІЇ ---
+    renderReceiptHTML(i) {
         const a = this.currentData.apartments[i];
-        const d = this.currentData; 
+        const d = this.currentData;
         const dStr = new Date().toLocaleDateString('uk-UA');
         
-        // Визначаємо пристрій
-        const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-        // Розрахунки
-        const c = { ed: Math.max(0,(a.curr.ed||0)-(a.prev.ed||0)), en: Math.max(0,(a.curr.en||0)-(a.prev.en||0)), w: Math.max(0,(a.curr.w||0)-(a.prev.w||0)), g: Math.max(0,(a.curr.g||0)-(a.prev.g||0)) };
-        const cost = { ed: (c.ed*d.tariffs.el_d) + (c.en*d.tariffs.el_n), w: c.w*d.tariffs.w, g: c.g*d.tariffs.g };
+        // Розрахунки (з вашого коду)
+        const c = { 
+            ed: Math.max(0,(a.curr.ed||0)-(a.prev.ed||0)), 
+            en: Math.max(0,(a.curr.en||0)-(a.prev.en||0)), 
+            w: Math.max(0,(a.curr.w||0)-(a.prev.w||0)), 
+            g: Math.max(0,(a.curr.g||0)-(a.prev.g||0)) 
+        };
+        const cost = { 
+            ed: (c.ed * d.tariffs.el_d) + (c.en * d.tariffs.el_n), 
+            w: c.w * d.tariffs.w, 
+            g: c.g * d.tariffs.g 
+        };
+
         // Лічильники користувача
-        var custRows = ""; 
-        var custCostTotal = 0;
+        let custRows = "";
+        let custCostTotal = 0;
         (a.custom_counters || []).forEach(cc => {
-            let diff = Math.max(0, cc.curr - cc.prev);
-            let val = diff * cc.price;
+            const diff = Math.max(0, cc.curr - cc.prev);
+            const val = diff * cc.price;
             custCostTotal += val;
-            custRows += `<tr style="border-bottom:1px solid #e2e8f0;"><td style="padding:8px; color:#334155;">${cc.name}</td><td style="padding:8px; text-align:center;">${diff}</td><td style="padding:8px; text-align:center;">${cc.price}</td><td style="padding:8px; text-align:right; font-weight:bold;">${val.toFixed(2)}</td></tr>`;
+            custRows += `<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:8px; color:#334155">${cc.name}</td><td style="padding:8px; text-align:center">${diff}</td><td style="padding:8px; text-align:right">${val.toFixed(2)} грн</td></tr>`;
         });
-        // МЗК та послуги
-        var mzkVal = parseFloat((this.checks[i]?.match(/МЗК: (\d+\.\d+)/) || [0,0])[1]);
-        let sRows = a.services.map(s => `<tr style="border-bottom:1px solid #e2e8f0;"><td style="padding:8px; color:#334155;" colspan="3">${s.name}</td><td style="padding:8px; text-align:right; font-weight:bold;">${s.val.toFixed(2)}</td></tr>`).join('');
-        let tot = cost.ed + cost.w + cost.g + custCostTotal + a.services.reduce((s,x)=>s+x.val,0) + mzkVal + (a.debt||0);
-        let toPay = tot - (a.paid || 0);
 
-        // --- ШАБЛОН PDF (HTML) ---
-        const template = `
-        <div style="font-family: 'Inter', sans-serif; color:#1e293b; background:#fff; padding:40px; box-sizing: border-box; width: 100%;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px; border-bottom: 2px solid #0099ff; padding-bottom:20px;">
-                <div><div style="font-weight: 900; font-size: 24px; text-transform:uppercase;">Comunalco</div><div style="font-size:12px; color:#64748b;">Система обліку</div></div>
-                <div style="text-align:right;"><div style="font-size:14px; font-weight:bold;">${d.name}</div><div style="font-size:12px; color:#64748b;">${dStr}</div></div>
-            </div>
-            <div style="background:#f8fafc; padding:15px; border-radius:12px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center;">
-                <div><div style="font-size:10px; color:#64748b; text-transform:uppercase; font-weight:bold;">Платник</div><div style="font-size:18px; font-weight:bold; color:#0f172a;">${a.name}</div></div>
-                <div style="text-align:right;"><div style="font-size:10px; color:#64748b; text-transform:uppercase; font-weight:bold;">До сплати</div><div style="font-size:24px; font-weight:900; color:#0099ff;">${toPay.toFixed(2)} <span style="font-size:14px; color:#64748b;">грн</span></div></div>
-            </div>
-            <table style="width:100%; border-collapse:collapse; font-size:12px; margin-bottom:30px;">
-                <tr style="background:#0f172a; color:#fff;"><th style="padding:10px; text-align:left;">Послуга</th><th style="padding:10px; text-align:center;">Спожито</th><th style="padding:10px; text-align:center;">Тариф</th><th style="padding:10px; text-align:right;">Сума</th></tr>
-                ${c.ed > 0 || c.en > 0 ? `<tr style="border-bottom:1px solid #e2e8f0;"><td style="padding:8px;">⚡ Електрика</td><td style="padding:8px; text-align:center;">${c.ed} / ${c.en}</td><td style="padding:8px; text-align:center;">${d.tariffs.el_d} / ${d.tariffs.el_n}</td><td style="padding:8px; text-align:right; font-weight:bold;">${cost.ed.toFixed(2)}</td></tr>` : ''}
-                ${c.w > 0 ? `<tr style="border-bottom:1px solid #e2e8f0;"><td style="padding:8px;">💧 Вода</td><td style="padding:8px; text-align:center;">${c.w} м³</td><td style="padding:8px; text-align:center;">${d.tariffs.w}</td><td style="padding:8px; text-align:right; font-weight:bold;">${cost.w.toFixed(2)}</td></tr>` : ''}
-                ${c.g > 0 ? `<tr style="border-bottom:1px solid #e2e8f0;"><td style="padding:8px;">🔥 Газ</td><td style="padding:8px; text-align:center;">${c.g} м³</td><td style="padding:8px; text-align:center;">${d.tariffs.g}</td><td style="padding:8px; text-align:right; font-weight:bold;">${cost.g.toFixed(2)}</td></tr>` : ''}
-                ${custRows}
-                <tr style="border-bottom:1px solid #e2e8f0; background:rgba(255, 255, 0, 0.05);"><td style="padding:8px; color:#b45309;" colspan="3">🏢 МЗК (Спільні витрати)</td><td style="padding:8px; text-align:right; font-weight:bold; color:#b45309;">${mzkVal.toFixed(2)}</td></tr>
-                ${sRows}
-                ${a.debt > 0 ? `<tr style="border-bottom:1px solid #e2e8f0; color:#ef4444;"><td style="padding:8px;" colspan="3">❗️ Борг</td><td style="padding:8px; text-align:right; font-weight:bold;">${a.debt.toFixed(2)}</td></tr>` : ''}
-                ${a.paid > 0 ? `<tr style="border-bottom:1px solid #e2e8f0; color:#10b981;"><td style="padding:8px;" colspan="3">✅ Сплачено</td><td style="padding:8px; text-align:right; font-weight:bold;">-${a.paid.toFixed(2)}</td></tr>` : ''}
-            </table>
-            <div style="border: 1px dashed #cbd5e1; padding:15px; border-radius:8px; background:#f8fafc;">
-                <div style="font-size:10px; font-weight:bold; color:#64748b; margin-bottom:5px; text-transform:uppercase;">Реквізити:</div>
-                ${d.requisites.map(r=>`<div style="font-size:12px; margin-bottom:3px;">${r.name}: <strong>${r.val}</strong></div>`).join('')}
-            </div>
-            <div style="margin-top:20px; text-align:center; font-size:10px; color:#94a3b8;">Згенеровано сервісом Comunalco.com</div>
-        </div>`;
-
-        // Генерація PDF
-        const overlay = document.createElement('div');
-        overlay.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #333; z-index: 99999; display: flex; justify-content: center; overflow: auto; padding: 20px;';
-        const container = document.createElement('div');
-        container.style.cssText = 'width: 148mm; background: white; margin: auto; box-shadow: 0 0 20px rgba(0,0,0,0.5); min-height: 210mm;'; 
-        container.innerHTML = template;
-        overlay.appendChild(container); 
-        document.body.appendChild(overlay); 
+        // Послуги та МЗК
+        const mzkMatch = (this.checks && this.checks[i]) ? this.checks[i].match(/МЗК: (\d+\.\d+)/) : null;
+        const mzkVal = mzkMatch ? parseFloat(mzkMatch[1]) : 0;
         
-        await new Promise(r => setTimeout(r, 1000)); // Чекаємо рендер
+        const sRows = (a.services||[]).map(s => `<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:8px; color:#334155" colspan="2">${s.name}</td><td style="padding:8px; text-align:right">${parseFloat(s.val).toFixed(2)} грн</td></tr>`).join('');
+        
+        const tot = cost.ed + cost.w + cost.g + custCostTotal + (a.services||[]).reduce((s,x)=>s+x.val,0) + mzkVal + (a.debt||0);
+        const toPay = tot - (a.paid || 0);
 
-        const fileName = `Rahunok_${a.name.replace(/\s/g,'_')}_${Date.now()}.pdf`;
-        const opt = { margin: 0, filename: fileName, image: { type: 'jpeg', quality: 1.0 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'mm', format: 'a5', orientation: 'portrait' } };
+        // HTML Шаблон
+        return `
+        <div style="font-family:'Inter',sans-serif; color:#1e293b; background:#fff; padding:40px; box-sizing:border-box; width:100%">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px; border-bottom:2px solid #0099ff; padding-bottom:20px">
+                <div style="font-weight:900; font-size:24px; text-transform:uppercase; color:#0f172a">Comunalco</div>
+                <div style="text-align:right">
+                    <div style="font-size:14px; font-weight:bold">${d.name}</div>
+                    <div style="font-size:12px; color:#64748b">${dStr}</div>
+                </div>
+            </div>
+            
+            <div style="background:#f8fafc; padding:15px; border-radius:12px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center">
+                <div style="font-size:10px; color:#64748b; text-transform:uppercase; font-weight:bold">Платник</div>
+                <div style="font-size:18px; font-weight:bold; color:#0f172a">${a.name}</div>
+            </div>
 
-        try { 
-            const pdfWorker = html2pdf().set(opt).from(container);
-            const pdfBlob = await pdfWorker.output('blob'); 
-            const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
-            if (isMobile && navigator.canShare && navigator.canShare({ files: [file] })) { 
-                await navigator.share({ files: [file] });
-            } else { 
-                await pdfWorker.save();
-            }
-        } catch (e) { 
-            alert("Помилка PDF: " + e.message);
-        } finally { 
-            document.body.removeChild(overlay);
-        }
+            <table style="width:100%; border-collapse:collapse; font-size:12px; margin-bottom:20px">
+                <thead><tr style="background:#f1f5f9; text-transform:uppercase; font-size:10px; color:#64748b"><th style="padding:10px; text-align:left">Послуга</th><th style="padding:10px; text-align:center">Спожито</th><th style="padding:10px; text-align:right">Сума</th></tr></thead>
+                <tbody>
+                    ${c.ed>0 ? `<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:8px">Електроенергія (Д)</td><td style="padding:8px; text-align:center">${c.ed} кВт</td><td style="padding:8px; text-align:right">${cost.ed.toFixed(2)}</td></tr>` : ''}
+                    ${c.w>0 ? `<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:8px">Водопостачання</td><td style="padding:8px; text-align:center">${c.w} м3</td><td style="padding:8px; text-align:right">${cost.w.toFixed(2)}</td></tr>` : ''}
+                    ${c.g>0 ? `<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:8px">Газопостачання</td><td style="padding:8px; text-align:center">${c.g} м3</td><td style="padding:8px; text-align:right">${cost.g.toFixed(2)}</td></tr>` : ''}
+                    ${custRows}
+                    ${mzkVal>0 ? `<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:8px" colspan="2">МЗК (Опалення/Світло)</td><td style="padding:8px; text-align:right">${mzkVal.toFixed(2)} грн</td></tr>` : ''}
+                    ${sRows}
+                    ${a.debt>0 ? `<tr style="color:#ef4444"><td style="padding:8px" colspan="2">Борг за минулий період</td><td style="padding:8px; text-align:right">${a.debt} грн</td></tr>` : ''}
+                    ${a.paid>0 ? `<tr style="color:#22c55e"><td style="padding:8px" colspan="2">Сплачено</td><td style="padding:8px; text-align:right">-${a.paid} грн</td></tr>` : ''}
+                </tbody>
+            </table>
+
+            <div style="background:#0f172a; color:white; padding:20px; border-radius:12px; display:flex; justify-content:space-between; align-items:center">
+                <div style="font-size:12px; opacity:0.8">ДО СПЛАТИ</div>
+                <div style="font-size:24px; font-weight:900">${toPay.toFixed(2)} грн</div>
+            </div>
+            
+            <div style="margin-top:20px; font-size:10px; color:#94a3b8; text-align:center">
+                ${(d.requisites||[]).map(r => `<div>${r.name}: ${r.val}</div>`).join('')}
+            </div>
+        </div>`;
     }
 
+    // --- PDF ГЕНЕРАЦІЯ ТА ВІДПРАВКА (FIXED) ---
+    async sharePDF(i) {
+        if (typeof html2pdf === 'undefined') { alert('Помилка: Бібліотека PDF ще завантажується.'); return; }
+        
+        const apt = this.currentData.apartments[i];
+        
+        // Створюємо елемент
+        const element = document.createElement('div');
+        element.innerHTML = this.renderReceiptHTML(i);
+        element.style.width = '100%'; 
+        element.style.position = 'fixed'; 
+        element.style.left = '-9999px';
+        document.body.appendChild(element);
+
+        const opt = {
+            margin: 0,
+            filename: `Receipt_${apt.name}_${new Date().toISOString().slice(0,10)}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        html2pdf().set(opt).from(element).output('blob').then((blob) => {
+            const file = new File([blob], opt.filename, { type: 'application/pdf' });
+            
+            // Текст для месенджера
+            const month = new Date().toLocaleDateString('uk-UA', { month: 'long', year: 'numeric' });
+            const msg = `🧾 Квитанція: ${apt.name}\n📅 ${month}\n\nФайл квитанції додано окремо.`;
+
+            // Мобільний
+            if (navigator.canShare && navigator.canShare({ files: [file] }) && /Android|iPhone|iPad/i.test(navigator.userAgent)) {
+                navigator.share({ files: [file], title: 'Квитанція', text: msg }).catch(err => console.log('Share closed', err));
+            } 
+            // Ноутбук
+            else {
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = opt.filename;
+                link.click();
+
+                this.openShareModal(msg);
+                setTimeout(() => alert("📥 PDF-файл завантажено!\nПеретягніть його у чат."), 1000);
+            }
+            document.body.removeChild(element);
+        }).catch(err => {
+            console.error(err);
+            alert("Помилка PDF");
+            document.body.removeChild(element);
+        });
+    }
     startNewMonth() { 
         if (!confirm("⚠️ Закрити місяць?\n\n1. Поточні квитанції будуть збережені в Історію.\n2. Поля будуть очищені для нового місяця.")) return;
         // 1. Перевіряємо, чи є куди складати історію
@@ -1784,6 +1826,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
