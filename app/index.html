@@ -1022,7 +1022,7 @@ class App {
         const roleName = roleNames[this.selectedRole];
         const link = "https://comunalco.com";
         
-        const msg = `👋 Вітаємо!\nВам надано доступ до об'єкту в системі "КомуналкОблік".\n\n🏢 Об'єкт: ${this.currentData.name}\n🔑 Рівень доступу: ${aptNameForMsg} (${roleName})\n\nДля входу:\n1. Перейди за посиланням: ${link}\n2. Натисніть кнопку "Вхід" (через Google)\n3. Використайте пошту: ${email}`;
+        const msg = `👋 Вам надано доступ!\n\n🏢 Об'єкт: ${this.currentData.name}\n🔑 Роль: ${aptNameForMsg} (${roleName})\n\n👇 Вхід:\n🌍 ${link}\n📧 Логін: ${email}`;
 
         // --- РОЗУМНА ВІДПРАВКА ---
         // Якщо це мобільний телефон - використовуємо рідне меню
@@ -1784,6 +1784,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
