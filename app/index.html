@@ -961,19 +961,23 @@ class App {
     }
 
     grantUserAccess() {
-        const email = document.getElementById('new-user-email').value.trim();
+        const emailInput = document.getElementById('new-user-email');
+        const email = emailInput.value.trim();
+        
         if(!email || !email.includes('@')) { alert("Введіть коректний Email (Gmail)!"); return; }
         
-        // Тут буде логіка Firebase. Поки що симулюємо додавання.
         if(!this.currentData.users) this.currentData.users = [];
         
         let label = "Весь об'єкт";
+        let aptNameForMsg = "Всі квартири";
+        
         if(this.selectedRole === 'tenant') {
             const aptSelect = document.getElementById('access-apt-select');
             if(aptSelect) {
                 const aptId = aptSelect.value;
-                const aptName = this.currentData.apartments.find(a => a.id == aptId)?.name || 'Квартира';
-                label = aptName;
+                const aptObj = this.currentData.apartments.find(a => a.id == aptId);
+                label = aptObj ? aptObj.name : 'Квартира';
+                aptNameForMsg = label;
             }
         }
 
@@ -987,8 +991,23 @@ class App {
         this.currentData.users.push(newUser);
         this.save();
         this.renderUserList();
-        document.getElementById('new-user-email').value = '';
-        alert(`Користувача ${email} додано! (Локально)`);
+        emailInput.value = '';
+
+        // --- 🔥 НОВИЙ ОФІЦІЙНИЙ ТЕКСТ 🔥 ---
+        const roleNames = { 'manager': '🛠 Менеджер', 'tenant': '🏠 Мешканець', 'viewer': '👀 Гість' };
+        const roleName = roleNames[this.selectedRole];
+        const link = "https://comunalco.com";
+        
+        const msg = `👋 Вітаємо!\nВам надано доступ до об'єкту в системі "КомуналкОблік".\n\n🏢 Об'єкт: ${this.currentData.name}\n🔑 Рівень доступу: ${aptNameForMsg} (${roleName})\n\nДля входу:\n1. Перейди за посиланням: ${link}\n2. Натисніть кнопку "Вхід" (через Google)\n3. Використайте пошту: ${email}`;
+
+        if(confirm(`Користувача успішно додано!\n\nНадіслати йому офіційне запрошення?`)) {
+            if (navigator.share) {
+                navigator.share({ title: 'Запрошення', text: msg, url: link }).catch(e => console.log('Share canceled'));
+            } else {
+                this.copyTextToClipboard(msg);
+                alert("Текст запрошення скопійовано!\nНадішліть його користувачу (Viber/Telegram).");
+            }
+        }
     }
 
     deleteUserAccess(id) {
@@ -1704,6 +1723,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
