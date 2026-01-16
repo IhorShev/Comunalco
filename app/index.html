@@ -263,9 +263,9 @@
         <div style="flex:1; text-align:center; position: relative;">
             <div style="display:flex; align-items:center; justify-content:center; gap:5px;">
                 <input type="text" id="object-title" class="object-title" value="Мій Об'єкт" onchange="app.updateObjectName(this.value)" placeholder="НАЗВА ОБ'ЄКТУ">
-                <span onclick="app.deleteObject()" style="color:var(--danger); cursor:pointer; font-size:16px;" title="Видалити об'єкт">🗑</span>
             </div>
             <div style="display:flex; align-items:center; justify-content:center; gap: 15px; margin-top: 4px;">
+                <span onclick="app.deleteObject()" style="color:var(--danger); cursor:pointer; font-size:18px;" title="Видалити об'єкт">🗑</span>
                 <div id="status-badge" class="status-badge" onclick="app.openMenu('premium')">FREE</div>
                 <div onclick="app.addObject()" style="cursor:pointer; color:var(--primary); font-weight:900; font-size:22px; line-height:12px;" title="Додати об'єкт">+</div>
             </div>
@@ -1508,6 +1508,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
