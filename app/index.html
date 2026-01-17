@@ -1542,110 +1542,111 @@ class App {
         </div>`;
     }
 
-   // --- ФІНАЛ: ВИПРАВЛЕННЯ РОЗБИТОЇ КАРТИНКИ (PNG) ---
+   // --- ФІНАЛ: МЕТОД "ПРОФЕСІЙНИЙ ФОТОГРАФ" ---
     async sharePDF(i) {
-        if (typeof html2pdf === 'undefined') { alert('Зачекайте, система завантажується...'); return; }
-        
         const apt = this.currentData.apartments[i];
         const month = new Date().toLocaleDateString('uk-UA', { month: 'long', year: 'numeric' });
-        
-        // 1. Показуємо лоадер
-        this.openShareModal('<div style="padding:30px; text-align:center; color:#64748b;">⏳ <b>Генеруємо квитанцію...</b></div>');
-        
-        // 2. Створюємо елемент
-        const element = document.createElement('div');
-        element.innerHTML = this.renderReceiptHTML(i);
-        element.style.width = '595px'; 
-        element.style.position = 'fixed'; 
-        element.style.left = '-9999px';
-        element.style.top = '0';
-        element.style.background = 'white';
-        document.body.appendChild(element);
 
-        // Налаштування (PNG)
-        const opt = {
-            margin: 0,
-            filename: `Receipt.png`,
-            image: { type: 'png', quality: 1 },
-            html2canvas: { scale: 2, useCORS: true, logging: false },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
+        // 1. ВІДКРИВАЄМО ВІКНО З ЛОАДЕРОМ
+        this.openShareModal('<div style="padding:40px; text-align:center; color:#64748b;">⏳ <b>Вмикаємо фотоапарат...</b><br><span style="font-size:12px">Завантаження інструментів</span></div>');
 
         try {
-            // 3. ОТРИМУЄМО САМЕ КАРТИНКУ (outputImg)
-            // Це повертає HTML-елемент <img>, в якому ВЖЕ є картинка
-            const imgElement = await html2pdf().set(opt).from(element).outputImg();
-            const dataUri = imgElement.src; // Беремо з нього чистий код картинки
-            
-            // Підготуємо Blob для буфера
-            const res = await fetch(dataUri);
-            const blob = await res.blob();
-
-            // 4. ОНОВЛЮЄМО ВІКНО (Вставляємо картинку)
-            const modalContent = document.querySelector('#shareModal .modal-content');
-            if (modalContent) {
-                modalContent.innerHTML = `
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                        <h3 style="margin:0; font-size:18px;">📄 Готово</h3>
-                        <span onclick="document.getElementById('shareModal').style.display='none'" style="cursor:pointer; font-size:24px;">&times;</span>
-                    </div>
-
-                    <div style="background:#f1f5f9; padding:10px; border-radius:8px; margin-bottom:15px; text-align:center;">
-                        <img src="${dataUri}" style="max-width:100%; max-height:350px; border:1px solid #cbd5e1; border-radius:4px; box-shadow:0 2px 4px rgba(0,0,0,0.1);">
-                    </div>
-
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                        <button id="btn-copy-final" style="background:#8b5cf6; color:white; border:none; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center; gap:8px;">
-                            🚀 Скопіювати
-                        </button>
-                        <button id="btn-dl-final" style="background:#3b82f6; color:white; border:none; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer; font-size:16px;">
-                            💾 Скачати
-                        </button>
-                    </div>
-                    <div id="status-text" style="margin-top:10px; text-align:center; font-size:13px; color:#64748b;">
-                        Натисніть "Скопіювати" -> Вставте в Viber (Ctrl+V)
-                    </div>
-                `;
-
-                // --- ЛОГІКА КОПІЮВАННЯ ---
-                document.getElementById('btn-copy-final').onclick = async () => {
-                    const btn = document.getElementById('btn-copy-final');
-                    const st = document.getElementById('status-text');
-
-                    try {
-                        const item = new ClipboardItem({ "image/png": blob });
-                        await navigator.clipboard.write([item]);
-
-                        // УСПІХ
-                        btn.style.background = '#10b981';
-                        btn.innerHTML = '✅ Скопійовано!';
-                        st.innerHTML = '<b style="color:#16a34a">Успіх! Тисніть Ctrl+V у чаті.</b>';
-                        
-                        navigator.clipboard.writeText(`🧾 Квитанція: ${apt.name} (${month})`);
-
-                    } catch (err) {
-                        console.error(err);
-                        btn.style.background = '#f59e0b';
-                        btn.innerHTML = '⚠️ Увага';
-                        st.innerHTML = '<span style="color:#b45309">Авто-копіювання не спрацювало.</span><br>Натисніть на картинку <b>Правою Кнопкою -> Копіювати</b>.';
-                    }
-                };
-
-                // --- ЛОГІКА СКАЧУВАННЯ ---
-                document.getElementById('btn-dl-final').onclick = () => {
-                    const link = document.createElement('a');
-                    link.href = dataUri;
-                    link.download = `Receipt_${apt.name}.png`;
-                    link.click();
-                };
+            // 2. АВТО-ЗАВАНТАЖЕННЯ html2canvas (якщо його немає)
+            if (typeof html2canvas === 'undefined') {
+                await new Promise((resolve, reject) => {
+                    const script = document.createElement('script');
+                    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+                    script.onload = resolve;
+                    script.onerror = () => reject(new Error("Не вдалося завантажити html2canvas"));
+                    document.head.appendChild(script);
+                });
             }
+
+            // 3. ГОТУЄМО КВИТАНЦІЮ (Приховано)
+            const element = document.createElement('div');
+            element.innerHTML = this.renderReceiptHTML(i);
+            // Важливо: білий фон і фіксований розмір для гарного фото
+            element.style.cssText = 'position:fixed; top:0; left:-9999px; width:595px; background:white; z-index:9999; padding:0;';
+            document.body.appendChild(element);
+
+            // 4. РОБИМО ФОТО (Скріншот)
+            // scale: 2 означає високу якість (Retina)
+            const canvas = await html2canvas(element, { scale: 2, useCORS: true, logging: false });
+            
+            // Прибираємо квитанцію з екрану
+            document.body.removeChild(element);
+
+            // 5. ОТРИМУЄМО РЕЗУЛЬТАТИ (Картинка і Blob)
+            const dataUri = canvas.toDataURL('image/png'); // Для показу на екрані
+            
+            // Конвертуємо в Blob для буфера (це працює миттєво)
+            canvas.toBlob(async (blob) => {
+                
+                // 6. ОНОВЛЮЄМО ВІКНО (Показуємо результат)
+                const modalContent = document.querySelector('#shareModal .modal-content');
+                if (modalContent) {
+                    modalContent.innerHTML = `
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                            <h3 style="margin:0; font-size:18px;">📸 Квитанція готова</h3>
+                            <span onclick="document.getElementById('shareModal').style.display='none'" style="cursor:pointer; font-size:24px;">&times;</span>
+                        </div>
+
+                        <div style="background:#e2e8f0; padding:15px; border-radius:12px; margin-bottom:15px; text-align:center; display:flex; justify-content:center;">
+                            <img src="${dataUri}" style="max-width:100%; max-height:350px; border-radius:6px; box-shadow:0 4px 10px rgba(0,0,0,0.1); display:block;">
+                        </div>
+
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+                            <button id="btn-copy-img" style="background:#8b5cf6; color:white; border:none; padding:14px; border-radius:10px; font-weight:bold; cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center; gap:8px; transition:0.2s;">
+                                🚀 Скопіювати
+                            </button>
+                            <button id="btn-dl-img" style="background:#3b82f6; color:white; border:none; padding:14px; border-radius:10px; font-weight:bold; cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center; gap:8px; transition:0.2s;">
+                                💾 Скачати
+                            </button>
+                        </div>
+                        <div id="status-line" style="margin-top:12px; text-align:center; font-size:13px; color:#64748b;">
+                            Натисніть "Скопіювати" -> Вставте у Viber (Ctrl+V)
+                        </div>
+                    `;
+
+                    // --- ЛОГІКА КНОПКИ "СКОПІЮВАТИ" ---
+                    document.getElementById('btn-copy-img').onclick = async () => {
+                        const btn = document.getElementById('btn-copy-img');
+                        const st = document.getElementById('status-line');
+
+                        try {
+                            // Працює, бо у вас є HTTPS!
+                            const item = new ClipboardItem({ "image/png": blob });
+                            await navigator.clipboard.write([item]);
+
+                            btn.style.background = '#10b981'; // Зелений
+                            btn.innerHTML = '✅ Скопійовано!';
+                            st.innerHTML = '<b style="color:#16a34a">Успіх! Відкривайте Viber і тисніть Ctrl+V</b>';
+                            
+                            // Копіюємо текст
+                            navigator.clipboard.writeText(`🧾 Квитанція: ${apt.name} (${month})`);
+
+                        } catch (err) {
+                            console.error(err);
+                            btn.style.background = '#f59e0b';
+                            btn.innerHTML = '⚠️ Помилка буфера';
+                            st.innerHTML = 'Браузер не дав доступу. Натисніть на картинку <b>Правою кнопкою -> Копіювати</b>.';
+                        }
+                    };
+
+                    // --- ЛОГІКА КНОПКИ "СКАЧАТИ" ---
+                    document.getElementById('btn-dl-img').onclick = () => {
+                        const link = document.createElement('a');
+                        link.href = dataUri;
+                        link.download = `Receipt_${apt.name}.png`;
+                        link.click();
+                    };
+                }
+            });
 
         } catch (err) {
             console.error(err);
-            alert("Помилка генерації: " + err.message);
+            alert("Помилка: " + err.message);
             document.getElementById('shareModal').style.display = 'none';
-        } finally {
-            if(document.body.contains(element)) document.body.removeChild(element);
         }
     }
     startNewMonth() { 
@@ -1882,6 +1883,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
