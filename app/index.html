@@ -1542,7 +1542,7 @@ class App {
         </div>`;
     }
 
-   // --- ФІНАЛ-ФІНАЛІВ: СТВОРЕННЯ КАРТИНКИ (PNG) ---
+   // --- ФІНАЛ: ВИПРАВЛЕННЯ РОЗБИТОЇ КАРТИНКИ ---
     async sharePDF(i) {
         if (typeof html2pdf === 'undefined') { alert('Зачекайте, система завантажується...'); return; }
         
@@ -1562,7 +1562,7 @@ class App {
         element.style.background = 'white';
         document.body.appendChild(element);
 
-        // Налаштування
+        // Налаштування (PNG)
         const opt = {
             margin: 0,
             filename: `Receipt.png`,
@@ -1572,10 +1572,10 @@ class App {
         };
 
         try {
-            // 3. ОТРИМУЄМО САМЕ КАРТИНКУ (outputImg)
-            // Це повертає HTML-елемент <img>, в якому ВЖЕ є картинка
+            // 3. ОТРИМУЄМО КАРТИНКУ (outputImg)
+            // Увага: outputImg повертає готовий тег <img>
             const imgElement = await html2pdf().set(opt).from(element).outputImg();
-            const dataUri = imgElement.src; // Беремо з нього чистий код картинки
+            const dataUri = imgElement.src; // Беремо з нього код картинки (data:image/png...)
             
             // Підготуємо Blob для буфера
             const res = await fetch(dataUri);
@@ -1882,6 +1882,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
