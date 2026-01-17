@@ -1573,9 +1573,9 @@ class App {
 
         try {
             // 3. ОТРИМУЄМО САМЕ КАРТИНКУ (outputImg)
-            // Це повертає HTML-елемент <img>
+            // Це повертає HTML-елемент <img>, в якому ВЖЕ є картинка
             const imgElement = await html2pdf().set(opt).from(element).outputImg();
-            const dataUri = imgElement.src; // Беремо з нього код картинки
+            const dataUri = imgElement.src; // Беремо з нього чистий код картинки
             
             // Підготуємо Blob для буфера
             const res = await fetch(dataUri);
@@ -1882,6 +1882,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
