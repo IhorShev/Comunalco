@@ -1542,22 +1542,28 @@ class App {
         </div>`;
     }
 
-    // --- НОВИЙ ПІДХІД: ПОПЕРЕДНІЙ ПЕРЕГЛЯД ---
+   // --- ФІНАЛЬНА ВЕРСІЯ: ПЕРЕГЛЯД + КОПІЮВАННЯ (DataURI) ---
     sharePDF(i) {
+        // 1. Перевірка бібліотеки
+        if (typeof html2pdf === 'undefined') { 
+            alert('Зачекайте, компоненти завантажуються...'); 
+            return; 
+        }
+
         const apt = this.currentData.apartments[i];
         const month = new Date().toLocaleDateString('uk-UA', { month: 'long', year: 'numeric' });
         
-        // 1. Генеруємо HTML квитанції
+        // 2. Генеруємо HTML квитанції
         const receiptHTML = this.renderReceiptHTML(i);
 
-        // 2. Відкриваємо модальне вікно
+        // 3. Відкриваємо модальне вікно (щоб користувач бачив процес)
         this.openShareModal('Підготовка...');
         
-        // 3. Знаходимо нутрощі вікна
+        // 4. Отримуємо доступ до вмісту вікна
         const modalContent = document.querySelector('#shareModal .modal-content');
         if (!modalContent) return;
 
-        // 4. ПОВНІСТЮ ОЧИЩАЄМО ВІКНО і будуємо свій інтерфейс
+        // 5. Будуємо інтерфейс: Квитанція + Кнопки
         modalContent.innerHTML = `
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
                 <h3 style="margin:0; font-size:18px;">📄 Перегляд квитанції</h3>
@@ -1569,62 +1575,20 @@ class App {
             </div>
 
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                <button id="btn-copy-img" style="background:#8b5cf6; color:white; border:none; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
+                <button id="btn-copy-img" style="background:#8b5cf6; color:white; border:none; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:0.2s;">
                     📸 Скопіювати (Ctrl+V)
                 </button>
-                <button id="btn-download-pdf" style="background:#3b82f6; color:white; border:none; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
+                <button id="btn-download-pdf" style="background:#3b82f6; color:white; border:none; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:0.2s;">
                     💾 Скачати PDF
                 </button>
             </div>
             
             <div id="status-msg" style="margin-top:10px; font-size:12px; text-align:center; color:#64748b; min-height:20px;">
-                Оберіть дію вище
+                Оберіть дію
             </div>
         `;
 
-        // 5. ОЖИВЛЯЄМО КНОПКИ
-        
-        // А) КНОПКА "СКОПІЮВАТИ КАРТИНКУ"
-        document.getElementById('btn-copy-img').onclick = async () => {
-            const btn = document.getElementById('btn-copy-img');
-            const status = document.getElementById('status-msg');
-            const element = document.getElementById('receipt-preview-box');
-            
-            btn.innerHTML = '⏳ Обробка...';
-            
-            try {
-                // Використовуємо html2pdf як двигун для створення канвасу
-                // Це надійно, бо елемент видимий на екрані!
-                const canvas = await html2pdf().from(element).set({
-                    html2canvas: { scale: 2, useCORS: true, scrollY: 0 }
-                }).toCanvas();
-
-                canvas.toBlob(async (blob) => {
-                    try {
-                        const item = new ClipboardItem({ "image/png": blob });
-                        await navigator.clipboard.write([item]);
-                        
-                        // УСПІХ
-                        status.innerHTML = `<span style="color:#16a34a; font-weight:bold;">✅ Скопійовано! Відкрийте Viber і натисніть Ctrl+V</span>`;
-                        btn.innerHTML = '📸 Скопіювати ще раз';
-                        btn.style.background = '#10b981';
-                        
-                        // Копіюємо і текст заголовка
-                        navigator.clipboard.writeText(`🧾 Квитанція: ${apt.name} (${month})`);
-
-                    } catch (err) {
-                        // Якщо буфер заблокований
-                        status.innerHTML = `<span style="color:#ca8a04;">⚠️ Браузер не дав доступу. Натисніть ПРАВОЮ кнопкою на квитанцію -> Копіювати зображення.</span>`;
-                        btn.innerHTML = '⚠️ Спробуйте вручну';
-                    }
-                });
-            } catch (e) {
-                alert('Помилка: ' + e.message);
-                btn.innerHTML = '📸 Скопіювати (Ctrl+V)';
-            }
-        };
-
-       // А) КНОПКА "СКОПІЮВАТИ КАРТИНКУ" (FIXED)
+        // --- ЛОГІКА КНОПКИ "СКОПІЮВАТИ" (Виправлена під вашу версію бібліотеки) ---
         document.getElementById('btn-copy-img').onclick = async () => {
             const btn = document.getElementById('btn-copy-img');
             const status = document.getElementById('status-msg');
@@ -1643,15 +1607,16 @@ class App {
             status.innerHTML = 'Генеруємо знімок...';
 
             try {
-                // 1. Просимо бібліотеку дати нам КОД картинки (Base64)
-                // Це набагато стабільніше, ніж toCanvas()
+                // 1. Замість toCanvas (який глючить), просимо рядок DataURI
+                // Це працює стабільно на всіх версіях
                 const dataUrl = await html2pdf().set(opt).from(element).output('datauristring');
 
-                // 2. Перетворюємо код у справжній файл у пам'яті (Blob)
+                // 2. Перетворюємо цей рядок у справжній Blob (файл у пам'яті)
                 const res = await fetch(dataUrl);
                 const blob = await res.blob();
 
-                // 3. Пробуємо записати в буфер обміну
+                // 3. Записуємо Blob у буфер обміну
+                // Це вимагає HTTPS або localhost, на звичайному http може не спрацювати
                 const item = new ClipboardItem({ "image/png": blob });
                 await navigator.clipboard.write([item]);
                 
@@ -1659,28 +1624,53 @@ class App {
                 status.innerHTML = `<span style="color:#16a34a; font-weight:bold;">✅ Скопійовано! Відкрийте Viber і натисніть Ctrl+V</span>`;
                 btn.innerHTML = '✅ Готово!';
                 btn.style.background = '#10b981';
-                setTimeout(() => btn.innerHTML = '📸 Скопіювати ще раз', 3000);
                 
-                // Копіюємо текст заголовка
+                // Копіюємо текст заголовка в буфер тексту
                 navigator.clipboard.writeText(`🧾 Квитанція: ${apt.name} (${month})`);
+
+                setTimeout(() => {
+                    btn.innerHTML = '📸 Скопіювати ще раз';
+                    btn.style.background = '#8b5cf6';
+                }, 3000);
 
             } catch (err) {
                 console.error("Copy failed:", err);
                 
-                // ПЛАН Б: Якщо копіювання не вдалось - просто завантажуємо картинку
-                status.innerHTML = `<span style="color:#ca8a04;">⚠️ Авто-копіювання не спрацювало. Картинку завантажено.</span>`;
-                btn.innerHTML = '⬇️ Картинка завантажена';
+                // ПЛАН Б: Якщо браузер заборонив доступ до буфера
+                status.innerHTML = `<span style="color:#ca8a04;">⚠️ Браузер не дав доступу до буфера. Картинку завантажено.</span>`;
+                btn.innerHTML = '⬇️ Картинка збережена';
                 
-                // Створюємо посилання для скачування картинки (PNG)
-                // Ми використовуємо той самий element, тому треба перегенерувати
+                // Просто скачуємо картинку як файл
+                const link = document.createElement('a');
+                // Використовуємо html2pdf для отримання картинки
                 html2pdf().set(opt).from(element).outputImg().then(img => {
-                    const link = document.createElement('a');
                     link.href = img.src;
                     link.download = `Receipt_${apt.name}.png`;
                     link.click();
                 });
             }
         };
+
+        // --- ЛОГІКА КНОПКИ "СКАЧАТИ PDF" ---
+        document.getElementById('btn-download-pdf').onclick = () => {
+            const btn = document.getElementById('btn-download-pdf');
+            btn.innerHTML = '⏳ Завантаження...';
+            
+            const element = document.getElementById('receipt-preview-box');
+            const opt = {
+                margin: 0,
+                filename: `Receipt_${apt.name}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                 document.getElementById('status-msg').innerHTML = "✅ Файл збережено в 'Завантаження'";
+                 btn.innerHTML = '💾 Скачати PDF';
+            });
+        };
+    }
     startNewMonth() { 
         if (!confirm("⚠️ Закрити місяць?\n\n1. Поточні квитанції будуть збережені в Історію.\n2. Поля будуть очищені для нового місяця.")) return;
         // 1. Перевіряємо, чи є куди складати історію
@@ -1915,6 +1905,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
