@@ -1542,16 +1542,15 @@ class App {
         </div>`;
     }
 
-   // --- ФІНАЛ: МЕТОД "ПРОФЕСІЙНИЙ ФОТОГРАФ" ---
+   // --- ФІНАЛ: ВИПРАВЛЕННЯ КОПІЮВАННЯ (Тільки Картинка) ---
     async sharePDF(i) {
         const apt = this.currentData.apartments[i];
-        const month = new Date().toLocaleDateString('uk-UA', { month: 'long', year: 'numeric' });
-
+        
         // 1. ВІДКРИВАЄМО ВІКНО З ЛОАДЕРОМ
         this.openShareModal('<div style="padding:40px; text-align:center; color:#64748b;">⏳ <b>Вмикаємо фотоапарат...</b><br><span style="font-size:12px">Завантаження інструментів</span></div>');
 
         try {
-            // 2. АВТО-ЗАВАНТАЖЕННЯ html2canvas (якщо його немає)
+            // 2. АВТО-ЗАВАНТАЖЕННЯ html2canvas
             if (typeof html2canvas === 'undefined') {
                 await new Promise((resolve, reject) => {
                     const script = document.createElement('script');
@@ -1562,27 +1561,22 @@ class App {
                 });
             }
 
-            // 3. ГОТУЄМО КВИТАНЦІЮ (Приховано)
+            // 3. ГОТУЄМО КВИТАНЦІЮ
             const element = document.createElement('div');
             element.innerHTML = this.renderReceiptHTML(i);
-            // Важливо: білий фон і фіксований розмір для гарного фото
             element.style.cssText = 'position:fixed; top:0; left:-9999px; width:595px; background:white; z-index:9999; padding:0;';
             document.body.appendChild(element);
 
-            // 4. РОБИМО ФОТО (Скріншот)
-            // scale: 2 означає високу якість (Retina)
+            // 4. РОБИМО ФОТО
             const canvas = await html2canvas(element, { scale: 2, useCORS: true, logging: false });
-            
-            // Прибираємо квитанцію з екрану
             document.body.removeChild(element);
 
-            // 5. ОТРИМУЄМО РЕЗУЛЬТАТИ (Картинка і Blob)
-            const dataUri = canvas.toDataURL('image/png'); // Для показу на екрані
+            // 5. ОТРИМУЄМО РЕЗУЛЬТАТИ
+            const dataUri = canvas.toDataURL('image/png');
             
-            // Конвертуємо в Blob для буфера (це працює миттєво)
             canvas.toBlob(async (blob) => {
                 
-                // 6. ОНОВЛЮЄМО ВІКНО (Показуємо результат)
+                // 6. ОНОВЛЮЄМО ВІКНО
                 const modalContent = document.querySelector('#shareModal .modal-content');
                 if (modalContent) {
                     modalContent.innerHTML = `
@@ -1603,8 +1597,8 @@ class App {
                                 💾 Скачати
                             </button>
                         </div>
-                        <div id="status-line" style="margin-top:12px; text-align:center; font-size:13px; color:#64748b;">
-                            Натисніть "Скопіювати" -> Вставте у Viber (Ctrl+V)
+                        <div id="status-line" style="margin-top:12px; text-align:center; font-size:14px; color:#64748b;">
+                            Натисніть "Скопіювати", потім вставте у месенджер
                         </div>
                     `;
 
@@ -1614,21 +1608,23 @@ class App {
                         const st = document.getElementById('status-line');
 
                         try {
-                            // Працює, бо у вас є HTTPS!
+                            // 1. Копіюємо ТІЛЬКИ картинку
                             const item = new ClipboardItem({ "image/png": blob });
                             await navigator.clipboard.write([item]);
+                            
+                            // Ми прибрали копіювання тексту, щоб не збивати Telegram
 
+                            // 2. Оновлюємо інтерфейс
                             btn.style.background = '#10b981'; // Зелений
                             btn.innerHTML = '✅ Скопійовано!';
-                            st.innerHTML = '<b style="color:#16a34a">Успіх! Відкривайте Viber і тисніть Ctrl+V</b>';
                             
-                            // Копіюємо текст
-                            navigator.clipboard.writeText(`🧾 Квитанція: ${apt.name} (${month})`);
+                            // 3. Ваш новий текст
+                            st.innerHTML = '<b style="color:#16a34a">Успіх! Відкрийте месенджер, вставте адресату, відправте.</b>';
 
                         } catch (err) {
                             console.error(err);
                             btn.style.background = '#f59e0b';
-                            btn.innerHTML = '⚠️ Помилка буфера';
+                            btn.innerHTML = '⚠️ Помилка';
                             st.innerHTML = 'Браузер не дав доступу. Натисніть на картинку <b>Правою кнопкою -> Копіювати</b>.';
                         }
                     };
@@ -1883,6 +1879,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
