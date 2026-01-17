@@ -1542,17 +1542,18 @@ class App {
         </div>`;
     }
 
-    // --- TURBO-ВІДПРАВКА (FINAL: DATA URI + КРОКОВА ІНСТРУКЦІЯ) ---
+    // --- TURBO-ВІДПРАВКА (ARCHITECT EDITION) ---
     async sharePDF(i) {
         if (typeof html2pdf === 'undefined') { alert('Зачекайте, система готує інструменти...'); return; }
         
         const apt = this.currentData.apartments[i];
         const month = new Date().toLocaleDateString('uk-UA', { month: 'long', year: 'numeric' });
         
-        // 1. Створюємо "невидиму" квитанцію
+        // 1. Створюємо контейнер
         const element = document.createElement('div');
         element.innerHTML = this.renderReceiptHTML(i);
-        element.style.width = '595px'; 
+        // Фіксуємо розміри жорстко, щоб канвас не "поплив"
+        element.style.width = '794px'; // Ширина А4 в пікселях (96 DPI)
         element.style.position = 'fixed'; 
         element.style.left = '-9999px';
         element.style.top = '0';
@@ -1561,9 +1562,10 @@ class App {
         document.body.appendChild(element);
 
         const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
+        const msg = `🧾 Квитанція: ${apt.name} (${month})`;
 
         try {
-            // === ВАРІАНТ А: МОБІЛЬНИЙ (Файл PDF) ===
+            // === ВАРІАНТ А: МОБІЛЬНИЙ (Файл PDF - тут все стабільно) ===
             if (isMobile && navigator.canShare) {
                 const optMobile = {
                     margin: 0,
@@ -1575,57 +1577,57 @@ class App {
                 
                 const blob = await html2pdf().set(optMobile).from(element).output('blob');
                 const file = new File([blob], optMobile.filename, { type: 'application/pdf' });
-                const msg = `🧾 Квитанція: ${apt.name}\n📅 ${month}`;
                 
                 await navigator.share({ files: [file], title: 'Квитанція', text: msg });
             } 
             
-            // === ВАРІАНТ Б: НОУТБУК ===
+            // === ВАРІАНТ Б: НОУТБУК (Пряма робота з Canvas) ===
             else {
-                // Налаштування: PNG
-                const optPC = {
-                    margin: 0,
-                    filename: `Receipt_${apt.name}.png`,
-                    image: { type: 'png', quality: 1 }, 
-                    html2canvas: { scale: 2, useCORS: true },
-                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-                };
-
-                // 1. Отримуємо рядок Base64
-                const dataUri = await html2pdf().set(optPC).from(element).outputImg('datauristring');
-                
-                // Перетворюємо в Blob
-                const base64Response = await fetch(dataUri);
-                const blob = await base64Response.blob();
-
-                const msg = `🧾 Квитанція: ${apt.name} (${month})`;
-                
-                // Спочатку відкриваємо вікно
+                // ВІДКРИВАЄМО ВІКНО ВІДРАЗУ (щоб користувач бачив реакцію)
                 this.openShareModal(msg);
+                const instruction = document.querySelector('#shareModal p');
+                if (instruction) instruction.innerHTML = `<span style="color:#64748b;">⏳ Генеруємо зображення...</span>`;
 
-                try {
-                    const item = new ClipboardItem({ "image/png": blob });
-                    await navigator.clipboard.write([item]);
-                    
-                    // ✅ УСПІХ: Виводимо вашу нову інструкцію
-                    this.showToast("📸 Квитанцію скопійовано!");
-                    this.updateShareInstruction('success');
-                    navigator.clipboard.writeText(msg); 
+                // 1. Отримуємо ЧИСТИЙ CANVAS (без обгорток PDF)
+                // Використовуємо .toCanvas(), який є базою html2pdf
+                const canvas = await html2pdf().from(element).set({
+                    html2canvas: { scale: 1.5, useCORS: true, logging: false } // Scale 1.5 для швидкості і щоб не забивати пам'ять
+                }).toCanvas();
 
-                } catch (clipboardErr) {
-                    console.error("Clipboard blocked:", clipboardErr);
-                    
-                    // ⚠️ НЕВДАЧА: План Б
-                    this.showImageInModal(dataUri);
-                    this.updateShareInstruction('manual');
-                }
+                // 2. Конвертуємо Canvas у Blob (PNG) вручну (нативний JS)
+                canvas.toBlob(async (blob) => {
+                    if (!blob) { throw new Error("Canvas is empty"); }
+
+                    try {
+                        // 3. Спроба запису в буфер
+                        const item = new ClipboardItem({ "image/png": blob });
+                        await navigator.clipboard.write([item]);
+                        
+                        // УСПІХ
+                        this.showToast("📸 Скопійовано в буфер!");
+                        this.updateShareInstruction('success');
+                        navigator.clipboard.writeText(msg);
+
+                    } catch (clipboardErr) {
+                        console.warn("Clipboard blocked. Using Fallback.");
+                        
+                        // ПЛАН Б: Генеруємо DataURL для показу картинки
+                        const dataUrl = canvas.toDataURL("image/png");
+                        this.showImageInModal(dataUrl);
+                        this.updateShareInstruction('manual');
+                    }
+                }, 'image/png');
             }
 
         } catch (err) {
             console.error(err);
             alert("Помилка: " + err.message);
+            // Закриваємо модалку якщо критична помилка
+            document.getElementById('shareModal').style.display = 'none';
         } finally {
-            document.body.removeChild(element);
+            if (document.body.contains(element)) {
+                document.body.removeChild(element);
+            }
         }
     }
 
@@ -1633,8 +1635,8 @@ class App {
 
     showToast(text) {
         const toast = document.createElement('div');
-        toast.innerHTML = `<div style="display:flex; align-items:center; gap:10px;"><span style="font-size:24px;">📸</span><div style="font-weight:bold; font-size:14px;">${text}</div></div>`;
-        toast.style.cssText = "position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:#1e293b; color:white; padding:12px 20px; border-radius:12px; z-index:10000; box-shadow:0 10px 25px rgba(0,0,0,0.3); animation: fadeInUp 0.3s ease-out;";
+        toast.innerHTML = `<div style="display:flex; align-items:center; gap:10px;"><span style="font-size:20px;">✅</span><div style="font-weight:bold; font-size:14px;">${text}</div></div>`;
+        toast.style.cssText = "position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:#10b981; color:white; padding:12px 20px; border-radius:30px; z-index:10000; box-shadow:0 10px 25px rgba(0,0,0,0.2); animation: fadeInUp 0.3s ease-out;";
         document.body.appendChild(toast);
         setTimeout(() => { toast.style.opacity='0'; setTimeout(()=>toast.remove(), 500) }, 3000);
     }
@@ -1643,22 +1645,20 @@ class App {
         const instruction = document.querySelector('#shareModal p');
         if(!instruction) return;
 
-        // 👇 ОНОВЛЕНИЙ ТЕКСТ ТУТ 👇
         if (type === 'success') {
             instruction.innerHTML = `
-                <div style="background:#ecfdf5; border:1px solid #10b981; padding:10px; border-radius:8px; color:#065f46; font-size:13px; margin-bottom:10px; text-align:left;">
-                    ✅ <b>Квитанція вже у буфері!</b><br>
+                <div style="background:#f0fdf4; border:1px solid #16a34a; padding:12px; border-radius:8px; color:#15803d; font-size:13px; margin-bottom:15px; text-align:left;">
+                    🚀 <b>Все готово!</b><br>
                     1. Відкрийте месенджер.<br>
-                    2. Виберіть отримувача.<br>
+                    2. Оберіть контакт.<br>
                     3. Натисніть <b>Ctrl + V</b>.
                 </div>
-                Оберіть месенджер:
             `;
         } else if (type === 'manual') {
             instruction.innerHTML = `
-                <div style="background:#fff3cd; border:1px solid #ffecb5; padding:10px; border-radius:8px; color:#856404; font-size:13px; margin-bottom:10px; text-align:left;">
-                    ⚠️ <b>Авто-копіювання не спрацювало.</b><br>
-                    1. Натисніть на картинку нижче <b>Правою кнопкою</b>.<br>
+                <div style="background:#fffbeb; border:1px solid #f59e0b; padding:12px; border-radius:8px; color:#b45309; font-size:13px; margin-bottom:15px; text-align:left;">
+                    ⚠️ <b>Авто-копіювання заблоковано.</b><br>
+                    1. Натисніть <b>ПРАВОЮ кнопкою</b> на картинку нижче.<br>
                     2. Оберіть <b>"Копіювати зображення"</b>.<br>
                     3. Вставте в чат (Ctrl + V).
                 </div>
@@ -1674,10 +1674,15 @@ class App {
         const img = document.createElement('img');
         img.src = src;
         img.className = 'preview-img';
-        img.style.cssText = "width:100%; border:1px solid #ddd; border-radius:8px; margin-bottom:15px; display:block;";
+        // Стилі, щоб картинка влізла і була гарною
+        img.style.cssText = "width:100%; max-height:300px; object-fit:contain; border:1px solid #e2e8f0; border-radius:8px; margin-bottom:15px; display:block; background:#f8fafc;";
         
         const btnGrid = modalContent.querySelector('div[style*="display:grid"]');
-        modalContent.insertBefore(img, btnGrid);
+        if (btnGrid) {
+            modalContent.insertBefore(img, btnGrid);
+        } else {
+            modalContent.appendChild(img);
+        }
     }
     startNewMonth() { 
         if (!confirm("⚠️ Закрити місяць?\n\n1. Поточні квитанції будуть збережені в Історію.\n2. Поля будуть очищені для нового місяця.")) return;
@@ -1913,6 +1918,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
