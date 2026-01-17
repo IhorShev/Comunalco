@@ -1542,7 +1542,7 @@ class App {
         </div>`;
     }
 
-   // --- ФІНАЛЬНА СТАБІЛЬНА ВЕРСІЯ (DataURI) ---
+   // --- ФІНАЛ-ФІНАЛІВ: СТВОРЕННЯ КАРТИНКИ (PNG) ---
     async sharePDF(i) {
         if (typeof html2pdf === 'undefined') { alert('Зачекайте, система завантажується...'); return; }
         
@@ -1562,7 +1562,7 @@ class App {
         element.style.background = 'white';
         document.body.appendChild(element);
 
-        // Налаштування (PNG обов'язково для буфера)
+        // Налаштування
         const opt = {
             margin: 0,
             filename: `Receipt.png`,
@@ -1572,10 +1572,12 @@ class App {
         };
 
         try {
-            // 3. ОТРИМУЄМО КАРТИНКУ (Найнадійніший метод для вашої версії)
-            const dataUri = await html2pdf().set(opt).from(element).output('datauristring');
+            // 3. ОТРИМУЄМО САМЕ КАРТИНКУ (outputImg)
+            // Це повертає HTML-елемент <img>
+            const imgElement = await html2pdf().set(opt).from(element).outputImg();
+            const dataUri = imgElement.src; // Беремо з нього код картинки
             
-            // Конвертуємо в Blob заздалегідь (щоб кнопка працювала миттєво)
+            // Підготуємо Blob для буфера
             const res = await fetch(dataUri);
             const blob = await res.blob();
 
@@ -1593,10 +1595,10 @@ class App {
                     </div>
 
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                        <button id="btn-copy-stable" style="background:#8b5cf6; color:white; border:none; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center; gap:8px;">
+                        <button id="btn-copy-final" style="background:#8b5cf6; color:white; border:none; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center; gap:8px;">
                             🚀 Скопіювати
                         </button>
-                        <button id="btn-dl-stable" style="background:#3b82f6; color:white; border:none; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer; font-size:16px;">
+                        <button id="btn-dl-final" style="background:#3b82f6; color:white; border:none; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer; font-size:16px;">
                             💾 Скачати
                         </button>
                     </div>
@@ -1606,34 +1608,31 @@ class App {
                 `;
 
                 // --- ЛОГІКА КОПІЮВАННЯ ---
-                document.getElementById('btn-copy-stable').onclick = async () => {
-                    const btn = document.getElementById('btn-copy-stable');
+                document.getElementById('btn-copy-final').onclick = async () => {
+                    const btn = document.getElementById('btn-copy-final');
                     const st = document.getElementById('status-text');
 
                     try {
-                        // Спробуємо записати в буфер (вимагає HTTPS)
                         const item = new ClipboardItem({ "image/png": blob });
                         await navigator.clipboard.write([item]);
 
                         // УСПІХ
-                        btn.style.background = '#10b981'; // Зелений
+                        btn.style.background = '#10b981';
                         btn.innerHTML = '✅ Скопійовано!';
                         st.innerHTML = '<b style="color:#16a34a">Успіх! Тисніть Ctrl+V у чаті.</b>';
                         
-                        // Копіюємо текст-опис
                         navigator.clipboard.writeText(`🧾 Квитанція: ${apt.name} (${month})`);
 
                     } catch (err) {
                         console.error(err);
-                        // Якщо браузер блокує - ТІЛЬКИ ПОВІДОМЛЯЄМО (не качаємо!)
-                        btn.style.background = '#f59e0b'; // Жовтий
+                        btn.style.background = '#f59e0b';
                         btn.innerHTML = '⚠️ Увага';
                         st.innerHTML = '<span style="color:#b45309">Авто-копіювання не спрацювало.</span><br>Натисніть на картинку <b>Правою Кнопкою -> Копіювати</b>.';
                     }
                 };
 
-                // --- ЛОГІКА СКАЧУВАННЯ (Тільки якщо натиснули кнопку!) ---
-                document.getElementById('btn-dl-stable').onclick = () => {
+                // --- ЛОГІКА СКАЧУВАННЯ ---
+                document.getElementById('btn-dl-final').onclick = () => {
                     const link = document.createElement('a');
                     link.href = dataUri;
                     link.download = `Receipt_${apt.name}.png`;
@@ -1883,6 +1882,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
