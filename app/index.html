@@ -1542,94 +1542,107 @@ class App {
         </div>`;
     }
 
-    // --- TURBO-ВІДПРАВКА (ARCHITECT: RELIABLE MODE) ---
-    async sharePDF(i) {
-        // 1. Перевірка наявності бібліотеки
-        if (typeof html2pdf === 'undefined') { 
-            alert('Бібліотека PDF ще завантажується, спробуйте через секунду.'); 
-            return; 
-        }
-        
+    // --- НОВИЙ ПІДХІД: ПОПЕРЕДНІЙ ПЕРЕГЛЯД ---
+    sharePDF(i) {
         const apt = this.currentData.apartments[i];
         const month = new Date().toLocaleDateString('uk-UA', { month: 'long', year: 'numeric' });
         
-        // 2. Створюємо контейнер для чека
-        const element = document.createElement('div');
-        element.innerHTML = this.renderReceiptHTML(i);
-        element.style.width = '794px'; // A4 ширина
-        element.style.background = 'white'; 
-        // Ховаємо з очей, але залишаємо доступним для рендера
-        element.style.position = 'fixed'; 
-        element.style.left = '-9999px';
-        element.style.top = '0';
-        element.style.zIndex = '9999';
-        document.body.appendChild(element);
+        // 1. Генеруємо HTML квитанції
+        const receiptHTML = this.renderReceiptHTML(i);
 
-        const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
-        const fileName = `Receipt_${apt.name}_${Date.now()}.pdf`;
+        // 2. Відкриваємо модальне вікно
+        this.openShareModal('Підготовка...');
+        
+        // 3. Знаходимо нутрощі вікна
+        const modalContent = document.querySelector('#shareModal .modal-content');
+        if (!modalContent) return;
 
-        const opt = {
-            margin: 0,
-            filename: fileName,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        // 4. ПОВНІСТЮ ОЧИЩАЄМО ВІКНО і будуємо свій інтерфейс
+        modalContent.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h3 style="margin:0; font-size:18px;">📄 Перегляд квитанції</h3>
+                <span onclick="document.getElementById('shareModal').style.display='none'" style="cursor:pointer; font-size:24px;">&times;</span>
+            </div>
+
+            <div id="receipt-preview-box" style="border:1px solid #e2e8f0; border-radius:8px; padding:0; overflow:hidden; margin-bottom:20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+                ${receiptHTML}
+            </div>
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <button id="btn-copy-img" style="background:#8b5cf6; color:white; border:none; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
+                    📸 Скопіювати (Ctrl+V)
+                </button>
+                <button id="btn-download-pdf" style="background:#3b82f6; color:white; border:none; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
+                    💾 Скачати PDF
+                </button>
+            </div>
+            
+            <div id="status-msg" style="margin-top:10px; font-size:12px; text-align:center; color:#64748b; min-height:20px;">
+                Оберіть дію вище
+            </div>
+        `;
+
+        // 5. ОЖИВЛЯЄМО КНОПКИ
+        
+        // А) КНОПКА "СКОПІЮВАТИ КАРТИНКУ"
+        document.getElementById('btn-copy-img').onclick = async () => {
+            const btn = document.getElementById('btn-copy-img');
+            const status = document.getElementById('status-msg');
+            const element = document.getElementById('receipt-preview-box');
+            
+            btn.innerHTML = '⏳ Обробка...';
+            
+            try {
+                // Використовуємо html2pdf як двигун для створення канвасу
+                // Це надійно, бо елемент видимий на екрані!
+                const canvas = await html2pdf().from(element).set({
+                    html2canvas: { scale: 2, useCORS: true, scrollY: 0 }
+                }).toCanvas();
+
+                canvas.toBlob(async (blob) => {
+                    try {
+                        const item = new ClipboardItem({ "image/png": blob });
+                        await navigator.clipboard.write([item]);
+                        
+                        // УСПІХ
+                        status.innerHTML = `<span style="color:#16a34a; font-weight:bold;">✅ Скопійовано! Відкрийте Viber і натисніть Ctrl+V</span>`;
+                        btn.innerHTML = '📸 Скопіювати ще раз';
+                        btn.style.background = '#10b981';
+                        
+                        // Копіюємо і текст заголовка
+                        navigator.clipboard.writeText(`🧾 Квитанція: ${apt.name} (${month})`);
+
+                    } catch (err) {
+                        // Якщо буфер заблокований
+                        status.innerHTML = `<span style="color:#ca8a04;">⚠️ Браузер не дав доступу. Натисніть ПРАВОЮ кнопкою на квитанцію -> Копіювати зображення.</span>`;
+                        btn.innerHTML = '⚠️ Спробуйте вручну';
+                    }
+                });
+            } catch (e) {
+                alert('Помилка: ' + e.message);
+                btn.innerHTML = '📸 Скопіювати (Ctrl+V)';
+            }
         };
 
-        try {
-            // === ВАРІАНТ А: МОБІЛЬНИЙ (Нативна відправка) ===
-            if (isMobile && navigator.canShare) {
-                const blob = await html2pdf().set(opt).from(element).output('blob');
-                const file = new File([blob], fileName, { type: 'application/pdf' });
-                const msg = `🧾 Квитанція: ${apt.name}\n📅 ${month}`;
-                
-                await navigator.share({ files: [file], title: 'Квитанція', text: msg });
-            } 
+        // Б) КНОПКА "СКАЧАТИ PDF"
+        document.getElementById('btn-download-pdf').onclick = () => {
+            const btn = document.getElementById('btn-download-pdf');
+            btn.innerHTML = '⏳ Завантаження...';
             
-            // === ВАРІАНТ Б: НОУТБУК (Залізобетонний метод) ===
-            else {
-                // 1. Примусово зберігаємо файл (це ніколи не глючить)
-                html2pdf().set(opt).from(element).save();
+            const element = document.getElementById('receipt-preview-box');
+            const opt = {
+                margin: 0,
+                filename: `Receipt_${apt.name}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
 
-                // 2. Відкриваємо вікно з підказкою
-                const msg = `🧾 Квитанція: ${apt.name} (${month})`;
-                this.openShareModal(msg);
-
-                // 3. Пишемо просту і чесну інструкцію
-                const instruction = document.querySelector('#shareModal p');
-                const textArea = document.getElementById('share-text-area');
-
-                if (instruction) {
-                    instruction.innerHTML = `
-                        <div style="background:#f0f9ff; border:1px solid #0ea5e9; padding:15px; border-radius:12px; color:#0369a1; font-size:14px; text-align:left; line-height:1.5;">
-                            ✅ <b>Квитанцію завантажено!</b><br>
-                            (Дивіться в "Завантаженнях" браузера)<br><br>
-                            👉 <b>Просто перетягніть файл</b> у Viber/Telegram.
-                        </div>
-                    `;
-                }
-                
-                // Копіюємо текст опису в буфер, щоб було зручно вставити підпис
-                navigator.clipboard.writeText(msg);
-                if (textArea) textArea.value = msg;
-                
-                // Маленька спливашка для підтвердження
-                const toast = document.createElement('div');
-                toast.innerHTML = "⬇️ Файл збережено!";
-                toast.style.cssText = "position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:#0f172a; color:white; padding:10px 20px; border-radius:30px; z-index:10000; animation: fadeInUp 0.5s;";
-                document.body.appendChild(toast);
-                setTimeout(() => toast.remove(), 3000);
-            }
-
-        } catch (err) {
-            console.error(err);
-            alert("Помилка: " + err.message);
-        } finally {
-            // Завжди чистимо сміття
-            setTimeout(() => {
-                if(document.body.contains(element)) document.body.removeChild(element);
-            }, 1000);
-        }
+            html2pdf().set(opt).from(element).save().then(() => {
+                 document.getElementById('status-msg').innerHTML = "✅ Файл збережено в 'Завантаження'";
+                 btn.innerHTML = '💾 Скачати PDF';
+            });
+        };
     }
     startNewMonth() { 
         if (!confirm("⚠️ Закрити місяць?\n\n1. Поточні квитанції будуть збережені в Історію.\n2. Поля будуть очищені для нового місяця.")) return;
@@ -1865,6 +1878,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
