@@ -1796,7 +1796,7 @@ window.addEventListener('load', () => {
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-  import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+  import { getDatabase, ref, set, update, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js"; [cite_start]// [cite: 519] Додали 'update'
 
   const firebaseConfig = {
     apiKey: "AIzaSyDWFMF95PiGQmclQPkvvb7gvvkZT_lzMCI",
@@ -1808,13 +1808,18 @@ window.addEventListener('load', () => {
     appId: "1:157109120062:web:112cf7680fb68ac3bab56f",
     measurementId: "G-L50LMQFZP8"
   };
+
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getDatabase(app);
   const provider = new GoogleAuthProvider();
 
+  // 🔥 ОСЬ ЦЕ ГОЛОВНА ЗМІНА: Робимо інструменти доступними глобально
+  window.firebase = { db, ref, set, update, onValue, auth, provider, signInWithPopup, signOut };
+  // ------------------------------------------------------------------
+
   window.currentUser = null;
-  let isRestoring = false; // Прапорець "Зараз йде відновлення"
+  let isRestoring = false;
 
   window.googleLogin = () => {
     if (window.currentUser) {
@@ -1823,19 +1828,14 @@ window.addEventListener('load', () => {
         signInWithPopup(auth, provider).catch(e => alert(e.message));
     }
   };
-  // ФУНКЦІЯ ЗБЕРЕЖЕННЯ (З ЗАХИСТОМ)
+
   window.cloudSave = (data) => {
-      // 1. Якщо юзера немає — стоп.
-      // 2. Якщо зараз йде процес відновлення з хмари — стоп (щоб не перезаписати хмару пустотою).
       if(!window.currentUser || isRestoring) return;
-      // 3. Захист від дурня: якщо випадково намагаємось зберегти "голий" об'єкт, а в хмарі було багато
-      if(data.objects.length === 1 && data.objects[0].apartments.length === 1) {
-          // Це виглядає як пустий дефолтний стан.
-          // Не зберігаємо його автоматично, поки не переконаємось.
-          console.log("Auto-save skipped: Data looks empty/default.");
+      // Простий захист від перезапису пустими даними
+      if(data.objects.length === 1 && data.objects[0].apartments.length === 1 && data.objects[0].apartments[0].curr.ed === 0) {
+          console.log("Skipped auto-save of empty default data");
           return;
       }
-
       set(ref(db, 'users/' + window.currentUser.uid), data)
         .then(() => console.log("☁️ Saved"))
         .catch(e => console.error(e));
@@ -1843,32 +1843,20 @@ window.addEventListener('load', () => {
 
   onAuthStateChanged(auth, (user) => {
     const btn = document.getElementById('auth-btn');
-    
     if (user) {
       window.currentUser = user;
-      if(btn) { btn.innerText = `🟢 ${user.displayName.split(' ')[0]}`; btn.style.borderColor = 'var(--success)'; }
+      if(btn) { btn.innerText = `🟢 ${user.email}`; btn.style.borderColor = 'var(--success)'; }
 
-      // 🔥 ВІДНОВЛЕННЯ ДАНИХ 🔥
+      // Якщо я ВЛАСНИК, завантажую свої дані (логіку для гостя додамо пізніше)
       const userRef = ref(db, 'users/' + user.uid);
-      
       onValue(userRef, (snapshot) => {
-        if (snapshot.exists()) {
-            const cloudData = snapshot.val();
-            
-            // Якщо локальні дані відрізняються від хмарних — беремо хмарні!
-            // Особливо якщо локально у нас "пусто", а в хмарі є квартири.
-            if (window.app) {
-                console.log("🔄 ВІДНОВЛЮЮ ДАНІ З ХМАРИ...");
-                isRestoring = true; // Блокуємо збереження на секунду
-                
-                window.app.state = cloudData;
-                localStorage.setItem(window.app.STORAGE_KEY, JSON.stringify(cloudData));
-                window.app.renderAll();
-                window.app.updateStatus();
-                
-                // Знімаємо блокування
-                setTimeout(() => { isRestoring = false; }, 2000);
-            }
+        if (snapshot.exists() && window.app) {
+            console.log("🔄 Sync from cloud...");
+            isRestoring = true;
+            window.app.state = snapshot.val();
+            window.app.renderAll();
+            window.app.updateStatus();
+            setTimeout(() => { isRestoring = false; }, 2000);
         }
       });
     } else {
@@ -1879,6 +1867,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
