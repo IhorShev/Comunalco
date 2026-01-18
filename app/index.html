@@ -1790,6 +1790,79 @@ class App {
             btn.disabled = false; btn.innerText = "OK";
         }
     }
+    // --- 🛡 ФУНКЦІЯ ЗАХИСТУ ІНТЕРФЕЙСУ ---
+    applyRoleRestrictions() {
+        // Якщо роль не визначена або я Власник/Менеджер - нічого не ховаємо
+        if (!window.currentRole || window.currentRole === 'owner' || window.currentRole === 'manager') return;
+
+        console.log(`🔒 Застосовую обмеження для ролі: ${window.currentRole}`);
+
+        // 1. Приховуємо "небезпечні" кнопки в шапці (Видалити, Налаштування)
+        const deleteBtn = document.querySelector('span[title="Видалити об\'єкт"]');
+        if(deleteBtn) deleteBtn.style.display = 'none';
+        
+        const addObjBtn = document.querySelector('div[title="Додати об\'єкт"]');
+        if(addObjBtn) addObjBtn.style.display = 'none';
+
+        // 2. Приховуємо Меню Тарифів та Доступу (вгорі)
+        const topMenu = document.querySelectorAll('.desktop-only span');
+        topMenu.forEach(el => {
+            if(el.innerText.includes('Тарифи') || el.innerText.includes('Доступ')) {
+                el.style.display = 'none';
+            }
+        });
+        const mobMenu = document.getElementById('mobile-dropdown');
+        if(mobMenu) {
+            if(mobMenu.children[0]) mobMenu.children[0].style.display = 'none'; // Тарифи
+            if(mobMenu.children[3]) mobMenu.children[3].style.display = 'none'; // Доступ
+        }
+
+        // 3. Блокуємо редагування тарифів
+        const inputs = document.querySelectorAll('details input');
+        inputs.forEach(inp => inp.disabled = true);
+        
+        // 4. СПЕЦИФІКА ДЛЯ МЕШКАНЦЯ (TENANT)
+        if (window.currentRole === 'tenant' && window.currentAptId) {
+            const apartmentsDiv = document.getElementById('apartments-container');
+            const allApts = apartmentsDiv.querySelectorAll('details');
+            
+            allApts.forEach((details, index) => {
+                const aptData = this.currentData.apartments[index];
+                if (aptData.id != window.currentAptId) {
+                    details.style.display = 'none'; 
+                } else {
+                    details.open = true;
+                    const summary = details.querySelector('summary');
+                    if(summary) summary.innerHTML = `<div>🏠 <b>Ваша квартира</b></div>`;
+                }
+            });
+
+            const addAptBtn = document.querySelector('button[onclick="app.addApartment()"]');
+            if(addAptBtn) addAptBtn.parentElement.style.display = 'none';
+
+            const groupsContainer = document.getElementById('groups-container');
+            if(groupsContainer) groupsContainer.style.display = 'none';
+            
+            const addGroupBtn = document.querySelector('button[onclick="app.addGroup()"]');
+            if(addGroupBtn) addGroupBtn.parentElement.style.display = 'none';
+        }
+
+        // 5. Візуальний стиль "Тільки читання"
+        document.body.classList.add('archive-mode');
+        const style = document.createElement('style');
+        style.innerHTML = `
+            body.archive-mode { border-color: var(--primary); }
+            body.archive-mode::before { 
+                content: "👀 РЕЖИМ ПЕРЕГЛЯДУ (Ви увійшли як Мешканець)"; 
+                background: var(--primary); 
+            }
+            .del-icon { display: none !important; }
+        `;
+        document.head.appendChild(style);
+        
+        const saveBtn = document.querySelector('.sticky-footer button.btn-warning');
+        if(saveBtn) saveBtn.style.display = 'none';
+    }
 }
 window.app = new App();
 
@@ -1884,6 +1957,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
