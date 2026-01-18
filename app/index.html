@@ -979,24 +979,26 @@ class App {
         }
     }
 
-    grantUserAccess() {
+   grantUserAccess() {
         const emailInput = document.getElementById('new-user-email');
-        const email = emailInput.value.trim();
+        // Приводимо до нижнього регістру, щоб не було проблем (User@gmail.com != user@gmail.com)
+        const email = emailInput.value.trim().toLowerCase();
         
         if(!email || !email.includes('@')) { alert("Введіть коректний Email (Gmail)!"); return; }
         
+        // 1. Зберігаємо локально для відображення в списку (стара логіка)
         if(!this.currentData.users) this.currentData.users = [];
         
         let label = "Весь об'єкт";
-        let aptNameForMsg = "Всі квартири";
+        let aptId = null; // ID квартири для мешканця
         
+        // Якщо обрали роль "Мешканець", дізнаємось, яка квартира
         if(this.selectedRole === 'tenant') {
             const aptSelect = document.getElementById('access-apt-select');
             if(aptSelect) {
-                const aptId = aptSelect.value;
+                aptId = aptSelect.value; // Зберігаємо ID
                 const aptObj = this.currentData.apartments.find(a => a.id == aptId);
                 label = aptObj ? aptObj.name : 'Квартира';
-                aptNameForMsg = label;
             }
         }
 
@@ -1004,32 +1006,52 @@ class App {
             id: Date.now(),
             email: email,
             role: this.selectedRole,
-            accessLabel: label
+            accessLabel: label,
+            aptId: aptId // Запам'ятовуємо ID квартири
         };
-
-        this.currentData.users.push(newUser);
-        this.save();
-        this.renderUserList();
-        emailInput.value = '';
-
-        // --- 🔥 НОВИЙ ОФІЦІЙНИЙ ТЕКСТ 🔥 ---
-        const roleNames = { 'manager': '🛠 Менеджер', 'tenant': '🏠 Мешканець', 'viewer': '👀 Гість' };
-        const roleName = roleNames[this.selectedRole];
-        const link = "https://comunalco.com";
         
-        const msg = `👋 Вам надано доступ!\n\n🏢 Об'єкт: ${this.currentData.name}\n🔑 Роль: ${aptNameForMsg} (${roleName})\n\n👇 Вхід:\n🌍 ${link}\n📧 Логін: ${email}`;
+        this.currentData.users.push(newUser);
+        this.save(); // Зберігаємо список "users" в основний файл
+        this.renderUserList();
 
-        // --- РОЗУМНА ВІДПРАВКА ---
-        // Якщо це мобільний телефон - використовуємо рідне меню
-        if (navigator.share && /Android|iPhone|iPad/i.test(navigator.userAgent)) {
-             if(confirm(`Користувача додано! Відкрити месенджер?`)) {
-                 navigator.share({ title: 'Запрошення', text: msg, url: link }).catch(e => console.log('Share canceled'));
-             }
-        } else {
-            // Якщо це НОУТБУК - відкриваємо наше нове вікно
-            this.openShareModal(msg);
+        // 2. 🔥 НОВЕ: Записуємо права доступу в системні папки Firebase
+        if (window.currentUser && window.firebase) {
+            const fb = window.firebase;
+            const ownerUid = window.currentUser.uid;
+            
+            // Firebase забороняє крапки в ключах, тому замінюємо '.' на ','
+            // Наприклад: ivan.test@gmail.com -> ivan,test@gmail,com
+            const safeEmail = email.replace(/\./g, ',');
+
+            const updates = {};
+            
+            // Запис 1: В папку ACL (Access Control List)
+            // "У мене (Власника) цей email має таку роль"
+            updates[`acl/${ownerUid}/${safeEmail}`] = {
+                role: this.selectedRole,
+                aptId: aptId || false // Якщо менеджер - то false (доступ до всього)
+            };
+
+            // Запис 2: В папку INVITES
+            // "Цей email запрошений до мене"
+            updates[`invites/${safeEmail}/${ownerUid}`] = true;
+
+            // Відправляємо все одним пакетом
+            fb.update(fb.ref(fb.db), updates)
+                .then(() => console.log("✅ Доступ записано в хмару"))
+                .catch(err => alert("Помилка запису в хмару: " + err.message));
         }
-    }
+
+        emailInput.value = '';
+        
+        // Формуємо повідомлення для месенджера
+        const roleNames = { 'manager': '🛠 Менеджер', 'tenant': '🏠 Мешканець' };
+        const roleName = roleNames[this.selectedRole];
+        const link = "https://comunalco.com"; // Твоє посилання
+        const msg = `👋 Вам надано доступ!\n\n🏢 Об'єкт: ${this.currentData.name}\n🔑 Роль: ${label} (${roleName})\n\n👇 Вхід:\n🌍 ${link}\n📧 Увійдіть через Google пошта: ${email}`;
+        
+        this.openShareModal(msg);
+    } 
 
     deleteUserAccess(id) {
         if(!confirm("Забрати доступ у цього користувача?")) return;
@@ -1862,6 +1884,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
