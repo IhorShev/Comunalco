@@ -493,23 +493,18 @@
             <input type="email" id="new-user-email" placeholder="email@gmail.com" style="margin-bottom:10px;">
             
             <label>Оберіть роль:</label>
-            <div class="role-selector">
-                <div class="role-card selected" onclick="app.selectRole(this, 'manager')">
-                    <span class="role-icon">🛠</span>
-                    <span class="role-name">Менеджер</span>
-                    <span class="role-desc">Повний доступ (Вхід+Квартири)</span>
-                </div>
-                <div class="role-card" onclick="app.selectRole(this, 'tenant')">
-                    <span class="role-icon">🏠</span>
-                    <span class="role-name">Мешканець</span>
-                    <span class="role-desc">Тільки своя квартира</span>
-                </div>
-                <div class="role-card" onclick="app.selectRole(this, 'viewer')">
-                    <span class="role-icon">👀</span>
-                    <span class="role-name">Гість</span>
-                    <span class="role-desc">Тільки перегляд (без змін)</span>
-                </div>
-            </div>
+<div class="role-selector">
+    <div class="role-card selected" onclick="app.selectRole(this, 'manager')">
+        <span class="role-icon">🛠</span>
+        <span class="role-name">Менеджер</span>
+        <span class="role-desc">Повний доступ (помічник)</span>
+    </div>
+    <div class="role-card" onclick="app.selectRole(this, 'tenant')">
+        <span class="role-icon">🏠</span>
+        <span class="role-name">Мешканець</span>
+        <span class="role-desc">Тільки перегляд своєї кв.</span>
+    </div>
+</div>
 
             <div id="apt-selector-block" style="display:none; margin-bottom:10px;">
                 <label>До якої квартири?</label>
@@ -1867,6 +1862,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
