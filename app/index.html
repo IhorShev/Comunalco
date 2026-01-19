@@ -612,9 +612,8 @@ class App {
     }
 
     openMenu(id) {
-        if (id === 'history') { 
-            if (this.renderHistory) this.renderHistory();
-            else alert("Помилка: Функція історії ще не додана!");
+        if (id === 'history') {
+            this.openHistory();
             return;
         }
         document.getElementById('menuModal').style.display='flex';
@@ -2144,6 +2143,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
