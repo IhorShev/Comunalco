@@ -462,7 +462,7 @@
             <div style="flex:1;">
                 <label style="font-size:11px; color:var(--text-sec); display:block; margin-bottom:4px;">Об'єкт</label>
                 <select id="chart-selector" onchange="app.updateChart()" style="width:100%; padding:8px; font-weight:bold; background:var(--input-bg); color:var(--text); border:1px solid var(--border); border-radius:8px;">
-                    <option value="group">🏢 Вхідна Група</option>
+                    <option value="group">🏢 Загальнобудинкові (МЗК)</option>
                 </select>
             </div>
             <div style="flex:1;">
@@ -682,7 +682,7 @@ class App {
             tariffs: { el_d: 4.32, el_n: 2.16, w: 30.0, g: 8.0 }, 
             extra_tariffs: [], 
             requisites: [{ id: 1, name: "Картка", val: "" }],
-            groups: [{ id: 1, name: "Вхідна Група", prev: { ed: 0, en: 0, w: 0, g: 0 }, curr: { ed: 0, en: 0, w: 0, g: 0 }, custom_counters: [], services: [] }],
+            groups: [{ id: 1, name: "Загальнобудинкові (МЗК)", prev: { ed: 0, en: 0, w: 0, g: 0 }, curr: { ed: 0, en: 0, w: 0, g: 0 }, custom_counters:
             apartments: [{ id: 1, name: "Кв. 1", group_id: 1, messenger: 'viber', email: '', phone: '', prev: { ed: 0, en: 0, w: 0, g: 0 }, curr: { ed: 0, en: 0, w: 0, g: 0 }, custom_counters: [], services: [], paid: 0, debt: 0 }]
         };
     }
@@ -791,7 +791,7 @@ class App {
 
         // Наповнюємо список об'єктів
         const selector = document.getElementById('chart-selector');
-        let opts = `<option value="group">🏢 Вхідна Група (МЗК + Квартири)</option>`;
+        let opts = `<option value="group">🏢 Загальнобудинкові (МЗК + Квартири)</option>`;
         this.currentData.apartments.forEach((a) => {
             opts += `<option value="${a.id}">🏠 ${a.name}</option>`;
         });
@@ -1957,6 +1957,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
