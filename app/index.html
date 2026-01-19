@@ -626,107 +626,7 @@ class App {
         if(id === 'premium') this.renderTariffs();
     }
 
-    // --- ФУНКЦІЯ ІСТОРІЇ (З захистом від помилок і кнопкою видалення) ---
-    openHistory() {
-        const modal = document.getElementById('historyModal');
-        let content = modal.querySelector('.history-list'); 
-        
-        // Створюємо контейнер, якщо його немає
-        if(!content) {
-             content = modal.querySelector('.modal-content div');
-             if(!content) {
-                 const c = document.createElement('div');
-                 c.className = 'history-list';
-                 modal.querySelector('.modal-content').appendChild(c);
-                 content = c;
-             }
-        }
-        
-        // Перевірка на порожню історію
-        if (!this.currentData.history || this.currentData.history.length === 0) {
-            content.innerHTML = '<p style="text-align:center; color:var(--text-sec); padding:20px;">Історія порожня 🤷‍♂️</p>';
-            modal.style.display = 'flex';
-            return;
-        }
-
-        let html = '<div style="display:flex; flex-direction:column; gap:10px; max-height:60vh; overflow-y:auto;">';
-        
-        // Розгортаємо масив (нові зверху)
-        [...this.currentData.history].reverse().forEach(h => {
-            
-            // 1. ВИПРАВЛЕННЯ ДАТИ (Якщо дата "бита", пишемо "Дата невідома")
-            let dateStr = "Дата невідома";
-            if (h.date) {
-                const d = new Date(h.date);
-                if (!isNaN(d.getTime())) dateStr = d.toLocaleDateString();
-            } else if (h.id && !isNaN(new Date(h.id).getTime())) {
-                dateStr = new Date(h.id).toLocaleDateString();
-            }
-
-            let sumDisplay = 0;
-            let titleDisplay = "";
-            let showRow = true;
-
-            // 2. ФІЛЬТР (Хто дивиться?)
-            if (window.currentRole === 'tenant' && window.currentAptId) {
-                // МЕШКАНЕЦЬ: бачить тільки себе
-                if (h.apartments && Array.isArray(h.apartments)) {
-                    const myAptSnapshot = h.apartments.find(a => a.id == window.currentAptId);
-                    if (myAptSnapshot) {
-                        sumDisplay = myAptSnapshot.bill || 0; 
-                        titleDisplay = `Нараховано за місяць`;
-                    } else {
-                        showRow = false; 
-                    }
-                } else {
-                    showRow = false; // Старий формат не показуємо
-                }
-            } else {
-                // ВЛАСНИК: бачить загальну суму
-                sumDisplay = h.total_bill || 0;
-                titleDisplay = `Всього по об'єкту (${h.apartments ? h.apartments.length : 0} кв.)`;
-            }
-
-            // 3. КНОПКА ВИДАЛЕННЯ (Тільки для Власника)
-            let deleteBtn = "";
-            // Показуємо хрестик, якщо це власник або роль не визначена (адмін)
-            if (!window.currentRole || window.currentRole === 'owner') {
-                deleteBtn = `<div onclick="app.deleteHistoryItem(${h.id})" style="cursor:pointer; padding:5px 10px; color:var(--danger); font-size:18px; font-weight:bold;" title="Видалити запис">✖</div>`;
-            }
-
-            if (showRow) {
-                html += `
-                <div style="background:var(--bg); padding:12px; border-radius:10px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
-                    <div style="flex:1;">
-                        <div style="font-weight:bold; font-size:14px; color:var(--text);">📅 ${dateStr}</div>
-                        <div style="font-size:11px; color:var(--text-sec); margin-top:2px;">${titleDisplay}</div>
-                    </div>
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <div style="font-weight:bold; font-size:16px; color:var(--primary);">
-                            ${sumDisplay.toFixed(2)} грн
-                        </div>
-                        ${deleteBtn}
-                    </div>
-                </div>`;
-            }
-        });
-
-        html += '</div>';
-        content.innerHTML = html;
-        modal.style.display = 'flex';
-    }
-
-    // --- ФУНКЦІЯ ВИДАЛЕННЯ ЗАПИСУ ---
-    deleteHistoryItem(id) {
-        if(!confirm("Ви впевнені, що хочете видалити цей запис?")) return;
-        
-        // Видаляємо елемент з масиву
-        this.currentData.history = this.currentData.history.filter(h => h.id !== id);
-        
-        this.save();       // Зберігаємо в базу
-        this.openHistory(); // Оновлюємо список
-    }
-
+    
     loadHistoryItem(index) {
         if(!confirm("⚠️ Увага! Режим ПЕРЕГЛЯДУ архіву.\nЗміни тут не зберігаються.\nОновіть сторінку для виходу.")) return;
         
@@ -1960,11 +1860,12 @@ class App {
         const saveBtn = document.querySelector('.sticky-footer button.btn-warning');
         if(saveBtn) saveBtn.style.display = 'none';
     }
-   // --- ФУНКЦІЯ ІСТОРІЇ (Розумна: фільтрує дані для мешканця) ---
+   // --- ФУНКЦІЯ ІСТОРІЇ (З ВЕЛИКОЮ ЧЕРВОНОЮ КНОПКОЮ) ---
     openHistory() {
         const modal = document.getElementById('historyModal');
-        // Знаходимо або створюємо контейнер для списку
         let content = modal.querySelector('.history-list'); 
+        
+        // Створюємо контейнер
         if(!content) {
              content = modal.querySelector('.modal-content div');
              if(!content) {
@@ -1983,42 +1884,58 @@ class App {
 
         let html = '<div style="display:flex; flex-direction:column; gap:10px; max-height:60vh; overflow-y:auto;">';
         
-        // Розгортаємо масив (нові зверху)
         [...this.currentData.history].reverse().forEach(h => {
-            let date = new Date(h.date).toLocaleDateString();
+            
+            // 1. РЕМОНТ ДАТИ
+            let dateStr = "Дата невідома";
+            if (h.date) {
+                const d = new Date(h.date);
+                if (!isNaN(d.getTime())) dateStr = d.toLocaleDateString();
+            } else if (h.id && !isNaN(new Date(h.id).getTime())) {
+                dateStr = new Date(h.id).toLocaleDateString();
+            }
+
+            // 2. РЕМОНТ ID (Якщо ID зник, створюємо тимчасовий, щоб можна було видалити)
+            if(!h.id) h.id = Date.now() + Math.random();
+
             let sumDisplay = 0;
             let titleDisplay = "";
             let showRow = true;
 
-            // --- ЛОГІКА ФІЛЬТРУВАННЯ ---
+            // Логіка відображення
             if (window.currentRole === 'tenant' && window.currentAptId) {
-                // Я МЕШКАНЕЦЬ: Шукаю ТІЛЬКИ свою квартиру
-                if (h.apartments) {
+                if (h.apartments && Array.isArray(h.apartments)) {
                     const myAptSnapshot = h.apartments.find(a => a.id == window.currentAptId);
                     if (myAptSnapshot) {
                         sumDisplay = myAptSnapshot.bill || 0; 
                         titleDisplay = `Нараховано за місяць`;
-                    } else {
-                        showRow = false; // Мене тоді ще не було
-                    }
-                } else {
-                    showRow = false;
-                }
+                    } else { showRow = false; }
+                } else { showRow = false; }
             } else {
-                // Я ВЛАСНИК: Загальна каса
                 sumDisplay = h.total_bill || 0;
                 titleDisplay = `Всього по об'єкту (${h.apartments ? h.apartments.length : 0} кв.)`;
             }
 
+            // 3. КНОПКА ВИДАЛЕННЯ (ПРИМУСОВА!)
+            // Стиль: червона рамка, червоний текст, жирний шрифт
+            let deleteBtn = `
+                <div onclick="event.stopPropagation(); app.deleteHistoryItem(${h.id})" 
+                     style="cursor:pointer; padding:5px 10px; margin-left:10px; border:2px solid red; border-radius:5px; color:red; font-weight:bold; font-size:12px; background:rgba(255,0,0,0.1);">
+                     🗑 ВИДАЛИТИ
+                </div>`;
+
             if (showRow) {
                 html += `
                 <div style="background:var(--bg); padding:12px; border-radius:10px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
-                    <div>
-                        <div style="font-weight:bold; font-size:14px; color:var(--text);">📅 ${date}</div>
+                    <div style="flex:1;">
+                        <div style="font-weight:bold; font-size:14px; color:var(--text);">📅 ${dateStr}</div>
                         <div style="font-size:11px; color:var(--text-sec); margin-top:2px;">${titleDisplay}</div>
                     </div>
-                    <div style="font-weight:bold; font-size:16px; color:var(--primary);">
-                        ${sumDisplay.toFixed(2)} грн
+                    <div style="display:flex; align-items:center;">
+                        <div style="font-weight:bold; font-size:16px; color:var(--primary);">
+                            ${sumDisplay.toFixed(2)} грн
+                        </div>
+                        ${deleteBtn}
                     </div>
                 </div>`;
             }
@@ -2027,6 +1944,14 @@ class App {
         html += '</div>';
         content.innerHTML = html;
         modal.style.display = 'flex';
+    }
+
+    // --- ФУНКЦІЯ ВИДАЛЕННЯ ---
+    deleteHistoryItem(id) {
+        if(!confirm("Видалити цей запис?")) return;
+        this.currentData.history = this.currentData.history.filter(h => h.id !== id);
+        this.save();
+        this.openHistory();
     } 
 }
 window.app = new App();
@@ -2187,6 +2112,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
