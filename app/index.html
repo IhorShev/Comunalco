@@ -1958,7 +1958,7 @@ window.addEventListener('load', () => {
 
   window.currentUser = null;
   let isRestoring = false;
-  // Тимчасові змінні для збереження даних про запрошення
+  // Змінна для збереження даних про знайдене запрошення
   let pendingInviteData = null; 
 
   window.googleLogin = () => {
@@ -1972,8 +1972,6 @@ window.addEventListener('load', () => {
   window.cloudSave = (data) => {
       if(!window.currentUser || isRestoring) return;
       if(window.currentRole && window.currentRole !== 'owner' && window.currentRole !== 'manager') return;
-      
-      // Захист від перезапису пустими даними
       if(data.objects.length === 1 && data.objects[0].apartments.length === 1 && (!data.objects[0].apartments[0].curr || data.objects[0].apartments[0].curr.ed === 0)) return;
 
       set(ref(db, 'users/' + window.currentUser.uid), data)
@@ -1981,13 +1979,14 @@ window.addEventListener('load', () => {
         .catch(e => console.error(e));
   };
 
-  // --- 🔥 ЛОГІКА ВИБОРУ РОЛІ 🔥 ---
-  // Цю функцію ми викликаємо з кнопок у новому вікні
+  // --- 🔥 БЕЗПЕЧНА ЛОГІКА ВИБОРУ РОЛІ 🔥 ---
   window.app.loginAs = (role) => {
-      document.getElementById('roleChoiceModal').style.display = 'none';
+      // Ховаємо вікно вибору
+      const modal = document.getElementById('roleChoiceModal');
+      if(modal) modal.style.display = 'none';
       
       if (role === 'guest' && pendingInviteData) {
-          // --- ЗАВАНТАЖУЄМО ЧУЖІ ДАНІ ---
+          // --- ВХІД ЯК МЕШКАНЕЦЬ ---
           const { ownerUid, safeEmail } = pendingInviteData;
           console.log(`🔑 Вхід як Гість до: ${ownerUid}`);
 
@@ -2003,6 +2002,7 @@ window.addEventListener('load', () => {
                           window.app.state = dataSnap.val();
                           window.app.renderAll();
                           window.app.updateStatus();
+                          // Запускаємо режим обмежень (синій банер)
                           if(window.app.applyRoleRestrictions) window.app.applyRoleRestrictions();
                           setTimeout(() => { isRestoring = false; }, 2000);
                       }
@@ -2010,19 +2010,18 @@ window.addEventListener('load', () => {
               }
           });
       } else {
-          // --- ЗАВАНТАЖУЄМО СВОЇ ДАНІ (Власник) ---
+          // --- ВХІД ЯК ВЛАСНИК ---
           console.log("👤 Вхід як Власник");
           window.currentRole = 'owner';
           window.currentAptId = null;
           
-          // Прибираємо обмеження (якщо були)
+          // Прибираємо синій банер (якщо він раптом був)
           document.body.classList.remove('archive-mode');
-          // Видаляємо стиль архіву, якщо він був доданий динамічно
-          const styleAr = document.querySelector('style'); 
-          if(styleAr && styleAr.innerHTML.includes('archive-mode')) styleAr.remove();
 
+          // Оновлюємо інтерфейс
           if(window.app.renderAll) window.app.renderAll();
 
+          // Завантажуємо власні дані
           onValue(ref(db, `users/${window.currentUser.uid}`), (snapshot) => {
             if (snapshot.exists() && window.app) {
                 isRestoring = true;
@@ -2044,22 +2043,22 @@ window.addEventListener('load', () => {
 
       const safeEmail = (user.email || "").toLowerCase().replace(/\./g, ',');
       
-      // 1. ПЕРЕВІРЯЄМО, ЧИ Є ЗАПРОШЕННЯ
+      // Перевіряємо, чи є запрошення для цього емейлу
       onValue(ref(db, `invites/${safeEmail}`), (inviteSnap) => {
           if (inviteSnap.exists()) {
-              // ❗ Є ЗАПРОШЕННЯ! 
+              // Знайшли запрошення!
               pendingInviteData = {
                   ownerUid: Object.keys(inviteSnap.val())[0],
                   safeEmail: safeEmail
               };
               
-              // Якщо ми ще не обрали роль (це перший вхід), показуємо вікно
+              // Якщо роль ще не обрана, показуємо вікно вибору
               if (!window.currentRole) {
-                  document.getElementById('roleChoiceModal').style.display = 'flex';
+                  const modal = document.getElementById('roleChoiceModal');
+                  if(modal) modal.style.display = 'flex';
               }
-              
           } else {
-              // НЕМАЄ ЗАПРОШЕНЬ -> Автоматично йдемо як Власник
+              // Запрошень немає — автоматично входимо як Власник
               window.app.loginAs('owner');
           }
       }, { onlyOnce: true });
@@ -2073,6 +2072,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
