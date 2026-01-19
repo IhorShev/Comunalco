@@ -1917,6 +1917,74 @@ class App {
         const saveBtn = document.querySelector('.sticky-footer button.btn-warning');
         if(saveBtn) saveBtn.style.display = 'none';
     }
+   // --- ФУНКЦІЯ ІСТОРІЇ (Розумна: фільтрує дані для мешканця) ---
+    openHistory() {
+        const modal = document.getElementById('historyModal');
+        // Знаходимо або створюємо контейнер для списку
+        let content = modal.querySelector('.history-list'); 
+        if(!content) {
+             content = modal.querySelector('.modal-content div');
+             if(!content) {
+                 const c = document.createElement('div');
+                 c.className = 'history-list';
+                 modal.querySelector('.modal-content').appendChild(c);
+                 content = c;
+             }
+        }
+        
+        if (!this.currentData.history || this.currentData.history.length === 0) {
+            content.innerHTML = '<p style="text-align:center; color:var(--text-sec); padding:20px;">Історія порожня 🤷‍♂️</p>';
+            modal.style.display = 'flex';
+            return;
+        }
+
+        let html = '<div style="display:flex; flex-direction:column; gap:10px; max-height:60vh; overflow-y:auto;">';
+        
+        // Розгортаємо масив (нові зверху)
+        [...this.currentData.history].reverse().forEach(h => {
+            let date = new Date(h.date).toLocaleDateString();
+            let sumDisplay = 0;
+            let titleDisplay = "";
+            let showRow = true;
+
+            // --- ЛОГІКА ФІЛЬТРУВАННЯ ---
+            if (window.currentRole === 'tenant' && window.currentAptId) {
+                // Я МЕШКАНЕЦЬ: Шукаю ТІЛЬКИ свою квартиру
+                if (h.apartments) {
+                    const myAptSnapshot = h.apartments.find(a => a.id == window.currentAptId);
+                    if (myAptSnapshot) {
+                        sumDisplay = myAptSnapshot.bill || 0; 
+                        titleDisplay = `Нараховано за місяць`;
+                    } else {
+                        showRow = false; // Мене тоді ще не було
+                    }
+                } else {
+                    showRow = false;
+                }
+            } else {
+                // Я ВЛАСНИК: Загальна каса
+                sumDisplay = h.total_bill || 0;
+                titleDisplay = `Всього по об'єкту (${h.apartments ? h.apartments.length : 0} кв.)`;
+            }
+
+            if (showRow) {
+                html += `
+                <div style="background:var(--bg); padding:12px; border-radius:10px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <div style="font-weight:bold; font-size:14px; color:var(--text);">📅 ${date}</div>
+                        <div style="font-size:11px; color:var(--text-sec); margin-top:2px;">${titleDisplay}</div>
+                    </div>
+                    <div style="font-weight:bold; font-size:16px; color:var(--primary);">
+                        ${sumDisplay.toFixed(2)} грн
+                    </div>
+                </div>`;
+            }
+        });
+
+        html += '</div>';
+        content.innerHTML = html;
+        modal.style.display = 'flex';
+    } 
 }
 window.app = new App();
 
@@ -2076,6 +2144,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
