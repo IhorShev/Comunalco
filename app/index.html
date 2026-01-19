@@ -547,26 +547,26 @@
     </div>
 </div>
 <div id="roleChoiceModal" class="modal" style="z-index: 5000; background: var(--bg);">
-    <div class="modal-content" style="text-align:center; max-width: 350px;">
-        <h3 style="margin-top:0;">👋 З поверненням!</h3>
+    <div class="modal-content" style="text-align:center; max-width: 350px; background: var(--card); border: 1px solid var(--border);">
+        <h3 style="margin-top:0; color: var(--text);">🔥 З поверненням!</h3>
         <p style="color:var(--text-sec); font-size:13px; margin-bottom:20px;">
             Ми знайшли запрошення для вас.<br>Як ви хочете увійти?
         </p>
         
         <div style="display:flex; flex-direction:column; gap:10px;">
-            <button onclick="app.loginAs('owner')" class="role-card selected" style="padding:15px; border:2px solid var(--primary); text-align:left; display:flex; align-items:center; gap:15px; width:100%; box-sizing:border-box;">
+            <button onclick="app.loginAs('owner')" class="role-card selected" style="padding:15px; border:2px solid var(--primary); background: transparent; text-align:left; display:flex; align-items:center; gap:15px; width:100%; box-sizing:border-box; cursor:pointer;">
                 <span style="font-size:24px;">👑</span>
                 <div>
-                    <div style="font-weight:bold; font-size:14px;">Я Власник</div>
+                    <div style="font-weight:bold; font-size:14px; color: var(--text);">Мої Об'єкти</div>
                     <div style="font-size:11px; color:var(--text-sec);">Увійти в мій кабінет</div>
                 </div>
             </button>
 
-            <button onclick="app.loginAs('guest')" class="role-card" style="padding:15px; border:2px solid var(--success); text-align:left; display:flex; align-items:center; gap:15px; width:100%; box-sizing:border-box;">
+            <button onclick="app.loginAs('guest')" class="role-card" style="padding:15px; border:2px solid var(--success); background: transparent; text-align:left; display:flex; align-items:center; gap:15px; width:100%; box-sizing:border-box; cursor:pointer;">
                 <span style="font-size:24px;">🏠</span>
                 <div>
-                    <div style="font-weight:bold; font-size:14px;">Я Мешканець/Гість</div>
-                    <div style="font-size:11px; color:var(--text-sec);">Перегляд чужого об'єкту</div>
+                     <div style="font-weight:bold; font-size:14px; color: var(--text);">Моя Квартира</div>
+                    <div style="font-size:11px; color:var(--text-sec);">Перегляд квартири, яку я орендую</div>
                 </div>
             </button>
         </div>
@@ -627,49 +627,60 @@ class App {
         if(id === 'premium') this.renderTariffs();
     }
 
-    renderHistory() {
-        // 1. Знаходимо елементи
-        const list = document.getElementById('history-list');
+    openHistory() {
         const modal = document.getElementById('historyModal');
-
-        // 2. Якщо вікна немає (але воно має бути!), виходимо
-        if (!list || !modal) return;
-
-        const h = this.currentData.history || [];
+        const content = modal.querySelector('.modal-content div');
         
-        // 3. Малюємо список
-        if (h.length === 0) {
-            list.innerHTML = `<div style="text-align:center; padding:30px; color:var(--text-sec); opacity:0.7;">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:10px;"><circle cx="12" cy="12" r="10"/><path d="M16 16s-1.5-2-4-2c-3.6 0-4.6 2-4.6 2"/></svg>
-                <br>Архів поки що порожній.<br>Закрийте поточний місяць.
-            </div>`;
-        } else {
-            list.innerHTML = h.map((item, i) => {
-                let total = 0;
-                (item.apartments || []).forEach(a => {
-                    const c = { ed: (a.curr.ed||0)-(a.prev.ed||0), en: (a.curr.en||0)-(a.prev.en||0), w: (a.curr.w||0)-(a.prev.w||0), g: (a.curr.g||0)-(a.prev.g||0) };
-                    const t = item.tariffs;
-                    total += (c.ed*(t.el_d||0))+(c.en*(t.el_n||0))+(c.w*(t.w||0))+(c.g*(t.g||0));
-                });
-                return `
-                <div class="card" style="border-left:4px solid var(--text-sec); padding:15px; margin-bottom:10px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <div>
-                            <div style="font-weight:800; font-size:16px;">${item.monthName}</div>
-                            <div style="font-size:11px; color:var(--text-sec); margin-top:4px;">📅 ${item.date} • 🏠 ${item.apartments.length} кв.</div>
-                        </div>
-                        <div style="text-align:right;">
-                            <div style="font-weight:bold; font-size:15px; color:var(--primary);">~${total.toFixed(0)} грн</div>
-                            <button class="btn btn-sm btn-outline" onclick="app.loadHistoryItem(${i})" style="margin-top:6px; font-size:11px; padding: 4px 10px;">👁 Переглянути</button>
-                        </div>
+        if (!this.currentData.history || this.currentData.history.length === 0) {
+            content.innerHTML = '<p style="text-align:center; color:var(--text-sec)">Історія порожня</p>';
+            modal.style.display = 'flex';
+            return;
+        }
+
+        let html = '<div style="display:flex; flex-direction:column; gap:10px;">';
+        
+        [...this.currentData.history].reverse().forEach(h => {
+            let date = new Date(h.date).toLocaleDateString();
+            let sumDisplay = 0;
+            let titleDisplay = "";
+            let showRow = true;
+
+            // --- ЛОГІКА ФІЛЬТРУВАННЯ ---
+            if (window.currentRole === 'tenant' && window.currentAptId) {
+                // Я МЕШКАНЕЦЬ: Шукаю ТІЛЬКИ свою квартиру
+                if (h.apartments) {
+                    const myAptSnapshot = h.apartments.find(a => a.id == window.currentAptId);
+                    if (myAptSnapshot) {
+                        sumDisplay = myAptSnapshot.bill || 0; // Тільки моя сума
+                        titleDisplay = `Нараховано за місяць`;
+                    } else {
+                        showRow = false; // Мене тоді ще не було
+                    }
+                } else {
+                    showRow = false;
+                }
+            } else {
+                // Я ВЛАСНИК: Загальна каса
+                sumDisplay = h.total_bill || 0;
+                titleDisplay = `Всього по об'єкту`;
+            }
+
+            if (showRow) {
+                html += `
+                <div style="background:var(--bg); padding:10px; border-radius:8px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <div style="font-weight:bold; font-size:14px;">📅 ${date}</div>
+                        <div style="font-size:11px; color:var(--text-sec);">${titleDisplay}</div>
+                    </div>
+                    <div style="font-weight:bold; font-size:16px; color:var(--primary);">
+                        ${sumDisplay.toFixed(2)} грн
                     </div>
                 </div>`;
-            }).join('');
-        }
-        
-        // 4. Відкриваємо вікно
-        const menuM = document.getElementById('menuModal'); 
-        if(menuM) menuM.style.display = 'none';
+            }
+        });
+
+        html += '</div>';
+        content.innerHTML = html;
         modal.style.display = 'flex';
     }
 
@@ -1842,51 +1853,55 @@ class App {
     }
     // --- 🛡 ФУНКЦІЯ ЗАХИСТУ ІНТЕРФЕЙСУ ---
     applyRoleRestrictions() {
-        // Якщо роль не визначена або я Власник/Менеджер - нічого не ховаємо
         if (!window.currentRole || window.currentRole === 'owner' || window.currentRole === 'manager') return;
 
-        console.log(`🔒 Застосовую обмеження для ролі: ${window.currentRole}`);
-
-        // 1. Приховуємо "небезпечні" кнопки в шапці (Видалити, Налаштування)
+        // 1. Приховуємо кнопки управління (Видалити, Додати)
         const deleteBtn = document.querySelector('span[title="Видалити об\'єкт"]');
         if(deleteBtn) deleteBtn.style.display = 'none';
         
         const addObjBtn = document.querySelector('div[title="Додати об\'єкт"]');
         if(addObjBtn) addObjBtn.style.display = 'none';
 
-        // 2. Приховуємо Меню Тарифів та Доступу (вгорі)
+        // 2. Приховуємо ТІЛЬКИ Тарифи та Доступ (Історію залишаємо!)
         const topMenu = document.querySelectorAll('.desktop-only span');
         topMenu.forEach(el => {
-            if(el.innerText.includes('Тарифи') || el.innerText.includes('Доступ')) {
+            const txt = el.innerText;
+            if(txt.includes('Тарифи') || txt.includes('Доступ')) {
                 el.style.display = 'none';
             }
         });
+        
         const mobMenu = document.getElementById('mobile-dropdown');
         if(mobMenu) {
             if(mobMenu.children[0]) mobMenu.children[0].style.display = 'none'; // Тарифи
+            // Історію НЕ чіпаємо
             if(mobMenu.children[3]) mobMenu.children[3].style.display = 'none'; // Доступ
         }
 
-        // 3. Блокуємо редагування тарифів
+        // 3. Блокуємо інпути тарифів
         const inputs = document.querySelectorAll('details input');
         inputs.forEach(inp => inp.disabled = true);
         
-        // 4. СПЕЦИФІКА ДЛЯ МЕШКАНЦЯ (TENANT)
+        // 4. СПЕЦИФІКА ДЛЯ МЕШКАНЦЯ
         if (window.currentRole === 'tenant' && window.currentAptId) {
             const apartmentsDiv = document.getElementById('apartments-container');
             const allApts = apartmentsDiv.querySelectorAll('details');
             
             allApts.forEach((details, index) => {
                 const aptData = this.currentData.apartments[index];
+                
+                // Ховаємо чужі квартири
                 if (aptData.id != window.currentAptId) {
                     details.style.display = 'none'; 
                 } else {
                     details.open = true;
+                    // 👇 ТУТ МИ ПОВЕРТАЄМО ОРИГІНАЛЬНУ НАЗВУ КВАРТИРИ
                     const summary = details.querySelector('summary');
-                    if(summary) summary.innerHTML = `<div>🏠 <b>Ваша квартира</b></div>`;
+                    if(summary) summary.innerHTML = `<div>🏠 <b>${aptData.name}</b></div>`;
                 }
             });
 
+            // Ховаємо кнопки додавання квартир/груп
             const addAptBtn = document.querySelector('button[onclick="app.addApartment()"]');
             if(addAptBtn) addAptBtn.parentElement.style.display = 'none';
 
@@ -1897,19 +1912,8 @@ class App {
             if(addGroupBtn) addGroupBtn.parentElement.style.display = 'none';
         }
 
-        // 5. Візуальний стиль "Тільки читання"
+        // 5. Стиль перегляду
         document.body.classList.add('archive-mode');
-        const style = document.createElement('style');
-        style.innerHTML = `
-            body.archive-mode { border-color: var(--primary); }
-            body.archive-mode::before { 
-                content: "👀 РЕЖИМ ПЕРЕГЛЯДУ (Ви увійшли як Мешканець)"; 
-                background: var(--primary); 
-            }
-            .del-icon { display: none !important; }
-        `;
-        document.head.appendChild(style);
-        
         const saveBtn = document.querySelector('.sticky-footer button.btn-warning');
         if(saveBtn) saveBtn.style.display = 'none';
     }
@@ -2072,6 +2076,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
