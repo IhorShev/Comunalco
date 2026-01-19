@@ -1920,7 +1920,7 @@ class App {
         const saveBtn = document.querySelector('.sticky-footer button.btn-warning');
         if(saveBtn) saveBtn.style.display = 'none';
     }
-   // --- ФУНКЦІЯ ІСТОРІЇ (З ВЕЛИКОЮ ЧЕРВОНОЮ КНОПКОЮ) ---
+   // --- ФУНКЦІЯ ІСТОРІЇ (Фінальна: Видалення тільки для Власника) ---
     openHistory() {
         const modal = document.getElementById('historyModal');
         let content = modal.querySelector('.history-list'); 
@@ -1955,7 +1955,7 @@ class App {
                 dateStr = new Date(h.id).toLocaleDateString();
             }
 
-            // 2. РЕМОНТ ID (Якщо ID зник, створюємо тимчасовий, щоб можна було видалити)
+            // 2. РЕМОНТ ID
             if(!h.id) h.id = Date.now() + Math.random();
 
             let sumDisplay = 0;
@@ -1964,25 +1964,31 @@ class App {
 
             // Логіка відображення
             if (window.currentRole === 'tenant' && window.currentAptId) {
+                // --- МЕШКАНЕЦЬ ---
                 if (h.apartments && Array.isArray(h.apartments)) {
                     const myAptSnapshot = h.apartments.find(a => a.id == window.currentAptId);
                     if (myAptSnapshot) {
+                        // Показуємо збережену суму (bill) або перераховуємо, якщо старий запис
                         sumDisplay = myAptSnapshot.bill || 0; 
                         titleDisplay = `Нараховано за місяць`;
                     } else { showRow = false; }
                 } else { showRow = false; }
             } else {
+                // --- ВЛАСНИК ---
                 sumDisplay = h.total_bill || 0;
                 titleDisplay = `Всього по об'єкту (${h.apartments ? h.apartments.length : 0} кв.)`;
             }
 
-            // 3. КНОПКА ВИДАЛЕННЯ (ПРИМУСОВА!)
-            // Стиль: червона рамка, червоний текст, жирний шрифт
-            let deleteBtn = `
+            // 3. КНОПКА ВИДАЛЕННЯ (ТІЛЬКИ ДЛЯ ВЛАСНИКА)
+            let deleteBtn = "";
+            // Перевірка: Якщо ролі немає (адмін) АБО роль = owner
+            if (!window.currentRole || window.currentRole === 'owner') {
+                deleteBtn = `
                 <div onclick="event.stopPropagation(); app.deleteHistoryItem(${h.id})" 
-                     style="cursor:pointer; padding:5px 10px; margin-left:10px; border:2px solid red; border-radius:5px; color:red; font-weight:bold; font-size:12px; background:rgba(255,0,0,0.1);">
-                     🗑 ВИДАЛИТИ
+                     style="cursor:pointer; padding:5px 10px; margin-left:10px; border:1px solid var(--danger); border-radius:5px; color:var(--danger); font-weight:bold; font-size:11px; opacity:0.7;">
+                     🗑
                 </div>`;
+            }
 
             if (showRow) {
                 html += `
@@ -2172,6 +2178,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
