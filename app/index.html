@@ -546,6 +546,32 @@
         </div>
     </div>
 </div>
+<div id="roleChoiceModal" class="modal" style="z-index: 5000; background: var(--bg);">
+    <div class="modal-content" style="text-align:center; max-width: 350px;">
+        <h3 style="margin-top:0;">👋 З поверненням!</h3>
+        <p style="color:var(--text-sec); font-size:13px; margin-bottom:20px;">
+            Ми знайшли запрошення для вас.<br>Як ви хочете увійти?
+        </p>
+        
+        <div style="display:flex; flex-direction:column; gap:10px;">
+            <button onclick="app.loginAs('owner')" class="role-card selected" style="padding:15px; border:2px solid var(--primary); text-align:left; display:flex; align-items:center; gap:15px; width:100%; box-sizing:border-box;">
+                <span style="font-size:24px;">👑</span>
+                <div>
+                    <div style="font-weight:bold; font-size:14px;">Я Власник</div>
+                    <div style="font-size:11px; color:var(--text-sec);">Увійти в мій кабінет</div>
+                </div>
+            </button>
+
+            <button onclick="app.loginAs('guest')" class="role-card" style="padding:15px; border:2px solid var(--success); text-align:left; display:flex; align-items:center; gap:15px; width:100%; box-sizing:border-box;">
+                <span style="font-size:24px;">🏠</span>
+                <div>
+                    <div style="font-weight:bold; font-size:14px;">Я Мешканець/Гість</div>
+                    <div style="font-size:11px; color:var(--text-sec);">Перегляд чужого об'єкту</div>
+                </div>
+            </button>
+        </div>
+    </div>
+</div>
     
 <script>
 class App {
@@ -1928,11 +1954,12 @@ window.addEventListener('load', () => {
   const db = getDatabase(app);
   const provider = new GoogleAuthProvider();
 
-  // 🔥 ВАЖЛИВО: Експортуємо інструменти для роботи запрошень
   window.firebase = { db, ref, set, update, onValue, auth, provider, signInWithPopup, signOut };
 
   window.currentUser = null;
   let isRestoring = false;
+  // Тимчасові змінні для збереження даних про запрошення
+  let pendingInviteData = null; 
 
   window.googleLogin = () => {
     if (window.currentUser) {
@@ -1944,19 +1971,70 @@ window.addEventListener('load', () => {
 
   window.cloudSave = (data) => {
       if(!window.currentUser || isRestoring) return;
-      // Захист від перезапису пустими даними
-      if(data.objects.length === 1 && data.objects[0].apartments.length === 1 && (!data.objects[0].apartments[0].curr || data.objects[0].apartments[0].curr.ed === 0)) {
-          return; 
-      }
-      // Мешканець не може зберігати в корінь (це блокується правилами, але про всяк випадок)
       if(window.currentRole && window.currentRole !== 'owner' && window.currentRole !== 'manager') return;
+      
+      // Захист від перезапису пустими даними
+      if(data.objects.length === 1 && data.objects[0].apartments.length === 1 && (!data.objects[0].apartments[0].curr || data.objects[0].apartments[0].curr.ed === 0)) return;
 
       set(ref(db, 'users/' + window.currentUser.uid), data)
         .then(() => console.log("☁️ Saved"))
         .catch(e => console.error(e));
   };
 
-  // 🔥 ГОЛОВНА ЛОГІКА ВХОДУ 🔥
+  // --- 🔥 ЛОГІКА ВИБОРУ РОЛІ 🔥 ---
+  // Цю функцію ми викликаємо з кнопок у новому вікні
+  window.app.loginAs = (role) => {
+      document.getElementById('roleChoiceModal').style.display = 'none';
+      
+      if (role === 'guest' && pendingInviteData) {
+          // --- ЗАВАНТАЖУЄМО ЧУЖІ ДАНІ ---
+          const { ownerUid, safeEmail } = pendingInviteData;
+          console.log(`🔑 Вхід як Гість до: ${ownerUid}`);
+
+          onValue(ref(db, `acl/${ownerUid}/${safeEmail}`), (aclSnap) => {
+              if(aclSnap.exists()) {
+                  const perm = aclSnap.val();
+                  window.currentRole = perm.role;
+                  window.currentAptId = perm.aptId;
+                  
+                  onValue(ref(db, `users/${ownerUid}`), (dataSnap) => {
+                      if (dataSnap.exists() && window.app) {
+                          isRestoring = true;
+                          window.app.state = dataSnap.val();
+                          window.app.renderAll();
+                          window.app.updateStatus();
+                          if(window.app.applyRoleRestrictions) window.app.applyRoleRestrictions();
+                          setTimeout(() => { isRestoring = false; }, 2000);
+                      }
+                  });
+              }
+          });
+      } else {
+          // --- ЗАВАНТАЖУЄМО СВОЇ ДАНІ (Власник) ---
+          console.log("👤 Вхід як Власник");
+          window.currentRole = 'owner';
+          window.currentAptId = null;
+          
+          // Прибираємо обмеження (якщо були)
+          document.body.classList.remove('archive-mode');
+          // Видаляємо стиль архіву, якщо він був доданий динамічно
+          const styleAr = document.querySelector('style'); 
+          if(styleAr && styleAr.innerHTML.includes('archive-mode')) styleAr.remove();
+
+          if(window.app.renderAll) window.app.renderAll();
+
+          onValue(ref(db, `users/${window.currentUser.uid}`), (snapshot) => {
+            if (snapshot.exists() && window.app) {
+                isRestoring = true;
+                window.app.state = snapshot.val();
+                window.app.renderAll();
+                window.app.updateStatus();
+                setTimeout(() => { isRestoring = false; }, 2000);
+            }
+          });
+      }
+  };
+
   onAuthStateChanged(auth, (user) => {
     const btn = document.getElementById('auth-btn');
     
@@ -1966,50 +2044,23 @@ window.addEventListener('load', () => {
 
       const safeEmail = (user.email || "").toLowerCase().replace(/\./g, ',');
       
-      // 1. ПЕРЕВІРЯЄМО ЗАПРОШЕННЯ (invites)
+      // 1. ПЕРЕВІРЯЄМО, ЧИ Є ЗАПРОШЕННЯ
       onValue(ref(db, `invites/${safeEmail}`), (inviteSnap) => {
           if (inviteSnap.exists()) {
-              // --- Я ГІСТЬ/МЕШКАНЕЦЬ ---
-              const ownerUid = Object.keys(inviteSnap.val())[0];
-              console.log(`🔑 Знайдено запрошення від: ${ownerUid}`);
-
-              // Дізнаємось роль
-              onValue(ref(db, `acl/${ownerUid}/${safeEmail}`), (aclSnap) => {
-                  if(aclSnap.exists()) {
-                      const perm = aclSnap.val();
-                      window.currentRole = perm.role;
-                      window.currentAptId = perm.aptId;
-                      
-                      // Завантажуємо дані ВЛАСНИКА
-                      onValue(ref(db, `users/${ownerUid}`), (dataSnap) => {
-                          if (dataSnap.exists() && window.app) {
-                              console.log("📥 Guest Mode: Loaded owner data");
-                              isRestoring = true;
-                              window.app.state = dataSnap.val();
-                              window.app.renderAll();
-                              window.app.updateStatus();
-                              
-                              // Запускаємо візуальний захист
-                              if(window.app.applyRoleRestrictions) window.app.applyRoleRestrictions();
-                              
-                              setTimeout(() => { isRestoring = false; }, 2000);
-                          }
-                      });
-                  }
-              });
+              // ❗ Є ЗАПРОШЕННЯ! 
+              pendingInviteData = {
+                  ownerUid: Object.keys(inviteSnap.val())[0],
+                  safeEmail: safeEmail
+              };
+              
+              // Якщо ми ще не обрали роль (це перший вхід), показуємо вікно
+              if (!window.currentRole) {
+                  document.getElementById('roleChoiceModal').style.display = 'flex';
+              }
+              
           } else {
-              // --- Я ВЛАСНИК (Звичайний вхід) ---
-              console.log("👤 Owner Mode");
-              window.currentRole = 'owner';
-              onValue(ref(db, `users/${user.uid}`), (snapshot) => {
-                if (snapshot.exists() && window.app) {
-                    isRestoring = true;
-                    window.app.state = snapshot.val();
-                    window.app.renderAll();
-                    window.app.updateStatus();
-                    setTimeout(() => { isRestoring = false; }, 2000);
-                }
-              });
+              // НЕМАЄ ЗАПРОШЕНЬ -> Автоматично йдемо як Власник
+              window.app.loginAs('owner');
           }
       }, { onlyOnce: true });
 
@@ -2022,6 +2073,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
