@@ -1928,9 +1928,8 @@ window.addEventListener('load', () => {
   const db = getDatabase(app);
   const provider = new GoogleAuthProvider();
 
-  // 🔥 ОСЬ ЦЕ ГОЛОВНА ЗМІНА: Робимо інструменти доступними глобально
+  // 🔥 ВАЖЛИВО: Експортуємо інструменти для роботи запрошень
   window.firebase = { db, ref, set, update, onValue, auth, provider, signInWithPopup, signOut };
-  // ------------------------------------------------------------------
 
   window.currentUser = null;
   let isRestoring = false;
@@ -1945,36 +1944,78 @@ window.addEventListener('load', () => {
 
   window.cloudSave = (data) => {
       if(!window.currentUser || isRestoring) return;
-      // Простий захист від перезапису пустими даними
-      if(data.objects.length === 1 && data.objects[0].apartments.length === 1 && data.objects[0].apartments[0].curr.ed === 0) {
-          console.log("Skipped auto-save of empty default data");
-          return;
+      // Захист від перезапису пустими даними
+      if(data.objects.length === 1 && data.objects[0].apartments.length === 1 && (!data.objects[0].apartments[0].curr || data.objects[0].apartments[0].curr.ed === 0)) {
+          return; 
       }
+      // Мешканець не може зберігати в корінь (це блокується правилами, але про всяк випадок)
+      if(window.currentRole && window.currentRole !== 'owner' && window.currentRole !== 'manager') return;
+
       set(ref(db, 'users/' + window.currentUser.uid), data)
         .then(() => console.log("☁️ Saved"))
         .catch(e => console.error(e));
   };
 
+  // 🔥 ГОЛОВНА ЛОГІКА ВХОДУ 🔥
   onAuthStateChanged(auth, (user) => {
     const btn = document.getElementById('auth-btn');
+    
     if (user) {
       window.currentUser = user;
       if(btn) { btn.innerText = `🟢 ${user.email}`; btn.style.borderColor = 'var(--success)'; }
 
-      // Якщо я ВЛАСНИК, завантажую свої дані (логіку для гостя додамо пізніше)
-      const userRef = ref(db, 'users/' + user.uid);
-      onValue(userRef, (snapshot) => {
-        if (snapshot.exists() && window.app) {
-            console.log("🔄 Sync from cloud...");
-            isRestoring = true;
-            window.app.state = snapshot.val();
-            window.app.renderAll();
-            window.app.updateStatus();
-            setTimeout(() => { isRestoring = false; }, 2000);
-        }
-      });
+      const safeEmail = (user.email || "").toLowerCase().replace(/\./g, ',');
+      
+      // 1. ПЕРЕВІРЯЄМО ЗАПРОШЕННЯ (invites)
+      onValue(ref(db, `invites/${safeEmail}`), (inviteSnap) => {
+          if (inviteSnap.exists()) {
+              // --- Я ГІСТЬ/МЕШКАНЕЦЬ ---
+              const ownerUid = Object.keys(inviteSnap.val())[0];
+              console.log(`🔑 Знайдено запрошення від: ${ownerUid}`);
+
+              // Дізнаємось роль
+              onValue(ref(db, `acl/${ownerUid}/${safeEmail}`), (aclSnap) => {
+                  if(aclSnap.exists()) {
+                      const perm = aclSnap.val();
+                      window.currentRole = perm.role;
+                      window.currentAptId = perm.aptId;
+                      
+                      // Завантажуємо дані ВЛАСНИКА
+                      onValue(ref(db, `users/${ownerUid}`), (dataSnap) => {
+                          if (dataSnap.exists() && window.app) {
+                              console.log("📥 Guest Mode: Loaded owner data");
+                              isRestoring = true;
+                              window.app.state = dataSnap.val();
+                              window.app.renderAll();
+                              window.app.updateStatus();
+                              
+                              // Запускаємо візуальний захист
+                              if(window.app.applyRoleRestrictions) window.app.applyRoleRestrictions();
+                              
+                              setTimeout(() => { isRestoring = false; }, 2000);
+                          }
+                      });
+                  }
+              });
+          } else {
+              // --- Я ВЛАСНИК (Звичайний вхід) ---
+              console.log("👤 Owner Mode");
+              window.currentRole = 'owner';
+              onValue(ref(db, `users/${user.uid}`), (snapshot) => {
+                if (snapshot.exists() && window.app) {
+                    isRestoring = true;
+                    window.app.state = snapshot.val();
+                    window.app.renderAll();
+                    window.app.updateStatus();
+                    setTimeout(() => { isRestoring = false; }, 2000);
+                }
+              });
+          }
+      }, { onlyOnce: true });
+
     } else {
       window.currentUser = null;
+      window.currentRole = null;
       if(btn) { btn.innerText = "👤 Вхід"; btn.style.borderColor = 'var(--primary)'; }
     }
   });
