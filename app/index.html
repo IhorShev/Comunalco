@@ -343,7 +343,7 @@
 
         <div id="groups-container"></div>
         <div style="text-align:center; margin: 20px 0;">
-            <button class="btn btn-outline" style="width:auto; display:inline-block; padding:10px 20px;" onclick="app.addGroup()">+ Група МЗК (Вхід)</button>
+            <button class="btn btn-outline" style="width:auto; display:inline-block; padding:10px 20px;" onclick="app.addGroup()">+ Загальнобудинкові (МЗК)</button>
         </div>
 
         <div id="apartments-container"></div>
@@ -1339,7 +1339,7 @@ class App {
     
     updateGroup(i,k,v){this.currentData.groups[i][k]=v;this.save();}
     updateGroupMetric(i,t,k,v){this.currentData.groups[i][t][k]=parseFloat(v);this.save();}
-    addGroup(){this.currentData.groups.push({id:Date.now(),name:"Група МЗК",prev:{},curr:{}, custom_counters:[], services:[]});this.save();this.renderGroups();}
+    addGroup(){this.currentData.groups.push({id:Date.now(),name:"Загальнобудинкові (МЗК)",prev:{},curr:{}, custom_counters:[], services:[]});this.save();this.renderGroups();}
     delGroup(i){if(confirm("Видалити групу?")){this.currentData.groups.splice(i,1);this.save();this.renderGroups();}}
     
     addGS(i){ if(!this.currentData.groups[i].services) this.currentData.groups[i].services = [];
@@ -1981,6 +1981,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
