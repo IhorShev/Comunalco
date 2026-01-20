@@ -2145,8 +2145,13 @@ window.addEventListener('load', () => {
     
     if (user) {
       window.currentUser = user;
-      if(btn) { btn.innerText = `🟢 ${user.email}`; btn.style.borderColor = 'var(--success)'; }
-
+      if(btn) { 
+          // Беремо тільки те, що до собачки @
+          const shortName = user.email.split('@')[0];
+          // Вставляємо скорочене ім'я
+          btn.innerHTML = `🟢 <span style="overflow:hidden; text-overflow:ellipsis;">${shortName}</span>`; 
+          btn.style.borderColor = 'var(--success)'; 
+      }
       const safeEmail = (user.email || "").toLowerCase().replace(/\./g, ',');
       
       // Перевіряємо, чи є запрошення для цього емейлу
@@ -2178,6 +2183,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
