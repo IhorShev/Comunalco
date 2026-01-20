@@ -251,7 +251,7 @@
             <button onclick="app.toggleTheme()" style="background:none; border:none; cursor:pointer; padding:0; display:flex; align-items:center;" title="Змінити тему">
                 <svg class="theme-icon-svg" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
             </button>
-            <span id="auth-btn" onclick="window.googleLogin()" style="border: 1px solid var(--primary); padding: 5px 12px; border-radius: 20px; color: var(--primary); font-size: 13px; font-weight:bold; cursor:pointer; display:flex; align-items:center; gap:5px; transition:0.2s;">
+            <span id="auth-btn" onclick="window.googleLogin()" style="border: 1px solid var(--primary); padding: 5px 8px; border-radius: 20px; color: var(--primary); font-size: 13px; font-weight:bold; cursor:pointer; display:flex; align-items:center; gap:5px; transition:0.2s; max-width: 130px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
                 👤 <span id="user-name-display">Вхід</span>
             </span>
         </div>
@@ -2178,6 +2178,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
