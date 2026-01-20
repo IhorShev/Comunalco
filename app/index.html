@@ -1144,7 +1144,13 @@ class App {
                     <div class="col" style="flex:0.6"><label>Месенджер</label><select onchange="app.updateApt(${i},'messenger',this.value)"><option value="viber" ${a.messenger==='viber'?'selected':''}>Viber</option><option value="whatsapp" ${a.messenger==='whatsapp'?'selected':''}>WhatsApp</option><option value="telegram" ${a.messenger==='telegram'?'selected':''}>Telegram</option></select></div>
                     <div class="col"><label>Телефон</label><input type="tel" value="${a.phone||''}" placeholder="380..." oninput="app.updateApt(${i},'phone',this.value)"></div>
                 </div>
-                
+
+                <div class="row">
+                    <div class="col">
+                        <label>Email (для Telegram-бота)</label>
+                        <input type="email" value="${a.email||''}" placeholder="Введіть пошту мешканця..." onchange="app.updateApt(${i},'email',this.value)" style="border-color:var(--primary); background:rgba(0,153,255,0.05);">
+                    </div>
+                </div>
                 <div class="section-title">Лічильники</div>
                 ${this.renderMR(i,a,'apt','⚡ Е/Е День','ed')} ${this.renderMR(i,a,'apt','🌙 Е/Е Ніч','en')}
                 ${this.renderMR(i,a,'apt','💧 Вода','w')} ${this.renderMR(i,a,'apt','🔥 Газ','g')}
@@ -2183,6 +2189,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
