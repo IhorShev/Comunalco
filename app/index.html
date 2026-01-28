@@ -1439,24 +1439,24 @@ class App {
         else { await this.copyTextToClipboard(txt); alert("Текст скопійовано"); }
     }
 
-    async sendToMake(i) {
-        // 👇 ВАШЕ ПРАВИЛЬНЕ ПОСИЛАННЯ
+    // 1. ОНОВЛЕНА функція відправки (з тихим режимом)
+    async sendToMake(i, isSilentMode = false) {
+        // 👇 ВАШЕ ПОСИЛАННЯ З MAKE
         const WEBHOOK_URL = "https://hook.eu2.make.com/t4kgmli7yuqi0dc0wa0jexl1l7k4ulw2"; 
         
         const a = this.currentData.apartments[i];
         const d = this.currentData;
         
-        // Знаходимо кнопку
-        const btn = event ? event.currentTarget : null;
+        // Логіка кнопки (працює тільки якщо це НЕ масова розсилка)
+        const btn = (event && event.currentTarget) ? event.currentTarget : null;
         let originalText = "";
         
-        if(btn) {
+        if(btn && !isSilentMode) {
              originalText = btn.innerText;
              btn.disabled = true;
              btn.innerText = "⏳ ...";
         }
 
-        // 1. Рахуємо споживання
         const c = { 
             ed: Math.max(0,(a.curr.ed||0)-(a.prev.ed||0)), 
             en: Math.max(0,(a.curr.en||0)-(a.prev.en||0)), 
@@ -1464,52 +1464,39 @@ class App {
             g: Math.max(0,(a.curr.g||0)-(a.prev.g||0)) 
         };
 
-        // 2. Збираємо реквізити (Приват, Моно) для Telegram
         const requisitesText = (d.requisites || [])
             .map(r => `💳 ${r.name}: <code>${r.val}</code>`)
             .join('\n');
 
-        // 3. Формуємо пакет даних
         const payload = {
             object_name: d.name,
             flat_name: a.name,
             flat_id: a.id,
             date: new Date().toLocaleDateString('uk-UA'),
-            
-            // Показники
             cons_light_day: c.ed,
             cons_light_night: c.en,
             cons_water: c.w,
             cons_gas: c.g,
-            
-            // Фінанси (🔥 ТУТ ДОДАЛИ ОКРУГЛЕННЯ)
             tariffs: d.tariffs,
-            total_bill: (a.bill || 0).toFixed(2), // Було просто a.bill
-            debt: (a.debt || 0).toFixed(2),       // Округлили борг
-            paid: (a.paid || 0).toFixed(2),       // Округлили оплату
-            
-            // Реквізити
+            total_bill: (a.bill || 0).toFixed(2),
+            debt: (a.debt || 0).toFixed(2),
+            paid: (a.paid || 0).toFixed(2),
             requisites: requisitesText,
-
-            // Контакти
             phone: (a.phone || "").replace(/\D/g,''),
             email: a.email || ""
         };
 
         try {
-            // 4. Відправка
             await fetch(WEBHOOK_URL, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             });
 
-            // 5. Успіх
-            if(btn) {
+            if(btn && !isSilentMode) {
                 btn.classList.remove('btn-outline');
                 btn.classList.add('btn-success');
                 btn.innerText = "✅ Надіслано!";
-                
                 setTimeout(() => {
                     btn.innerText = originalText;
                     btn.disabled = false;
@@ -1517,15 +1504,57 @@ class App {
                     btn.classList.add('btn-outline');
                 }, 3000);
             }
-
         } catch (e) {
             console.error(e);
-            alert("Помилка з'єднання: " + e.message);
-            if(btn) {
+            if(btn && !isSilentMode) {
                 btn.innerText = "❌ Помилка";
                 btn.disabled = false;
             }
         }
+    }
+
+    // 2. Функція вибору всіх галочок
+    toggleAllCheckboxes(source) {
+        const checkboxes = document.querySelectorAll('.mass-send-chk');
+        checkboxes.forEach(cb => cb.checked = source.checked);
+    }
+
+    // 3. Функція МАСОВОЇ розсилки
+    async sendBatch() {
+        const checkboxes = document.querySelectorAll('.mass-send-chk:checked');
+        if(checkboxes.length === 0) { alert("Виберіть хоча б одну квартиру!"); return; }
+
+        if(!confirm(`Ви вибрали ${checkboxes.length} квартир. Почати розсилку?`)) return;
+
+        const btn = document.getElementById('batch-btn');
+        const originalText = btn.innerText;
+        btn.disabled = true;
+
+        let successCount = 0;
+        
+        for (let i = 0; i < checkboxes.length; i++) {
+            const index = parseInt(checkboxes[i].value);
+            
+            // Показуємо прогрес
+            btn.innerText = `⏳ Sending ${i+1}/${checkboxes.length}...`;
+            
+            try {
+                // Викликаємо функцію в ТИХОМУ режимі (true)
+                await this.sendToMake(index, true); 
+                successCount++;
+            } catch (e) {
+                console.error(e);
+            }
+
+            // Пауза 0.5 сек між відправками, щоб не блокували
+            await new Promise(r => setTimeout(r, 500));
+        }
+
+        btn.innerText = `✅ Готово (${successCount})`;
+        setTimeout(() => {
+            btn.innerText = originalText;
+            btn.disabled = false;
+        }, 3000);
     }
     copyTextToClipboard(text) { 
         const ta = document.createElement("textarea");
@@ -2289,6 +2318,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
