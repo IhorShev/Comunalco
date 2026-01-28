@@ -1139,6 +1139,7 @@ class App {
     }
 
     renderApartments() { 
+        // 1. Малюємо список квартир з ГАЛОЧКАМИ
         document.getElementById('apartments-container').innerHTML = (this.currentData.apartments || []).map((a, i) => { 
             return `<details open style="border-left: 4px solid var(--primary)">
             <summary style="display:flex; align-items:center;">
@@ -1162,7 +1163,7 @@ class App {
                 <div class="section-title">Лічильники</div>
                 ${this.renderMR(i,a,'apt','⚡ Е/Е День','ed')} ${this.renderMR(i,a,'apt','🌙 Е/Е Ніч','en')}
                 ${this.renderMR(i,a,'apt','💧 Вода','w')} ${this.renderMR(i,a,'apt','🔥 Газ','g')}
-                
+                 
                 <div id="a-counters-${i}">
                     ${(a.custom_counters||[]).map((c, ci) => this.renderCustomCounterRow('apt', i, ci, c)).join('')}
                 </div>
@@ -1177,11 +1178,17 @@ class App {
                     <div class="col"><label>Борг</label><input type="number" value="${a.debt||0}" onchange="app.updateApt(${i},'debt',this.value)"></div>
                     <div class="col"><label style="color:var(--success)">Сплачено</label><input type="number" value="${a.paid||''}" placeholder="0.00" onchange="app.updateApt(${i},'paid',this.value)" style="border-color:var(--success)"></div>
                 </div>
+                
+                <div style="margin-top:15px; display:flex; gap:10px;">
+                    <button class="btn btn-outline btn-sm" style="border-color:#8b5cf6; color:#8b5cf6;" onclick="app.sendToMake(${i})">🚀 Bot</button>
+                    </div>
+
             </div></details>`;
-        }).join('');
-        // Показуємо панель розсилки тільки якщо є квартири
-       const controls = document.getElementById('batch-controls');
-       if(controls) controls.style.display = (this.currentData.apartments.length > 0) ? 'flex' : 'none';
+        }).join(''); 
+        
+        // 2. Логіка появи панелі масової розсилки
+        const controls = document.getElementById('batch-controls');
+        if(controls) controls.style.display = (this.currentData.apartments.length > 0) ? 'flex' : 'none';
     }
 
     renderMR(i, obj, mode, label, key) { 
@@ -1439,15 +1446,15 @@ class App {
         else { await this.copyTextToClipboard(txt); alert("Текст скопійовано"); }
     }
 
-    // 1. ОНОВЛЕНА функція відправки (з тихим режимом)
-    async sendToMake(i, isSilentMode = false) {
-        // 👇 ВАШЕ ПОСИЛАННЯ З MAKE
+   async sendToMake(i, isSilentMode = false) {
+        // 👇 ВАШЕ ПОСИЛАННЯ
         const WEBHOOK_URL = "https://hook.eu2.make.com/t4kgmli7yuqi0dc0wa0jexl1l7k4ulw2"; 
         
         const a = this.currentData.apartments[i];
         const d = this.currentData;
+        const t = d.tariffs; // Тарифи для розрахунку
         
-        // Логіка кнопки (працює тільки якщо це НЕ масова розсилка)
+        // Логіка кнопки
         const btn = (event && event.currentTarget) ? event.currentTarget : null;
         let originalText = "";
         
@@ -1457,6 +1464,7 @@ class App {
              btn.innerText = "⏳ ...";
         }
 
+        // 1. Рахуємо споживання (Різниця показників)
         const c = { 
             ed: Math.max(0,(a.curr.ed||0)-(a.prev.ed||0)), 
             en: Math.max(0,(a.curr.en||0)-(a.prev.en||0)), 
@@ -1464,23 +1472,40 @@ class App {
             g: Math.max(0,(a.curr.g||0)-(a.prev.g||0)) 
         };
 
+        // 2. 🔥 РАХУЄМО ВАРТІСТЬ (ГРИВНІ) 🔥
+        const cost = {
+            light: (c.ed * t.el_d) + (c.en * t.el_n),
+            water: c.w * t.w,
+            gas: c.g * t.g
+        };
+
         const requisitesText = (d.requisites || [])
             .map(r => `💳 ${r.name}: <code>${r.val}</code>`)
             .join('\n');
 
+        // 3. Формуємо пакет даних (Додаємо нові поля val_...)
         const payload = {
             object_name: d.name,
             flat_name: a.name,
             flat_id: a.id,
             date: new Date().toLocaleDateString('uk-UA'),
+            
+            // Показники (Куби/кВт)
             cons_light_day: c.ed,
             cons_light_night: c.en,
             cons_water: c.w,
             cons_gas: c.g,
-            tariffs: d.tariffs,
+            
+            // 🔥 ВАРТІСТЬ У ГРИВНЯХ (Нові поля)
+            val_light: cost.light.toFixed(2),
+            val_water: cost.water.toFixed(2),
+            val_gas: cost.gas.toFixed(2),
+
+            // Загальні суми
             total_bill: (a.bill || 0).toFixed(2),
             debt: (a.debt || 0).toFixed(2),
             paid: (a.paid || 0).toFixed(2),
+            
             requisites: requisitesText,
             phone: (a.phone || "").replace(/\D/g,''),
             email: a.email || ""
@@ -2318,6 +2343,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
