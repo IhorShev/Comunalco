@@ -1428,16 +1428,14 @@ class App {
         else { await this.copyTextToClipboard(txt); alert("Текст скопійовано"); }
     }
 
-    // --- АВТОМАТИЗАЦІЯ MAKE ---
     async sendToMake(i) {
-        // 👇 ВСТАВТЕ СЮДИ ВАШ WEBHOOK URL З MAKE.COM
+        // 👇 ВАШЕ ПРАВИЛЬНЕ ПОСИЛАННЯ
         const WEBHOOK_URL = "https://hook.eu2.make.com/t4kgmli7yuqi0dc0wa0jexl1l7k4ulw2"; 
         
         const a = this.currentData.apartments[i];
         const d = this.currentData;
         
-        // Знаходимо кнопку, щоб змінити її текст під час відправки
-        // (Шукаємо елемент, який викликав функцію)
+        // Знаходимо кнопку
         const btn = event ? event.currentTarget : null;
         let originalText = "";
         
@@ -1447,15 +1445,20 @@ class App {
              btn.innerText = "⏳ ...";
         }
 
-        // 1. Збираємо чисті дані (Payload)
+        // 1. Рахуємо споживання
         const c = { 
             ed: Math.max(0,(a.curr.ed||0)-(a.prev.ed||0)), 
             en: Math.max(0,(a.curr.en||0)-(a.prev.en||0)), 
             w: Math.max(0,(a.curr.w||0)-(a.prev.w||0)), 
             g: Math.max(0,(a.curr.g||0)-(a.prev.g||0)) 
         };
-        
-        // Формуємо об'єкт для Make
+
+        // 2. Збираємо реквізити (Приват, Моно) для Telegram
+        const requisitesText = (d.requisites || [])
+            .map(r => `💳 ${r.name}: <code>${r.val}</code>`)
+            .join('\n');
+
+        // 3. Формуємо пакет даних
         const payload = {
             object_name: d.name,
             flat_name: a.name,
@@ -1468,32 +1471,32 @@ class App {
             cons_water: c.w,
             cons_gas: c.g,
             
-            // Тарифи (передаємо поточні, щоб Make міг перерахувати точно)
+            // Фінанси
             tariffs: d.tariffs,
-            
-            // Фінанси (сума з локального розрахунку)
-            total_bill: a.bill || 0, // Переконайтесь, що calculate() записує це, або Make порахує сам
+            total_bill: a.bill || 0,
             debt: a.debt || 0,
             paid: a.paid || 0,
+            
+            // Реквізити
+            requisites: requisitesText,
 
             // Контакти
-            chat_id: a.chat_id || "", // Якщо ви вже зберігаєте chat_id
             phone: (a.phone || "").replace(/\D/g,''),
             email: a.email || ""
         };
 
         try {
-            // 2. Відправка на сервер
+            // 4. Відправка
             await fetch(WEBHOOK_URL, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             });
 
-            // 3. Успіх
+            // 5. Успіх
             if(btn) {
                 btn.classList.remove('btn-outline');
-                btn.classList.add('btn-success'); // Зелена кнопка
+                btn.classList.add('btn-success');
                 btn.innerText = "✅ Надіслано!";
                 
                 setTimeout(() => {
@@ -1502,8 +1505,6 @@ class App {
                     btn.classList.remove('btn-success');
                     btn.classList.add('btn-outline');
                 }, 3000);
-            } else {
-                alert("Дані відправлено в Make!");
             }
 
         } catch (e) {
@@ -2277,6 +2278,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
