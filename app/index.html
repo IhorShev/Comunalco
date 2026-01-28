@@ -1471,11 +1471,11 @@ class App {
             cons_water: c.w,
             cons_gas: c.g,
             
-            // Фінанси
+            // Фінанси (🔥 ТУТ ДОДАЛИ ОКРУГЛЕННЯ)
             tariffs: d.tariffs,
-            total_bill: a.bill || 0,
-            debt: a.debt || 0,
-            paid: a.paid || 0,
+            total_bill: (a.bill || 0).toFixed(2), // Було просто a.bill
+            debt: (a.debt || 0).toFixed(2),       // Округлили борг
+            paid: (a.paid || 0).toFixed(2),       // Округлили оплату
             
             // Реквізити
             requisites: requisitesText,
@@ -2278,6 +2278,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
