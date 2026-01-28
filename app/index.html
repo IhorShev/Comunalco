@@ -1135,8 +1135,10 @@ class App {
     renderApartments() { 
         document.getElementById('apartments-container').innerHTML = (this.currentData.apartments || []).map((a, i) => { 
             return `<details open style="border-left: 4px solid var(--primary)">
-            <summary>
-                <div>🚪 <span contenteditable="true" onclick="event.preventDefault()" onblur="app.updateApt(${i},'name',this.innerText)" style="font-weight:700">${a.name}</span> <span style="font-size:12px; opacity:0.7" id="badge-${i}"></span></div>
+            <summary style="display:flex; align-items:center;">
+                <input type="checkbox" class="mass-send-chk" value="${i}" onclick="event.stopPropagation()" style="width:20px; height:20px; margin-right:10px; cursor:pointer;">
+                
+                <div style="flex:1;">🚪 <span contenteditable="true" onclick="event.preventDefault()" onblur="app.updateApt(${i},'name',this.innerText)" style="font-weight:700">${a.name}</span> <span style="font-size:12px; opacity:0.7" id="badge-${i}"></span></div>
                 <span class="del-icon" onclick="app.delApt(${i})">&times;</span>
             </summary>
             <div class="content">
@@ -2278,6 +2280,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
