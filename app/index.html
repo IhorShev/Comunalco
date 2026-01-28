@@ -1426,7 +1426,94 @@ class App {
         else if (a.messenger === 'viber') { await this.copyTextToClipboard(txt); window.location.href = phone ? `viber://chat?number=%2B${phone}` : `viber://forward?text=${encTxt}`; }
         else { await this.copyTextToClipboard(txt); alert("Текст скопійовано"); }
     }
-    
+
+    // --- АВТОМАТИЗАЦІЯ MAKE ---
+    async sendToMake(i) {
+        // 👇 ВСТАВТЕ СЮДИ ВАШ WEBHOOK URL З MAKE.COM
+        const WEBHOOK_URL = "https://hook.eu2.make.com/t4kgmli7yuqi0dc0wa0jexl1l7k4ulw2"; 
+        
+        const a = this.currentData.apartments[i];
+        const d = this.currentData;
+        
+        // Знаходимо кнопку, щоб змінити її текст під час відправки
+        // (Шукаємо елемент, який викликав функцію)
+        const btn = event ? event.currentTarget : null;
+        let originalText = "";
+        
+        if(btn) {
+             originalText = btn.innerText;
+             btn.disabled = true;
+             btn.innerText = "⏳ ...";
+        }
+
+        // 1. Збираємо чисті дані (Payload)
+        const c = { 
+            ed: Math.max(0,(a.curr.ed||0)-(a.prev.ed||0)), 
+            en: Math.max(0,(a.curr.en||0)-(a.prev.en||0)), 
+            w: Math.max(0,(a.curr.w||0)-(a.prev.w||0)), 
+            g: Math.max(0,(a.curr.g||0)-(a.prev.g||0)) 
+        };
+        
+        // Формуємо об'єкт для Make
+        const payload = {
+            object_name: d.name,
+            flat_name: a.name,
+            flat_id: a.id,
+            date: new Date().toLocaleDateString('uk-UA'),
+            
+            // Показники
+            cons_light_day: c.ed,
+            cons_light_night: c.en,
+            cons_water: c.w,
+            cons_gas: c.g,
+            
+            // Тарифи (передаємо поточні, щоб Make міг перерахувати точно)
+            tariffs: d.tariffs,
+            
+            // Фінанси (сума з локального розрахунку)
+            total_bill: a.bill || 0, // Переконайтесь, що calculate() записує це, або Make порахує сам
+            debt: a.debt || 0,
+            paid: a.paid || 0,
+
+            // Контакти
+            chat_id: a.chat_id || "", // Якщо ви вже зберігаєте chat_id
+            phone: (a.phone || "").replace(/\D/g,''),
+            email: a.email || ""
+        };
+
+        try {
+            // 2. Відправка на сервер
+            await fetch(WEBHOOK_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            // 3. Успіх
+            if(btn) {
+                btn.classList.remove('btn-outline');
+                btn.classList.add('btn-success'); // Зелена кнопка
+                btn.innerText = "✅ Надіслано!";
+                
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                    btn.classList.remove('btn-success');
+                    btn.classList.add('btn-outline');
+                }, 3000);
+            } else {
+                alert("Дані відправлено в Make!");
+            }
+
+        } catch (e) {
+            console.error(e);
+            alert("Помилка з'єднання: " + e.message);
+            if(btn) {
+                btn.innerText = "❌ Помилка";
+                btn.disabled = false;
+            }
+        }
+    }
     copyTextToClipboard(text) { 
         const ta = document.createElement("textarea");
         ta.value = text; 
@@ -2189,6 +2276,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
