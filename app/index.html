@@ -1178,7 +1178,10 @@ class App {
                     <div class="col"><label style="color:var(--success)">Сплачено</label><input type="number" value="${a.paid||''}" placeholder="0.00" onchange="app.updateApt(${i},'paid',this.value)" style="border-color:var(--success)"></div>
                 </div>
             </div></details>`;
-        }).join(''); 
+        }).join('');
+        // Показуємо панель розсилки тільки якщо є квартири
+       const controls = document.getElementById('batch-controls');
+       if(controls) controls.style.display = (this.currentData.apartments.length > 0) ? 'flex' : 'none';
     }
 
     renderMR(i, obj, mode, label, key) { 
@@ -2286,6 +2289,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
