@@ -346,6 +346,12 @@
             <button class="btn btn-outline" style="width:auto; display:inline-block; padding:10px 20px;" onclick="app.addGroup()">+ Загальнобудинкові (МЗК)</button>
         </div>
 
+        <div id="batch-controls" style="display:none; background:var(--card); padding:10px; border-radius:12px; margin:15px 0; border:1px solid var(--primary); align-items:center; justify-content:space-between;">
+            <label style="font-weight:bold; display:flex; align-items:center; gap:8px; cursor:pointer;">
+                <input type="checkbox" onchange="app.toggleAllCheckboxes(this)" style="width:18px; height:18px;"> Вибрати всі
+            </label>
+            <button id="batch-btn" class="btn btn-primary" style="width:auto; padding:8px 15px; font-size:13px; background:#8b5cf6;" onclick="app.sendBatch()">🚀 Розіслати</button>
+        </div>
         <div id="apartments-container"></div>
         
         <div style="text-align:center; margin: 30px 0;">
@@ -2280,6 +2286,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
