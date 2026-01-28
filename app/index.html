@@ -1405,6 +1405,7 @@ class App {
                 </div>
                 <div style="font-size:12px;color:var(--text-sec);margin-bottom:12px; text-align:right;">До сплати: <b>${bal.toFixed(2)}</b></div>
                 <div style="display:flex; gap:10px;">
+                    <button class="btn btn-outline btn-sm" style="border-color:#8b5cf6; color:#8b5cf6;" onclick="app.sendToMake(${i})">🚀 Bot</button>
                     <button class="btn ${btnClass} btn-sm" onclick="app.sendCheck(${i})">💬 ${btnText}</button>
                     <button class="btn btn-warning btn-sm" onclick="app.sharePDF(${i})">📄 PDF</button>
                 </div>
@@ -2276,6 +2277,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
