@@ -1686,13 +1686,33 @@ class App {
         const date = new Date();
         const fileName = `Komunalka_Backup_${date.toISOString().slice(0,10)}.txt`; 
         const str = JSON.stringify(this.state); 
-        const file = new File([str], fileName, { type: "text/plain" });
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-            try { await navigator.share({ files: [file], title: 'Зберегти бекап' }); return; } catch (e) {}
+        const blob = new Blob([str], { type: "text/plain" });
+
+        // Спроба 1: Сучасний діалог "Зберегти як..." (Працює в Chrome/Edge на HTTPS/Localhost)
+        if (window.showSaveFilePicker) {
+            try {
+                const handle = await window.showSaveFilePicker({
+                    suggestedName: fileName,
+                    types: [{ description: 'Text File', accept: {'text/plain': ['.txt']} }],
+                });
+                const writable = await handle.createWritable();
+                await writable.write(blob);
+                await writable.close();
+                alert("✅ Файл успішно збережено!");
+                return;
+            } catch (err) {
+                if (err.name !== 'AbortError') console.warn("SaveFilePicker failed:", err);
+                // Якщо не вийшло (або скасували) - йдемо до варіанту 2
+            }
         }
+
+        // Спроба 2: Стандартне завантаження (Browser Default)
         const a = document.createElement('a');
-        a.href = "data:text/plain;charset=utf-8," + encodeURIComponent(str); 
-        a.download = fileName; document.body.appendChild(a); a.click(); a.remove();
+        a.href = URL.createObjectURL(blob); 
+        a.download = fileName; 
+        document.body.appendChild(a); 
+        a.click(); 
+        document.body.removeChild(a);
     }
 
     loadBackup(inpt) { 
@@ -2402,6 +2422,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
