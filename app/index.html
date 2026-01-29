@@ -1401,32 +1401,49 @@ class App {
         document.getElementById('mzk-info').innerHTML = `<div>МЗК Всього: <b>${mzkCost.toFixed(2)}</b> грн | На квартиру: <b>${mzkPerApt.toFixed(2)}</b> грн</div>`;
         const dStr = new Date().toLocaleDateString('uk-UA');
         document.getElementById('results-list').innerHTML = (d.apartments || []).map((a, i) => {
+            // 1. Повторний розрахунок для відображення
             const c = { ed: Math.max(0,(a.curr.ed||0)-(a.prev.ed||0)), en: Math.max(0,(a.curr.en||0)-(a.prev.en||0)), w: Math.max(0,(a.curr.w||0)-(a.prev.w||0)), g: Math.max(0,(a.curr.g||0)-(a.prev.g||0)) };
             let mCost = (c.ed*t.el_d)+(c.en*t.el_n)+(c.w*t.w)+(c.g*t.g);
             
             let custCost = 0; let custTxt = "";
             (a.custom_counters || []).forEach(cc => {
-                let diff = Math.max(0, cc.curr - cc.prev);
-                let cost = diff * cc.price;
-                custCost += cost;
-                custTxt += `${cc.name}: ${diff} од. (${cost.toFixed(0)} грн)\n`;
+                 let diff = Math.max(0, cc.curr - cc.prev);
+                 let cost = diff * cc.price;
+                 custCost += cost;
+                 custTxt += `${cc.name}: ${diff} од. (${cost.toFixed(0)} грн)\n`;
             });
 
             let sCost=0, sTxt=""; (a.services || []).forEach(s=>{sCost+=(s.val||0); sTxt+=`${s.name}: ${s.val}\n`});
+            
+            // Фінальні суми
             let tot = mCost + custCost + sCost + mzkPerApt + (a.debt||0); 
             let bal = tot - (a.paid||0);
             
             const requisitesTxt = (d.requisites || []).map(r=>`${r.name}: ${r.val}`).join('\n');
 
+            // Формуємо текст квитанції
             const txt = `Квитанція ${dStr}\n${d.name} - ${a.name}\n\n⚡Е/Е: ${c.ed}/${c.en} (${((c.ed*t.el_d)+(c.en*t.el_n)).toFixed(0)} грн)\n💧Вода: ${c.w} (${(c.w*t.w).toFixed(0)} грн)\n🔥Газ: ${c.g} (${(c.g*t.g).toFixed(0)} грн)\n${custTxt}🏢МЗК: ${mzkPerApt.toFixed(2)} грн\n${sTxt?'---\n'+sTxt:''}----------------\nНараховано: ${(mCost+custCost+sCost+mzkPerApt).toFixed(2)} грн\nДО СПЛАТИ: ${tot.toFixed(2)} грн\n${a.paid?`Сплачено: -${a.paid}\nЗалишок: ${bal.toFixed(2)}`:''}\n\nРеквізити:\n${requisitesTxt}`;
-            this.checks[i] = txt;
-            const badge = document.getElementById(`badge-${i}`);
-            if(badge) badge.innerText = Math.round(tot);
             
-            let btnClass = 'btn-outline', btnText = 'Скопіювати';
-            if(a.messenger === 'viber') { btnClass = 'btn-viber'; btnText = 'Viber'; }
-            if(a.messenger === 'telegram') { btnClass = 'btn-telegram'; btnText = 'Telegram'; }
-            if(a.messenger === 'whatsapp') { btnClass = 'btn-whatsapp'; btnText = 'WhatsApp'; }
+            this.checks[i] = txt; // Зберігаємо текст для кнопки "Скопіювати"
+            
+            // --- 🔥 ЛОГІКА РОЗУМНИХ КНОПОК 🔥 ---
+            const encodedText = encodeURIComponent(txt);
+            const phoneOnly = (a.phone || "").replace(/\D/g, '');
+            let actionBtn = '';
+
+            if (a.messenger === 'telegram') {
+                // Якщо Telegram -> кнопка БОТА
+                actionBtn = `<button class="btn" style="background:#2AABEE; color:white; padding:5px 10px; font-size:12px;" onclick="app.sendToMake(${i})">✈️ Надіслати</button>`;
+            } else if (a.messenger === 'viber') {
+                // Якщо Viber -> відкриваємо додаток з ВЖЕ ВСТАВЛЕНИМ ТЕКСТОМ
+                actionBtn = `<a href="viber://chat?number=%2B${phoneOnly}&draft=${encodedText}" class="btn" style="background:#7360f2; color:white; padding:5px 10px; font-size:12px; text-decoration:none; display:inline-block; text-align:center;">🟣 Viber</a>`;
+            } else if (a.messenger === 'whatsapp') {
+                // Якщо WhatsApp -> відкриваємо чат з текстом
+                actionBtn = `<a href="https://wa.me/${phoneOnly}?text=${encodedText}" target="_blank" class="btn" style="background:#25D366; color:white; padding:5px 10px; font-size:12px; text-decoration:none; display:inline-block; text-align:center;">🟢 WhatsApp</a>`;
+            } else {
+                 // Якщо нічого не вибрано -> просто копіюємо
+                 actionBtn = `<button class="btn btn-outline" style="padding:5px 10px; font-size:13px;" onclick="app.sendCheck(${i})">📋 Скопіювати</button>`;
+            }
 
             return `<div class="card" style="border-left:4px solid var(--primary); padding:15px;">
                 <div style="display:flex;justify-content:space-between; margin-bottom:5px;">
@@ -1434,10 +1451,10 @@ class App {
                     <span style="font-weight:bold; font-size:16px; color:var(--text);">${tot.toFixed(2)} грн</span>
                 </div>
                 <div style="font-size:12px;color:var(--text-sec);margin-bottom:12px; text-align:right;">До сплати: <b>${bal.toFixed(2)}</b></div>
-                <div style="display:flex; gap:10px;">
-                    <button class="btn btn-outline btn-sm" style="border-color:#8b5cf6; color:#8b5cf6;" onclick="app.sendToMake(${i})">🚀 Bot</button>
-                    <button class="btn ${btnClass} btn-sm" onclick="app.sendCheck(${i})">💬 ${btnText}</button>
-                    <button class="btn btn-warning btn-sm" onclick="app.sharePDF(${i})">📄 PDF</button>
+                
+                <div style="display:grid; grid-template-columns: 1fr auto; gap:10px;">
+                    ${actionBtn}
+                    <button class="btn btn-warning" style="padding:5px 10px; font-size:13px;" onclick="app.sharePDF(${i})">📄 PDF</button>
                 </div>
             </div>`;
         }).join('');
@@ -2355,6 +2372,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
