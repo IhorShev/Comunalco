@@ -346,11 +346,10 @@
             <button class="btn btn-outline" style="width:auto; display:inline-block; padding:10px 20px;" onclick="app.addGroup()">+ Загальнобудинкові (МЗК)</button>
         </div>
 
-        <div id="batch-controls" style="display:none; background:var(--card); padding:10px; border-radius:12px; margin:15px 0; border:1px solid var(--primary); align-items:center; justify-content:space-between;">
-            <label style="font-weight:bold; display:flex; align-items:center; gap:8px; cursor:pointer;">
-                <input type="checkbox" onchange="app.toggleAllCheckboxes(this)" style="width:18px; height:18px;"> Вибрати всі
+        <div id="batch-controls" style="display:none; padding:10px 0; align-items:center; justify-content:flex-end;">
+            <label style="font-weight:bold; display:flex; align-items:center; gap:8px; cursor:pointer; background:var(--card); padding:8px 15px; border-radius:8px; border:1px solid var(--primary); color:var(--text);">
+                <input type="checkbox" onchange="app.toggleAllCheckboxes(this)" style="width:18px; height:18px;"> Вибрати всі (Telegram)
             </label>
-            <button id="batch-btn" class="btn btn-primary" style="width:auto; padding:8px 15px; font-size:13px; background:#8b5cf6;" onclick="app.sendBatch()">🚀 Розіслати</button>
         </div>
         <div id="apartments-container"></div>
         
@@ -362,21 +361,20 @@
     
     <div style="height: 120px;"></div>
 
-    <div class="sticky-footer">
-        <button class="btn btn-warning" style="flex:1;" onclick="app.downloadBackup()">💾 Зберегти</button>
-        <button class="btn btn-outline" style="flex:1; border-color:var(--border); color:var(--text);" onclick="document.getElementById('file-input').click()">📂 Завантажити</button>
-        <button class="btn btn-success" style="flex:1.5;" onclick="app.calculate()">✅ Розрахувати</button>
-        <input type="file" id="file-input" style="display:none" accept=".json, .txt, application/json, text/plain" onchange="app.loadBackup(this)">
-    </div>
+    <div class="sticky-footer" style="gap:8px; padding:10px; flex-wrap:wrap;">
+        
+        <div style="display:flex; gap:5px; flex:1; min-width: 140px;">
+            <button class="btn btn-warning" style="flex:1; padding:12px 5px; font-size:13px;" onclick="app.downloadBackup()">💾 Зберегти</button>
+            <button class="btn btn-outline" style="flex:1; padding:12px 5px; border:1px solid var(--border); background:var(--card); font-size:13px; color:var(--text);" onclick="document.getElementById('file-input').click()">📂 Завантажити</button>
+            <input type="file" id="file-input" style="display:none" accept=".json, .txt, application/json, text/plain" onchange="app.loadBackup(this)">
+        </div>
 
-    <div id="resultModal" class="modal">
-        <div class="modal-content">
-            <span class="modal-close" onclick="document.getElementById('resultModal').style.display='none'">&times;</span>
-            <h3 style="margin-top:0; text-align:center; font-family:'Montserrat',sans-serif;">Квитанції</h3>
-            <div id="mzk-info" style="background:var(--bg); padding:12px; border-radius:10px; margin-bottom:20px; font-size:13px; text-align:center; border:1px solid var(--border);"></div>
-            <div id="results-list"></div>
-            <hr style="margin: 20px 0; border:0; border-top:1px solid var(--border);">
-            <button class="btn btn-danger" onclick="app.startNewMonth()">🗓 Закрити місяць</button>
+        <div style="display:flex; gap:5px; flex:1.2; min-width: 160px;">
+            <button class="btn btn-success" style="flex:1; font-weight:bold; font-size:14px;" onclick="app.calculate()">✅ Розрахувати</button>
+            
+            <button id="batch-btn" class="btn" style="flex:1; background:#2AABEE; color:white; font-weight:bold; font-size:14px; display:flex; align-items:center; justify-content:center; gap:5px;" onclick="app.sendBatch()">
+                <span>✈️</span> Telegram
+            </button>
         </div>
     </div>
 
@@ -1139,18 +1137,33 @@ class App {
     }
 
     renderApartments() { 
-        // 1. Малюємо список квартир з ГАЛОЧКАМИ
         document.getElementById('apartments-container').innerHTML = (this.currentData.apartments || []).map((a, i) => { 
+            
+            // 🔥 ПЕРЕВІРКА: Чи користується мешканець Телеграмом?
+            const isTelegram = (a.messenger === 'telegram');
+            
+            const selectionIndicator = isTelegram 
+                ? `<input type="checkbox" class="mass-send-chk" value="${i}" onclick="event.stopPropagation()" style="width:20px; height:20px; margin-right:10px; cursor:pointer;">`
+                : `<span title="Відправити вручну (${a.messenger})" style="color:#ff4444; font-size:14px; margin-right:10px; font-weight:bold; border:1px solid #ff4444; border-radius:50%; width:20px; height:20px; display:flex; align-items:center; justify-content:center;">!</span>`;
+
             return `<details open style="border-left: 4px solid var(--primary)">
             <summary style="display:flex; align-items:center;">
-                <input type="checkbox" class="mass-send-chk" value="${i}" onclick="event.stopPropagation()" style="width:20px; height:20px; margin-right:10px; cursor:pointer;">
+                
+                ${selectionIndicator}
                 
                 <div style="flex:1;">🚪 <span contenteditable="true" onclick="event.preventDefault()" onblur="app.updateApt(${i},'name',this.innerText)" style="font-weight:700">${a.name}</span> <span style="font-size:12px; opacity:0.7" id="badge-${i}"></span></div>
                 <span class="del-icon" onclick="app.delApt(${i})">&times;</span>
             </summary>
             <div class="content">
                 <div class="row">
-                    <div class="col" style="flex:0.6"><label>Месенджер</label><select onchange="app.updateApt(${i},'messenger',this.value)"><option value="viber" ${a.messenger==='viber'?'selected':''}>Viber</option><option value="whatsapp" ${a.messenger==='whatsapp'?'selected':''}>WhatsApp</option><option value="telegram" ${a.messenger==='telegram'?'selected':''}>Telegram</option></select></div>
+                    <div class="col" style="flex:0.6">
+                        <label>Месенджер</label>
+                        <select onchange="app.updateApt(${i},'messenger',this.value); app.renderApartments();">
+                            <option value="viber" ${a.messenger==='viber'?'selected':''}>Viber</option>
+                            <option value="whatsapp" ${a.messenger==='whatsapp'?'selected':''}>WhatsApp</option>
+                            <option value="telegram" ${a.messenger==='telegram'?'selected':''}>Telegram</option>
+                        </select>
+                    </div>
                     <div class="col"><label>Телефон</label><input type="tel" value="${a.phone||''}" placeholder="380..." oninput="app.updateApt(${i},'phone',this.value)"></div>
                 </div>
 
@@ -1181,12 +1194,11 @@ class App {
                 
                 <div style="margin-top:15px; display:flex; gap:10px;">
                     <button class="btn btn-outline btn-sm" style="border-color:#8b5cf6; color:#8b5cf6;" onclick="app.sendToMake(${i})">🚀 Bot</button>
-                    </div>
+                </div>
 
             </div></details>`;
         }).join(''); 
         
-        // 2. Логіка появи панелі масової розсилки
         const controls = document.getElementById('batch-controls');
         if(controls) controls.style.display = (this.currentData.apartments.length > 0) ? 'flex' : 'none';
     }
@@ -2343,6 +2355,7 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
 
 
 
