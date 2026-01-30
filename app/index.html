@@ -1164,7 +1164,7 @@ class App {
                             <option value="telegram" ${a.messenger==='telegram'?'selected':''}>Telegram</option>
                         </select>
                     </div>
-                    <div class="col"><label>Телефон</label><input type="tel" value="${a.phone||''}" placeholder="380..." oninput="app.updateApt(${i},'phone',this.value)"></div>
+                    <div class="col"><label>Телефон</label><input type="tel" value="${a.phone||''}" placeholder="380..." onchange="app.updateApt(${i},'phone',this.value)"></div>
                 </div>
 
                 <div class="row">
@@ -1507,7 +1507,7 @@ class App {
 
    async sendToMake(i, isSilentMode = false) {
         // 👇 ВАШЕ ПОСИЛАННЯ
-        const WEBHOOK_URL = "https://hook.eu2.make.com/t4kgmli7yuqi0dc0wa0jexl1l7k4ulw2"; 
+        const WEBHOOK_URL = "https://hook.eu2.make.com/3qfjsymx0vjzhsp6eg0stbhe61wkfh39"; 
         
         const a = this.currentData.apartments[i];
         const d = this.currentData;
@@ -2433,6 +2433,7 @@ window.addEventListener('load', () => {
     </div>
 </body>
 </html>
+
 
 
 
