@@ -2278,148 +2278,69 @@ window.addEventListener('load', () => {
 });
 </script>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-  import { getDatabase, ref, set, update, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyDWFMF95PiGQmclQPkvvb7gvvkZT_lzMCI",
-    authDomain: "comunalco-7f29f.firebaseapp.com",
-    databaseURL: "https://comunalco-7f29f-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "comunalco-7f29f",
-    storageBucket: "comunalco-7f29f.firebasestorage.app",
-    messagingSenderId: "157109120062",
-    appId: "1:157109120062:web:112cf7680fb68ac3bab56f",
-    measurementId: "G-L50LMQFZP8"
+<script>
+  // Ваші дані з панелі Supabase
+  const SUPABASE_URL = 'https://aougdxtsmzjgo-ykaslbt.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFvdWdkeHRzbXpqZ295a2FzbGJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA5MTg0NzMsImV4cCI6MjA4NjQ5NDQ3M30.47XlL0ddVxtOi1b-7DYw7NmHioSzjnS4c7um9WO2VVI';
+  
+  const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // Змінні для сумісності з вашим додатком
+  window.currentUser = null;
+  window.currentRole = 'owner'; // Тимчасово для перевірки
+
+  // Функція входу (Tesla-style)
+  window.googleLogin = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: window.location.origin
+      }
+    });
+    if (error) alert("Помилка входу: " + error.message);
   };
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getDatabase(app);
-  const provider = new GoogleAuthProvider();
-
-  window.firebase = { db, ref, set, update, onValue, auth, provider, signInWithPopup, signOut };
-
-  window.currentUser = null;
-  let isRestoring = false;
-  // Змінна для збереження даних про знайдене запрошення
-  let pendingInviteData = null; 
-
-  window.googleLogin = () => {
-    if (window.currentUser) {
-        if(confirm("Вийти?")) signOut(auth).then(() => location.reload());
-    } else {
-        signInWithPopup(auth, provider).catch(e => alert(e.message));
+  // Функція виходу
+  window.googleLogout = async () => {
+    if (confirm("Вийти з системи?")) {
+      await supabase.auth.signOut();
+      location.reload();
     }
   };
 
-  window.cloudSave = (data) => {
-      if(!window.currentUser || isRestoring) return;
-      if(window.currentRole && window.currentRole !== 'owner' && window.currentRole !== 'manager') return;
-      if(data.objects.length === 1 && data.objects[0].apartments.length === 1 && (!data.objects[0].apartments[0].curr || data.objects[0].apartments[0].curr.ed === 0)) return;
-
-      set(ref(db, 'users/' + window.currentUser.uid), data)
-        .then(() => console.log("☁️ Saved"))
-        .catch(e => console.error(e));
-  };
-
-  // --- 🔥 БЕЗПЕЧНА ЛОГІКА ВИБОРУ РОЛІ 🔥 ---
-  window.app.loginAs = (role) => {
-      // Ховаємо вікно вибору
-      const modal = document.getElementById('roleChoiceModal');
-      if(modal) modal.style.display = 'none';
-      
-      if (role === 'guest' && pendingInviteData) {
-          // --- ВХІД ЯК МЕШКАНЕЦЬ ---
-          const { ownerUid, safeEmail } = pendingInviteData;
-          console.log(`🔑 Вхід як Гість до: ${ownerUid}`);
-
-          onValue(ref(db, `acl/${ownerUid}/${safeEmail}`), (aclSnap) => {
-              if(aclSnap.exists()) {
-                  const perm = aclSnap.val();
-                  window.currentRole = perm.role;
-                  window.currentAptId = perm.aptId;
-                  
-                  onValue(ref(db, `users/${ownerUid}`), (dataSnap) => {
-                      if (dataSnap.exists() && window.app) {
-                          isRestoring = true;
-                          window.app.state = dataSnap.val();
-                          window.app.renderAll();
-                          window.app.updateStatus();
-                          // Запускаємо режим обмежень (синій банер)
-                          if(window.app.applyRoleRestrictions) window.app.applyRoleRestrictions();
-                          setTimeout(() => { isRestoring = false; }, 2000);
-                      }
-                  });
-              }
-          });
-      } else {
-          // --- ВХІД ЯК ВЛАСНИК ---
-          console.log("👤 Вхід як Власник");
-          window.currentRole = 'owner';
-          window.currentAptId = null;
-          
-          // Прибираємо синій банер (якщо він раптом був)
-          document.body.classList.remove('archive-mode');
-
-          // Оновлюємо інтерфейс
-          if(window.app.renderAll) window.app.renderAll();
-
-          // Завантажуємо власні дані
-          onValue(ref(db, `users/${window.currentUser.uid}`), (snapshot) => {
-            if (snapshot.exists() && window.app) {
-                isRestoring = true;
-                window.app.state = snapshot.val();
-                window.app.renderAll();
-                window.app.updateStatus();
-                setTimeout(() => { isRestoring = false; }, 2000);
-            }
-          });
-      }
-  };
-
-  onAuthStateChanged(auth, (user) => {
+  // Слухач авторизації (працює автоматично)
+  supabase.auth.onAuthStateChange((event, session) => {
+    const user = session?.user;
     const btn = document.getElementById('auth-btn');
     
     if (user) {
       window.currentUser = user;
       if(btn) { 
-          // Беремо тільки те, що до собачки @
+          // Відображаємо імейл до собачки @
           const shortName = user.email.split('@')[0];
-          // Вставляємо скорочене ім'я
           btn.innerHTML = `🟢 <span style="overflow:hidden; text-overflow:ellipsis;">${shortName}</span>`; 
-          btn.style.borderColor = 'var(--success)'; 
+          btn.style.borderColor = 'var(--success)';
+          // Натискання на кнопку тепер викликає вихід
+          btn.onclick = window.googleLogout;
       }
-      const safeEmail = (user.email || "").toLowerCase().replace(/\./g, ',');
-      
-      // Перевіряємо, чи є запрошення для цього емейлу
-      onValue(ref(db, `invites/${safeEmail}`), (inviteSnap) => {
-          if (inviteSnap.exists()) {
-              // Знайшли запрошення!
-              pendingInviteData = {
-                  ownerUid: Object.keys(inviteSnap.val())[0],
-                  safeEmail: safeEmail
-              };
-              
-              // Якщо роль ще не обрана, показуємо вікно вибору
-              if (!window.currentRole) {
-                  const modal = document.getElementById('roleChoiceModal');
-                  if(modal) modal.style.display = 'flex';
-              }
-          } else {
-              // Запрошень немає — автоматично входимо як Власник
-              window.app.loginAs('owner');
-          }
-      }, { onlyOnce: true });
-
+      console.log("Успішний вхід через Supabase:", user.email);
     } else {
       window.currentUser = null;
-      window.currentRole = null;
-      if(btn) { btn.innerText = "👤 Вхід"; btn.style.borderColor = 'var(--primary)'; }
+      if(btn) { 
+          btn.innerText = "👤 Вхід";
+          btn.style.borderColor = 'var(--primary)'; 
+          btn.onclick = window.googleLogin;
+      }
     }
   });
-    </script>
+
+  // Заглушка для хмарного збереження (реалізуємо наступним кроком)
+  window.cloudSave = async (data) => {
+      console.log("Дані готові до відправки в Supabase:", data);
+  };
+</script>
 
     <div id="resultModal" class="modal">
         <div class="modal-content">
@@ -2433,6 +2354,7 @@ window.addEventListener('load', () => {
     </div>
 </body>
 </html>
+
 
 
 
