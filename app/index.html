@@ -2281,10 +2281,15 @@ window.addEventListener('load', () => {
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-  // 🔥 ВАЖЛИВО: Адреса взята точно з налаштувань Google Cloud (без дефісу)
+  // Ваші налаштування
   const SUPABASE_URL = 'https://aougdxtsmzjgoykaslbt.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFvdWdkeHRzbXpqZ295a2FzbGJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA5MTg0NzMsImV4cCI6MjA4NjQ5NDQ3M30.47XlL0ddVxtOi1b-7DYw7NmHioSzjnS4c7um9WO2VVI';
   
+  // 🔥 ВАЖЛИВО: Сюди вставте реальну адресу вашого сайту (не localhost, не file://)
+  // Це має бути одне з посилань, які ви додали в Supabase -> Authentication -> URL Configuration
+  const REDIRECT_URL = 'https://comunalco.com'; 
+  // Або, якщо тестуєте на GitHub: const REDIRECT_URL = 'https://ihorshev.github.io/Comunalco/';
+
   const sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   window.currentUser = null;
@@ -2292,15 +2297,11 @@ window.addEventListener('load', () => {
 
   // Функція входу
   window.googleLogin = async () => {
-    // Визначаємо, куди повертатися (автоматично бере поточну адресу сторінки)
-    const currentUrl = window.location.href.split('#')[0]; // Прибираємо хеш, якщо є
-    
-    console.log("Спроба входу. Redirect to:", currentUrl);
-
+    console.log("Вхід через Google... Повернення на:", REDIRECT_URL);
     const { error } = await sbClient.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: currentUrl 
+        redirectTo: REDIRECT_URL 
       }
     });
     if (error) alert("Помилка: " + error.message);
@@ -2321,14 +2322,14 @@ window.addEventListener('load', () => {
     
     if (user) {
       window.currentUser = user;
-      // Зберігаємо інфо про користувача глобально, щоб інші функції це бачили
+      // Зберігаємо імейл для інших функцій
       if(btn) { 
           const shortName = user.email.split('@')[0];
           btn.innerHTML = `🟢 <span style="overflow:hidden; text-overflow:ellipsis;">${shortName}</span>`; 
           btn.style.borderColor = 'var(--success)';
           btn.onclick = window.googleLogout;
       }
-      console.log("Авторизовано:", user.email);
+      console.log("Успішний вхід:", user.email);
     } else {
       window.currentUser = null;
       if(btn) { 
@@ -2339,14 +2340,14 @@ window.addEventListener('load', () => {
     }
   });
 
-  // Тимчасова заглушка для збереження
+  // Тимчасова заглушка збереження
   window.cloudSave = async (data) => {
-      if(!window.currentUser) {
-          alert("Спочатку увійдіть в систему!");
-          return;
+      console.log("Спроба збереження...", data);
+      if(window.currentUser) {
+          alert("Авторизація працює! Скоро тут буде збереження в базу.");
+      } else {
+          alert("Будь ласка, увійдіть в систему.");
       }
-      console.log("Зберігаємо в Supabase...", data);
-      alert("Функцію збереження ще не налаштовано, але вхід працює!");
   };
 </script>
 
@@ -2362,6 +2363,7 @@ window.addEventListener('load', () => {
     </div>
 </body>
 </html>
+
 
 
 
