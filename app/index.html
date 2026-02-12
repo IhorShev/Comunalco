@@ -2281,19 +2281,20 @@ window.addEventListener('load', () => {
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-  // Ваші дані з панелі Supabase
+  // --- ВИПРАВЛЕННЯ ПОМИЛКИ ---
   const SUPABASE_URL = 'https://aougdxtsmzjgo-ykaslbt.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFvdWdkeHRzbXpqZ295a2FzbGJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA5MTg0NzMsImV4cCI6MjA4NjQ5NDQ3M30.47XlL0ddVxtOi1b-7DYw7NmHioSzjnS4c7um9WO2VVI';
   
-  const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  // Зверніть увагу: ми використовуємо ім'я 'sbClient', щоб уникнути конфлікту
+  const sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  // Змінні для сумісності з вашим додатком
+  // Змінні для сумісності
   window.currentUser = null;
-  window.currentRole = 'owner'; // Тимчасово для перевірки
+  window.currentRole = 'owner'; 
 
-  // Функція входу (Tesla-style)
+  // Функція входу
   window.googleLogin = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
+    const { error } = await sbClient.auth.signInWithOAuth({
       provider: 'google',
       options: {
         redirectTo: window.location.origin
@@ -2305,24 +2306,23 @@ window.addEventListener('load', () => {
   // Функція виходу
   window.googleLogout = async () => {
     if (confirm("Вийти з системи?")) {
-      await supabase.auth.signOut();
+      await sbClient.auth.signOut();
       location.reload();
     }
   };
 
-  // Слухач авторизації (працює автоматично)
-  supabase.auth.onAuthStateChange((event, session) => {
+  // Слухач авторизації
+  sbClient.auth.onAuthStateChange((event, session) => {
     const user = session?.user;
     const btn = document.getElementById('auth-btn');
     
     if (user) {
       window.currentUser = user;
       if(btn) { 
-          // Відображаємо імейл до собачки @
           const shortName = user.email.split('@')[0];
+          // Робимо кнопку зеленою
           btn.innerHTML = `🟢 <span style="overflow:hidden; text-overflow:ellipsis;">${shortName}</span>`; 
           btn.style.borderColor = 'var(--success)';
-          // Натискання на кнопку тепер викликає вихід
           btn.onclick = window.googleLogout;
       }
       console.log("Успішний вхід через Supabase:", user.email);
@@ -2336,7 +2336,7 @@ window.addEventListener('load', () => {
     }
   });
 
-  // Заглушка для хмарного збереження (реалізуємо наступним кроком)
+  // Заглушка
   window.cloudSave = async (data) => {
       console.log("Дані готові до відправки в Supabase:", data);
   };
@@ -2354,6 +2354,7 @@ window.addEventListener('load', () => {
     </div>
 </body>
 </html>
+
 
 
 
