@@ -2281,26 +2281,27 @@ window.addEventListener('load', () => {
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-  // --- ВИПРАВЛЕННЯ ПОМИЛКИ ---
-  const SUPABASE_URL = 'https://aougdxtsmzjgo-ykaslbt.supabase.co';
+  // --- ВИПРАВЛЕНА АДРЕСА (без дефіса) ---
+  const SUPABASE_URL = 'https://aougdxtsmzjgoykaslbt.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFvdWdkeHRzbXpqZ295a2FzbGJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA5MTg0NzMsImV4cCI6MjA4NjQ5NDQ3M30.47XlL0ddVxtOi1b-7DYw7NmHioSzjnS4c7um9WO2VVI';
   
-  // Зверніть увагу: ми використовуємо ім'я 'sbClient', щоб уникнути конфлікту
+  // Використовуємо 'sbClient', щоб не конфліктувати з бібліотекою
   const sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  // Змінні для сумісності
+  // Змінні для сумісності з вашим старим кодом
   window.currentUser = null;
   window.currentRole = 'owner'; 
 
   // Функція входу
   window.googleLogin = async () => {
+    console.log("Починаємо вхід..."); // Для перевірки в консолі
     const { error } = await sbClient.auth.signInWithOAuth({
       provider: 'google',
       options: {
         redirectTo: window.location.origin
       }
     });
-    if (error) alert("Помилка входу: " + error.message);
+    if (error) alert("Помилка: " + error.message);
   };
 
   // Функція виходу
@@ -2320,12 +2321,11 @@ window.addEventListener('load', () => {
       window.currentUser = user;
       if(btn) { 
           const shortName = user.email.split('@')[0];
-          // Робимо кнопку зеленою
           btn.innerHTML = `🟢 <span style="overflow:hidden; text-overflow:ellipsis;">${shortName}</span>`; 
           btn.style.borderColor = 'var(--success)';
           btn.onclick = window.googleLogout;
       }
-      console.log("Успішний вхід через Supabase:", user.email);
+      console.log("Успішний вхід:", user.email);
     } else {
       window.currentUser = null;
       if(btn) { 
@@ -2336,9 +2336,9 @@ window.addEventListener('load', () => {
     }
   });
 
-  // Заглушка
+  // Заглушка для збереження (реалізуємо далі)
   window.cloudSave = async (data) => {
-      console.log("Дані готові до відправки в Supabase:", data);
+      console.log("Supabase готовий приймати дані:", data);
   };
 </script>
 
@@ -2354,6 +2354,7 @@ window.addEventListener('load', () => {
     </div>
 </body>
 </html>
+
 
 
 
