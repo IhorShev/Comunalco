@@ -989,12 +989,12 @@ class App {
 
    grantUserAccess() {
         const emailInput = document.getElementById('new-user-email');
-        // Приводимо до нижнього регістру, щоб не було проблем (User@gmail.com != user@gmail.com)
+        // Приводимо до нижнього регістру
         const email = emailInput.value.trim().toLowerCase();
         
         if(!email || !email.includes('@')) { alert("Введіть коректний Email (Gmail)!"); return; }
         
-        // 1. Зберігаємо локально для відображення в списку (стара логіка)
+        // 1. Зберігаємо локально для відображення в списку
         if(!this.currentData.users) this.currentData.users = [];
         
         let label = "Весь об'єкт";
@@ -1004,7 +1004,8 @@ class App {
         if(this.selectedRole === 'tenant') {
             const aptSelect = document.getElementById('access-apt-select');
             if(aptSelect) {
-                aptId = aptSelect.value; // Зберігаємо ID
+                aptId = aptSelect.value;
+                // Зберігаємо ID
                 const aptObj = this.currentData.apartments.find(a => a.id == aptId);
                 label = aptObj ? aptObj.name : 'Квартира';
             }
@@ -1019,39 +1020,14 @@ class App {
         };
         
         this.currentData.users.push(newUser);
-        this.save(); // Зберігаємо список "users" в основний файл
+        
+        // Ця команда збереже дані локально і автоматично відправить їх у Supabase (завдяки нашій новій window.cloudSave)
+        this.save(); 
         this.renderUserList();
 
-        // 2. 🔥 НОВЕ: Записуємо права доступу в системні папки Firebase
-        if (window.currentUser && window.firebase) {
-            const fb = window.firebase;
-            const ownerUid = window.currentUser.uid;
-            
-            // Firebase забороняє крапки в ключах, тому замінюємо '.' на ','
-            // Наприклад: ivan.test@gmail.com -> ivan,test@gmail,com
-            const safeEmail = email.replace(/\./g, ',');
-
-            const updates = {};
-            
-            // Запис 1: В папку ACL (Access Control List)
-            // "У мене (Власника) цей email має таку роль"
-            updates[`acl/${ownerUid}/${safeEmail}`] = {
-                role: this.selectedRole,
-                aptId: aptId || false // Якщо менеджер - то false (доступ до всього)
-            };
-
-            // Запис 2: В папку INVITES
-            // "Цей email запрошений до мене"
-            updates[`invites/${safeEmail}/${ownerUid}`] = true;
-
-            // Відправляємо все одним пакетом
-            fb.update(fb.ref(fb.db), updates)
-                .then(() => console.log("✅ Доступ записано в хмару"))
-                .catch(err => alert("Помилка запису в хмару: " + err.message));
-        }
-
+        // Очищуємо поле введення
         emailInput.value = '';
-        
+
         // Формуємо повідомлення для месенджера
         const roleNames = { 'manager': '🛠 Менеджер', 'tenant': '🏠 Мешканець' };
         const roleName = roleNames[this.selectedRole];
@@ -2366,6 +2342,7 @@ window.addEventListener('load', () => {
     </div>
 </body>
 </html>
+
 
 
 
