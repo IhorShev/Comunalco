@@ -2257,91 +2257,138 @@ window.addEventListener('load', () => {
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-  // Ваші налаштування
+  // 1. КОНФІГУРАЦІЯ
   const SUPABASE_URL = 'https://aougdxtsmzjgoykaslbt.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFvdWdkeHRzbXpqZ295a2FzbGJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA5MTg0NzMsImV4cCI6MjA4NjQ5NDQ3M30.47XlL0ddVxtOi1b-7DYw7NmHioSzjnS4c7um9WO2VVI';
   
   const sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+  // Глобальні змінні
   window.currentUser = null;
-  window.currentRole = 'owner'; 
+  window.currentRole = 'owner';
 
-  // Функція входу
+  // 2. ЛОГІКА ВХОДУ (Виправлена проблема з редіректом)
   window.googleLogin = async () => {
-    // Перевірка: чи ми не локально?
+    // Якщо запускаємо з папки - сваримось
     if (window.location.protocol === 'file:') {
-        alert("🛑 УВАГА: Вхід через Google НЕ ПРАЦЮЄ з локального файлу!\n\nБудь ласка, завантажте цей файл на хостинг (comunalco.com) і спробуйте там.");
+        alert("🛑 Вхід працює тільки на сайті (https://comunalco.com)!");
         return;
     }
 
-    console.log("Вхід... Повернення на:", window.location.origin);
+    // 🔥 ВАЖЛИВО: Повертаємось на поточну сторінку (href), а не на origin
+    // Це вирішує проблему, коли вас викидало з /app/ на головну
+    const returnUrl = window.location.href; 
+    console.log("Вхід... Повернення на:", returnUrl);
     
     const { error } = await sbClient.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        // Повертаємо користувача точно туди, звідки він прийшов (наприклад, comunalco.com)
-        redirectTo: window.location.origin 
+        redirectTo: returnUrl 
       }
     });
-    if (error) alert("Помилка: " + error.message);
+    if (error) alert("Помилка Supabase: " + error.message);
   };
 
-  // Функція виходу
+  // 3. ЛОГІКА ВИХОДУ
   window.googleLogout = async () => {
-    if (confirm("Вийти з системи?")) {
+    if (confirm("Вийти з акаунту?")) {
       await sbClient.auth.signOut();
       location.reload();
     }
   };
 
-  // Слухач авторизації
+  // 4. СЛУХАЧ АВТОРИЗАЦІЇ (Головний мозок)
   sbClient.auth.onAuthStateChange((event, session) => {
     const user = session?.user;
     const btn = document.getElementById('auth-btn');
-    
+    const nameSpan = document.getElementById('user-name-display');
+
     if (user) {
+      // Користувач увійшов
       window.currentUser = user;
-      if(btn) { 
-          const shortName = user.email.split('@')[0];
-          btn.innerHTML = `🟢 <span style="overflow:hidden; text-overflow:ellipsis;">${shortName}</span>`; 
+      
+      const shortName = user.email.split('@')[0];
+      console.log(`✅ Увійшов як: ${shortName}`);
+
+      // Оновлюємо кнопку
+      if(btn && nameSpan) { 
+          nameSpan.innerText = shortName;
           btn.style.borderColor = 'var(--success)';
-          btn.onclick = window.googleLogout;
+          btn.style.color = 'var(--success)';
+          // Змінюємо дію кнопки на Вихід
+          btn.onclick = window.googleLogout; 
       }
-      console.log("Вхід успішний:", user.email);
+
+      // ☁️ Спробуємо автоматично зберегти/підтягнути дані (якщо треба)
+      // window.app.save(); 
+
     } else {
+      // Користувач вийшов
       window.currentUser = null;
-      if(btn) { 
-          btn.innerText = "👤 Вхід";
+      console.log("👤 Гість");
+
+      if(btn && nameSpan) { 
+          nameSpan.innerText = "Вхід";
           btn.style.borderColor = 'var(--primary)'; 
+          btn.style.color = 'var(--primary)';
           btn.onclick = window.googleLogin;
       }
     }
   });
 
-  // Заглушка для збереження
+  // 5. ХМАРНЕ ЗБЕРЕЖЕННЯ (Supabase Upsert)
   window.cloudSave = async (data) => {
-      console.log("Спроба збереження...", data);
-      if(window.currentUser) {
-          // Тут скоро буде код запису в базу
-          console.log("Збережено в Supabase (поки що в консоль)");
-      } else {
-          alert("Будь ласка, увійдіть в систему.");
+      // Якщо не авторизовані - мовчки виходимо (зберігаємо тільки локально)
+      if(!window.currentUser) {
+          console.log("💾 Збережено локально (увійдіть для хмари)");
+          return;
       }
+
+      const btn = document.getElementById('auth-btn');
+      const originalText = document.getElementById('user-name-display').innerText;
+      
+      // Анімація збереження
+      if(btn) document.getElementById('user-name-display').innerText = "⏳...";
+
+      const userId = window.currentUser.id;
+      console.log("☁️ Відправка в Supabase...");
+
+      // Зберігаємо будинки
+      // У майбутньому ми розширимо це на квартири та лічильники
+      for (const obj of data.objects) {
+          const { error } = await sbClient
+              .from('houses')
+              .upsert({ 
+                  id: obj.id || undefined, // Якщо це новий об'єкт без UUID - база створить сама
+                  owner_id: userId,
+                  name: obj.name 
+                  // Тут можна додати mzk_mode, коли оновимо таблицю
+              });
+
+          if (error) console.error("Помилка запису будинку:", error.message);
+      }
+      
+      // Повертаємо кнопку в норму
+      setTimeout(() => {
+          if(btn) document.getElementById('user-name-display').innerText = originalText;
+          console.log("✅ Хмара синхронізована");
+      }, 1000);
   };
 </script>
 
-    <div id="resultModal" class="modal">
-        <div class="modal-content">
-            <span class="modal-close" onclick="document.getElementById('resultModal').style.display='none'">&times;</span>
-            <h3 style="margin-top:0; text-align:center; font-family:'Montserrat',sans-serif;">Квитанції</h3>
-            <div id="mzk-info" style="background:var(--bg); padding:12px; border-radius:10px; margin-bottom:20px; font-size:13px; text-align:center; border:1px solid var(--border);"></div>
-            <div id="results-list"></div>
-            <hr style="margin: 20px 0; border:0; border-top:1px solid var(--border);">
-            <button class="btn btn-danger" onclick="app.startNewMonth()">🗓 Закрити місяць</button>
-        </div>
+<div id="resultModal" class="modal">
+    <div class="modal-content">
+        <span class="modal-close" onclick="document.getElementById('resultModal').style.display='none'">&times;</span>
+        <h3 style="margin-top:0; text-align:center; font-family:'Montserrat',sans-serif;">Квитанції</h3>
+        <div id="mzk-info" style="background:var(--bg); padding:12px; border-radius:10px; margin-bottom:20px; font-size:13px; text-align:center; border:1px solid var(--border);"></div>
+        <div id="results-list"></div>
+        <hr style="margin: 20px 0; border:0; border-top:1px solid var(--border);">
+        <button class="btn btn-danger" onclick="app.startNewMonth()">🗓 Закрити місяць</button>
     </div>
+</div>
 </body>
 </html>
+
 
 
 
