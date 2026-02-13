@@ -2269,39 +2269,27 @@ window.addEventListener('load', () => {
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-  // 1. КОНФІГУРАЦІЯ
+  // 1. НАЛАШТУВАННЯ
   const SUPABASE_URL = 'https://aougdxtsmzjgoykaslbt.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFvdWdkeHRzbXpqZ295a2FzbGJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA5MTg0NzMsImV4cCI6MjA4NjQ5NDQ3M30.47XlL0ddVxtOi1b-7DYw7NmHioSzjnS4c7um9WO2VVI';
   
   const sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-  // Глобальні змінні
   window.currentUser = null;
-  window.currentRole = 'owner';
 
-  // 2. ЛОГІКА ВХОДУ (Виправлена проблема з редіректом)
+  // 2. ВХІД
   window.googleLogin = async () => {
-    // Якщо запускаємо з папки - сваримось
     if (window.location.protocol === 'file:') {
         alert("🛑 Вхід працює тільки на сайті (https://comunalco.com)!");
         return;
     }
-
-    // 🔥 ВАЖЛИВО: Повертаємось на поточну сторінку (href), а не на origin
-    // Це вирішує проблему, коли вас викидало з /app/ на головну
-    const returnUrl = window.location.href; 
-    console.log("Вхід... Повернення на:", returnUrl);
-    
     const { error } = await sbClient.auth.signInWithOAuth({
       provider: 'google',
-      options: {
-        redirectTo: returnUrl 
-      }
+      options: { redirectTo: window.location.href }
     });
-    if (error) alert("Помилка Supabase: " + error.message);
+    if (error) alert("Помилка: " + error.message);
   };
 
-  // 3. ЛОГІКА ВИХОДУ
+  // 3. ВИХІД
   window.googleLogout = async () => {
     if (confirm("Вийти з акаунту?")) {
       await sbClient.auth.signOut();
@@ -2309,82 +2297,172 @@ window.addEventListener('load', () => {
     }
   };
 
-  // 4. СЛУХАЧ АВТОРИЗАЦІЇ (Головний мозок)
-  sbClient.auth.onAuthStateChange((event, session) => {
+  // 4. СЛУХАЧ (Авто-старт)
+  sbClient.auth.onAuthStateChange(async (event, session) => {
     const user = session?.user;
     const btn = document.getElementById('auth-btn');
     const nameSpan = document.getElementById('user-name-display');
 
     if (user) {
-      // Користувач увійшов
       window.currentUser = user;
-      
       const shortName = user.email.split('@')[0];
-      console.log(`✅ Увійшов як: ${shortName}`);
-
-      // Оновлюємо кнопку
+      
       if(btn && nameSpan) { 
           nameSpan.innerText = shortName;
           btn.style.borderColor = 'var(--success)';
           btn.style.color = 'var(--success)';
-          // Змінюємо дію кнопки на Вихід
           btn.onclick = window.googleLogout; 
       }
 
-      // ☁️ Спробуємо автоматично зберегти/підтягнути дані (якщо треба)
-      // window.app.save(); 
+      // Якщо даних на телефоні майже немає (тільки пустий шаблон), а ми зайшли в акаунт - вантажимо з хмари
+      if (window.app && window.app.state.objects.length === 1 && window.app.state.objects[0].apartments.length === 1 && window.app.state.objects[0].apartments[0].name === "Кв. 1" && !window.app.state.objects[0].apartments[0].phone) {
+          console.log("🔄 Пристрій пустий. Запускаємо повне відновлення...");
+          await window.cloudLoad();
+      }
 
     } else {
-      // Користувач вийшов
       window.currentUser = null;
-      console.log("👤 Гість");
-
       if(btn && nameSpan) { 
           nameSpan.innerText = "Вхід";
           btn.style.borderColor = 'var(--primary)'; 
-          btn.style.color = 'var(--primary)';
           btn.onclick = window.googleLogin;
       }
     }
   });
 
-  // 5. ХМАРНЕ ЗБЕРЕЖЕННЯ (Supabase Upsert)
+  // 5. ЗАВАНТАЖЕННЯ (DOWNLOAD) - "Розпаковка"
+  window.cloudLoad = async () => {
+      if (!window.currentUser) return;
+      
+      const btn = document.querySelector('.sticky-footer button.btn-warning');
+      const oldText = btn ? btn.innerText : '';
+      if(btn) btn.innerText = "📥 Синхронізація...";
+
+      console.log("☁️ Отримуємо дані з Supabase...");
+      const userId = window.currentUser.id;
+
+      // 1. Тягнемо будинки з усіма "сейфами"
+      const { data: houses, error: errH } = await sbClient
+          .from('houses')
+          .select('*')
+          .eq('owner_id', userId);
+
+      if (errH || !houses || houses.length === 0) {
+          console.log("📭 Хмара пуста");
+          if(btn) btn.innerText = oldText;
+          return;
+      }
+
+      let newObjects = [];
+
+      for (const h of houses) {
+          // 2. Відновлюємо тарифи
+          const { data: dbTariffs } = await sbClient.from('service_tariffs').select('*').eq('house_id', h.id);
+          let tariffObj = { el_d: 0, el_n: 0, w: 0, g: 0 };
+          if (dbTariffs) {
+              dbTariffs.forEach(t => { if(t.service_name) tariffObj[t.service_name] = parseFloat(t.price_per_unit); });
+          }
+
+          // 3. Відновлюємо квартири
+          const { data: dbApts } = await sbClient.from('apartments').select('*').eq('house_id', h.id);
+          let cleanApts = [];
+          
+          if (dbApts) {
+              cleanApts = dbApts.map(a => {
+                  // 🔥 МАГІЯ: Розпаковуємо current_data (лічильники, цифри)
+                  const savedState = a.current_data || {};
+                  
+                  return {
+                      id: a.id,
+                      name: a.name,
+                      phone: a.phone,
+                      email: a.email,
+                      messenger: a.messenger,
+                      debt: parseFloat(a.debt || 0),
+                      paid: parseFloat(a.paid || 0),
+                      
+                      // Відновлюємо точні цифри
+                      prev: savedState.prev || {ed:0, en:0, w:0, g:0},
+                      curr: savedState.curr || {ed:0, en:0, w:0, g:0},
+                      custom_counters: savedState.custom || [],
+                      services: savedState.serv || [],
+                      
+                      // Для сумісності
+                      group_id: 1 
+                  };
+              });
+          }
+
+          // 4. Розпаковуємо дані будинку (Групи, Реквізити, Історія)
+          const groups = h.groups_data || [{ id: 1, name: "Загальнобудинкові (МЗК)", prev:{}, curr:{}, services:[], custom_counters:[] }];
+          const extras = h.extra_data || { extra: [], req: [] };
+          const history = h.history_data || []; // Історія архівів
+
+          newObjects.push({
+              id: h.id,
+              name: h.name,
+              tariffs: tariffObj,
+              apartments: cleanApts,
+              groups: groups,
+              extra_tariffs: extras.extra || [],
+              requisites: extras.req || [],
+              history: history
+          });
+      }
+
+      // 5. Застосовуємо зміни
+      if (window.app && newObjects.length > 0) {
+          window.app.state.objects = newObjects;
+          window.app.state.currentObjIdx = 0;
+          window.app.save();
+          window.app.renderAll();
+          console.log("✅ Успішно відновлено з хмари!");
+          if(btn) { btn.innerText = "✅ Готово"; setTimeout(()=>btn.innerText=oldText, 2000); }
+      } else {
+          if(btn) btn.innerText = oldText;
+      }
+  };
+
+  // 6. ЗБЕРЕЖЕННЯ (UPLOAD) - "Упаковка"
   window.cloudSave = async (data) => {
       if(!window.currentUser) return;
       const userId = window.currentUser.id;
       
-      // Знаходимо кнопку, щоб показати анімацію
       const btn = document.querySelector('.sticky-footer button.btn-warning');
       const oldText = btn ? btn.innerText : '';
       if(btn) btn.innerText = "☁️...";
 
-      console.log("🚀 Починаємо повну синхронізацію...");
+      console.log("🚀 Відправка повного бекапу...");
 
       for (const house of data.objects) {
-          // 1. Зберігаємо БУДИНОК
-          const { error: errH } = await sbClient
-              .from('houses')
-              .upsert({ id: String(house.id), owner_id: userId, name: house.name });
-          
-          if(errH) console.error("Помилка будинку:", errH);
+          // Пакуємо додаткові дані будинку
+          const extraData = {
+              extra: house.extra_tariffs,
+              req: house.requisites
+          };
 
-          // 2. Зберігаємо ТАРИФИ цього будинку
+          // 1. Зберігаємо БУДИНОК + ГРУПИ + ІСТОРІЮ + ЕКСТРА
+          await sbClient.from('houses').upsert({ 
+              id: String(house.id), 
+              owner_id: userId, 
+              name: house.name,
+              groups_data: house.groups, // Зберігаємо весь масив груп з лічильниками
+              extra_data: extraData,
+              history_data: house.history // Зберігаємо архів квитанцій
+          });
+
+          // 2. Тарифи (як і раніше)
           const tariffsData = [
               { service_name: 'el_d', price_per_unit: house.tariffs.el_d },
               { service_name: 'el_n', price_per_unit: house.tariffs.el_n },
               { service_name: 'w', price_per_unit: house.tariffs.w },
               { service_name: 'g', price_per_unit: house.tariffs.g }
-          ].map(t => ({
-              house_id: String(house.id), 
-              service_name: t.service_name, 
-              price_per_unit: t.price_per_unit
-          }));
+          ].map(t => ({ house_id: String(house.id), service_name: t.service_name, price_per_unit: t.price_per_unit }));
 
-          // Спочатку чистимо старі, потім пишемо нові
           await sbClient.from('service_tariffs').delete().eq('house_id', String(house.id));
           await sbClient.from('service_tariffs').insert(tariffsData);
 
-          // 3. Зберігаємо КВАРТИРИ
+          // 3. Зберігаємо КВАРТИРИ з повним станом (current_data)
           if (house.apartments && house.apartments.length > 0) {
               const aptsToSave = house.apartments.map(a => ({
                   id: String(a.id),
@@ -2394,24 +2472,25 @@ window.addEventListener('load', () => {
                   email: a.email || '',
                   messenger: a.messenger || 'viber',
                   debt: parseFloat(a.debt || 0),
-                  paid: parseFloat(a.paid || 0)
+                  paid: parseFloat(a.paid || 0),
+                  
+                  // 🔥 ПАКУЄМО ЦИФРИ У СЕЙФ
+                  current_data: {
+                      prev: a.prev,
+                      curr: a.curr,
+                      custom: a.custom_counters,
+                      serv: a.services
+                  }
               }));
               
-              const { error: errA } = await sbClient
-                  .from('apartments')
-                  .upsert(aptsToSave);
-                  
-              if(errA) console.error("Помилка квартир:", errA);
+              const { error } = await sbClient.from('apartments').upsert(aptsToSave);
+              if(error) console.error("Помилка квартир:", error);
           }
       }
-
-      console.log("✅ Все збережено в хмару!");
-      if(btn) {
-          btn.innerText = "✅ OK";
-          setTimeout(() => btn.innerText = oldText, 2000);
-      }
+      
+      console.log("✅ Все збережено!");
+      if(btn) { btn.innerText = "✅ OK"; setTimeout(() => btn.innerText = oldText, 2000); }
   };
-    
 </script>
 
 <div id="resultModal" class="modal">
@@ -2426,6 +2505,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
