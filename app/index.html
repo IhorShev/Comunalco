@@ -2350,42 +2350,68 @@ window.addEventListener('load', () => {
 
   // 5. ХМАРНЕ ЗБЕРЕЖЕННЯ (Supabase Upsert)
   window.cloudSave = async (data) => {
-      // Якщо не авторизовані - мовчки виходимо (зберігаємо тільки локально)
-      if(!window.currentUser) {
-          console.log("💾 Збережено локально (увійдіть для хмари)");
-          return;
-      }
-
-      const btn = document.getElementById('auth-btn');
-      const originalText = document.getElementById('user-name-display').innerText;
-      
-      // Анімація збереження
-      if(btn) document.getElementById('user-name-display').innerText = "⏳...";
-
+      if(!window.currentUser) return;
       const userId = window.currentUser.id;
-      console.log("☁️ Відправка в Supabase...");
-
-      // Зберігаємо будинки
-      // У майбутньому ми розширимо це на квартири та лічильники
-      for (const obj of data.objects) {
-          const { error } = await sbClient
-              .from('houses')
-              .upsert({ 
-                  id: obj.id || undefined, // Якщо це новий об'єкт без UUID - база створить сама
-                  owner_id: userId,
-                  name: obj.name 
-                  // Тут можна додати mzk_mode, коли оновимо таблицю
-              });
-
-          if (error) console.error("Помилка запису будинку:", error.message);
-      }
       
-      // Повертаємо кнопку в норму
-      setTimeout(() => {
-          if(btn) document.getElementById('user-name-display').innerText = originalText;
-          console.log("✅ Хмара синхронізована");
-      }, 1000);
+      // Знаходимо кнопку, щоб показати анімацію
+      const btn = document.querySelector('.sticky-footer button.btn-warning');
+      const oldText = btn ? btn.innerText : '';
+      if(btn) btn.innerText = "☁️...";
+
+      console.log("🚀 Починаємо повну синхронізацію...");
+
+      for (const house of data.objects) {
+          // 1. Зберігаємо БУДИНОК
+          const { error: errH } = await sbClient
+              .from('houses')
+              .upsert({ id: String(house.id), owner_id: userId, name: house.name });
+          
+          if(errH) console.error("Помилка будинку:", errH);
+
+          // 2. Зберігаємо ТАРИФИ цього будинку
+          const tariffsData = [
+              { service_name: 'el_d', price_per_unit: house.tariffs.el_d },
+              { service_name: 'el_n', price_per_unit: house.tariffs.el_n },
+              { service_name: 'w', price_per_unit: house.tariffs.w },
+              { service_name: 'g', price_per_unit: house.tariffs.g }
+          ].map(t => ({
+              house_id: String(house.id), 
+              service_name: t.service_name, 
+              price_per_unit: t.price_per_unit
+          }));
+
+          // Спочатку чистимо старі, потім пишемо нові
+          await sbClient.from('service_tariffs').delete().eq('house_id', String(house.id));
+          await sbClient.from('service_tariffs').insert(tariffsData);
+
+          // 3. Зберігаємо КВАРТИРИ
+          if (house.apartments && house.apartments.length > 0) {
+              const aptsToSave = house.apartments.map(a => ({
+                  id: String(a.id),
+                  house_id: String(house.id),
+                  name: a.name,
+                  phone: a.phone || '',
+                  email: a.email || '',
+                  messenger: a.messenger || 'viber',
+                  debt: parseFloat(a.debt || 0),
+                  paid: parseFloat(a.paid || 0)
+              }));
+              
+              const { error: errA } = await sbClient
+                  .from('apartments')
+                  .upsert(aptsToSave);
+                  
+              if(errA) console.error("Помилка квартир:", errA);
+          }
+      }
+
+      console.log("✅ Все збережено в хмару!");
+      if(btn) {
+          btn.innerText = "✅ OK";
+          setTimeout(() => btn.innerText = oldText, 2000);
+      }
   };
+    
 </script>
 
 <div id="resultModal" class="modal">
@@ -2400,6 +2426,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
