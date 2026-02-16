@@ -1598,15 +1598,13 @@ ${requisitesTxt}`;
         }
     } 
 
-   async sendToMake(i, isSilentMode = false) {
-        // 👇 ВАШЕ ПОСИЛАННЯ
-        const WEBHOOK_URL = "https://hook.eu2.make.com/3qfjsymx0vjzhsp6eg0stbhe61wkfh39"; 
+   // 1. ФУНКЦІЯ ВІДПРАВКИ ЧЕРЕЗ SUPABASE (Оновлена назва)
+    async sendToBot(i, isSilentMode = false) {
+        const FUNCTION_URL = "https://aougdxtsmzjgoykaslbt.supabase.co/functions/v1/telegram-bot";
         
         const a = this.currentData.apartments[i];
-        const d = this.currentData;
-        const t = d.tariffs; // Тарифи для розрахунку
         
-        // Логіка кнопки
+        // Візуалізація натискання (тільки якщо це не масова розсилка)
         const btn = (event && event.currentTarget) ? event.currentTarget : null;
         let originalText = "";
         
@@ -1616,59 +1614,35 @@ ${requisitesTxt}`;
              btn.innerText = "⏳ ...";
         }
 
-        // 1. Рахуємо споживання (Різниця показників)
-        const c = { 
-            ed: Math.max(0,(a.curr.ed||0)-(a.prev.ed||0)), 
-            en: Math.max(0,(a.curr.en||0)-(a.prev.en||0)), 
-            w: Math.max(0,(a.curr.w||0)-(a.prev.w||0)), 
-            g: Math.max(0,(a.curr.g||0)-(a.prev.g||0)) 
-        };
+        // Перевіряємо ID
+        let chatId = a.telegram_chat_id; 
+        if (!chatId) {
+            if(btn && !isSilentMode) { btn.innerText = "❌ Нема ID"; btn.disabled = false; }
+            if(!isSilentMode) alert(`⚠️ У квартири "${a.name}" немає Telegram ID.\nІнструкція:\n1. Мешканець пише боту /start\n2. Ви вписуєте отриманий ID у базу.`);
+            return false; // Повертаємо false, щоб sendBatch знав про помилку
+        }
 
-        // 2. 🔥 РАХУЄМО ВАРТІСТЬ (ГРИВНІ) 🔥
-        const cost = {
-            light: (c.ed * t.el_d) + (c.en * t.el_n),
-            water: c.w * t.w,
-            gas: c.g * t.g
-        };
+        // Перевіряємо квитанцію
+        if (!this.checks[i]) {
+             if(!isSilentMode) alert("Спочатку натисніть 'Розрахувати'!");
+             if(btn) { btn.innerText = originalText; btn.disabled = false; }
+             return false;
+        }
 
-        const requisitesText = (d.requisites || [])
-            .map(r => `💳 ${r.name}: <code>${r.val}</code>`)
-            .join('\n');
-
-        // 3. Формуємо пакет даних (Додаємо нові поля val_...)
-        const payload = {
-            object_name: d.name,
-            flat_name: a.name,
-            flat_id: a.id,
-            date: new Date().toLocaleDateString('uk-UA'),
-            
-            // Показники (Куби/кВт)
-            cons_light_day: c.ed,
-            cons_light_night: c.en,
-            cons_water: c.w,
-            cons_gas: c.g,
-            
-            // 🔥 ВАРТІСТЬ У ГРИВНЯХ (Нові поля)
-            val_light: cost.light.toFixed(2),
-            val_water: cost.water.toFixed(2),
-            val_gas: cost.gas.toFixed(2),
-
-            // Загальні суми
-            total_bill: (a.bill || 0).toFixed(2),
-            debt: (a.debt || 0).toFixed(2),
-            paid: (a.paid || 0).toFixed(2),
-            
-            requisites: requisitesText,
-            phone: (a.phone || "").replace(/\D/g,''),
-            email: a.email || ""
-        };
+        const receiptText = this.checks[i];
 
         try {
-            await fetch(WEBHOOK_URL, {
+            const response = await fetch(FUNCTION_URL, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
+                body: JSON.stringify({
+                    action: "send_message",
+                    chat_id: chatId,
+                    text: receiptText
+                })
             });
+
+            if (!response.ok) throw new Error("Server error");
 
             if(btn && !isSilentMode) {
                 btn.classList.remove('btn-outline');
@@ -1681,31 +1655,35 @@ ${requisitesTxt}`;
                     btn.classList.add('btn-outline');
                 }, 3000);
             }
+            return true; // Успіх
+
         } catch (e) {
             console.error(e);
             if(btn && !isSilentMode) {
                 btn.innerText = "❌ Помилка";
+                if(!isSilentMode) alert("Помилка відправки");
                 btn.disabled = false;
             }
+            return false; // Помилка
         }
     }
 
-    // 2. Функція вибору всіх галочок
+    // 2. Допоміжна функція для галочок
     toggleAllCheckboxes(source) {
         const checkboxes = document.querySelectorAll('.mass-send-chk');
         checkboxes.forEach(cb => cb.checked = source.checked);
     }
 
-    // 3. Функція МАСОВОЇ розсилки
+    // 3. ФУНКЦІЯ МАСОВОЇ РОЗСИЛКИ (Тепер викликає sendToBot)
     async sendBatch() {
         const checkboxes = document.querySelectorAll('.mass-send-chk:checked');
         if(checkboxes.length === 0) { alert("Виберіть хоча б одну квартиру!"); return; }
 
-        if(!confirm(`Ви вибрали ${checkboxes.length} квартир. Почати розсилку?`)) return;
+        if(!confirm(`Вибрано квартир: ${checkboxes.length}. Відправити квитанції через бота?`)) return;
 
         const btn = document.getElementById('batch-btn');
-        const originalText = btn.innerText;
-        btn.disabled = true;
+        const originalText = btn ? btn.innerHTML : "Масова розсилка";
+        if(btn) btn.disabled = true;
 
         let successCount = 0;
         
@@ -1713,25 +1691,27 @@ ${requisitesTxt}`;
             const index = parseInt(checkboxes[i].value);
             
             // Показуємо прогрес
-            btn.innerText = `⏳ Sending ${i+1}/${checkboxes.length}...`;
+            if(btn) btn.innerText = `⏳ Sending ${i+1}/${checkboxes.length}...`;
             
-            try {
-                // Викликаємо функцію в ТИХОМУ режимі (true)
-                await this.sendToMake(index, true); 
-                successCount++;
-            } catch (e) {
-                console.error(e);
-            }
+            // 🔥 ВИКЛИКАЄМО НОВУ ФУНКЦІЮ sendToBot
+            // true означає "тихий режим" (без alert-ів на кожну квартиру)
+            const result = await this.sendToBot(index, true); 
+            
+            if (result) successCount++;
 
-            // Пауза 0.5 сек між відправками, щоб не блокували
-            await new Promise(r => setTimeout(r, 500));
+            // Пауза 0.3 сек, щоб Telegram не заблокував за спам
+            await new Promise(r => setTimeout(r, 300));
         }
 
-        btn.innerText = `✅ Готово (${successCount})`;
-        setTimeout(() => {
-            btn.innerText = originalText;
-            btn.disabled = false;
-        }, 3000);
+        if(btn) {
+            btn.innerHTML = `✅ Відправлено: ${successCount}`;
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }, 3000);
+        }
+        
+        alert(`Звіт:\nВсього вибрано: ${checkboxes.length}\nУспішно надіслано: ${successCount}\n(Якщо менше - перевірте, чи у всіх є Telegram ID)`);
     }
     copyTextToClipboard(text) { 
         const ta = document.createElement("textarea");
@@ -2690,6 +2670,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
