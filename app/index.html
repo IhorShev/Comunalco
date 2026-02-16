@@ -710,21 +710,46 @@ class App {
         if(this.state.currentObjIdx >= this.state.objects.length) this.state.currentObjIdx=0;
     }
     
-    save() { 
-        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.state));
-        this.updateStatus(); 
-        
+    save() {
+        // 1. Миттєве локальне збереження (зберігаємо сумісність з вашим ключем)
+        if(this.STORAGE_KEY) {
+             localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.state));
+        }
+
+        // 2. АВТО-ЗБЕРЕЖЕННЯ В ХМАРУ (5 секунд тиші)
         if (window.currentUser && window.cloudSave) {
-            window.cloudSave(this.state);
-            const btn = document.getElementById('auth-btn');
+            
+            const btn = document.querySelector('.sticky-footer button.btn-warning');
+            
+            // Якщо почали писати - показуємо "Олівець"
             if(btn) {
-                let originalText = btn.innerText;
-                btn.innerText = "☁️ Збережено";
-                setTimeout(() => {
-                    if(window.currentUser) btn.innerText = `🟢 ${window.currentUser.displayName.split(' ')[0]}`;
-                    else btn.innerText = "👤 Вхід";
-                }, 1500);
+                if(btn.innerText !== "☁️ Зберігаю..." && btn.innerText !== "✅ Готово") {
+                    btn.innerText = "✍️ Запис...";
+                    btn.style.opacity = "0.8";
+                }
             }
+
+            // Скидаємо таймер, якщо ви продовжуєте друкувати
+            if (this.saveTimer) clearTimeout(this.saveTimer);
+
+            // Заводимо таймер на 5 секунд
+            this.saveTimer = setTimeout(async () => {
+                if(btn) btn.innerText = "☁️ Зберігаю...";
+                
+                try {
+                    await window.cloudSave(this.state);
+                    
+                    if(btn) {
+                        btn.innerText = "✅ Готово";
+                        btn.style.opacity = "1";
+                        // Через 3 секунди повертаємо напис
+                        setTimeout(() => btn.innerText = "💾 Авто Save", 3000);
+                    }
+                } catch (e) {
+                    console.error("Помилка автозбереження", e);
+                    if(btn) btn.innerText = "⚠️ Помилка";
+                }
+            }, 5000);
         }
     }
     get currentData() { return this.state.objects[this.state.currentObjIdx]; }
@@ -2505,6 +2530,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
