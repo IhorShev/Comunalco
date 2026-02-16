@@ -365,7 +365,9 @@
         
         <div style="display:flex; gap:5px; flex:1; min-width: 140px;">
             <button class="btn btn-warning" style="flex:1; padding:12px 5px; font-size:13px;" onclick="app.downloadBackup()">💾 Зберегти</button>
-            <button class="btn btn-outline" style="flex:1; padding:12px 5px; border:1px solid var(--border); background:var(--card); font-size:13px; color:var(--text);" onclick="document.getElementById('file-input').click()">📂 Завантажити</button>
+            <button class="btn btn-outline" style="flex:1; padding:12px 5px; border:1px solid var(--border); background:var(--card); font-size:13px; color:var(--text);" onclick="if(window.currentUser) { window.cloudLoad(); } else { document.getElementById('file-input').click(); }">
+    🔄 Оновити
+</button>
             <input type="file" id="file-input" style="display:none" accept=".json, .txt, application/json, text/plain" onchange="app.loadBackup(this)">
         </div>
 
@@ -2530,6 +2532,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
