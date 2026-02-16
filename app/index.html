@@ -1832,81 +1832,238 @@ ${requisitesTxt}`;
     renderReceiptHTML(i) {
         const a = this.currentData.apartments[i];
         const d = this.currentData;
-        const dStr = new Date().toLocaleDateString('uk-UA');
+        const t = d.tariffs;
+        const dStr = new Date().toLocaleDateString('uk-UA', { month: 'long', year: 'numeric' }).toUpperCase();
         
-        // Розрахунки (з вашого коду)
+        // --- 1. ПОВТОРЮЄМО ТОЧНИЙ РОЗРАХУНОК (Щоб цифри збігалися з Viber) ---
+        
+        // Споживання квартири
         const c = { 
             ed: Math.max(0,(a.curr.ed||0)-(a.prev.ed||0)), 
             en: Math.max(0,(a.curr.en||0)-(a.prev.en||0)), 
             w: Math.max(0,(a.curr.w||0)-(a.prev.w||0)), 
             g: Math.max(0,(a.curr.g||0)-(a.prev.g||0)) 
         };
-        const cost = { 
-            ed: (c.ed * d.tariffs.el_d) + (c.en * d.tariffs.el_n), 
-            w: c.w * d.tariffs.w, 
-            g: c.g * d.tariffs.g 
+
+        // Вартість ресурсів
+        const cost = {
+            ed: c.ed * t.el_d,
+            en: c.en * t.el_n,
+            w: c.w * t.w,
+            g: c.g * t.g
         };
 
+        // Розрахунок МЗК (Точно як у головній функції)
+        let totalIn={ed:0,en:0,w:0,g:0}, gServSum=0, totalApts={ed:0,en:0,w:0,g:0};
+        (d.groups || []).forEach(g => { 
+            totalIn.ed += Math.max(0,(g.curr.ed||0)-(g.prev.ed||0)); 
+            totalIn.en += Math.max(0,(g.curr.en||0)-(g.prev.en||0)); 
+            totalIn.w += Math.max(0,(g.curr.w||0)-(g.prev.w||0)); 
+            totalIn.g += Math.max(0,(g.curr.g||0)-(g.prev.g||0)); 
+            if(g.services) g.services.forEach(s => gServSum += (parseFloat(s.val)||0));
+        });
+        (d.apartments || []).forEach(ap => { 
+            totalApts.ed += Math.max(0,(ap.curr.ed||0)-(ap.prev.ed||0)); 
+            totalApts.en += Math.max(0,(ap.curr.en||0)-(ap.prev.en||0)); 
+            totalApts.w += Math.max(0,(ap.curr.w||0)-(ap.prev.w||0)); 
+            totalApts.g += Math.max(0,(ap.curr.g||0)-(ap.prev.g||0)); 
+        });
+        (d.extra_tariffs || []).forEach(et => gServSum += (parseFloat(et.val) || 0));
+
+        let mzkRaw = { 
+            ed: Math.max(0,totalIn.ed-totalApts.ed), 
+            en: Math.max(0,totalIn.en-totalApts.en), 
+            w: Math.max(0,totalIn.w-totalApts.w), 
+            g: Math.max(0,totalIn.g-totalApts.g) 
+        };
+        let mzkCostTotal = (mzkRaw.ed*t.el_d) + (mzkRaw.en*t.el_n) + (mzkRaw.w*t.w) + (mzkRaw.g*t.g) + gServSum;
+        let aptCount = (d.apartments || []).length;
+        let mzkPerApt = aptCount > 0 ? mzkCostTotal / aptCount : 0;
+
+        // --- 2. ГЕНЕРУЄМО РЯДКИ ТАБЛИЦІ ---
+
+        let rowsHTML = '';
+
+        // Електрика ДЕНЬ
+        if (c.ed > 0 || a.curr.ed > 0) {
+            rowsHTML += `
+            <tr style="border-bottom:1px solid #e2e8f0">
+                <td style="padding:12px 8px;">
+                    <div style="font-weight:bold; color:#334155;">⚡ Електрика (День)</div>
+                    <div style="font-size:11px; color:#64748b;">Показники: ${a.prev.ed} ➔ <b>${a.curr.ed}</b></div>
+                </td>
+                <td style="padding:12px 8px; text-align:center;">${c.ed} кВт</td>
+                <td style="padding:12px 8px; text-align:right;">${cost.ed.toFixed(2)}</td>
+            </tr>`;
+        }
+
+        // Електрика НІЧ
+        if (c.en > 0 || a.curr.en > 0) {
+            rowsHTML += `
+            <tr style="border-bottom:1px solid #e2e8f0">
+                <td style="padding:12px 8px;">
+                    <div style="font-weight:bold; color:#334155;">🌙 Електрика (Ніч)</div>
+                    <div style="font-size:11px; color:#64748b;">Показники: ${a.prev.en} ➔ <b>${a.curr.en}</b></div>
+                </td>
+                <td style="padding:12px 8px; text-align:center;">${c.en} кВт</td>
+                <td style="padding:12px 8px; text-align:right;">${cost.en.toFixed(2)}</td>
+            </tr>`;
+        }
+
+        // Вода
+        if (c.w > 0 || a.curr.w > 0) {
+            rowsHTML += `
+            <tr style="border-bottom:1px solid #e2e8f0">
+                <td style="padding:12px 8px;">
+                    <div style="font-weight:bold; color:#334155;">💧 Водопостачання</div>
+                    <div style="font-size:11px; color:#64748b;">Показники: ${a.prev.w} ➔ <b>${a.curr.w}</b></div>
+                </td>
+                <td style="padding:12px 8px; text-align:center;">${c.w} м³</td>
+                <td style="padding:12px 8px; text-align:right;">${cost.w.toFixed(2)}</td>
+            </tr>`;
+        }
+
+        // Газ
+        if (c.g > 0 || a.curr.g > 0) {
+            rowsHTML += `
+            <tr style="border-bottom:1px solid #e2e8f0">
+                <td style="padding:12px 8px;">
+                    <div style="font-weight:bold; color:#334155;">🔥 Газопостачання</div>
+                    <div style="font-size:11px; color:#64748b;">Показники: ${a.prev.g} ➔ <b>${a.curr.g}</b></div>
+                </td>
+                <td style="padding:12px 8px; text-align:center;">${c.g} м³</td>
+                <td style="padding:12px 8px; text-align:right;">${cost.g.toFixed(2)}</td>
+            </tr>`;
+        }
+
         // Лічильники користувача
-        let custRows = "";
-        let custCostTotal = 0;
+        let custCost = 0;
         (a.custom_counters || []).forEach(cc => {
             const diff = Math.max(0, cc.curr - cc.prev);
             const val = diff * cc.price;
-            custCostTotal += val;
-            custRows += `<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:8px; color:#334155">${cc.name}</td><td style="padding:8px; text-align:center">${diff}</td><td style="padding:8px; text-align:right">${val.toFixed(2)} грн</td></tr>`;
+            custCost += val;
+            if(diff > 0 || cc.curr > 0) {
+                rowsHTML += `
+                <tr style="border-bottom:1px solid #e2e8f0">
+                    <td style="padding:12px 8px;">
+                        <div style="color:#334155;">${cc.name}</div>
+                        <div style="font-size:11px; color:#64748b;">${cc.prev} ➔ <b>${cc.curr}</b></div>
+                    </td>
+                    <td style="padding:12px 8px; text-align:center;">${diff}</td>
+                    <td style="padding:12px 8px; text-align:right;">${val.toFixed(2)}</td>
+                </tr>`;
+            }
         });
 
-        // Послуги та МЗК
-        const mzkMatch = (this.checks && this.checks[i]) ? this.checks[i].match(/МЗК: (\d+\.\d+)/) : null;
-        const mzkVal = mzkMatch ? parseFloat(mzkMatch[1]) : 0;
-        
-        const sRows = (a.services||[]).map(s => `<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:8px; color:#334155" colspan="2">${s.name}</td><td style="padding:8px; text-align:right">${parseFloat(s.val).toFixed(2)} грн</td></tr>`).join('');
-        
-        const tot = cost.ed + cost.w + cost.g + custCostTotal + (a.services||[]).reduce((s,x)=>s+x.val,0) + mzkVal + (a.debt||0);
-        const toPay = tot - (a.paid || 0);
+        // МЗК
+        rowsHTML += `
+        <tr style="border-bottom:1px solid #e2e8f0; background-color:#f8fafc;">
+            <td style="padding:12px 8px;" colspan="2">
+                <div style="font-weight:bold; color:#475569;">🏢 МЗК (Загальні витрати)</div>
+                <div style="font-size:10px; color:#94a3b8;">Світло, прибирання та ін.</div>
+            </td>
+            <td style="padding:12px 8px; text-align:right; font-weight:bold; color:#475569;">${mzkPerApt.toFixed(2)}</td>
+        </tr>`;
 
-        // HTML Шаблон
+        // Послуги (Інтернет, Охорона тощо)
+        let sCost = 0;
+        (a.services||[]).forEach(s => {
+            const val = parseFloat(s.val)||0;
+            sCost += val;
+            if(val > 0) {
+                rowsHTML += `
+                <tr style="border-bottom:1px solid #e2e8f0">
+                    <td style="padding:12px 8px;" colspan="2">${s.name}</td>
+                    <td style="padding:12px 8px; text-align:right;">${val.toFixed(2)}</td>
+                </tr>`;
+            }
+        });
+
+        // Фінальні суми
+        const currentTotal = cost.ed + cost.en + cost.w + cost.g + custCost + sCost + mzkPerApt;
+        const debt = parseFloat(a.debt)||0;
+        const paid = parseFloat(a.paid)||0;
+        const totalToPay = currentTotal + debt - paid;
+
+        // --- 3. ЗБИРАЄМО HTML ШАБЛОН ---
         return `
         <div style="font-family:'Inter',sans-serif; color:#1e293b; background:#fff; padding:40px; box-sizing:border-box; width:100%">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px; border-bottom:2px solid #0099ff; padding-bottom:20px">
-                <div style="font-weight:900; font-size:24px; text-transform:uppercase; color:#0f172a">Comunalco</div>
+            
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px; border-bottom:3px solid #0099ff; padding-bottom:20px">
+                <div>
+                    <div style="font-weight:900; font-size:26px; letter-spacing:-1px; text-transform:uppercase; color:#0f172a">Comunalco</div>
+                    <div style="font-size:12px; color:#64748b; margin-top:5px;">Система обліку</div>
+                </div>
                 <div style="text-align:right">
-                    <div style="font-size:14px; font-weight:bold">${d.name}</div>
-                    <div style="font-size:12px; color:#64748b">${dStr}</div>
+                    <div style="font-size:18px; font-weight:bold; color:#0f172a">${d.name}</div>
+                    <div style="font-size:13px; color:#0099ff; font-weight:bold; margin-top:2px;">${dStr}</div>
                 </div>
             </div>
             
-            <div style="background:#f8fafc; padding:15px; border-radius:12px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center">
-                <div style="font-size:10px; color:#64748b; text-transform:uppercase; font-weight:bold">Платник</div>
-                <div style="font-size:18px; font-weight:bold; color:#0f172a">${a.name}</div>
+            <div style="background:#f1f5f9; padding:15px 20px; border-radius:12px; margin-bottom:25px; display:flex; justify-content:space-between; align-items:center; border:1px solid #e2e8f0;">
+                <div>
+                    <div style="font-size:10px; color:#64748b; text-transform:uppercase; font-weight:bold; letter-spacing:1px;">Платник</div>
+                    <div style="font-size:20px; font-weight:800; color:#0f172a; margin-top:2px;">${a.name}</div>
+                </div>
+                ${a.phone ? `<div style="font-size:14px; color:#64748b;">${a.phone}</div>` : ''}
             </div>
 
-            <table style="width:100%; border-collapse:collapse; font-size:12px; margin-bottom:20px">
-                <thead><tr style="background:#f1f5f9; text-transform:uppercase; font-size:10px; color:#64748b"><th style="padding:10px; text-align:left">Послуга</th><th style="padding:10px; text-align:center">Спожито</th><th style="padding:10px; text-align:right">Сума</th></tr></thead>
+            <table style="width:100%; border-collapse:collapse; font-size:13px; margin-bottom:30px">
+                <thead>
+                    <tr style="text-transform:uppercase; font-size:10px; color:#64748b; border-bottom:2px solid #e2e8f0;">
+                        <th style="padding:10px 8px; text-align:left; width:50%">Послуга / Показники</th>
+                        <th style="padding:10px 8px; text-align:center; width:25%">Спожито</th>
+                        <th style="padding:10px 8px; text-align:right; width:25%">Сума (грн)</th>
+                    </tr>
+                </thead>
                 <tbody>
-                    ${c.ed>0 ? `<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:8px">Електроенергія (Д)</td><td style="padding:8px; text-align:center">${c.ed} кВт</td><td style="padding:8px; text-align:right">${cost.ed.toFixed(2)}</td></tr>` : ''}
-                    ${c.w>0 ? `<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:8px">Водопостачання</td><td style="padding:8px; text-align:center">${c.w} м3</td><td style="padding:8px; text-align:right">${cost.w.toFixed(2)}</td></tr>` : ''}
-                    ${c.g>0 ? `<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:8px">Газопостачання</td><td style="padding:8px; text-align:center">${c.g} м3</td><td style="padding:8px; text-align:right">${cost.g.toFixed(2)}</td></tr>` : ''}
-                    ${custRows}
-                    ${mzkVal>0 ? `<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:8px" colspan="2">МЗК (Опалення/Світло)</td><td style="padding:8px; text-align:right">${mzkVal.toFixed(2)} грн</td></tr>` : ''}
-                    ${sRows}
-                    ${a.debt>0 ? `<tr style="color:#ef4444"><td style="padding:8px" colspan="2">Борг за минулий період</td><td style="padding:8px; text-align:right">${a.debt} грн</td></tr>` : ''}
-                    ${a.paid>0 ? `<tr style="color:#22c55e"><td style="padding:8px" colspan="2">Сплачено</td><td style="padding:8px; text-align:right">-${a.paid} грн</td></tr>` : ''}
+                    ${rowsHTML}
                 </tbody>
             </table>
 
-            <div style="background:#0f172a; color:white; padding:20px; border-radius:12px; display:flex; justify-content:space-between; align-items:center">
-                <div style="font-size:12px; opacity:0.8">ДО СПЛАТИ</div>
-                <div style="font-size:24px; font-weight:900">${toPay.toFixed(2)} грн</div>
+            <div style="display:flex; justify-content:flex-end; margin-bottom:30px;">
+                <div style="width:250px;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:13px;">
+                        <span style="color:#64748b;">Нараховано:</span>
+                        <span style="font-weight:bold;">${currentTotal.toFixed(2)}</span>
+                    </div>
+                    ${debt > 0 ? `
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:13px; color:#ef4444;">
+                        <span>❗️ Борг:</span>
+                        <span style="font-weight:bold;">${debt.toFixed(2)}</span>
+                    </div>` : ''}
+                    ${paid > 0 ? `
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:13px; color:#22c55e;">
+                        <span>✅ Сплачено:</span>
+                        <span style="font-weight:bold;">-${paid.toFixed(2)}</span>
+                    </div>` : ''}
+                    
+                    <div style="border-top:2px solid #0f172a; margin-top:10px; padding-top:10px; display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:12px; font-weight:bold; text-transform:uppercase;">До сплати</span>
+                        <span style="font-size:22px; font-weight:900; color:#0f172a;">${totalToPay.toFixed(2)}</span>
+                    </div>
+                </div>
             </div>
             
-            <div style="margin-top:20px; font-size:10px; color:#94a3b8; text-align:center">
-                ${(d.requisites||[]).map(r => `<div>${r.name}: ${r.val}</div>`).join('')}
+            ${(d.requisites && d.requisites.length > 0) ? `
+            <div style="background:#0f172a; color:white; padding:20px; border-radius:12px; font-size:12px;">
+                <div style="text-transform:uppercase; font-weight:bold; opacity:0.6; margin-bottom:10px; letter-spacing:1px;">Реквізити для оплати</div>
+                <div style="display:grid; gap:10px;">
+                    ${d.requisites.map(r => `
+                        <div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:5px;">
+                            <span>${r.name}:</span>
+                            <span style="font-family:monospace; font-size:13px; letter-spacing:0.5px;">${r.val}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+            ` : ''}
+            
+            <div style="margin-top:20px; text-align:center; font-size:10px; color:#cbd5e1;">
+                Згенеровано автоматично сервісом Comunalco
             </div>
         </div>`;
     }
-
    // --- ФІНАЛ: ВИПРАВЛЕННЯ КОПІЮВАННЯ (Тільки Картинка) ---
     async sharePDF(i) {
         const apt = this.currentData.apartments[i];
@@ -2622,6 +2779,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
