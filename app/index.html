@@ -2666,7 +2666,6 @@ window.addEventListener('load', () => {
           await sbClient.from('service_tariffs').delete().eq('house_id', String(house.id));
           await sbClient.from('service_tariffs').insert(tariffsData);
 
-          // 3. Зберігаємо КВАРТИРИ з повним станом (current_data)
           if (house.apartments && house.apartments.length > 0) {
               const aptsToSave = house.apartments.map(a => ({
                   id: String(a.id),
@@ -2677,8 +2676,9 @@ window.addEventListener('load', () => {
                   messenger: a.messenger || 'viber',
                   debt: parseFloat(a.debt || 0),
                   paid: parseFloat(a.paid || 0),
+                  total_bill: parseFloat(a.bill || 0), // 🔥 ОСЬ ЦЕ ГОЛОВНЕ
+                  telegram_chat_id: a.telegram_chat_id, 
                   
-                  // 🔥 ПАКУЄМО ЦИФРИ У СЕЙФ
                   current_data: {
                       prev: a.prev,
                       curr: a.curr,
@@ -2686,7 +2686,6 @@ window.addEventListener('load', () => {
                       serv: a.services
                   }
               }));
-              
               const { error } = await sbClient.from('apartments').upsert(aptsToSave);
               if(error) console.error("Помилка квартир:", error);
           }
@@ -2731,6 +2730,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
