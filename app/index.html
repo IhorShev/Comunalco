@@ -1198,7 +1198,15 @@ class App {
                 </div>
                 
                 <div style="margin-top:15px; display:flex; gap:10px;">
-                    <button class="btn btn-outline btn-sm" style="border-color:#8b5cf6; color:#8b5cf6;" onclick="app.sendToMake(${i})">🚀 Bot</button>
+                    <button class="btn btn-outline btn-sm" style="border-color:#0ea5e9; color:#0ea5e9;" 
+                        onclick="navigator.clipboard.writeText('https://t.me/Comunalco_bot?start=${a.id}'); alert('Посилання скопійовано!')">
+                        🔗 Link
+                    </button>
+
+                    <button class="btn btn-outline btn-sm" style="border-color:#8b5cf6; color:#8b5cf6;"
+                        onclick="app.sendToBot(${i})">
+                        🚀 Bot
+                    </button>
                 </div>
 
             </div></details>`;
@@ -2700,6 +2708,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
