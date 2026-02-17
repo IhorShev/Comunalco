@@ -1599,37 +1599,18 @@ ${requisitesTxt}`;
     } 
 
    // 1. ФУНКЦІЯ ВІДПРАВКИ ЧЕРЕЗ SUPABASE (Оновлена назва)
+    // --- 1. ВІДПРАВКА ОДНІЄЇ КВИТАНЦІЇ (Оновлена) ---
     async sendToBot(i, isSilentMode = false) {
         const FUNCTION_URL = "https://aougdxtsmzjgoykaslbt.supabase.co/functions/v1/telegram-bot";
-        
         const a = this.currentData.apartments[i];
         
-        // Візуалізація натискання (тільки якщо це не масова розсилка)
+        if (!a.telegram_chat_id) {
+            if (!isSilentMode) alert(`⚠️ ${a.name}: Немає Telegram ID. Натисніть кнопку "Link" у таблиці.`);
+            return false;
+        }
+
         const btn = (event && event.currentTarget) ? event.currentTarget : null;
-        let originalText = "";
-        
-        if(btn && !isSilentMode) {
-             originalText = btn.innerText;
-             btn.disabled = true;
-             btn.innerText = "⏳ ...";
-        }
-
-        // Перевіряємо ID
-        let chatId = a.telegram_chat_id; 
-        if (!chatId) {
-            if(btn && !isSilentMode) { btn.innerText = "❌ Нема ID"; btn.disabled = false; }
-            if(!isSilentMode) alert(`⚠️ У квартири "${a.name}" немає Telegram ID.\nІнструкція:\n1. Мешканець пише боту /start\n2. Ви вписуєте отриманий ID у базу.`);
-            return false; // Повертаємо false, щоб sendBatch знав про помилку
-        }
-
-        // Перевіряємо квитанцію
-        if (!this.checks[i]) {
-             if(!isSilentMode) alert("Спочатку натисніть 'Розрахувати'!");
-             if(btn) { btn.innerText = originalText; btn.disabled = false; }
-             return false;
-        }
-
-        const receiptText = this.checks[i];
+        if (btn && !isSilentMode) { btn.disabled = true; btn.innerText = "⏳..."; }
 
         try {
             const response = await fetch(FUNCTION_URL, {
@@ -1637,34 +1618,81 @@ ${requisitesTxt}`;
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     action: "send_message",
-                    chat_id: chatId,
-                    text: receiptText
+                    chat_id: a.telegram_chat_id,
+                    text: this.checks[i] // Текст квитанції
                 })
             });
 
-            if (!response.ok) throw new Error("Server error");
+            if (!response.ok) throw new Error("Server Error");
 
-            if(btn && !isSilentMode) {
-                btn.classList.remove('btn-outline');
-                btn.classList.add('btn-success');
-                btn.innerText = "✅ Надіслано!";
-                setTimeout(() => {
-                    btn.innerText = originalText;
-                    btn.disabled = false;
-                    btn.classList.remove('btn-success');
-                    btn.classList.add('btn-outline');
-                }, 3000);
+            if (btn && !isSilentMode) {
+                btn.innerText = "✅ OK";
+                setTimeout(() => { btn.innerText = "Надіслати"; btn.disabled = false; }, 2000);
             }
-            return true; // Успіх
-
+            return true;
         } catch (e) {
             console.error(e);
-            if(btn && !isSilentMode) {
-                btn.innerText = "❌ Помилка";
-                if(!isSilentMode) alert("Помилка відправки");
-                btn.disabled = false;
-            }
-            return false; // Помилка
+            if (btn && !isSilentMode) { btn.innerText = "❌ Помилка"; btn.disabled = false; }
+            return false;
+        }
+    }
+
+    // --- 2. ОГОЛОШЕННЯ ДЛЯ ВСІХ ---
+    async broadcastAnnouncement() {
+        const text = prompt("📢 Введіть текст оголошення для ВСІХ мешканців:");
+        if (!text) return;
+
+        if(!confirm(`Ви впевнені, що хочете надіслати це повідомлення всім підключеним мешканцям?`)) return;
+
+        const FUNCTION_URL = "https://aougdxtsmzjgoykaslbt.supabase.co/functions/v1/telegram-bot";
+        
+        try {
+            const response = await fetch(FUNCTION_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    action: "broadcast",
+                    text: text
+                })
+            });
+            
+            const result = await response.json();
+            alert(`✅ Оголошення надіслано! Отримали: ${result.count} чол.`);
+        } catch (e) {
+            alert("❌ Помилка розсилки: " + e.message);
+        }
+    }
+
+    // --- 3. НАГАДУВАННЯ БОРЖНИКАМ ---
+    async remindDebtors() {
+        if(!confirm("🔔 Надіслати нагадування всім, у кого борг більше 0 грн?")) return;
+
+        const FUNCTION_URL = "https://aougdxtsmzjgoykaslbt.supabase.co/functions/v1/telegram-bot";
+        
+        // Збираємо список боржників
+        const debtors = this.currentData.apartments
+            .filter(a => parseFloat(a.debt) > 0 && a.telegram_chat_id) // Тільки з боргом і Телеграмом
+            .map(a => ({ chat_id: a.telegram_chat_id, amount: a.debt }));
+
+        if (debtors.length === 0) {
+            alert("🤷‍♂️ Боржників з підключеним Телеграмом не знайдено.");
+            return;
+        }
+
+        try {
+            const response = await fetch(FUNCTION_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    action: "remind_debtors",
+                    debtors: debtors
+                })
+            });
+            
+            const result = await response.json();
+            alert(`🔔 Нагадування відправлено ${result.count} мешканцям.`);
+        } catch (e) {
+            alert("❌ Помилка: " + e.message);
         }
     }
 
@@ -2670,6 +2698,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
