@@ -361,24 +361,25 @@
     
     <div style="height: 120px;"></div>
 
-    <div class="sticky-footer" style="gap:8px; padding:10px; flex-wrap:wrap;">
+    <div class="sticky-footer" style="flex-direction: column; gap: 8px; padding: 12px; border-radius: 24px; bottom: 10px;">
         
-        <div style="display:flex; gap:5px; flex:1; min-width: 140px;">
-            <button class="btn btn-warning" style="flex:1; padding:12px 5px; font-size:13px;" onclick="app.downloadBackup()">💾 Зберегти</button>
-            <button class="btn btn-outline" style="flex:1; padding:12px 5px; border:1px solid var(--border); background:var(--card); font-size:13px; color:var(--text);" onclick="if(window.currentUser) { window.cloudLoad(); } else { document.getElementById('file-input').click(); }">
-    🔄 Оновити
-</button>
-            <input type="file" id="file-input" style="display:none" accept=".json, .txt, application/json, text/plain" onchange="app.loadBackup(this)">
+        <div style="display:flex; gap:10px; width: 100%;">
+            <button class="btn btn-warning" style="flex:1; padding:12px; font-size:14px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" onclick="app.downloadBackup()">
+                💾 Зберегти
+            </button>
+            <button class="btn btn-outline" style="flex:1; padding:12px; font-size:14px; background:var(--card); color:var(--text); border:1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.05);" onclick="window.currentUser ? window.cloudLoad() : document.getElementById('file-input').click()">
+                🔄 Оновити
+            </button>
+            <input type="file" id="file-input" style="display:none" onchange="app.loadBackup(this)">
         </div>
 
-        <div style="display:flex; gap:5px; flex:1.2; min-width: 160px;">
-            <button class="btn btn-success" style="flex:1; font-weight:bold; font-size:14px;" onclick="app.calculate()">✅ Розрахувати</button>
-            
-            <button id="batch-btn" class="btn" style="flex:1; background:#2AABEE; color:white; font-weight:bold; font-size:13px; display:flex; align-items:center; justify-content:center; gap:5px;" onclick="app.sendBatch()">
-            <span>✈️</span> Надіслати Телеграм
-        </button>
-            <button class="btn btn-warning" style="flex:1; font-weight:bold; font-size:13px;" onclick="app.broadcastAnnouncement()">📢 Всім</button>
-<button class="btn btn-danger" style="flex:1; font-weight:bold; font-size:13px;" onclick="app.remindDebtors()">🔔 Борг</button>
+        <div style="display:flex; gap:10px; width: 100%;">
+            <button class="btn btn-success" style="flex:1; padding:12px; font-weight:bold; font-size:15px; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);" onclick="app.calculate()">
+                ✅ Розрахувати
+            </button>
+            <button id="tg-menu-btn" class="btn" style="flex:1; background:#2AABEE; color:white; padding:12px; font-weight:bold; font-size:15px; box-shadow: 0 4px 10px rgba(42, 171, 238, 0.3);" onclick="document.getElementById('tgActionModal').style.display='flex'">
+                ✈️ Надіслати
+            </button>
         </div>
     </div>
 
@@ -2706,8 +2707,31 @@ window.addEventListener('load', () => {
         <button class="btn btn-danger" onclick="app.startNewMonth()">🗓 Закрити місяць</button>
     </div>
 </div>
+
+    <div id="tgActionModal" class="modal" style="z-index: 9999;">
+    <div class="modal-content" style="max-width: 320px; text-align: center; padding: 30px 20px;">
+        <span class="modal-close" onclick="document.getElementById('tgActionModal').style.display='none'">&times;</span>
+        
+        <div style="font-size: 40px; margin-bottom: 10px;">✈️</div>
+        <h3 style="margin-top:0; margin-bottom: 5px;">Телеграм Бот</h3>
+        <p style="color:var(--text-sec); font-size:13px; margin-bottom:25px;">Оберіть масову дію для всіх мешканців:</p>
+        
+        <div style="display:flex; flex-direction:column; gap:12px;">
+            <button class="btn" style="background:#2AABEE; color:white; padding: 14px;" onclick="app.sendBatch(); document.getElementById('tgActionModal').style.display='none'">
+                📨 Відправити квітанції
+            </button>
+            <button class="btn btn-warning" style="padding: 14px;" onclick="app.broadcastAnnouncement(); document.getElementById('tgActionModal').style.display='none'">
+                📢 Зробити повідомлення
+            </button>
+            <button class="btn btn-danger" style="padding: 14px;" onclick="app.remindDebtors(); document.getElementById('tgActionModal').style.display='none'">
+                🔔 Нагадати про борг
+            </button>
+        </div>
+    </div>
+</div>
 </body>
 </html>
+
 
 
 
