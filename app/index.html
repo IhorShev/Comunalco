@@ -377,6 +377,8 @@
             <button id="batch-btn" class="btn" style="flex:1; background:#2AABEE; color:white; font-weight:bold; font-size:13px; display:flex; align-items:center; justify-content:center; gap:5px;" onclick="app.sendBatch()">
             <span>✈️</span> Надіслати Телеграм
         </button>
+            <button class="btn btn-warning" style="flex:1; font-weight:bold; font-size:13px;" onclick="app.broadcastAnnouncement()">📢 Всім</button>
+<button class="btn btn-danger" style="flex:1; font-weight:bold; font-size:13px;" onclick="app.remindDebtors()">🔔 Борг</button>
         </div>
     </div>
 
@@ -2698,6 +2700,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
