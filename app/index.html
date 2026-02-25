@@ -1381,32 +1381,42 @@ class App {
         type === 'group' ? this.renderGroups() : this.renderApartments();
     }
 
-    // --- DATA UPDATES ---
-    setTariff(k,v) { this.currentData.tariffs[k]=parseFloat(v); this.save(); }
-    addExtraTariff(){this.currentData.extra_tariffs.push({name:"",val:0});this.save();this.renderExtraTariffs();}
-    updateExtraTariff(i,k,v){this.currentData.extra_tariffs[i][k]=k==='val'?parseFloat(v):v;this.save();}
-    delExtraTariff(i){if(confirm("Видалити?")){this.currentData.extra_tariffs.splice(i,1);this.save();this.renderExtraTariffs();}}
+    // --- DATA UPDATES (З АВТО-РОЗРАХУНКОМ) ---
+    setTariff(k,v) { this.currentData.tariffs[k]=parseFloat(v); this.save(); this.calculate(); }
+    
+    addExtraTariff(){this.currentData.extra_tariffs.push({name:"",val:0});this.save();this.renderExtraTariffs(); this.calculate();}
+    updateExtraTariff(i,k,v){this.currentData.extra_tariffs[i][k]=k==='val'?parseFloat(v):v;this.save(); this.calculate();}
+    delExtraTariff(i){if(confirm("Видалити?")){this.currentData.extra_tariffs.splice(i,1);this.save();this.renderExtraTariffs(); this.calculate();}}
     
     addRequisite(){this.currentData.requisites.push({name:"",val:""});this.save();this.renderRequisites();}
     updateReq(i,k,v){this.currentData.requisites[i][k]=v;this.save();}
     delReq(i){if(confirm("Видалити?")){this.currentData.requisites.splice(i,1);this.save();this.renderRequisites();}}
     
     updateGroup(i,k,v){this.currentData.groups[i][k]=v;this.save();}
-    updateGroupMetric(i,t,k,v){this.currentData.groups[i][t][k]=parseFloat(v);this.save();}
+    updateGroupMetric(i,t,k,v){this.currentData.groups[i][t][k]=parseFloat(v);this.save(); this.calculate();}
     addGroup(){this.currentData.groups.push({id:Date.now(),name:"Загальнобудинкові (МЗК)",prev:{},curr:{}, custom_counters:[], services:[]});this.save();this.renderGroups();}
-    delGroup(i){if(confirm("Видалити групу?")){this.currentData.groups.splice(i,1);this.save();this.renderGroups();}}
+    delGroup(i){if(confirm("Видалити групу?")){this.currentData.groups.splice(i,1);this.save();this.renderGroups(); this.calculate();}}
     
     addGS(i){ if(!this.currentData.groups[i].services) this.currentData.groups[i].services = [];
-        this.currentData.groups[i].services.push({name:"",val:0}); this.save(); this.renderGroups(); }
-    updateGS(gi,si,k,v){ this.currentData.groups[gi].services[si][k]=k==='val'?parseFloat(v):v; this.save(); }
-    delGS(gi,si){ this.currentData.groups[gi].services.splice(si,1); this.save(); this.renderGroups(); }
+    this.currentData.groups[i].services.push({name:"",val:0}); this.save(); this.renderGroups(); this.calculate(); }
+    updateGS(gi,si,k,v){ this.currentData.groups[gi].services[si][k]=k==='val'?parseFloat(v):v; this.save(); this.calculate(); }
+    delGS(gi,si){ this.currentData.groups[gi].services.splice(si,1); this.save(); this.renderGroups(); this.calculate(); }
 
-    updateApt(i,k,v){this.currentData.apartments[i][k]=(k==='debt'||k==='paid')?parseFloat(v):v;this.save();}
-    updateAptMetric(i,t,k,v){this.currentData.apartments[i][t][k]=parseFloat(v);this.save();}
-    addAS(i){this.currentData.apartments[i].services.push({name:"",val:0});this.save();this.renderApartments();}
-    updateAS(ai,si,k,v){this.currentData.apartments[ai].services[si][k]=k==='val'?parseFloat(v):v;this.save();}
-    delAS(ai,si){this.currentData.apartments[ai].services.splice(si,1);this.save();this.renderApartments();}
-    delApt(i){if(confirm("Видалити квартиру?")){this.currentData.apartments.splice(i,1);this.save();this.renderApartments(); this.updateStatus();}}
+    // 🔥 ГОЛОВНІ ФУНКЦІЇ ДЛЯ КВАРТИР
+    updateApt(i,k,v){
+        this.currentData.apartments[i][k]=(k==='debt'||k==='paid')?parseFloat(v):v;
+        this.save();
+        this.calculate(); // Перераховуємо баланс відразу
+    }
+    updateAptMetric(i,t,k,v){
+        this.currentData.apartments[i][t][k]=parseFloat(v);
+        this.save();
+        this.calculate(); // Перераховуємо суму відразу
+    }
+    addAS(i){this.currentData.apartments[i].services.push({name:"",val:0});this.save();this.renderApartments(); this.calculate();}
+    updateAS(ai,si,k,v){this.currentData.apartments[ai].services[si][k]=k==='val'?parseFloat(v):v;this.save(); this.calculate();}
+    delAS(ai,si){this.currentData.apartments[ai].services.splice(si,1);this.save();this.renderApartments(); this.calculate();}
+    delApt(i){if(confirm("Видалити квартиру?")){this.currentData.apartments.splice(i,1);this.save();this.renderApartments(); this.updateStatus(); this.calculate();}}
 
     // --- CALCULATIONS ---
     calculate() {
@@ -2754,6 +2764,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
