@@ -619,7 +619,10 @@ class App {
         this.state = { license: { type: 'free', exp: null }, currentObjIdx: 0, objects: [] };
         this.checks = {};
         this.STORAGE_KEY = 'komunalka_v30_pro'; 
-        this.pendingPayment = null; 
+        this.pendingPayment = null;
+        // --- ПАРАМЕТРИ ПІДПИСКИ ---
+        this.subPeriod = 12; // По замовчуванню 1 рік
+        this.lastCalcAmount = 0;
         
         // 🛑 ВАШЕ ПОСИЛАННЯ НА GOOGLE SCRIPT 🛑
         this.API_URL = "https://script.google.com/macros/s/AKfycbxBvZG3n_tdvGApizm7U6okpL-wdXyKrZnpErt4c0_NUgEZ2VLo1-8s9GCDJc38C9uj/exec";
@@ -628,7 +631,79 @@ class App {
     }
     
     init() { this.load(); this.initTheme(); this.renderAll(); this.updateStatus(); }
-    
+    // 1. Розрахунок ціни (Ваша прогресивна шкала)
+    updateSubscriptionCalc() {
+        const aptsInput = document.getElementById('calc-apts');
+        const apts = aptsInput ? (parseInt(aptsInput.value) || 1) : 1;
+        const period = this.subPeriod;
+        
+        // Тарифікація за квартиру в місяць (чим більше квартир, тим дешевше)
+        let pricePerMonth = 7; 
+        if (apts >= 3) pricePerMonth = 6;
+        if (apts >= 10) pricePerMonth = 5;
+        if (apts >= 30) pricePerMonth = 3.5; // -50% знижка для великих об'єктів
+
+        let total = apts * pricePerMonth * period;
+        
+        // Додаткова знижка -20% якщо передплата на рік
+        if (period === 12) total = total * 0.8;
+
+        this.lastCalcAmount = Math.ceil(total);
+        
+        // Оновлюємо цифри на екрані
+        const totalSumEl = document.getElementById('calc-total-sum');
+        const pricePerAptEl = document.getElementById('calc-price-per-apt');
+        
+        if (totalSumEl) totalSumEl.innerText = `${this.lastCalcAmount} грн`;
+        if (pricePerAptEl) {
+            const effectivePrice = (this.lastCalcAmount / period / apts).toFixed(2);
+            pricePerAptEl.innerText = `(${effectivePrice} грн/кв в міс)`;
+        }
+        
+        // Показуємо ID користувача (короткий варіант для коментаря)
+        const displayIdEl = document.getElementById('display-user-id');
+        if (displayIdEl) {
+            const userId = window.currentUser ? window.currentUser.id.split('-')[0].toUpperCase() : 'ГОСТЬ';
+            displayIdEl.innerText = userId;
+        }
+    }
+
+    setSubPeriod(p) {
+        this.subPeriod = p;
+        // Оновлюємо візуально кнопки вибору періоду
+        const btn6 = document.getElementById('btn-period-6');
+        const btn12 = document.getElementById('btn-period-12');
+        
+        if (btn6 && btn12) {
+            btn6.style.borderWidth = p === 6 ? '2px' : '1px';
+            btn6.style.borderColor = p === 6 ? 'var(--primary)' : 'var(--border)';
+            btn12.style.borderWidth = p === 12 ? '2px' : '1px';
+            btn12.style.borderColor = p === 12 ? 'var(--success)' : 'var(--border)';
+        }
+        this.updateSubscriptionCalc();
+    }
+
+    // 2. Автоматизація Donatello
+    payViaDonatello() {
+        if (!window.currentUser) return alert("Будь ласка, спочатку увійдіть в акаунт!");
+        
+        const amount = this.lastCalcAmount;
+        const userId = window.currentUser.id;
+        const apts = document.getElementById('calc-apts').value;
+        
+        // Формуємо коментар, який наш бот розпізнає автоматично:
+        // Пакет: [ID користувача]:[Кількість квартир]:[Період]
+        const msg = `SUB:${userId}:${apts}:${this.subPeriod}`;
+        
+        // Посилання на ваш збір у Donatello
+        const url = `https://donatello.ua/comunalco?amount=${amount}&message=${encodeURIComponent(msg)}`;
+        
+        window.open(url, '_blank');
+    }
+
+    payViaCrypto() {
+        alert("Оплата Crypto через xRocket буде підключена автоматично після налаштування API ключа.");
+    }
     // --- UI & THEME ---
     initTheme() { 
         const isDark = localStorage.getItem('theme')==='dark';
@@ -2739,6 +2814,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
