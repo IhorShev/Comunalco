@@ -1418,8 +1418,7 @@ class App {
     delAS(ai,si){this.currentData.apartments[ai].services.splice(si,1);this.save();this.renderApartments(); this.calculate();}
     delApt(i){if(confirm("Видалити квартиру?")){this.currentData.apartments.splice(i,1);this.save();this.renderApartments(); this.updateStatus(); this.calculate();}}
 
-    // --- CALCULATIONS ---
-    calculate() {
+   calculate() {
         try {
             const d = this.currentData;
             const t = d.tariffs;
@@ -1433,7 +1432,6 @@ class App {
                 totalIn.g += Math.max(0,(g.curr.g||0)-(g.prev.g||0)); 
                 if(g.services) g.services.forEach(s => gServSum += (parseFloat(s.val)||0));
             });
-
             // 2. Рахуємо суми по квартирах
             (d.apartments || []).forEach(a => { 
                 totalApts.ed += Math.max(0,(a.curr.ed||0)-(a.prev.ed||0)); 
@@ -1441,10 +1439,8 @@ class App {
                 totalApts.w += Math.max(0,(a.curr.w||0)-(a.prev.w||0)); 
                 totalApts.g += Math.max(0,(a.curr.g||0)-(a.prev.g||0)); 
             });
-
             // 3. Додаткові витрати (МЗК)
             (d.extra_tariffs || []).forEach(et => gServSum += (parseFloat(et.val) || 0));
-
             // 4. Обчислюємо МЗК
             let mzk = { 
                 ed: Math.max(0,totalIn.ed-totalApts.ed), 
@@ -1453,18 +1449,20 @@ class App {
                 g: Math.max(0,totalIn.g-totalApts.g) 
             };
             let mzkCost = (mzk.ed*t.el_d) + (mzk.en*t.el_n) + (mzk.w*t.w) + (mzk.g*t.g) + gServSum;
-            
             let aptCount = (d.apartments || []).length;
             let mzkPerApt = aptCount > 0 ? mzkCost / aptCount : 0;
             
-            // Виводимо інфо про МЗК на екран
+            // Виводимо інфо про МЗК на екран (в модальному вікні)
             const mzkEl = document.getElementById('mzk-info');
             if(mzkEl) mzkEl.innerHTML = `<div>МЗК Всього: <b>${mzkCost.toFixed(2)}</b> грн | На квартиру: <b>${mzkPerApt.toFixed(2)}</b> грн</div>`;
             
             const dStr = new Date().toLocaleDateString('uk-UA', { month: 'long', year: 'numeric' });
-
-            // 5. Генеруємо список квитанцій
-            document.getElementById('results-list').innerHTML = (d.apartments || []).map((a, i) => {
+            
+            // 5. ГЕНЕРАЦІЯ КВИТАНЦІЙ І ОНОВЛЕННЯ ЕКРАНУ
+            const resultsList = document.getElementById('results-list');
+            
+            // Генеруємо HTML для списку квитанцій (для модального вікна)
+            const listHTML = (d.apartments || []).map((a, i) => {
                 // Різниця показників
                 const c = { 
                     ed: Math.max(0,(a.curr.ed||0)-(a.prev.ed||0)), 
@@ -1474,12 +1472,7 @@ class App {
                 };
                 
                 // Вартість ресурсів
-                const cost = {
-                    ed: c.ed * t.el_d,
-                    en: c.en * t.el_n,
-                    w: c.w * t.w,
-                    g: c.g * t.g
-                };
+                const cost = { ed: c.ed * t.el_d, en: c.en * t.el_n, w: c.w * t.w, g: c.g * t.g };
                 let mCost = cost.ed + cost.en + cost.w + cost.g;
                 
                 // Вартість лічильників користувача
@@ -1492,98 +1485,58 @@ class App {
                 });
 
                 // Вартість послуг
-                let sCost=0, sTxt=""; 
+                let sCost=0, sTxt="";
                 (a.services || []).forEach(s=>{
                     let val = parseFloat(s.val)||0;
                     sCost+=val; 
                     if(val > 0) sTxt+=`🛠 ${s.name}: ${val.toFixed(2)} грн\n`;
                 });
-                
-                // Фінальні суми
+
+                // --- ФІНАЛЬНІ СУМИ ---
                 let currentMonthTotal = mCost + custCost + sCost + mzkPerApt;
                 let debt = parseFloat(a.debt)||0;
                 let paid = parseFloat(a.paid)||0;
                 let tot = currentMonthTotal + debt; 
                 let bal = tot - paid;
-                
-                // Зберігаємо суму
-                a.bill = tot;
 
+                // --- 🔥 ОНОВЛЕННЯ UI (ЖИВІ ЦИФРИ НА КАРТЦІ) 🔥 ---
+                a.bill = currentMonthTotal; // Зберігаємо чисте нарахування в пам'ять
+                
+                const uiBill = document.getElementById(`live-bill-${i}`);
+                const uiBal = document.getElementById(`live-balance-${i}`);
+                
+                if (uiBill) uiBill.innerText = currentMonthTotal.toFixed(2);
+                if (uiBal) {
+                    uiBal.innerText = Math.abs(bal).toFixed(2) + " грн";
+                    uiBal.style.color = bal > 0.01 ? "var(--danger)" : (bal < -0.01 ? "var(--success)" : "var(--text)");
+                    // Оновлюємо підпис (Борг/Переплата)
+                    const label = uiBal.previousElementSibling; // Це тег <label> перед сумою
+                    if(label) label.innerText = bal > 0.01 ? "БОРГ" : (bal < -0.01 ? "ПЕРЕПЛАТА" : "ДО СПЛАТИ");
+                }
+
+                // --- ГЕНЕРАЦІЯ ТЕКСТУ КВИТАНЦІЇ (ДЛЯ ТЕЛЕГРАМ) ---
                 const requisitesTxt = (d.requisites || []).map(r=>`💳 ${r.name}:\n${r.val}`).join('\n\n');
-
-                // 🔥 ГЕНЕРАЦІЯ ДЕТАЛЬНОГО ТЕКСТУ (ДЛЯ МЕСЕНДЖЕРІВ) 🔥
                 let details = "";
+                if(c.ed > 0) details += `⚡ Електр (Д): ${a.prev.ed}➔${a.curr.ed} = ${c.ed} (${cost.ed.toFixed(2)})\n`;
+                if(c.en > 0) details += `🌙 Електр (Н): ${a.prev.en}➔${a.curr.en} = ${c.en} (${cost.en.toFixed(2)})\n`;
+                if(c.w > 0) details += `💧 Вода: ${a.prev.w}➔${a.curr.w} = ${c.w} (${cost.w.toFixed(2)})\n`;
+                if(c.g > 0) details += `🔥 Газ: ${a.prev.g}➔${a.curr.g} = ${c.g} (${cost.g.toFixed(2)})\n`;
+
+                const txt = `🧾 КВИТАНЦІЯ: ${dStr.toUpperCase()}\n🏠 ${a.name}\n\n${details}${custTxt}🏢 МЗК: ${mzkPerApt.toFixed(2)} грн\n${sTxt ? sTxt : ''}--------------------------------\n💰 НАРАХОВАНО: ${currentMonthTotal.toFixed(2)} грн\n${debt > 0 ? `❗️ Борг: ${debt.toFixed(2)} грн\n` : ''}${debt < 0 ? `💚 Переплата: ${Math.abs(debt).toFixed(2)} грн\n` : ''}--------------------------------\n💵 РАЗОМ: ${tot.toFixed(2)} грн\n${paid > 0 ? `✅ Сплачено: -${paid.toFixed(2)} грн\n📉 Залишок: ${bal.toFixed(2)} грн` : ''}\n\n${requisitesTxt}`;
                 
-                // Електрика
-                if(c.ed > 0 || c.en > 0) {
-                    details += `⚡ ЕЛЕКТРИКА:\n`;
-                    if(c.ed > 0) details += `   День: ${a.prev.ed} ➔ ${a.curr.ed} = ${c.ed} кВт\n   (${c.ed} x ${t.el_d} = ${cost.ed.toFixed(2)} грн)\n`;
-                    if(c.en > 0) details += `   Ніч: ${a.prev.en} ➔ ${a.curr.en} = ${c.en} кВт\n   (${c.en} x ${t.el_n} = ${cost.en.toFixed(2)} грн)\n`;
-                }
+                this.checks[i] = txt; // Зберігаємо готовий текст для кнопки "Надіслати"
 
-                // Вода
-                if(c.w > 0) {
-                    details += `💧 ВОДА:\n   ${a.prev.w} ➔ ${a.curr.w} = ${c.w} м³\n   (${c.w} x ${t.w} = ${cost.w.toFixed(2)} грн)\n`;
-                }
-
-                // Газ
-                if(c.g > 0) {
-                    details += `🔥 ГАЗ:\n   ${a.prev.g} ➔ ${a.curr.g} = ${c.g} м³\n   (${c.g} x ${t.g} = ${cost.g.toFixed(2)} грн)\n`;
-                }
-
-                const txt = `🧾 КВИТАНЦІЯ: ${dStr.toUpperCase()}
-🏠 ${d.name} | ${a.name}
-
-${details}${custTxt}
-🏢 МЗК (загальні): ${mzkPerApt.toFixed(2)} грн
-${sTxt ? sTxt : ''}--------------------------------
-💰 НАРАХОВАНО: ${currentMonthTotal.toFixed(2)} грн
-${debt > 0 ? `❗️ Борг: ${debt.toFixed(2)} грн\n` : ''}--------------------------------
-💵 ДО СПЛАТИ: ${tot.toFixed(2)} грн
-${paid > 0 ? `✅ Сплачено: -${paid.toFixed(2)} грн\n📉 Залишок: ${bal.toFixed(2)} грн` : ''}
-
-Реквізити:
-${requisitesTxt}`;
-                
-                this.checks[i] = txt;
-
-                // Кнопки
-                const encodedText = encodeURIComponent(txt);
-                const phoneOnly = (a.phone || "").replace(/\D/g, '');
-                let actionBtn = '';
-
-                // Оновлена логіка кнопок
-                if (a.messenger === 'viber') {
-                    // Для Вайбера викликаємо спеціальну функцію копіювання
-                    actionBtn = `<button class="btn" style="background:#7360f2; color:white; padding:5px 10px; font-size:12px;" onclick="app.sendCheck(${i}, 'viber')">🟣 Viber</button>`;
-                } else if (a.messenger === 'whatsapp') {
-                    actionBtn = `<button class="btn" style="background:#25D366; color:white; padding:5px 10px; font-size:12px;" onclick="app.sendCheck(${i}, 'whatsapp')">🟢 WhatsApp</button>`;
-                } else if (a.messenger === 'telegram') {
-                    actionBtn = `<button class="btn" style="background:#2AABEE; color:white; padding:5px 10px; font-size:12px;" onclick="app.sendCheck(${i}, 'telegram')">✈️ Telegram</button>`;
-                } else {
-                     actionBtn = `<button class="btn btn-outline" style="padding:5px 10px; font-size:13px;" onclick="app.sendCheck(${i}, 'copy')">📋 Скопіювати</button>`;
-                }
-
-                return `<div class="card" style="border-left:4px solid var(--primary); padding:15px;">
-                    <div style="display:flex;justify-content:space-between; margin-bottom:5px;">
-                        <span style="font-weight:bold; font-size:16px;">${a.name}</span>
-                        <span style="font-weight:bold; font-size:16px; color:var(--text);">${tot.toFixed(2)} грн</span>
-                    </div>
-                    <div style="font-size:12px;color:var(--text-sec);margin-bottom:12px; text-align:right;">До сплати: <b>${bal.toFixed(2)}</b></div>
-                    <div style="display:grid; grid-template-columns: 1fr auto; gap:10px;">
-                        ${actionBtn}
-                        <button class="btn btn-warning" style="padding:5px 10px; font-size:13px;" onclick="app.sharePDF(${i})">📄 PDF</button>
-                    </div>
+                // Повертаємо HTML для списку (зелена кнопка "Квитанції")
+                return `<div class="card" style="border-left:4px solid var(--primary); padding:10px; margin-bottom:10px;">
+                    <div style="font-weight:bold; display:flex; justify-content:space-between;"><span>${a.name}</span><span>${currentMonthTotal.toFixed(2)} грн</span></div>
+                    <div style="font-size:12px; color:var(--text-sec); text-align:right;">До сплати: <b>${bal.toFixed(2)}</b></div>
                 </div>`;
             }).join('');
             
-            document.getElementById('resultModal').style.display='flex';
+            if (resultsList) resultsList.innerHTML = listHTML;
 
-        } catch (e) {
-            console.error(e);
-            alert("⚠️ Помилка в розрахунках: " + e.message);
-        }
-    }
+        } catch (e) { console.error(e); }
+    } 
    async sendCheck(i, forceMethod = null) {
         const txt = this.checks[i];
         if (!txt) { alert("Помилка: Квитанція не знайдена"); return; }
@@ -2764,6 +2717,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
