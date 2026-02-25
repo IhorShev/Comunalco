@@ -2272,55 +2272,34 @@ class App {
         location.reload();
     }
 
-    renderTariffs() {
-        const container = document.getElementById('tariffs-list');
-        container.innerHTML = this.TARIFF_PLANS.map(plan => `
-            <div class="price-card ${plan.isPopular ? 'popular' : ''} ${plan.isVip ? 'vip' : ''}">
-                ${plan.isPopular ? '<div class="price-badge">ХІТ 🔥</div>' : ''}
-                ${plan.isVip ? '<div class="price-badge" style="background:var(--gold)">VIP 👑</div>' : ''}
-                <div class="price-title">${plan.name}</div>
-                <div class="price-val">${plan.price} грн</div>
-                <div class="price-sub">${plan.desc}</div>
-                <button class="btn ${plan.isVip ? 'btn-warning' : 'btn-primary'}" onclick="app.initPay('${plan.id}')">Замовити</button>
-            </div>
-        `).join('');
-    }
-    
-    initPay(planId) {
-        const plan = this.TARIFF_PLANS.find(p => p.id === planId);
-        if(!plan) return;
-        this.pendingPayment = plan; 
-        document.getElementById('menuModal').style.display = 'none'; 
-        document.getElementById('payModal').style.display = 'flex';
-        document.getElementById('pay-details').innerText = `${plan.name} — ${plan.price} грн`;
-        this.validatePayForm();
-    }
-    
-    validatePayForm() { 
-        const contact = document.getElementById('pay-contact').value.trim();
-        const isValid = contact.length >= 3; 
-        document.getElementById('btn-pay-tg').disabled = !isValid;
-        document.getElementById('btn-pay-email').disabled = !isValid;
-    }
-    
-    // --- ОНОВЛЕНА ЛОГІКА ОПЛАТИ ---
-    processPayment(method) {
-        const contact = document.getElementById('pay-contact').value;
-        const plan = this.pendingPayment;
-        if(!plan) return;
-
-        const text = `👋 Вітаю!
-Хочу оформити підписку.\n\n🏷 Тариф: ${plan.name}\n💰 Сума: ${plan.price} грн\n👤 Мій контакт: ${contact}`;
-        const encodedText = encodeURIComponent(text);
-        if (method === 'telegram') {
-            window.open(`https://t.me/comunalco?text=${encodedText}`, '_blank');
-        } 
-        else if (method === 'email') {
-            window.open(`mailto:support@comunalco.com?subject=Замовлення&body=${encodedText}`, '_self');
+    renderTariffs() { this.updateSubscriptionCalc(); }
+    setSubPeriod(p) {
+        this.subPeriod = p;
+        const btn6 = document.getElementById('btn-period-6');
+        const btn12 = document.getElementById('btn-period-12');
+        if (btn6 && btn12) {
+            btn6.style.borderWidth = p === 6 ? '2px' : '1px';
+            btn6.style.borderColor = p === 6 ? 'var(--primary)' : 'var(--border)';
+            btn12.style.borderWidth = p === 12 ? '2px' : '1px';
+            btn12.style.borderColor = p === 12 ? 'var(--success)' : 'var(--border)';
         }
-        document.getElementById('payModal').style.display = 'none';
+        this.updateSubscriptionCalc();
     }
 
+    payViaDonatello() {
+        if (!window.currentUser) return alert("Будь ласка, спочатку увійдіть в акаунт!");
+        const amount = this.lastCalcAmount;
+        const userId = window.currentUser.id;
+        const apts = document.getElementById('calc-apts').value;
+        const msg = `SUB:${userId}:${apts}:${this.subPeriod}`;
+        const url = `https://donatello.ua/comunalco?amount=${amount}&message=${encodeURIComponent(msg)}`;
+        window.open(url, '_blank');
+    }
+
+    payViaCrypto() {
+        alert("Оплата Crypto через xRocket буде підключена автоматично після налаштування API.");
+    }
+    
     async activatePro() { 
         const keyInput = document.getElementById('activation-key').value.trim();
         const btn = document.querySelector('#menu-content-premium button');
@@ -2814,6 +2793,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
