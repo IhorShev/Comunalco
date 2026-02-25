@@ -412,15 +412,37 @@
             </div>
 
             <div id="menu-content-premium" style="display:none">
-                <p style="font-size:13px; text-align:center; color:var(--text-sec); margin-bottom:15px;">Оберіть свій тарифний план:</p>
-                <div id="tariffs-list"></div>
-                <div style="margin-top:20px; padding-top:15px; border-top:1px dashed var(--border);">
-                    <div style="font-size:12px; font-weight:bold; margin-bottom:5px;">Вже маєте ключ?</div>
-                    <div style="display:flex; gap:5px;">
-                        <input type="text" id="activation-key" placeholder="Введіть код активації">
-                        <button class="btn btn-primary" style="width:auto;" onclick="app.activatePro()">OK</button>
+                <div style="background:var(--bg); padding:15px; border-radius:15px; border:1px solid var(--border); margin-bottom:20px;">
+                    <label style="font-size:12px; color:var(--text-sec);">Кількість квартир / об'єктів:</label>
+                    <input type="number" id="calc-apts" value="5" min="1" oninput="app.updateSubscriptionCalc()" 
+                           style="font-size:24px; font-weight:900; text-align:center; margin-bottom:15px; color:var(--primary); border-color:var(--primary);">
+                    
+                    <label style="font-size:12px; color:var(--text-sec);">Термін підписки:</label>
+                    <div style="display:flex; gap:10px; margin-bottom:20px;">
+                        <button id="btn-period-6" class="btn btn-outline" style="flex:1; border-width:1px; font-size:13px;" onclick="app.setSubPeriod(6)">6 місяців</button>
+                        <button id="btn-period-12" class="btn btn-outline" style="flex:1; border-width:2px; border-color:var(--success); color:var(--success); font-size:13px;" onclick="app.setSubPeriod(12)">1 рік (-20%)</button>
+                    </div>
+
+                    <div style="text-align:center; padding:15px; border-top:1px dashed var(--border); background:rgba(0,153,255,0.02); border-radius:0 0 15px 15px;">
+                        <div style="font-size:11px; text-transform:uppercase; letter-spacing:1px; color:var(--text-sec); margin-bottom:5px;">Сума до оплати:</div>
+                        <div id="calc-total-sum" style="font-size:32px; font-weight:900; color:var(--text);">0 грн</div>
+                        <div id="calc-price-per-apt" style="font-size:12px; color:var(--success); font-weight:bold; margin-top:5px;">(всього 0 грн/кв в міс)</div>
                     </div>
                 </div>
+
+                <div style="display:flex; flex-direction:column; gap:12px;">
+                    <button class="btn" style="background:#7360f2; padding:15px; font-size:15px;" onclick="app.payViaDonatello()">
+                        💳 Оплатити карткою (Donatello)
+                    </button>
+                    <button class="btn" style="background:#229ED9; padding:15px; font-size:15px;" onclick="app.payViaCrypto()">
+                        💎 Оплатити Crypto (xRocket)
+                    </button>
+                </div>
+                
+                <p style="font-size:10px; color:var(--text-sec); text-align:center; margin-top:15px; line-height:1.4;">
+                    * Активація відбувається автоматично після оплати.<br>
+                    Ваш ID: <b id="display-user-id" style="color:var(--text);">...</b>
+                </p>
             </div>
 
             <div id="menu-content-contacts" style="display:none">
@@ -2717,6 +2739,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
