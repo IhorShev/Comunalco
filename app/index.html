@@ -1145,78 +1145,102 @@ class App {
     renderApartments() { 
         document.getElementById('apartments-container').innerHTML = (this.currentData.apartments || []).map((a, i) => { 
             
-            // 🔥 ПЕРЕВІРКА: Чи користується мешканець Телеграмом?
-            const isTelegram = (a.messenger === 'telegram');
+            // 1. Статус підключення до бота
+            const isConnected = !!a.telegram_chat_id;
             
-            const selectionIndicator = isTelegram 
-                ? `<input type="checkbox" class="mass-send-chk" value="${i}" onclick="event.stopPropagation()" style="width:20px; height:20px; margin-right:10px; cursor:pointer;">`
-                : `<span title="Відправити вручну (${a.messenger})" style="color:#ff4444; font-size:14px; margin-right:10px; font-weight:bold; border:1px solid #ff4444; border-radius:50%; width:20px; height:20px; display:flex; align-items:center; justify-content:center;">!</span>`;
+            // 2. Логіка кольору балансу (Борг - червоний, Переплата - зелений)
+            const currentBill = parseFloat(a.bill || 0);
+            const oldDebt = parseFloat(a.debt || 0);
+            const paid = parseFloat(a.paid || 0);
+            
+            // Фінальний баланс: (Борг + Нараховано) - Сплачено
+            const totalBalance = (oldDebt + currentBill) - paid;
+            
+            const isDebt = totalBalance > 0.01;
+            const isOverpay = totalBalance < -0.01;
+            
+            let balanceColor = "var(--text)";
+            let balanceLabel = "До сплати";
+            if (isDebt) { balanceColor = "var(--danger)"; balanceLabel = "БОРГ"; }
+            if (isOverpay) { balanceColor = "var(--success)"; balanceLabel = "ПЕРЕПЛАТА"; }
 
-            return `<details open style="border-left: 4px solid var(--primary)">
-            <summary style="display:flex; align-items:center;">
-                
-                ${selectionIndicator}
-                
-                <div style="flex:1;">🚪 <span contenteditable="true" onclick="event.preventDefault()" onblur="app.updateApt(${i},'name',this.innerText)" style="font-weight:700">${a.name}</span> <span style="font-size:12px; opacity:0.7" id="badge-${i}"></span></div>
+            return `<details open style="border-left: 4px solid ${isConnected ? 'var(--success)' : 'var(--primary)'}; margin-bottom:15px;">
+            <summary style="display:flex; align-items:center; padding:12px;">
+                <div style="flex:1;">
+                    <div style="font-weight:700; font-size:16px;">🚪 ${a.name}</div>
+                    <div style="font-size:11px; margin-top:2px;">
+                        ${isConnected ? '<span style="color:var(--success); font-weight:bold;">✅ Бот підключено</span>' : '<span style="color:var(--text-sec);">⚠️ Не підключено</span>'}
+                    </div>
+                </div>
                 <span class="del-icon" onclick="app.delApt(${i})">&times;</span>
             </summary>
+            
             <div class="content">
                 <div class="row">
+                    <div class="col"><label>Телефон</label><input type="tel" value="${a.phone||''}" placeholder="380..." oninput="app.updateApt(${i},'phone',this.value)"></div>
                     <div class="col" style="flex:0.6">
                         <label>Месенджер</label>
-                        <select onchange="app.updateApt(${i},'messenger',this.value); app.renderApartments();">
+                        <select onchange="app.updateApt(${i},'messenger',this.value)">
                             <option value="viber" ${a.messenger==='viber'?'selected':''}>Viber</option>
-                            <option value="whatsapp" ${a.messenger==='whatsapp'?'selected':''}>WhatsApp</option>
                             <option value="telegram" ${a.messenger==='telegram'?'selected':''}>Telegram</option>
+                            <option value="whatsapp" ${a.messenger==='whatsapp'?'selected':''}>WhatsApp</option>
                         </select>
                     </div>
-                    <div class="col"><label>Телефон</label><input type="tel" value="${a.phone||''}" placeholder="380..." onchange="app.updateApt(${i},'phone',this.value)"></div>
                 </div>
 
-                <div class="row">
-                    <div class="col">
-                        <label>Email</label>
-                        <input type="email" value="${a.email||''}" placeholder="Введіть пошту мешканця..." onchange="app.updateApt(${i},'email',this.value)" style="border-color:var(--primary); background:rgba(0,153,255,0.05);">
-                    </div>
-                </div>
-                <div class="section-title">Лічильники</div>
-                ${this.renderMR(i,a,'apt','⚡ Е/Е День','ed')} ${this.renderMR(i,a,'apt','🌙 Е/Е Ніч','en')}
-                ${this.renderMR(i,a,'apt','💧 Вода','w')} ${this.renderMR(i,a,'apt','🔥 Газ','g')}
-                 
+                <div class="section-title">Лічильники (Авто-рахунок)</div>
+                ${this.renderMR(i,a,'apt','⚡ Е/Е День','ed')} 
+                ${this.renderMR(i,a,'apt','🌙 Е/Е Ніч','en')}
+                ${this.renderMR(i,a,'apt','💧 Вода','w')} 
+                ${this.renderMR(i,a,'apt','🔥 Газ','g')}
+                
                 <div id="a-counters-${i}">
                     ${(a.custom_counters||[]).map((c, ci) => this.renderCustomCounterRow('apt', i, ci, c)).join('')}
                 </div>
                 <button class="btn btn-add-counter" onclick="app.addCustomCounter('apt', ${i})">+ Лічильник</button>
 
-                <div class="section-title" style="margin-top:15px">Послуги</div>
-                <div id="a-serv-${i}">${(a.services||[]).map((s,si)=>`<div class="custom-row"><input type="text" value="${s.name}" placeholder="Назва" onchange="app.updateAS(${i},${si},'name',this.value)"><input type="number" value="${s.val}" placeholder="Сума" onchange="app.updateAS(${i},${si},'val',this.value)"><span class="del-icon" onclick="app.delAS(${i},${si})">&times;</span></div>`).join('')}</div>
-                <button class="btn btn-add" onclick="app.addAS(${i})">+ Індив. послуга</button>
-                
-                <div class="section-title">Баланс</div>
-                <div class="row">
-                    <div class="col"><label>Борг</label><input type="number" value="${a.debt||0}" onchange="app.updateApt(${i},'debt',this.value)"></div>
-                    <div class="col"><label style="color:var(--success)">Сплачено</label><input type="number" value="${a.paid||''}" placeholder="0.00" onchange="app.updateApt(${i},'paid',this.value)" style="border-color:var(--success)"></div>
+                <div style="margin-top:20px; padding:15px; background:rgba(0,0,0,0.03); border-radius:12px; border:1px solid var(--border);">
+                    <div style="display:flex; gap:10px; margin-bottom:10px;">
+                        <div class="col">
+                            <label>Нараховано (поточне)</label>
+                            <div id="live-bill-${i}" style="font-size:18px; font-weight:bold; padding:10px; background:var(--bg); border-radius:8px; text-align:center; border:1px solid var(--border);">
+                                ${currentBill.toFixed(2)}
+                            </div>
+                        </div>
+                        <div class="col">
+                            <label style="color:var(--success)">Сплачено</label>
+                            <input type="number" value="${a.paid||0}" 
+                                style="border-color:var(--success); font-weight:bold; text-align:center; font-size:18px;" 
+                                oninput="app.updateApt(${i},'paid',this.value)">
+                        </div>
+                    </div>
+                    
+                    <div style="text-align:center; padding-top:8px; border-top:1px dashed var(--border);">
+                        <label style="font-size:10px; text-transform:uppercase;">${balanceLabel}</label>
+                        <div id="live-balance-${i}" style="font-size:24px; font-weight:900; color:${balanceColor};">
+                            ${Math.abs(totalBalance).toFixed(2)} грн
+                        </div>
+                    </div>
                 </div>
-                
-                <div style="margin-top:15px; display:flex; gap:10px;">
-                    <button class="btn btn-outline btn-sm" style="border-color:#0ea5e9; color:#0ea5e9;" 
-                        onclick="navigator.clipboard.writeText('https://t.me/Comunalco_bot?start=${a.id}'); alert('Посилання скопійовано!')">
-                        🔗 Link
-                    </button>
 
-                    <button class="btn btn-outline btn-sm" style="border-color:#8b5cf6; color:#8b5cf6;"
-                        onclick="app.sendToBot(${i})">
-                        🚀 Bot
+                <div style="margin-top:15px;">
+                    <button class="btn btn-outline" 
+                        style="border-color:${isConnected ? 'var(--success)' : '#2AABEE'}; color:${isConnected ? 'var(--success)' : '#2AABEE'}; background: ${isConnected ? 'rgba(16, 185, 129, 0.1)' : 'transparent'};" 
+                        onclick="navigator.clipboard.writeText('https://t.me/Comunalco_bot?start=${a.id}'); alert('Посилання скопійовано! Надішліть його мешканцю.')">
+                        ${isConnected ? '✅ Квартира підключена' : '🔗 Підключити Телеграм-Бот'}
                     </button>
                 </div>
 
             </div></details>`;
         }).join(''); 
         
+        // Оновлюємо видимість кнопок масових дій
         const controls = document.getElementById('batch-controls');
         if(controls) controls.style.display = (this.currentData.apartments.length > 0) ? 'flex' : 'none';
+        
+        // Запускаємо розрахунок, щоб цифри відразу стали правильними
+        this.calculate();
     }
-
     renderMR(i, obj, mode, label, key) { 
         // 🔥 АВТО-РЕМОНТ ДАНИХ (ЗАХИСТ ВІД ЗБОЇВ) 🔥
         if (!obj.prev) obj.prev = {ed:0, en:0, w:0, g:0};
@@ -2730,6 +2754,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
