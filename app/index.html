@@ -715,7 +715,7 @@ class App {
 
         try {
             // Викликаємо Edge Function в Supabase
-            const { data, error } = await supabase.functions.invoke('create-crypto-invoice', {
+            const { data, error } = await sbClient.functions.invoke('create-crypto-invoice', {
                 body: { 
                     method: method, // 'xrocket' або 'cryptobot'
                     amount: amount, 
@@ -2766,6 +2766,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
