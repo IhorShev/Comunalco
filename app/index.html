@@ -2601,8 +2601,10 @@ window.addEventListener('load', () => {
         return;
     }
     const { error } = await sbClient.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: window.location.href }
+        provider: 'google',
+        options: {
+            redirectTo: 'https://comunalco.com/app/index.html'
+        }
     });
     if (error) alert("Помилка: " + error.message);
   };
@@ -2844,6 +2846,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
