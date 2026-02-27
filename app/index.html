@@ -707,8 +707,53 @@ class App {
         window.open(url, '_blank');
     }
 
-    payViaCrypto() {
-        alert("Оплата Crypto через xRocket буде підключена автоматично після налаштування API ключа.");
+    // 1. Оплата карткою через Destream
+    payViaDestream() {
+        if (!window.currentUser) return alert("Будь ласка, увійдіть в акаунт!");
+        const amount = this.lastCalcAmount;
+        const userId = window.currentUser.id;
+        const apts = document.getElementById('calc-apts').value;
+        const msg = `SUB:${userId}:${apts}:${this.subPeriod}`;
+        
+        // ЗАМІНІТЬ 'your_destream_username' на ваш реальний нік у Destream
+        const url = `https://destream.net/live/your_destream_username/donate?amount=${amount}&message=${encodeURIComponent(msg)}`;
+        window.open(url, '_blank');
+    }
+
+    // 2. Оплата Crypto (Вибір методу)
+    async payViaCrypto(method) {
+        if (!window.currentUser) return alert("Будь ласка, увійдіть в акаунт!");
+        
+        const amount = this.lastCalcAmount;
+        const userId = window.currentUser.id;
+        const apts = document.getElementById('calc-apts').value;
+        const period = this.subPeriod;
+
+        console.log(`Запит на інвойс ${method} для користувача ${userId}...`);
+
+        try {
+            // Викликаємо Edge Function в Supabase
+            const { data, error } = await supabase.functions.invoke('create-crypto-invoice', {
+                body: { 
+                    method: method, // 'xrocket' або 'cryptobot'
+                    amount: amount, 
+                    userId: userId, 
+                    apts: apts, 
+                    period: period 
+                }
+            });
+
+            if (error) throw error;
+
+            if (data?.payUrl) {
+                window.open(data.payUrl, '_blank');
+            } else {
+                alert("Помилка: Не вдалося отримати посилання на оплату.");
+            }
+        } catch (e) {
+            console.error("Payment error:", e);
+            alert("Сервіс оплати тимчасово недоступний. Спробуйте пізніше.");
+        }
     }
     // --- UI & THEME ---
     initTheme() { 
@@ -2799,6 +2844,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
