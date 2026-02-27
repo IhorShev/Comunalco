@@ -669,7 +669,7 @@ class App {
         // Показуємо ID користувача (короткий варіант для коментаря)
         const displayIdEl = document.getElementById('display-user-id');
         if (displayIdEl) {
-            const userId = window.currentUser ? window.currentUser.id.split('-')[0].toUpperCase() : 'ГОСТЬ';
+            const userId = window.currentUser ? window.currentUser.id.split('-')[0].toUpperCase() : 'ГІСТЬ';
             displayIdEl.innerText = userId;
         }
     }
@@ -2844,6 +2844,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
