@@ -431,13 +431,19 @@
                 </div>
 
                 <div style="display:flex; flex-direction:column; gap:12px;">
-                    <button class="btn" style="background:#7360f2; padding:15px; font-size:15px;" onclick="app.payViaDonatello()">
-                        💳 Оплатити карткою (Donatello)
-                    </button>
-                    <button class="btn" style="background:#229ED9; padding:15px; font-size:15px;" onclick="app.payViaCrypto()">
-                        💎 Оплатити Crypto (xRocket)
-                    </button>
-                </div>
+    <button class="btn" style="background:#7360f2; padding:15px;" onclick="app.payViaDestream()">
+        💳 Оплатити карткою (Destream)
+    </button>
+
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+        <button class="btn" style="background:#229ED9; font-size:13px; padding:12px;" onclick="app.payViaCrypto('xrocket')">
+            🚀 xRocket
+        </button>
+        <button class="btn" style="background:#313131; font-size:13px; padding:12px;" onclick="app.payViaCrypto('cryptobot')">
+            🤖 Crypto Bot
+        </button>
+    </div>
+</div>
                 
                 <p style="font-size:10px; color:var(--text-sec); text-align:center; margin-top:15px; line-height:1.4;">
                     * Активація відбувається автоматично після оплати.<br>
@@ -2793,6 +2799,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
