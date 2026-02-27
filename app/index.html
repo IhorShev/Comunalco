@@ -689,25 +689,7 @@ class App {
         this.updateSubscriptionCalc();
     }
 
-    // 2. Автоматизація Donatello
-    payViaDonatello() {
-        if (!window.currentUser) return alert("Будь ласка, спочатку увійдіть в акаунт!");
-        
-        const amount = this.lastCalcAmount;
-        const userId = window.currentUser.id;
-        const apts = document.getElementById('calc-apts').value;
-        
-        // Формуємо коментар, який наш бот розпізнає автоматично:
-        // Пакет: [ID користувача]:[Кількість квартир]:[Період]
-        const msg = `SUB:${userId}:${apts}:${this.subPeriod}`;
-        
-        // Посилання на ваш збір у Donatello
-        const url = `https://donatello.ua/comunalco?amount=${amount}&message=${encodeURIComponent(msg)}`;
-        
-        window.open(url, '_blank');
-    }
-
-    // 1. Оплата карткою через Destream
+        // 1. Оплата карткою через Destream
     payViaDestream() {
         if (!window.currentUser) return alert("Будь ласка, увійдіть в акаунт!");
         const amount = this.lastCalcAmount;
@@ -2337,69 +2319,7 @@ class App {
         this.updateSubscriptionCalc();
     }
 
-    payViaDonatello() {
-        if (!window.currentUser) return alert("Будь ласка, спочатку увійдіть в акаунт!");
-        const amount = this.lastCalcAmount;
-        const userId = window.currentUser.id;
-        const apts = document.getElementById('calc-apts').value;
-        const msg = `SUB:${userId}:${apts}:${this.subPeriod}`;
-        const url = `https://donatello.ua/comunalco?amount=${amount}&message=${encodeURIComponent(msg)}`;
-        window.open(url, '_blank');
-    }
-
-    payViaCrypto() {
-        alert("Оплата Crypto через xRocket буде підключена автоматично після налаштування API.");
-    }
-    
-    async activatePro() { 
-        const keyInput = document.getElementById('activation-key').value.trim();
-        const btn = document.querySelector('#menu-content-premium button');
-        
-        if(!keyInput) return;
-
-        // Генерація Fingerprint (Захист від очищення кешу)
-        let deviceId = localStorage.getItem('device_id');
-        if(!deviceId) {
-            const screenInfo = `${window.screen.width}x${window.screen.height}`;
-            const platform = navigator.platform || "unknown";
-            let str = screenInfo + platform + navigator.userAgent.length;
-            let hash = 0;
-            for (let i = 0; i < str.length; i++) {
-                hash = ((hash << 5) - hash) + str.charCodeAt(i);
-                hash |= 0;
-            }
-            const shortHash = Math.abs(hash).toString(16).toUpperCase().substr(0,5);
-            let osPrefix = "Dev";
-            if(/iPhone|iPad/.test(navigator.userAgent)) osPrefix = "iOS";
-            else if(/Android/.test(navigator.userAgent)) osPrefix = "And";
-            else if(/Win/.test(navigator.userAgent)) osPrefix = "Win";
-            deviceId = `${osPrefix}_${shortHash}`;
-            localStorage.setItem('device_id', deviceId);
-        }
-
-        btn.disabled = true; btn.innerText = "⏳";
-        try {
-            const res = await fetch(`${this.API_URL}?action=check&key=${encodeURIComponent(keyInput)}&deviceId=${deviceId}&ver=3.0`);
-            const data = await res.json();
-
-            if(data.result === 'success') {
-                let typeMap = { 'std_6': 'standard', 'std_12': 'standard', 'pro_6': 'pro', 'pro_12': 'pro', 'vip': 'vip' };
-                let userType = typeMap[data.plan] || (data.plan.includes('pro')?'pro':(data.plan==='vip'?'vip':'standard'));
-                
-                this.state.license = { type: userType, exp: data.exp };
-                this.save();
-                alert(`✅ Активовано!\nПлан: ${userType.toUpperCase()}\nПристрій: ${deviceId}`);
-                location.reload();
-            } else {
-                alert("❌ " + data.msg);
-            }
-        } catch(e) {
-            alert("Помилка з'єднання");
-        } finally {
-            btn.disabled = false; btn.innerText = "OK";
-        }
-    }
-    // --- 🛡 ФУНКЦІЯ ЗАХИСТУ ІНТЕРФЕЙСУ ---
+           // --- 🛡 ФУНКЦІЯ ЗАХИСТУ ІНТЕРФЕЙСУ ---
     applyRoleRestrictions() {
         if (!window.currentRole || window.currentRole === 'owner' || window.currentRole === 'manager') return;
 
@@ -2846,6 +2766,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
