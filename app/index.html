@@ -711,30 +711,24 @@ class App {
         const apts = document.getElementById('calc-apts').value;
         const period = this.subPeriod;
 
-        console.log(`Запит на інвойс ${method} для користувача ${userId}...`);
-
         try {
-            // Викликаємо Edge Function в Supabase
             const { data, error } = await sbClient.functions.invoke('create-crypto-invoice', {
-                body: { 
-                    method: method, // 'xrocket' або 'cryptobot'
-                    amount: amount, 
-                    userId: userId, 
-                    apts: apts, 
-                    period: period 
-                }
+                body: { method, amount, userId, apts, period }
             });
 
-            if (error) throw error;
+            if (error) {
+                throw new Error(error.message || "Помилка виклику функції");
+            }
 
             if (data?.payUrl) {
                 window.open(data.payUrl, '_blank');
             } else {
-                alert("Помилка: Не вдалося отримати посилання на оплату.");
+                // ПОКАЖЕМО СПРАВЖНЮ ВІДПОВІДЬ БОТА
+                alert("Помилка від " + method + ": " + JSON.stringify(data));
             }
         } catch (e) {
-            console.error("Payment error:", e);
-            alert("Сервіс оплати тимчасово недоступний. Спробуйте пізніше.");
+            // ПОКАЖЕМО СПРАВЖНЮ ПОМИЛКУ КОДУ
+            alert("Деталі помилки: " + (e.message || JSON.stringify(e)));
         }
     }
     // --- UI & THEME ---
@@ -2766,6 +2760,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
