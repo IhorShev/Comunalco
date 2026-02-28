@@ -2538,15 +2538,17 @@ window.addEventListener('load', () => {
     if (error) alert("Помилка: " + error.message);
   };
 
-  // 3. ВИХІД
-  window.googleLogout = async () => {
+  // 3. ФУНКЦІЯ ВИХОДУ (Тільки одна на весь файл!)
+  window.googleLogout = async (e) => {
+    if (e) e.stopPropagation();
     if (confirm("Вийти з акаунту?")) {
-      await sbClient.auth.signOut();
-      location.reload();
+        await sbClient.auth.signOut();
+        // ВАЖЛИВО: не чистимо localStorage, щоб не видалити дані, які ще не збереглися
+        window.location.reload();
     }
   };
 
-  // 4. СЛУХАЧ (Авто-старт) - ПРЯМИЙ І ЧІТКИЙ
+  // 4. СЛУХАЧ (Авто-старт)
   sbClient.auth.onAuthStateChange(async (event, session) => {
     const user = session?.user;
     const btn = document.getElementById('auth-btn');
@@ -2555,21 +2557,13 @@ window.addEventListener('load', () => {
 
     if (user) {
       window.currentUser = user;
-      const shortName = user.email.split('@')[0];
-      
+      // Виводимо в консоль ваш ПОТОЧНИЙ ID, щоб ви знали, хто ви зараз
+      console.log("Ваш поточний ID:", user.id);
+
       if(btn && nameSpan) { 
-          nameSpan.innerText = shortName;
+          nameSpan.innerText = user.email.split('@')[0];
           btn.style.color = 'var(--success)';
-          // ОДИН КЛІК - ОДНЕ ЗАПИТАННЯ
-          btn.onclick = async (e) => { 
-              e.stopPropagation(); 
-              if (confirm("Вийти з акаунту?")) {
-                  await sbClient.auth.signOut();
-                  localStorage.clear();
-                  sessionStorage.clear();
-                  window.location.reload();
-              }
-          }; 
+          btn.onclick = window.googleLogout; // Просто викликаємо функцію вище
       }
 
       try {
@@ -2582,11 +2576,15 @@ window.addEventListener('load', () => {
               }
               if(window.app) {
                   window.app.state.license = { type: 'pro', exp: profile.expires_at };
-                  window.app.LIMITS.pro = profile.apts_limit || 9999;
                   window.app.updateStatus();
               }
           }
-      } catch (e) { console.error("Auth error:", e); }
+      } catch (e) { console.error("Помилка профілю:", e); }
+
+      // Завантажуємо будинки, якщо ми їх ще не бачимо
+      if (window.app && window.app.state.objects.length <= 1) {
+          await window.cloudLoad();
+      }
     } else {
       window.currentUser = null;
       if(btn && nameSpan) { 
@@ -2793,6 +2791,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
