@@ -2535,7 +2535,7 @@ window.addEventListener('load', () => {
     }
   };
 
-  // 4. СЛУХАЧ (Авто-старт) - ПОВНІСТЮ ВИПРАВЛЕНИЙ
+  // 4. СЛУХАЧ (Авто-старт) - ОСТАТОЧНА ВИПРАВЛЕНА ВЕРСІЯ
   sbClient.auth.onAuthStateChange(async (event, session) => {
     const user = session?.user;
     const btn = document.getElementById('auth-btn');
@@ -2546,7 +2546,7 @@ window.addEventListener('load', () => {
       window.currentUser = user;
       const shortName = user.email.split('@')[0];
       
-      // Налаштовуємо кнопку. Якщо Logout з великої літери не спрацює, спробуємо з маленької.
+      // Налаштовуємо кнопку. Пробуємо обидва варіанти назви функції виходу
       if(btn && nameSpan) { 
           nameSpan.innerText = shortName;
           btn.style.borderColor = 'var(--success)';
@@ -2555,6 +2555,7 @@ window.addEventListener('load', () => {
               e.stopPropagation(); 
               if (typeof window.googleLogout === 'function') window.googleLogout();
               else if (typeof window.googlelogout === 'function') window.googlelogout();
+              else alert("Помилка: Функція виходу не знайдена");
           }; 
       }
 
@@ -2567,7 +2568,7 @@ window.addEventListener('load', () => {
               const today = new Date();
               
               if(subExpireEl) {
-                  // ТУТ ПРАВИЛЬНІ ЗВОРОТНІ АПОСТРОФИ ``
+                  // ТУТ ОБОВ'ЯЗКОВО ЗВОРОТНІ АПОСТРОФИ ``
                   subExpireEl.innerText = `PRO до ${expDate.toLocaleDateString()}`;
                   subExpireEl.style.display = 'block';
                   
@@ -2583,7 +2584,7 @@ window.addEventListener('load', () => {
                   window.app.updateStatus();
               }
           }
-      } catch (e) { console.error("Profile fetch error:", e); }
+      } catch (e) { console.error("Profile error:", e); }
 
       if (window.app && window.app.state.objects.length === 1 && !window.app.state.objects[0].apartments[0].phone) {
           await window.cloudLoad();
@@ -2600,7 +2601,6 @@ window.addEventListener('load', () => {
       if(subExpireEl) subExpireEl.style.display = 'none';
     }
   });
-
   // 5. ЗАВАНТАЖЕННЯ (DOWNLOAD) - "Розпаковка"
   window.cloudLoad = async () => {
       if (!window.currentUser) return;
@@ -2797,6 +2797,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
