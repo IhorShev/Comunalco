@@ -1645,7 +1645,13 @@ class App {
             if (apt) apt.can_submit_readings = isAllowed;
             this.save();
             
+            // Змінюємо фон блоку
             checkboxElement.parentElement.parentElement.style.background = isAllowed ? 'rgba(34, 197, 94, 0.1)' : 'rgba(0,0,0,0.03)';
+            
+            // 🔥 ЗМУШУЄМО ПОВЗУНОК РУХАТИСЯ ВІЗУАЛЬНО
+            const slider = checkboxElement.nextElementSibling;
+            slider.style.backgroundColor = isAllowed ? '#22c55e' : '#ccc';
+            slider.children[0].style.transform = isAllowed ? 'translateX(20px)' : 'translateX(0)';
             
         } catch (e) {
             console.error("Помилка:", e);
@@ -2901,6 +2907,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
