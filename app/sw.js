@@ -1,5 +1,5 @@
 // 1. ЗМІНЮЙТЕ ЦЮ ЦИФРУ (наприклад, v1 на v2), коли хочете оновити сайт у всіх
-const CACHE_NAME = 'comunalco-cache-v2.2'; 
+const CACHE_NAME = 'comunalco-cache-v5.0'; 
 
 const ASSETS = [
   '/',
