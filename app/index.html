@@ -2496,9 +2496,13 @@ window.app = new App();
 
 // --- ТРЕКІНГ ЗАПУСКІВ ---
 window.addEventListener('load', () => {
-    // Реєстрація Service Worker
+    // ВБИВАЄМО SERVICE WORKER НАЗАВЖДИ
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js').catch(err => console.log('SW Err'));
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+            for(let registration of registrations) {
+                registration.unregister();
+            }
+        });
     }
 
     // Трекінг
@@ -2780,6 +2784,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
