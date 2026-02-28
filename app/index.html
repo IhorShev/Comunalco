@@ -2552,9 +2552,8 @@ window.addEventListener('load', () => {
           btn.onclick = window.googleLogout; 
       }
 
-      // --- ПЕРЕВІРКА ТЕРМІНУ ОПЛАТИ ---
+      // --- ТУТ МИ ЙДЕМО В БАЗУ ЗА ДАТОЮ ---
       try {
-          // Шукаємо профіль користувача в таблиці profiles
           const { data: profile } = await sbClient.from('profiles').select('*').eq('id', user.id).maybeSingle();
           
           if (profile && profile.expires_at) {
@@ -2565,27 +2564,23 @@ window.addEventListener('load', () => {
                   subExpireEl.innerText = `PRO до ${expDate.toLocaleDateString()}`;
                   subExpireEl.style.display = 'block';
                   
-                  // Розрахунок днів до кінця
+                  // Перевірка нагадування (за 7 днів)
                   const daysLeft = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
-                  
-                  // Нагадування за 7 днів (тільки при вході)
                   if (daysLeft <= 7 && daysLeft > 0) {
                       alert(`🔔 Нагадування: Термін оплати закінчується через ${daysLeft} днів (${expDate.toLocaleDateString()})`);
                   }
               }
 
-              // Вмикаємо PRO-ліміти в самій програмі
+              // Оновлюємо ліміти квартир у самій програмі
               if(window.app) {
                   window.app.state.license = { type: 'pro', exp: profile.expires_at };
                   window.app.LIMITS.pro = profile.apts_limit || 9999;
                   window.app.updateStatus();
               }
           }
-      } catch (e) {
-          console.error("Помилка завантаження профілю:", e);
-      }
-      // -------------------------------
+      } catch (e) { console.error("Помилка завантаження профілю:", e); }
 
+      // Авто-завантаження хмари
       if (window.app && window.app.state.objects.length === 1 && window.app.state.objects[0].apartments.length === 1 && !window.app.state.objects[0].apartments[0].phone) {
           await window.cloudLoad();
       }
@@ -2798,6 +2793,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
