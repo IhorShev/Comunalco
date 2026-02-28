@@ -2028,21 +2028,6 @@ class App {
     }
 
     async downloadBackup() { 
-        // 1. ХМАРНЕ ЗБЕРЕЖЕННЯ (Tesla-Feature)
-        if (window.currentUser) {
-            const btn = document.querySelector('.sticky-footer button.btn-warning');
-            const oldText = btn.innerText;
-            btn.innerText = "☁️ Синхронізація...";
-            
-            // Викликаємо функцію збереження в Supabase
-            if(window.cloudSave) await window.cloudSave(this.state);
-            
-            btn.innerText = oldText;
-        } else {
-            alert("⚠️ Ви не увійшли в акаунт! Дані не потраплять у хмару.");
-        }
-
-        // 2. СТАНДАРТНЕ ЗАВАНТАЖЕННЯ ФАЙЛУ (Ваш старий код)
         const date = new Date();
         const fileName = `Komunalka_Backup_${date.toISOString().slice(0,10)}.txt`; 
         const str = JSON.stringify(this.state); 
@@ -2057,7 +2042,7 @@ class App {
                 const writable = await handle.createWritable();
                 await writable.write(blob);
                 await writable.close();
-                alert("✅ Файл збережено + Хмара оновлена!");
+                alert("✅ Файл успішно збережено!");
                 return;
             } catch (err) {
                 if (err.name !== 'AbortError') console.warn("SaveFilePicker failed:", err);
@@ -2911,6 +2896,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
