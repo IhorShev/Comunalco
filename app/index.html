@@ -752,6 +752,51 @@ class App {
             alert("Деталі помилки: " + (e.message || JSON.stringify(e)));
         }
     }
+    
+    // --- АКТИВАЦІЯ ПРОМОКОДУ ---
+    async activatePromoCode() {
+        if (!window.currentUser) return alert("Будь ласка, увійдіть в акаунт!");
+        const codeInput = document.getElementById('promo-code-input');
+        const code = codeInput.value.trim().toUpperCase();
+        if (!code) return alert("Введіть код!");
+
+        const btn = document.getElementById('btn-activate-promo');
+        btn.disabled = true; btn.innerText = "⏳...";
+
+        try {
+            // Звертаємось до нашої нової секретної функції в базі Supabase
+            const { data, error } = await sbClient.rpc('use_activation_key', { p_key_code: code });
+
+            if (error) throw error;
+            if (!data.success) {
+                alert("❌ " + data.error);
+                btn.disabled = false; btn.innerText = "Активувати";
+                return;
+            }
+
+            // Успіх!
+            alert("✅ Ура! Ваш тариф успішно активовано!");
+            codeInput.value = '';
+            
+            // Оновлюємо дату під логіном миттєво
+            const expDate = new Date(data.new_exp);
+            const subExpireEl = document.getElementById('sub-expire-display');
+            if(subExpireEl) {
+                subExpireEl.innerText = `PRO до ${expDate.toLocaleDateString()}`;
+                subExpireEl.style.display = 'block';
+            }
+            // Оновлюємо статус в системі програми
+            if (this.state) {
+                this.state.license = { type: data.plan, exp: data.new_exp };
+                this.updateStatus(); 
+            }
+            
+        } catch(e) {
+            console.error(e);
+            alert("❌ Помилка з'єднання з базою.");
+        }
+        btn.disabled = false; btn.innerText = "Активувати";
+    }
     // --- UI & THEME ---
     initTheme() { 
         const isDark = localStorage.getItem('theme')==='dark';
@@ -2803,6 +2848,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
