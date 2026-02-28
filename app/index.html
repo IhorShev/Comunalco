@@ -2546,7 +2546,7 @@ window.addEventListener('load', () => {
     }
   };
 
-  // 4. СЛУХАЧ (Авто-старт) - ФІНАЛЬНА ВЕРСІЯ
+  // 4. СЛУХАЧ (Авто-старт) - ПРЯМИЙ І ЧІТКИЙ
   sbClient.auth.onAuthStateChange(async (event, session) => {
     const user = session?.user;
     const btn = document.getElementById('auth-btn');
@@ -2557,19 +2557,16 @@ window.addEventListener('load', () => {
       window.currentUser = user;
       const shortName = user.email.split('@')[0];
       
-      // 💡 СПЕЦІАЛЬНИЙ МАЯЧОК: Друкуємо ВАШ справжній ID в консоль
-      console.log("Мій справжній ID для Supabase:", user.id);
-
       if(btn && nameSpan) { 
           nameSpan.innerText = shortName;
-          btn.style.borderColor = 'var(--success)';
           btn.style.color = 'var(--success)';
-          
-          // 💡 ПРОСТИЙ І БЕЗВІДМОВНИЙ ВИХІД (Без подвійних вікон)
+          // ОДИН КЛІК - ОДНЕ ЗАПИТАННЯ
           btn.onclick = async (e) => { 
               e.stopPropagation(); 
               if (confirm("Вийти з акаунту?")) {
                   await sbClient.auth.signOut();
+                  localStorage.clear();
+                  sessionStorage.clear();
                   window.location.reload();
               }
           }; 
@@ -2577,9 +2574,6 @@ window.addEventListener('load', () => {
 
       try {
           const { data: profile } = await sbClient.from('profiles').select('*').eq('id', user.id).maybeSingle();
-          
-          console.log("Дані, які повернула база:", profile); // Перевіряємо, чи знайшла база дату
-
           if (profile && profile.expires_at) {
               const expDate = new Date(profile.expires_at);
               if(subExpireEl) {
@@ -2592,17 +2586,11 @@ window.addEventListener('load', () => {
                   window.app.updateStatus();
               }
           }
-      } catch (e) { console.error("Помилка бази:", e); }
-
-      if (window.app && window.app.state.objects.length === 1 && !window.app.state.objects[0].apartments[0].phone) {
-          await window.cloudLoad();
-      }
-
+      } catch (e) { console.error("Auth error:", e); }
     } else {
       window.currentUser = null;
       if(btn && nameSpan) { 
           nameSpan.innerText = "Вхід";
-          btn.style.borderColor = 'var(--primary)';
           btn.style.color = 'var(--primary)';
           btn.onclick = window.googleLogin;
       }
@@ -2805,6 +2793,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
