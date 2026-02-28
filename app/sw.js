@@ -1,54 +1,64 @@
-const CACHE_NAME = 'comunalco-v4.0'; // <--- Я змінив v1 на v3.0. Це сигнал для оновлення!
+// 1. ЗМІНЮЙТЕ ЦЮ ЦИФРУ (наприклад, v1 на v2), коли хочете оновити сайт у всіх
+const CACHE_NAME = 'comunalco-cache-v2.1'; 
+
 const ASSETS = [
-  './',
-  './index.html',
-  './manifest.json',
-  './icon.png'
+  '/',
+  '/index.html',
+  // Додайте сюди ваші іконки або логотипи, якщо вони є:
+  // '/logo.png',
+  // '/icon.png'
 ];
 
-// 1. Встановлення
-self.addEventListener('install', (e) => {
-  e.waitUntil(
+// Встановлення: завантажуємо базові файли
+self.addEventListener('install', (event) => {
+  event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
   );
-  self.skipWaiting(); // Змушує новий код вступити в дію негайно
+  self.skipWaiting(); // Змушуємо новий SW активуватися негайно
 });
 
-// 2. Активація (чистка старого)
-self.addEventListener('activate', (e) => {
-  e.waitUntil(
+// Активація: видаляємо старий кеш
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
     caches.keys().then((keys) => {
       return Promise.all(
-        keys.map((key) => {
-          if (key !== CACHE_NAME) {
-             // Видаляємо старий кеш (v1, v2 і т.д.)
-            return caches.delete(key);
-          }
-        })
+        keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
       );
     })
   );
-  self.clients.claim(); // Перехоплюємо контроль над сторінкою
+  self.clients.claim(); // Негайно беремо під контроль усі відкриті вкладки
 });
 
-// 3. Стратегія "Network First" (Спочатку Інтернет)
-self.addEventListener('fetch', (e) => {
-  e.respondWith(
-    fetch(e.request)
-      .then((res) => {
-        // Якщо інтернет є і файл скачався:
-        // 1. Робимо копію відповіді
-        const resClone = res.clone();
-        // 2. Оновлюємо кеш свіжою версією
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(e.request, resClone);
+// Перехоплення запитів: виправляємо червоні помилки в консолі
+self.addEventListener('fetch', (event) => {
+  const url = new URL(event.request.url);
+
+  // ІГНОРУЄМО: не-GET запити (POST, DELETE), розширення Chrome та Supabase
+  if (
+    event.request.method !== 'GET' || 
+    !url.protocol.startsWith('http') || 
+    url.hostname.includes('supabase.co') ||
+    url.hostname.includes('google')
+  ) {
+    return; 
+  }
+
+  event.respondWith(
+    caches.match(event.request).then((response) => {
+      return response || fetch(event.request).then((fetchResponse) => {
+        return caches.open(CACHE_NAME).then((cache) => {
+          // Кешуємо тільки успішні відповіді
+          if (fetchResponse.status === 200) {
+            cache.put(event.request, fetchResponse.clone());
+          }
+          return fetchResponse;
         });
-        // 3. Віддаємо користувачу свіжий файл
-        return res;
-      })
-      .catch(() => {
-        // Якщо інтернету немає або помилка — беремо з кешу
-        return caches.match(e.request);
-      })
+      });
+    }).catch(() => {
+        // Якщо немає мережі — намагаємося віддати хоча б головну сторінку
+        if (event.request.mode === 'navigate') {
+            return caches.match('/index.html');
+        }
+    })
   );
 });
