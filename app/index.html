@@ -2538,12 +2538,11 @@ window.addEventListener('load', () => {
     if (error) alert("Помилка: " + error.message);
   };
 
-  // 3. ФУНКЦІЯ ВИХОДУ (Тільки одна на весь файл!)
+  // 3. ФУНКЦІЯ ВИХОДУ (ЧИСТА)
   window.googleLogout = async (e) => {
     if (e) e.stopPropagation();
     if (confirm("Вийти з акаунту?")) {
         await sbClient.auth.signOut();
-        // ВАЖЛИВО: не чистимо localStorage, щоб не видалити дані, які ще не збереглися
         window.location.reload();
     }
   };
@@ -2557,13 +2556,10 @@ window.addEventListener('load', () => {
 
     if (user) {
       window.currentUser = user;
-      // Виводимо в консоль ваш ПОТОЧНИЙ ID, щоб ви знали, хто ви зараз
-      console.log("Ваш поточний ID:", user.id);
-
       if(btn && nameSpan) { 
           nameSpan.innerText = user.email.split('@')[0];
           btn.style.color = 'var(--success)';
-          btn.onclick = window.googleLogout; // Просто викликаємо функцію вище
+          btn.onclick = window.googleLogout; // ВИКЛИКАЄМО ЧИСТУ ФУНКЦІЮ ВИЩЕ
       }
 
       try {
@@ -2574,17 +2570,12 @@ window.addEventListener('load', () => {
                   subExpireEl.innerText = `PRO до ${expDate.toLocaleDateString()}`;
                   subExpireEl.style.display = 'block';
               }
-              if(window.app) {
-                  window.app.state.license = { type: 'pro', exp: profile.expires_at };
-                  window.app.updateStatus();
-              }
+              if(window.app) window.app.state.license = { type: 'pro', exp: profile.expires_at };
           }
-      } catch (e) { console.error("Помилка профілю:", e); }
+      } catch (e) { console.error(e); }
 
-      // Завантажуємо будинки, якщо ми їх ще не бачимо
-      if (window.app && window.app.state.objects.length <= 1) {
-          await window.cloudLoad();
-      }
+      if (window.app && window.app.state.objects.length <= 1) await window.cloudLoad();
+
     } else {
       window.currentUser = null;
       if(btn && nameSpan) { 
@@ -2791,6 +2782,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
