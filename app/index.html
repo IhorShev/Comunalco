@@ -262,7 +262,7 @@
 
         <div style="display:flex; align-items:center;">
             <div class="desktop-only">
-                <span onclick="window.location.reload()" style="cursor:pointer; font-weight:bold; font-size:14px; display:flex; align-items:center; gap:5px;" title="Оновити">🔄 Оновити</span>
+                <span onclick="window.location.href = window.location.pathname + '?v=' + Date.now()" style="cursor:pointer; font-weight:bold; font-size:14px; display:flex; align-items:center; gap:5px;" title="Оновити">🔄 Оновити</span>
                 <span onclick="app.openMenu('premium')" style="color:var(--primary); font-weight:bold; cursor:pointer; font-size:14px;">💎 Тарифи</span>
                 <span onclick="app.openMenu('history')" style="cursor:pointer; font-weight:bold; font-size:14px; display:flex; align-items:center; gap:5px;" title="Архів">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/></svg> Історія
@@ -278,7 +278,7 @@
             </div>
 
             <div class="mobile-only" style="align-items:center; gap:18px;">
-                <span onclick="window.location.reload()" style="cursor:pointer; font-size:20px;" title="Оновити дані">🔄</span>
+                <span onclick="window.location.href = window.location.pathname + '?v=' + Date.now()" style="cursor:pointer; font-size:20px;" title="Оновити дані">🔄</span>
                 <button onclick="document.getElementById('mobile-dropdown').style.display = document.getElementById('mobile-dropdown').style.display==='block'?'none':'block'" style="background:none; border:none; cursor:pointer; font-size:28px; color:var(--text); padding:0; display:flex; align-items:center;">☰</button>
             </div>
         </div>
@@ -1969,7 +1969,7 @@ class App {
         const f = inpt.files[0]; if(!f) return;
         if (!confirm("Завантажити?")) return;
         const r = new FileReader(); 
-        r.onload = e => { try { this.state = JSON.parse(e.target.result); this.save(); location.reload(); } catch(x) { alert("Помилка"); } }; 
+        r.onload = e => { try { this.state = JSON.parse(e.target.result); this.save(); window.location.href = window.location.pathname + '?v=' + Date.now(); } catch(x) { alert("Помилка"); } }; 
         r.readAsText(f); 
     }
 
@@ -2311,7 +2311,7 @@ class App {
         // 4. ЗБЕРЕЖЕННЯ І ПЕРЕЗАВАНТАЖЕННЯ
         this.save();
         alert(`✅ Місяць успішно закрито!\nСума нарахувань: ${totalBill.toFixed(2)} грн`);
-        location.reload();
+        window.location.href = window.location.pathname + '?v=' + Date.now();
     }
 
     renderTariffs() { this.updateSubscriptionCalc(); }
@@ -2543,7 +2543,7 @@ window.addEventListener('load', () => {
     if (e) e.stopPropagation();
     if (confirm("Вийти з акаунту?")) {
         await sbClient.auth.signOut();
-        window.location.reload();
+        window.location.href = window.location.pathname + '?v=' + Date.now();
     }
   };
 
@@ -2782,6 +2782,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
