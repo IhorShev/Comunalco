@@ -2741,25 +2741,31 @@ window.addEventListener('load', () => {
                   const savedState = a.current_data || {};
                   
                   return {
-                      id: a.id,
-                      name: a.name,
-                      phone: a.phone,
-                      email: a.email,
-                      messenger: a.messenger,
-                      debt: parseFloat(a.debt || 0),
-                      paid: parseFloat(a.paid || 0),
-                      
-                      // Відновлюємо точні цифри
-                      prev: savedState.prev || {ed:0, en:0, w:0, g:0},
-                      curr: savedState.curr || {ed:0, en:0, w:0, g:0},
-                      custom_counters: savedState.custom || [],
-                      services: savedState.serv || [],
-                      
-                      // Для сумісності
-                      group_id: 1 
-                  };
-              });
-          }
+                        id: a.id,
+                        name: a.name,
+                        phone: a.phone,
+                        email: a.email,
+                        messenger: a.messenger,
+                        debt: parseFloat(a.debt || 0),
+                        paid: parseFloat(a.paid || 0),
+                        
+                        // 🔥 ОСЬ ДВІ КОЛОНКИ, ЯКІ МИ ЗАБУЛИ ЗАВАНТАЖИТИ З ХМАРИ:
+                        telegram_chat_id: a.telegram_chat_id, 
+                        can_submit_readings: a.can_submit_readings,
+                        
+                        // Відновлюємо точні цифри
+                        prev: savedState.prev || {ed:0, en:0, w:0, g:0},
+                        curr: savedState.curr || {ed:0, en:0, w:0, g:0},
+                        custom_counters: savedState.custom || [],
+                        services: savedState.serv || [],
+                        
+                        // Для сумісності
+                        group_id: 1 
+                    };
+                });
+
+                // 🔥 ДОДАЄМО СОРТУВАННЯ, ЩОБ КВАРТИРИ ЙШЛИ ПО ПОРЯДКУ
+                cleanApts.sort((a, b) => a.id - b.id);
 
           // 4. Розпаковуємо дані будинку (Групи, Реквізити, Історія)
           const groups = h.groups_data || [{ id: 1, name: "Загальнобудинкові (МЗК)", prev:{}, curr:{}, services:[], custom_counters:[] }];
@@ -2894,6 +2900,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
