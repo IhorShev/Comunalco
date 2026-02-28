@@ -2535,7 +2535,7 @@ window.addEventListener('load', () => {
     }
   };
 
-  // 4. СЛУХАЧ (Авто-старт) - ПОВНІСТЮ ВИПРАВЛЕНИЙ
+  // 4. СЛУХАЧ (Авто-старт)
   sbClient.auth.onAuthStateChange(async (event, session) => {
     const user = session?.user;
     const btn = document.getElementById('auth-btn');
@@ -2546,7 +2546,7 @@ window.addEventListener('load', () => {
       window.currentUser = user;
       const shortName = user.email.split('@')[0];
       
-      // Налаштовуємо кнопку (Вихід працюватиме завжди)
+      // ВІДРАЗУ налаштовуємо кнопку, щоб ВИХІД працював навіть при помилках далі
       if(btn && nameSpan) { 
           nameSpan.innerText = shortName;
           btn.style.borderColor = 'var(--success)';
@@ -2563,7 +2563,7 @@ window.addEventListener('load', () => {
               const today = new Date();
               
               if(subExpireEl) {
-                  // ВИКОРИСТОВУЄМО ЗВОРОТНІ АПОСТРОФИ ``
+                  // ВИКОРИСТОВУЄМО ТІЛЬКИ ЗВОРОТНІ АПОСТРОФИ ``
                   subExpireEl.innerText = `PRO до ${expDate.toLocaleDateString()}`;
                   subExpireEl.style.display = 'block';
                   
@@ -2579,10 +2579,10 @@ window.addEventListener('load', () => {
                   window.app.updateStatus();
               }
           }
-      } catch (e) { console.error("Profile check failed:", e); }
+      } catch (e) { console.error("Profile fetch error:", e); }
 
-      // Авто-відновлення даних
-      if (window.app && window.app.state.objects.length === 1 && window.app.state.objects[0].apartments.length === 1 && !window.app.state.objects[0].apartments[0].phone) {
+      // Авто-завантаження
+      if (window.app && window.app.state.objects.length === 1 && !window.app.state.objects[0].apartments[0].phone) {
           await window.cloudLoad();
       }
 
@@ -2794,6 +2794,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
