@@ -2535,7 +2535,7 @@ window.addEventListener('load', () => {
     }
   };
 
-  // 4. СЛУХАЧ (Авто-старт) - ОСТАТОЧНА ВИПРАВЛЕНА ВЕРСІЯ
+  // 4. СЛУХАЧ (Авто-старт) - ПОВНІСТЮ ВИПРАВЛЕНИЙ
   sbClient.auth.onAuthStateChange(async (event, session) => {
     const user = session?.user;
     const btn = document.getElementById('auth-btn');
@@ -2546,46 +2546,42 @@ window.addEventListener('load', () => {
       window.currentUser = user;
       const shortName = user.email.split('@')[0];
       
-      // Налаштовуємо кнопку. Пробуємо обидва варіанти назви функції виходу
+      // 1. НАЛАШТОВУЄМО КНОПКУ (Щоб вихід працював завжди)
       if(btn && nameSpan) { 
           nameSpan.innerText = shortName;
           btn.style.borderColor = 'var(--success)';
           btn.style.color = 'var(--success)';
+          // Призначаємо функцію виходу. Перевіряємо обидва регістри (Logout/logout)
           btn.onclick = (e) => { 
               e.stopPropagation(); 
-              if (typeof window.googleLogout === 'function') window.googleLogout();
-              else if (typeof window.googlelogout === 'function') window.googlelogout();
-              else alert("Помилка: Функція виходу не знайдена");
+              if (confirm("Вийти з акаунту?")) {
+                  if (typeof window.googleLogout === 'function') window.googleLogout();
+                  else if (typeof window.googlelogout === 'function') window.googlelogout();
+                  else sbClient.auth.signOut().then(() => location.reload());
+              }
           }; 
       }
 
-      // ПЕРЕВІРКА ПІДПИСКИ
+      // 2. ЗАПИТ ДАТИ (В окремому блоці, щоб не зламати вхід)
       try {
           const { data: profile } = await sbClient.from('profiles').select('*').eq('id', user.id).maybeSingle();
           
           if (profile && profile.expires_at) {
               const expDate = new Date(profile.expires_at);
-              const today = new Date();
-              
               if(subExpireEl) {
-                  // ТУТ ОБОВ'ЯЗКОВО ЗВОРОТНІ АПОСТРОФИ ``
+                  // УВАГА: Використовуйте тільки зворотні апострофи `` (клавіша під Esc)
                   subExpireEl.innerText = `PRO до ${expDate.toLocaleDateString()}`;
                   subExpireEl.style.display = 'block';
-                  
-                  const daysLeft = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
-                  if (daysLeft <= 7 && daysLeft > 0) {
-                      alert(`🔔 Нагадування: Термін оплати закінчується через ${daysLeft} днів (${expDate.toLocaleDateString()})`);
-                  }
               }
-
               if(window.app) {
                   window.app.state.license = { type: 'pro', exp: profile.expires_at };
                   window.app.LIMITS.pro = profile.apts_limit || 9999;
                   window.app.updateStatus();
               }
           }
-      } catch (e) { console.error("Profile error:", e); }
+      } catch (e) { console.error("Помилка завантаження профілю:", e); }
 
+      // 3. АВТО-ЗАВАНТАЖЕННЯ
       if (window.app && window.app.state.objects.length === 1 && !window.app.state.objects[0].apartments[0].phone) {
           await window.cloudLoad();
       }
@@ -2797,6 +2793,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
