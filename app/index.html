@@ -2535,7 +2535,6 @@ window.addEventListener('load', () => {
     }
   };
 
-  // 4. СЛУХАЧ (Авто-старт) - ПОВНІСТЮ ВИПРАВЛЕНИЙ
   sbClient.auth.onAuthStateChange(async (event, session) => {
     const user = session?.user;
     const btn = document.getElementById('auth-btn');
@@ -2553,8 +2552,9 @@ window.addEventListener('load', () => {
           btn.onclick = window.googleLogout; 
       }
 
-      // --- ПЕРЕВІРКА ПІДПИСКИ ТА ТЕРМІНУ ---
+      // --- ПЕРЕВІРКА ТЕРМІНУ ОПЛАТИ ---
       try {
+          // Шукаємо профіль користувача в таблиці profiles
           const { data: profile } = await sbClient.from('profiles').select('*').eq('id', user.id).maybeSingle();
           
           if (profile && profile.expires_at) {
@@ -2565,24 +2565,28 @@ window.addEventListener('load', () => {
                   subExpireEl.innerText = `PRO до ${expDate.toLocaleDateString()}`;
                   subExpireEl.style.display = 'block';
                   
-                  // Нагадування за 7 днів до кінця
+                  // Розрахунок днів до кінця
                   const daysLeft = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
+                  
+                  // Нагадування за 7 днів (тільки при вході)
                   if (daysLeft <= 7 && daysLeft > 0) {
-                      alert(`🔔 Нагадування: Підписка закінчується через ${daysLeft} днів (${expDate.toLocaleDateString()})`);
+                      alert(`🔔 Нагадування: Термін оплати закінчується через ${daysLeft} днів (${expDate.toLocaleDateString()})`);
                   }
               }
 
+              // Вмикаємо PRO-ліміти в самій програмі
               if(window.app) {
                   window.app.state.license = { type: 'pro', exp: profile.expires_at };
                   window.app.LIMITS.pro = profile.apts_limit || 9999;
                   window.app.updateStatus();
               }
           }
-      } catch (e) { console.error("Помилка профілю:", e); }
-      // ------------------------------------
+      } catch (e) {
+          console.error("Помилка завантаження профілю:", e);
+      }
+      // -------------------------------
 
-      // Авто-завантаження, якщо пристрій новий
-      if (window.app && window.app.state.objects.length === 1 && window.app.state.objects[0].apartments.length === 1 && window.app.state.objects[0].apartments[0].name === "Кв. 1" && !window.app.state.objects[0].apartments[0].phone) {
+      if (window.app && window.app.state.objects.length === 1 && window.app.state.objects[0].apartments.length === 1 && !window.app.state.objects[0].apartments[0].phone) {
           await window.cloudLoad();
       }
 
@@ -2794,6 +2798,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
