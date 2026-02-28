@@ -1,4 +1,4 @@
-const CACHE_NAME = 'comunalco-v3.0'; // <--- Я змінив v1 на v3.0. Це сигнал для оновлення!
+const CACHE_NAME = 'comunalco-v4.0'; // <--- Я змінив v1 на v3.0. Це сигнал для оновлення!
 const ASSETS = [
   './',
   './index.html',
