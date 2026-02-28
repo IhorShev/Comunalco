@@ -2540,11 +2540,22 @@ window.addEventListener('load', () => {
     if (error) alert("Помилка: " + error.message);
   };
 
-  // 3. ФУНКЦІЯ ВИХОДУ (ЧИСТА)
+  // 3. ФУНКЦІЯ ВИХОДУ (БРОНЕБІЙНА)
   window.googleLogout = async (e) => {
     if (e) e.stopPropagation();
     if (confirm("Вийти з акаунту?")) {
-        await sbClient.auth.signOut();
+        
+        // 1. Примусово видаляємо всі ключі авторизації Supabase з пам'яті браузера
+        Object.keys(localStorage).forEach(key => {
+            if (key.startsWith('sb-')) {
+                localStorage.removeItem(key);
+            }
+        });
+        
+        // 2. Відправляємо сигнал про вихід у базу, АЛЕ НЕ ЧЕКАЄМО на її відповідь
+        sbClient.auth.signOut().catch(err => console.log(err));
+        
+        // 3. Миттєво перезавантажуємо сторінку за свіжим посиланням
         window.location.href = window.location.pathname + '?v=' + Date.now();
     }
   };
@@ -2784,6 +2795,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
