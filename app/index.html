@@ -624,7 +624,7 @@
               for (let registration of registrations) registration.unregister();
           });
       }
-      setTimeout(() => { window.location.reload(true); }, 500);
+      setTimeout(() => { window.location.href = window.location.pathname + '?v=' + Date.now(); }, 500);
   }
 class App {
     constructor() {
@@ -2782,6 +2782,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
