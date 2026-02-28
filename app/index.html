@@ -1627,6 +1627,29 @@ class App {
     updateAS(ai,si,k,v){this.currentData.apartments[ai].services[si][k]=k==='val'?parseFloat(v):v;this.save(); this.calculate();}
     delAS(ai,si){this.currentData.apartments[ai].services.splice(si,1);this.save();this.renderApartments(); this.calculate();}
     delApt(i){if(confirm("Видалити квартиру?")){this.currentData.apartments.splice(i,1);this.save();this.renderApartments(); this.updateStatus(); this.calculate();}}
+    // --- ДОЗВІЛ НА ПЕРЕДАЧУ ПОКАЗНИКІВ ЧЕРЕЗ БОТА ---
+    async toggleBotPermission(aptId, checkboxElement) {
+        const isAllowed = checkboxElement.checked;
+        try {
+            const { error } = await sbClient
+                .from('apartments')
+                .update({ can_submit_readings: isAllowed })
+                .eq('id', String(aptId));
+
+            if (error) throw error;
+            
+            const apt = this.currentData.apartments.find(a => a.id == aptId);
+            if (apt) apt.can_submit_readings = isAllowed;
+            this.save();
+            
+            checkboxElement.parentElement.parentElement.style.background = isAllowed ? 'rgba(34, 197, 94, 0.1)' : 'rgba(0,0,0,0.03)';
+            
+        } catch (e) {
+            console.error("Помилка:", e);
+            alert("❌ Помилка з'єднання з базою.");
+            checkboxElement.checked = !isAllowed; 
+        }
+    }
    // --- ДОЗВІЛ НА ПЕРЕДАЧУ ПОКАЗНИКІВ ЧЕРЕЗ БОТА ---
     async toggleBotPermission(aptId, checkboxElement) {
         const isAllowed = checkboxElement.checked;
@@ -2894,6 +2917,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
