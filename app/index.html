@@ -755,10 +755,14 @@ class App {
     
     // --- АКТИВАЦІЯ ПРОМОКОДУ (ВЕРСІЯ 2.0) ---
     async activatePromoCode() {
-        if (!window.currentUser) return alert("Будь ласка, увійдіть в акаунт!");
-        const codeInput = document.getElementById('promo-code-input');
-        const code = codeInput.value.trim().toUpperCase();
-        if (!code) return alert("Введіть код!");
+    if (!window.currentUser) return alert("Будь ласка, увійдіть в акаунт!");
+    const codeInput = document.getElementById('promo-code-input');
+    
+    // Очищуємо від пробілів, переводимо в у верхній регістр та замінюємо "O" на "0"
+    let code = codeInput.value.trim().toUpperCase();
+    code = code.replace(/O/g, '0'); 
+    
+    if (!code) return alert("Введіть код!");
 
         const btn = document.getElementById('btn-activate-promo');
         btn.disabled = true; 
@@ -2849,6 +2853,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
