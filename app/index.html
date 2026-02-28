@@ -2533,13 +2533,15 @@ window.addEventListener('load', () => {
     }
   };
 
-  // 4. СЛУХАЧ (Авто-старт)
+  // 4. СЛУХАЧ (Авто-старт) - ПОВНІСТЮ ВИПРАВЛЕНИЙ
   sbClient.auth.onAuthStateChange(async (event, session) => {
     const user = session?.user;
     const btn = document.getElementById('auth-btn');
     const nameSpan = document.getElementById('user-name-display');
+    const subExpireEl = document.getElementById('sub-expire-display');
 
-    window.currentUser = user;
+    if (user) {
+      window.currentUser = user;
       const shortName = user.email.split('@')[0];
       
       if(btn && nameSpan) { 
@@ -2549,37 +2551,35 @@ window.addEventListener('load', () => {
           btn.onclick = window.googleLogout; 
       }
 
-      // --- ПЕРЕВІРКА ПІДПИСКИ (НОВЕ) ---
-      const subExpireEl = document.getElementById('sub-expire-display');
-      
-      // Запит до вашої нової таблиці profiles
-      const { data: profile } = await sbClient.from('profiles').select('*').eq('id', user.id).maybeSingle();
-      
-      if (profile && profile.expires_at) {
-          const expDate = new Date(profile.expires_at);
-          const today = new Date();
+      // --- ПЕРЕВІРКА ПІДПИСКИ ТА ТЕРМІНУ ---
+      try {
+          const { data: profile } = await sbClient.from('profiles').select('*').eq('id', user.id).maybeSingle();
           
-          if(subExpireEl) {
-              subExpireEl.innerText = `PRO до ${expDate.toLocaleDateString()}`;
-              subExpireEl.style.display = 'block';
+          if (profile && profile.expires_at) {
+              const expDate = new Date(profile.expires_at);
+              const today = new Date();
               
-              // Нагадування за 7 днів
-              const daysLeft = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
-              if (daysLeft <= 7 && daysLeft > 0) {
-                  alert(`🔔 Нагадування: Підписка закінчується через ${daysLeft} днів (${expDate.toLocaleDateString()})`);
+              if(subExpireEl) {
+                  subExpireEl.innerText = `PRO до ${expDate.toLocaleDateString()}`;
+                  subExpireEl.style.display = 'block';
+                  
+                  // Нагадування за 7 днів до кінця
+                  const daysLeft = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
+                  if (daysLeft <= 7 && daysLeft > 0) {
+                      alert(`🔔 Нагадування: Підписка закінчується через ${daysLeft} днів (${expDate.toLocaleDateString()})`);
+                  }
+              }
+
+              if(window.app) {
+                  window.app.state.license = { type: 'pro', exp: profile.expires_at };
+                  window.app.LIMITS.pro = profile.apts_limit || 9999;
+                  window.app.updateStatus();
               }
           }
+      } catch (e) { console.error("Помилка профілю:", e); }
+      // ------------------------------------
 
-          // Оновлюємо ліміти квартир у самому додатку
-          if(window.app) {
-              window.app.state.license = { type: 'pro', exp: profile.expires_at };
-              window.app.LIMITS.pro = profile.apts_limit || 9999;
-              window.app.updateStatus();
-          }
-      }
-      // ---------------------------------
-
-      // Ваш існуючий код cloudLoad (не видаляйте його!)
+      // Авто-завантаження, якщо пристрій новий
       if (window.app && window.app.state.objects.length === 1 && window.app.state.objects[0].apartments.length === 1 && window.app.state.objects[0].apartments[0].name === "Кв. 1" && !window.app.state.objects[0].apartments[0].phone) {
           await window.cloudLoad();
       }
@@ -2588,9 +2588,11 @@ window.addEventListener('load', () => {
       window.currentUser = null;
       if(btn && nameSpan) { 
           nameSpan.innerText = "Вхід";
-          btn.style.borderColor = 'var(--primary)'; 
+          btn.style.borderColor = 'var(--primary)';
+          btn.style.color = 'var(--primary)';
           btn.onclick = window.googleLogin;
       }
+      if(subExpireEl) subExpireEl.style.display = 'none';
     }
   });
 
@@ -2790,6 +2792,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
