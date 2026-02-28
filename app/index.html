@@ -753,7 +753,7 @@ class App {
         }
     }
     
-    // --- АКТИВАЦІЯ ПРОМОКОДУ ---
+    // --- АКТИВАЦІЯ ПРОМОКОДУ (ВЕРСІЯ 2.0) ---
     async activatePromoCode() {
         if (!window.currentUser) return alert("Будь ласка, увійдіть в акаунт!");
         const codeInput = document.getElementById('promo-code-input');
@@ -761,41 +761,42 @@ class App {
         if (!code) return alert("Введіть код!");
 
         const btn = document.getElementById('btn-activate-promo');
-        btn.disabled = true; btn.innerText = "⏳...";
+        btn.disabled = true; 
+        btn.innerText = "⏳...";
 
         try {
-            // Звертаємось до нашої нової секретної функції в базі Supabase
+            console.log("🚀 Спроба активації ключа:", code);
             const { data, error } = await sbClient.rpc('use_activation_key', { p_key_code: code });
 
             if (error) throw error;
+
             if (!data.success) {
                 alert("❌ " + data.error);
-                btn.disabled = false; btn.innerText = "Активувати";
-                return;
+            } else {
+                alert("✅ Ура! Ваш тариф успішно активовано!");
+                codeInput.value = '';
+                
+                // Миттєво оновлюємо дату на екрані
+                const expDate = new Date(data.new_exp);
+                const subExpireEl = document.getElementById('sub-expire-display');
+                if(subExpireEl) {
+                    subExpireEl.innerText = `PRO до ${expDate.toLocaleDateString()}`;
+                    subExpireEl.style.display = 'block';
+                }
+                // Оновлюємо статус в системі
+                if (this.state) {
+                    this.state.license = { type: data.plan, exp: data.new_exp };
+                    this.updateStatus(); 
+                }
             }
-
-            // Успіх!
-            alert("✅ Ура! Ваш тариф успішно активовано!");
-            codeInput.value = '';
-            
-            // Оновлюємо дату під логіном миттєво
-            const expDate = new Date(data.new_exp);
-            const subExpireEl = document.getElementById('sub-expire-display');
-            if(subExpireEl) {
-                subExpireEl.innerText = `PRO до ${expDate.toLocaleDateString()}`;
-                subExpireEl.style.display = 'block';
-            }
-            // Оновлюємо статус в системі програми
-            if (this.state) {
-                this.state.license = { type: data.plan, exp: data.new_exp };
-                this.updateStatus(); 
-            }
-            
         } catch(e) {
-            console.error(e);
-            alert("❌ Помилка з'єднання з базою.");
+            console.error("Помилка активації:", e);
+            alert("❌ Помилка з'єднання: " + (e.message || "База не відповідає"));
+        } finally {
+            // Цей блок виконається ЗАВЖДИ і розблокує кнопку
+            btn.disabled = false; 
+            btn.innerText = "Активувати";
         }
-        btn.disabled = false; btn.innerText = "Активувати";
     }
     // --- UI & THEME ---
     initTheme() { 
@@ -2848,6 +2849,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
