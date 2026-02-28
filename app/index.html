@@ -1776,8 +1776,12 @@ class App {
             }).join('');
             
             if (resultsList) resultsList.innerHTML = listHTML;
+                
+                // 🔥 ВІДКРИВАЄМО ВІКНО КВИТАНЦІЙ
+                document.getElementById('resultModal').style.display = 'flex';
 
-        } catch (e) { console.error(e); }
+        } catch (e) { console.error(e);
+        }
     } 
    async sendCheck(i, forceMethod = null) {
         const txt = this.checks[i];
@@ -2907,6 +2911,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
