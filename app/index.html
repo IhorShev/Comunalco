@@ -2535,6 +2535,7 @@ window.addEventListener('load', () => {
     }
   };
 
+  // 4. СЛУХАЧ (Авто-старт) - ПОВНІСТЮ ВИПРАВЛЕНИЙ
   sbClient.auth.onAuthStateChange(async (event, session) => {
     const user = session?.user;
     const btn = document.getElementById('auth-btn');
@@ -2545,14 +2546,15 @@ window.addEventListener('load', () => {
       window.currentUser = user;
       const shortName = user.email.split('@')[0];
       
+      // Налаштовуємо кнопку (Вихід працюватиме завжди)
       if(btn && nameSpan) { 
           nameSpan.innerText = shortName;
           btn.style.borderColor = 'var(--success)';
           btn.style.color = 'var(--success)';
-          btn.onclick = window.googleLogout; 
+          btn.onclick = (e) => { e.stopPropagation(); window.googleLogout(); }; 
       }
 
-      // --- ТУТ МИ ЙДЕМО В БАЗУ ЗА ДАТОЮ ---
+      // ПЕРЕВІРКА ПІДПИСКИ
       try {
           const { data: profile } = await sbClient.from('profiles').select('*').eq('id', user.id).maybeSingle();
           
@@ -2561,26 +2563,25 @@ window.addEventListener('load', () => {
               const today = new Date();
               
               if(subExpireEl) {
+                  // ВИКОРИСТОВУЄМО ЗВОРОТНІ АПОСТРОФИ ``
                   subExpireEl.innerText = `PRO до ${expDate.toLocaleDateString()}`;
                   subExpireEl.style.display = 'block';
                   
-                  // Перевірка нагадування (за 7 днів)
                   const daysLeft = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
                   if (daysLeft <= 7 && daysLeft > 0) {
                       alert(`🔔 Нагадування: Термін оплати закінчується через ${daysLeft} днів (${expDate.toLocaleDateString()})`);
                   }
               }
 
-              // Оновлюємо ліміти квартир у самій програмі
               if(window.app) {
                   window.app.state.license = { type: 'pro', exp: profile.expires_at };
                   window.app.LIMITS.pro = profile.apts_limit || 9999;
                   window.app.updateStatus();
               }
           }
-      } catch (e) { console.error("Помилка завантаження профілю:", e); }
+      } catch (e) { console.error("Profile check failed:", e); }
 
-      // Авто-завантаження хмари
+      // Авто-відновлення даних
       if (window.app && window.app.state.objects.length === 1 && window.app.state.objects[0].apartments.length === 1 && !window.app.state.objects[0].apartments[0].phone) {
           await window.cloudLoad();
       }
@@ -2793,6 +2794,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
