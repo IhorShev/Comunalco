@@ -1,64 +1,47 @@
-// 1. ЗМІНЮЙТЕ ЦЮ ЦИФРУ (наприклад, v1 на v2), коли хочете оновити сайт у всіх
-const CACHE_NAME = 'comunalco-cache-v5.0'; 
+const CACHE_NAME = 'comunalco-v6.0';
 
-const ASSETS = [
-  '/',
-  '/index.html',
-  // Додайте сюди ваші іконки або логотипи, якщо вони є:
-  // '/logo.png',
-  // '/icon.png'
-];
-
-// Встановлення: завантажуємо базові файли
+// 1. Встановлення (одразу активуємо)
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
-  );
-  self.skipWaiting(); // Змушуємо новий SW активуватися негайно
+  self.skipWaiting(); 
 });
 
-// Активація: видаляємо старий кеш
+// 2. Активація (видаляємо ВСІ старі кеші)
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
       return Promise.all(
-        keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
+        keys.map((key) => {
+          if (key !== CACHE_NAME) return caches.delete(key);
+        })
       );
     })
   );
-  self.clients.claim(); // Негайно беремо під контроль усі відкриті вкладки
+  self.clients.claim();
 });
 
-// Перехоплення запитів: виправляємо червоні помилки в консолі
+// 3. Перехоплення запитів (СТРАТЕГІЯ "NETWORK FIRST")
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
-  // ІГНОРУЄМО: не-GET запити (POST, DELETE), розширення Chrome та Supabase
-  if (
-    event.request.method !== 'GET' || 
-    !url.protocol.startsWith('http') || 
-    url.hostname.includes('supabase.co') ||
-    url.hostname.includes('google')
-  ) {
-    return; 
-  }
+  // Ігноруємо системні запити та запити до баз даних
+  if (event.request.method !== 'GET' || !url.protocol.startsWith('http')) return;
 
   event.respondWith(
-    caches.match(event.request).then((response) => {
-      return response || fetch(event.request).then((fetchResponse) => {
-        return caches.open(CACHE_NAME).then((cache) => {
-          // Кешуємо тільки успішні відповіді
-          if (fetchResponse.status === 200) {
-            cache.put(event.request, fetchResponse.clone());
-          }
-          return fetchResponse;
-        });
-      });
-    }).catch(() => {
-        // Якщо немає мережі — намагаємося віддати хоча б головну сторінку
-        if (event.request.mode === 'navigate') {
-            return caches.match('/index.html');
+    // СПЕРШУ ЗАВЖДИ ЙДЕМО В ІНТЕРНЕТ ЗА СВІЖИМ КОДОМ
+    fetch(event.request)
+      .then((response) => {
+        // Якщо інтернет є і код завантажився успішно - оновлюємо свій кеш
+        if (response.status === 200) {
+          const responseClone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseClone);
+          });
         }
-    })
+        return response; // Віддаємо вам найсвіжішу версію
+      })
+      .catch(() => {
+        // І ТІЛЬКИ ЯКЩО ІНТЕРНЕТУ НЕМАЄ - дістаємо стару версію з кешу
+        return caches.match(event.request);
+      })
   );
 });
