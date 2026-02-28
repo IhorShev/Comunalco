@@ -446,6 +446,14 @@
         </button>
     </div>
 </div>
+
+<div style="margin-top:20px; padding:15px; background:rgba(0,0,0,0.03); border-radius:12px; border:1px solid var(--border);">
+    <label style="font-size:11px; color:var(--text-sec); text-transform:uppercase;">Маєте ключ активації?</label>
+    <div style="display:flex; gap:10px; margin-top:5px;">
+        <input type="text" id="promo-code-input" placeholder="PRO-365-XXXXX" style="text-transform:uppercase; font-family:monospace; font-weight:bold; font-size:14px; margin-bottom:0;">
+        <button id="btn-activate-promo" class="btn btn-primary" style="width:auto; padding:0 20px; margin-top:0;" onclick="app.activatePromoCode()">Активувати</button>
+    </div>
+</div>
                 
                 <p style="font-size:10px; color:var(--text-sec); text-align:center; margin-top:15px; line-height:1.4;">
                     * Активація відбувається автоматично після оплати.<br>
@@ -2795,6 +2803,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
