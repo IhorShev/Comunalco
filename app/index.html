@@ -957,23 +957,31 @@ class App {
         document.getElementById('tgActionModal').style.display = 'flex';
     }
 
-    // --- РОЗУМНА ВІДПРАВКА (Всім або Одній) ---
-    smartSendReceipts() {
+    // --- УНІВЕРСАЛЬНА РОЗУМНА ВІДПРАВКА ---
+    smartAction(type) {
         const recipient = document.getElementById('tgRecipientSelect').value;
         const currentApts = this.state.objects[this.state.currentObjIdx].apartments;
         
-        if (recipient === 'all') {
-            // Якщо обрано "Всім", просто виділяємо всі підключені
-            currentApts.forEach(a => { if(a.tg_id || a.chat_id) a.selected = true; });
-        } else {
-            // 🔥 МАГІЯ: Виділяємо ТІЛЬКИ одну обрану квартиру, а з інших знімаємо галочки
-            currentApts.forEach(a => {
+        // 1. Ставимо галочки в пам'яті
+        currentApts.forEach(a => {
+            if (recipient === 'all') {
+                // Якщо масово - виділяємо всіх підключених
+                a.selected = !!(a.tg_id || a.chat_id || a.messenger);
+            } else {
+                // Якщо одна - виділяємо ТІЛЬКИ її
                 a.selected = (a.name === recipient);
-            });
-        }
+            }
+        });
         
-        // Викликаємо вашу стандартну функцію відправки (вона сама побачить, хто виділений)
-        this.sendBatch();
+        // 🔥 2. ПРИМУСОВО оновлюємо екран, щоб програма "побачила" нові галочки
+        this.renderAll();
+        
+        // 3. Запускаємо потрібну команду з мікро-затримкою (щоб браузер встиг намалювати галочки)
+        setTimeout(() => {
+            if (type === 'receipts') this.sendBatch();
+            if (type === 'announcement') this.broadcastAnnouncement();
+            if (type === 'debt') this.remindDebtors();
+        }, 200);
     }
     
     createDefaultObject(name) {
@@ -3021,13 +3029,13 @@ window.addEventListener('load', () => {
             </div>
 
             <div style="display:flex; flex-direction:column; gap:12px;">
-                <button class="btn" style="background:#2AABEE; color:white; padding: 14px;" onclick="app.smartSendReceipts(); document.getElementById('tgActionModal').style.display='none'">
+                <button class="btn" style="background:#2AABEE; color:white; padding: 14px;" onclick="app.smartAction('receipts'); document.getElementById('tgActionModal').style.display='none'">
                     📨 Відправити квитанції
                 </button>
-                <button class="btn btn-warning" style="padding: 14px;" onclick="app.broadcastAnnouncement(); document.getElementById('tgActionModal').style.display='none'">
+                <button class="btn btn-warning" style="padding: 14px;" onclick="app.smartAction('announcement'); document.getElementById('tgActionModal').style.display='none'">
                     📢 Зробити повідомлення
                 </button>
-                <button class="btn btn-danger" style="padding: 14px;" onclick="app.remindDebtors(); document.getElementById('tgActionModal').style.display='none'">
+                <button class="btn btn-danger" style="padding: 14px;" onclick="app.smartAction('debt'); document.getElementById('tgActionModal').style.display='none'">
                     🔔 Нагадати про борг
                 </button>
             </div>
@@ -3035,6 +3043,7 @@ window.addEventListener('load', () => {
     </div>
 </body>
 </html>
+
 
 
 
