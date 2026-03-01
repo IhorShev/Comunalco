@@ -905,6 +905,17 @@ class App {
         link.download = `Komunalka_${item.monthName.replace(/\s+/g, '_')}.csv`;
         link.click();
     }
+    // --- ВІДПРАВКА АРХІВУ В ТЕЛЕГРАМ ---
+    sendArchiveToTelegram(historyId) {
+        // 1. Спочатку миттєво завантажуємо цей місяць на екран (як при Огляді)
+        this.loadHistoryItem(historyId);
+        
+        // 2. Відкриваємо ваше стандартне вікно відправки Телеграм з невеличкою затримкою
+        setTimeout(() => {
+            const tgModal = document.getElementById('tgActionModal');
+            if (tgModal) tgModal.style.display = 'flex';
+        }, 500);
+    }
     
     createDefaultObject(name) {
         return {
@@ -2957,6 +2968,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
