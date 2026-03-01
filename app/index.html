@@ -854,10 +854,27 @@ class App {
             }
             exitBtn.style.display = 'flex';
 
-            // 3. ЗАВАНТАЖУЄМО ДАНІ (Без помилки Getter!)
+            // 3. ПІДГОТОВКА ДАНИХ (МАГІЯ ТЕЛЕГРАМУ)
             document.body.classList.add('archive-mode');
 
-            this.state.objects[this.state.currentObjIdx].apartments = item.apartments;
+            // Беремо поточні квартири та робимо безпечну копію старих
+            const currentApts = this.state.objects[this.state.currentObjIdx].apartments;
+            const archiveApts = JSON.parse(JSON.stringify(item.apartments));
+
+            // 🔥 Переносимо сучасні контакти в старий архів і автоматично "виділяємо" їх
+            archiveApts.forEach(old => {
+                const curr = currentApts.find(c => c.name === old.name);
+                if (curr) {
+                    old.tg_id = curr.tg_id;        // Даємо старій квартирі новий Телеграм
+                    old.chat_id = curr.chat_id;
+                    old.messenger = curr.messenger;
+                    old.phone = curr.phone;
+                    old.selected = true;           // 🔥 Ставимо галочку "Обрано для відправки"!
+                }
+            });
+
+            // Завантажуємо оновлені дані на екран
+            this.state.objects[this.state.currentObjIdx].apartments = archiveApts;
             this.state.objects[this.state.currentObjIdx].groups = item.groups;
             this.state.objects[this.state.currentObjIdx].tariffs = item.tariffs;
 
@@ -870,6 +887,13 @@ class App {
                 title.style.background = "var(--gold)";
                 title.style.color = "#000";
             }
+
+            // На всяк випадок програмно натискаємо всі чекбокси на екрані
+            setTimeout(() => {
+                document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                    if (!cb.className.includes('switch') && !cb.id.includes('bot')) cb.checked = true;
+                });
+            }, 300);
 
         } catch (error) {
             console.error("Помилка архіву:", error);
@@ -2968,6 +2992,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
