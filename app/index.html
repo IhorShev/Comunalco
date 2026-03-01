@@ -379,7 +379,7 @@
             <button class="btn btn-success" style="flex:1; padding:12px; font-weight:bold; font-size:15px; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);" onclick="app.calculate(); document.getElementById('resultModal').style.display='flex'">
                 ✅ Розрахувати
             </button>
-            <button id="tg-menu-btn" class="btn" style="flex:1; background:#2AABEE; color:white; padding:12px; font-weight:bold; font-size:15px; box-shadow: 0 4px 10px rgba(42, 171, 238, 0.3);" onclick="document.getElementById('tgActionModal').style.display='flex'">
+            <button id="tg-menu-btn" class="btn" style="flex:1; background:#2AABEE; color:white; padding:12px; font-weight:bold; font-size:15px; box-shadow: 0 4px 10px rgba(42, 171, 238, 0.3);" onclick="app.openTelegramMenu()">
                 ✈️ Надіслати
             </button>
         </div>
@@ -3035,6 +3035,7 @@ window.addEventListener('load', () => {
     </div>
 </body>
 </html>
+
 
 
 
