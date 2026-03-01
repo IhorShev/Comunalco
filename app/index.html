@@ -936,8 +936,7 @@ class App {
         
         // 2. Відкриваємо ваше стандартне вікно відправки Телеграм з невеличкою затримкою
         setTimeout(() => {
-            const tgModal = document.getElementById('tgActionModal');
-            if (tgModal) tgModal.style.display = 'flex';
+            this.openTelegramMenu();
         }, 500);
     }
     // --- ВІДКРИТТЯ МЕНЮ ТЕЛЕГРАМУ ЗІ СПИСКОМ ---
@@ -3036,6 +3035,7 @@ window.addEventListener('load', () => {
     </div>
 </body>
 </html>
+
 
 
 
