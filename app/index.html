@@ -2972,28 +2972,35 @@ window.addEventListener('load', () => {
 </div>
 
     <div id="tgActionModal" class="modal" style="z-index: 9999;">
-    <div class="modal-content" style="max-width: 320px; text-align: center; padding: 30px 20px;">
-        <span class="modal-close" onclick="document.getElementById('tgActionModal').style.display='none'">&times;</span>
-        
-        <div style="font-size: 40px; margin-bottom: 10px;">✈️</div>
-        <h3 style="margin-top:0; margin-bottom: 5px;">Телеграм Бот</h3>
-        <p style="color:var(--text-sec); font-size:13px; margin-bottom:25px;">Оберіть масову дію для всіх мешканців:</p>
-        
-        <div style="display:flex; flex-direction:column; gap:12px;">
-            <button class="btn" style="background:#2AABEE; color:white; padding: 14px;" onclick="app.sendBatch(); document.getElementById('tgActionModal').style.display='none'">
-                📨 Відправити квітанції
-            </button>
-            <button class="btn btn-warning" style="padding: 14px;" onclick="app.broadcastAnnouncement(); document.getElementById('tgActionModal').style.display='none'">
-                📢 Зробити повідомлення
-            </button>
-            <button class="btn btn-danger" style="padding: 14px;" onclick="app.remindDebtors(); document.getElementById('tgActionModal').style.display='none'">
-                🔔 Нагадати про борг
-            </button>
+        <div class="modal-content" style="max-width: 320px; text-align: center; padding: 30px 20px;">
+            <span class="modal-close" onclick="document.getElementById('tgActionModal').style.display='none'">&times;</span>
+
+            <div style="font-size: 40px; margin-bottom: 10px;">✈️</div>
+            <h3 style="margin-top:0; margin-bottom: 5px;">Телеграм Бот</h3>
+            
+            <div style="margin-bottom: 20px; text-align: left; background: var(--bg); padding: 12px; border-radius: 8px; border: 1px solid var(--border);">
+                <label style="font-size: 12px; color: var(--text-sec); display: block; margin-bottom: 6px; font-weight: bold;">Кому відправити:</label>
+                <select id="tgRecipientSelect" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--border); background: var(--card); color: var(--text); font-size: 14px; cursor: pointer;">
+                    <option value="all">Всім підключеним (Масово)</option>
+                </select>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:12px;">
+                <button class="btn" style="background:#2AABEE; color:white; padding: 14px;" onclick="app.smartSendReceipts(); document.getElementById('tgActionModal').style.display='none'">
+                    📨 Відправити квитанції
+                </button>
+                <button class="btn btn-warning" style="padding: 14px;" onclick="app.broadcastAnnouncement(); document.getElementById('tgActionModal').style.display='none'">
+                    📢 Зробити повідомлення
+                </button>
+                <button class="btn btn-danger" style="padding: 14px;" onclick="app.remindDebtors(); document.getElementById('tgActionModal').style.display='none'">
+                    🔔 Нагадати про борг
+                </button>
+            </div>
         </div>
     </div>
-</div>
 </body>
 </html>
+
 
 
 
