@@ -363,7 +363,7 @@
     
     <div style="height: 120px;"></div>
 
-    <div class="sticky-footer" style="flex-direction: column; gap: 8px; padding: 12px; border-radius: 24px; bottom: 10px;">
+    <div class="sticky-footer" style="flex-direction: column; gap: 8px; padding: 12px; border-radius: 24px; bottom: 10px; max-width: 500px; left: 50%; transform: translateX(-50%); background: var(--card); border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
         
         <div style="display:flex; gap:10px; width: 100%;">
             <button class="btn btn-warning" style="flex:1; padding:12px; font-size:14px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" onclick="app.downloadBackup()">
@@ -385,6 +385,9 @@
         </div>
 
     </div>
+   *(Після цього коду наступним рядком у вас має йти `<div id="menuModal" class="modal">`).*
+
+Збережіть зміни (**Commit changes**) і знову жорстко оновіть сторінку на сайті (`Ctrl + F5`). Тепер вони просто не мають шансів розлізтися! Напишіть, чи повернулися вони до центру екрана! 🤞
 
     <div id="menuModal" class="modal">
         <div class="modal-content">
@@ -2897,6 +2900,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
