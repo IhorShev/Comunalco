@@ -833,32 +833,50 @@ class App {
 
     
     loadHistoryItem(index) {
-        if(!confirm("⚠️ Увага! Режим ПЕРЕГЛЯДУ архіву.\nЗміни тут не зберігаються.\nОновіть сторінку для виходу.")) return;
-        
-        const item = this.currentData.history[index];
-        
-        // Вмикаємо візуальний режим архіву
-        document.body.classList.add('archive-mode'); 
-        
+        // 1. Знаходимо потрібний місяць (підтримує і індекс, і ID)
+        let item = (typeof index === 'string' || index > 1000) 
+            ? this.currentData.history.find(x => x.id == index) 
+            : this.currentData.history[index];
+            
+        if(!item) return;
+
+        // 2. Вмикаємо візуальний режим архіву
+        document.body.classList.add('archive-mode');
+
         const tempState = JSON.parse(JSON.stringify(this.state));
         tempState.objects[this.state.currentObjIdx].apartments = item.apartments;
         tempState.objects[this.state.currentObjIdx].groups = item.groups;
         tempState.objects[this.state.currentObjIdx].tariffs = item.tariffs;
-        
+
         this.currentData = tempState.objects[this.state.currentObjIdx];
         this.renderAll();
         document.getElementById('historyModal').style.display = 'none';
-        
+
         const title = document.getElementById('object-title');
         if(title) {
-            title.value = `📜 АРХІВ: ${item.monthName}`;
+            title.value = `АРХІВ: ${item.monthName || ''}`;
             title.disabled = true;
-            title.style.background = "var(--gold)"; 
+            title.style.background = "var(--gold)";
             title.style.color = "#000";
         }
-        
+
         const updateBtn = document.querySelector('.desktop-only span[title="Оновити"]');
         if(updateBtn) updateBtn.style.display = 'none';
+
+        // 🔥 3. ДОДАЄМО КРАСИВУ КНОПКУ ВИХОДУ (Замість дратівливого Alert)
+        let exitBtn = document.getElementById('exit-archive-btn');
+        if (!exitBtn) {
+            exitBtn = document.createElement('button');
+            exitBtn.id = 'exit-archive-btn';
+            exitBtn.innerHTML = '🔙 Вийти з Архіву';
+            exitBtn.style.cssText = 'position:fixed; top:20px; left:50%; transform:translateX(-50%); z-index:99999; background:#EF4444; color:white; border:none; padding:12px 28px; border-radius:30px; font-weight:bold; font-size:16px; box-shadow:0 10px 25px rgba(239, 68, 68, 0.5); cursor:pointer; display:flex; gap:8px; align-items:center; transition: 0.2s;';
+            
+            // Кнопка сама зробить оновлення при натисканні
+            exitBtn.onclick = () => window.location.reload(); 
+            
+            document.body.appendChild(exitBtn);
+        }
+        exitBtn.style.display = 'flex';
     }
 
     createDefaultObject(name) {
@@ -2914,6 +2932,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
