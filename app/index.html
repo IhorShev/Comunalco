@@ -839,25 +839,47 @@ class App {
                 
             if(!item) return;
 
-            // 1. ОДРАЗУ ХОВАЄМО ВІКНА
             document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
 
-            // 2. МАЛЮЄМО КНОПКУ ВИХОДУ
+            // 🔥 1. РОБИМО БЕКАП ПОТОЧНИХ ДАНИХ (Щоб виходити без перезавантаження сторінки!)
+            if (!this.liveStateBackup) {
+                this.liveStateBackup = JSON.parse(JSON.stringify(this.state.objects[this.state.currentObjIdx]));
+            }
+
+            // 2. МАЛЮЄМО НОВУ КНОПКУ ВИХОДУ
             let exitBtn = document.getElementById('exit-archive-btn');
             if (!exitBtn) {
                 exitBtn = document.createElement('button');
                 exitBtn.id = 'exit-archive-btn';
                 exitBtn.innerHTML = '🔙 Вийти з Архіву';
                 exitBtn.style.cssText = 'position:fixed; top:70px; left:50%; transform:translateX(-50%); z-index:2147483647; background:#EF4444; color:white; border:none; padding:12px 28px; border-radius:30px; font-weight:bold; font-size:16px; box-shadow:0 10px 25px rgba(239, 68, 68, 0.5); cursor:pointer; display:flex; gap:8px; align-items:center; transition: 0.2s;';
-                exitBtn.onclick = () => window.location.reload(); 
+                
+                // 🔥 ВИХОДИМО МИТТЄВО (Підставляємо збережені дані назад)
+                exitBtn.onclick = () => {
+                    if (this.liveStateBackup) {
+                        this.state.objects[this.state.currentObjIdx] = JSON.parse(JSON.stringify(this.liveStateBackup));
+                        this.liveStateBackup = null; // Очищаємо бекап
+                    }
+                    document.body.classList.remove('archive-mode');
+                    this.renderAll();
+                    
+                    const title = document.getElementById('object-title');
+                    if(title) {
+                        title.value = this.state.objects[this.state.currentObjIdx].name || "Мій Об'єкт";
+                        title.disabled = false;
+                        title.style.background = "";
+                        title.style.color = "";
+                    }
+                    document.getElementById('exit-archive-btn').style.display = 'none';
+                };
                 document.body.appendChild(exitBtn);
             }
             exitBtn.style.display = 'flex';
 
             document.body.classList.add('archive-mode');
 
-            // 🔥 3. МАГІЯ ТЕЛЕГРАМУ: Беремо поточні контакти і підставляємо в архів!
-            const currentApts = this.state.objects[this.state.currentObjIdx].apartments;
+            // 3. МАГІЯ ТЕЛЕГРАМУ
+            const currentApts = this.liveStateBackup.apartments;
             const archiveApts = JSON.parse(JSON.stringify(item.apartments));
 
             archiveApts.forEach(old => {
@@ -870,7 +892,6 @@ class App {
                 }
             });
 
-            // Завантажуємо оновлені дані з контактами
             this.state.objects[this.state.currentObjIdx].apartments = archiveApts;
             this.state.objects[this.state.currentObjIdx].groups = item.groups;
             this.state.objects[this.state.currentObjIdx].tariffs = item.tariffs;
@@ -919,25 +940,23 @@ class App {
         link.download = `Komunalka_${item.monthName.replace(/\s+/g, '_')}.csv`;
         link.click();
     }
+
     // --- ВІДПРАВКА АРХІВУ В ТЕЛЕГРАМ ---
     sendArchiveToTelegram(historyId) {
-        // 1. Спочатку миттєво завантажуємо цей місяць на екран (як при Огляді)
         this.loadHistoryItem(historyId);
         
-        // 2. Відкриваємо ваше стандартне вікно відправки Телеграм з невеличкою затримкою
         setTimeout(() => {
             this.openTelegramMenu();
         }, 500);
     }
+
     // --- ВІДКРИТТЯ МЕНЮ ТЕЛЕГРАМУ ЗІ СПИСКОМ ---
     openTelegramMenu() {
         const select = document.getElementById('tgRecipientSelect');
         if (select) {
-            // Очищаємо список і ставимо першим пунктом "Всім"
             select.innerHTML = '<option value="all">Всім підключеним (Масово)</option>';
             const currentApts = this.state.objects[this.state.currentObjIdx].apartments;
             
-            // Додаємо в список ТІЛЬКИ ті квартири, у яких підключений бот
             currentApts.forEach(apt => {
                 if (apt.tg_id || apt.chat_id || apt.messenger) {
                     select.innerHTML += `<option value="${apt.name}">${apt.name}</option>`;
@@ -955,23 +974,20 @@ class App {
         // 1. Ставимо галочки в пам'яті
         currentApts.forEach(a => {
             if (recipient === 'all') {
-                // Якщо масово - виділяємо всіх підключених
                 a.selected = !!(a.tg_id || a.chat_id || a.messenger);
             } else {
-                // Якщо одна - виділяємо ТІЛЬКИ її
                 a.selected = (a.name === recipient);
             }
         });
         
-        // 🔥 2. ПРИМУСОВО оновлюємо екран, щоб програма "побачила" нові галочки
-        this.renderAll();
-        
-        // 3. Запускаємо потрібну команду з мікро-затримкою (щоб браузер встиг намалювати галочки)
-        setTimeout(() => {
-            if (type === 'receipts') this.sendBatch();
-            if (type === 'announcement') this.broadcastAnnouncement();
-            if (type === 'debt') this.remindDebtors();
-        }, 200);
+        // 2. Імітуємо чекбокс "Вибрати всі", щоб обійти системні захисти
+        const selectAllCb = document.querySelector('input[type="checkbox"]');
+        if (selectAllCb) selectAllCb.checked = true;
+
+        // 3. Запускаємо потрібну команду миттєво
+        if (type === 'receipts') this.sendBatch();
+        if (type === 'announcement') this.broadcastAnnouncement();
+        if (type === 'debt') this.remindDebtors();
     }
     
     createDefaultObject(name) {
@@ -3033,6 +3049,7 @@ window.addEventListener('load', () => {
     </div>
 </body>
 </html>
+
 
 
 
