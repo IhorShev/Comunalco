@@ -2573,11 +2573,14 @@ class App {
                 </div>
 
                 ${(!window.currentRole || window.currentRole === 'owner') ? `
-                <div style="display:flex; gap:8px; border-top:1px dashed var(--border); padding-top:10px;">
-                    <button onclick="event.stopPropagation(); alert('Скоро тут буде генерація Excel! 📊')" class="btn" style="flex:1; padding:8px; font-size:13px; border-radius:6px; background:#10B981; color:white; border:none; display:flex; justify-content:center; align-items:center; gap:5px;">
-                        📊 В Excel
+                <div style="display:flex; gap:6px; border-top:1px dashed var(--border); padding-top:10px;">
+                    <button onclick="event.stopPropagation(); app.loadHistoryItem('${h.id}')" class="btn" style="flex:1; padding:8px 4px; font-size:13px; border-radius:6px; background:var(--card); color:var(--text); border:1px solid var(--border); display:flex; justify-content:center; align-items:center; gap:4px;">
+                        👀 Огляд
                     </button>
-                    <button onclick="event.stopPropagation(); alert('Скоро тут буде відправка в Телеграм! ✈️')" class="btn" style="flex:1; padding:8px; font-size:13px; border-radius:6px; background:#2AABEE; color:white; border:none; display:flex; justify-content:center; align-items:center; gap:5px;">
+                    <button onclick="event.stopPropagation(); alert('Скоро тут буде генерація Excel! 📊')" class="btn" style="flex:1; padding:8px 4px; font-size:13px; border-radius:6px; background:#10B981; color:white; border:none; display:flex; justify-content:center; align-items:center; gap:4px;">
+                        📊 Excel
+                    </button>
+                    <button onclick="event.stopPropagation(); alert('Скоро тут буде відправка в Телеграм! ✈️')" class="btn" style="flex:1; padding:8px 4px; font-size:13px; border-radius:6px; background:#2AABEE; color:white; border:none; display:flex; justify-content:center; align-items:center; gap:4px;">
                         ✈️ Надіслати
                     </button>
                 </div>
@@ -2911,6 +2914,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
