@@ -992,6 +992,8 @@ class App {
     }
     
     save() {
+        // 🔥 ЗАХИСТ: Ніколи не зберігаємо дані, якщо ми в режимі Архіву!
+        if (document.body.classList.contains('archive-mode')) return;
         // 1. Миттєве локальне збереження (зберігаємо сумісність з вашим ключем)
         if(this.STORAGE_KEY) {
              localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.state));
@@ -2992,6 +2994,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
