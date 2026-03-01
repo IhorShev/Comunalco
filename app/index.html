@@ -839,12 +839,10 @@ class App {
                 
             if(!item) return;
 
-            // 🔥 1. ОДРАЗУ ХОВАЄМО ВІКНА (щоб ніщо не завадило)
+            // 1. ОДРАЗУ ХОВАЄМО ВІКНА
             document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
-            const histModal = document.getElementById('historyModal');
-            if (histModal) histModal.style.display = 'none';
 
-            // 🔥 2. ОДРАЗУ МАЛЮЄМО КНОПКУ ВИХОДУ
+            // 2. МАЛЮЄМО КНОПКУ ВИХОДУ
             let exitBtn = document.getElementById('exit-archive-btn');
             if (!exitBtn) {
                 exitBtn = document.createElement('button');
@@ -856,15 +854,13 @@ class App {
             }
             exitBtn.style.display = 'flex';
 
-            // 3. ЗАВАНТАЖУЄМО ДАНІ АРХІВУ
+            // 3. ЗАВАНТАЖУЄМО ДАНІ (Без помилки Getter!)
             document.body.classList.add('archive-mode');
 
-            const tempState = JSON.parse(JSON.stringify(this.state));
-            tempState.objects[this.state.currentObjIdx].apartments = item.apartments;
-            tempState.objects[this.state.currentObjIdx].groups = item.groups;
-            tempState.objects[this.state.currentObjIdx].tariffs = item.tariffs;
+            this.state.objects[this.state.currentObjIdx].apartments = item.apartments;
+            this.state.objects[this.state.currentObjIdx].groups = item.groups;
+            this.state.objects[this.state.currentObjIdx].tariffs = item.tariffs;
 
-            this.currentData = tempState.objects[this.state.currentObjIdx];
             this.renderAll();
 
             const title = document.getElementById('object-title');
@@ -876,9 +872,8 @@ class App {
             }
 
         } catch (error) {
-            // Якщо щось піде не так, ми побачимо це віконце, а не просто зависання!
-            alert("⚠️ Помилка завантаження: " + error.message);
-            console.error(error);
+            console.error("Помилка архіву:", error);
+            alert("⚠️ Щось пішло не так: " + error.message);
         }
     }
 
@@ -909,7 +904,7 @@ class App {
         link.href = URL.createObjectURL(blob);
         link.download = `Komunalka_${item.monthName.replace(/\s+/g, '_')}.csv`;
         link.click();
-    } 
+    }
     
     createDefaultObject(name) {
         return {
@@ -2962,6 +2957,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
