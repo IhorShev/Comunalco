@@ -2558,20 +2558,34 @@ class App {
             }
 
             if (showRow) {
-                html += `
-                <div style="background:var(--bg); padding:12px; border-radius:10px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+            html += `
+            <div style="background:var(--bg); padding:12px; border-radius:10px; border:1px solid var(--border); margin-bottom:12px; display:flex; flex-direction:column; gap:10px;">
+                
+                <div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="app.loadHistoryItem('${h.id}')">
                     <div style="flex:1;">
-                        <div style="font-weight:bold; font-size:14px; color:var(--text);">📅 ${dateStr}</div>
-                        <div style="font-size:11px; color:var(--text-sec); margin-top:2px;">${titleDisplay}</div>
+                        <div style="font-weight:bold; font-size:15px; color:var(--text);">🗓 ${dateStr}</div>
+                        <div style="font-size:12px; color:var(--text-sec); margin-top:4px;">${titleDisplay}</div>
                     </div>
-                    <div style="display:flex; align-items:center;">
-                        <div style="font-weight:bold; font-size:16px; color:var(--primary);">
-                            ${sumDisplay.toFixed(2)} грн
-                        </div>
+                    <div style="display:flex; align-items:center; gap: 12px;">
+                        <div style="font-weight:bold; color:var(--accent); font-size:16px;">${parseFloat(sumDisplay).toFixed(2)} грн</div>
                         ${deleteBtn}
                     </div>
-                </div>`;
-            }
+                </div>
+
+                ${(!window.currentRole || window.currentRole === 'owner') ? `
+                <div style="display:flex; gap:8px; border-top:1px dashed var(--border); padding-top:10px;">
+                    <button onclick="event.stopPropagation(); alert('Скоро тут буде генерація Excel! 📊')" class="btn" style="flex:1; padding:8px; font-size:13px; border-radius:6px; background:#10B981; color:white; border:none; display:flex; justify-content:center; align-items:center; gap:5px;">
+                        📊 В Excel
+                    </button>
+                    <button onclick="event.stopPropagation(); alert('Скоро тут буде відправка в Телеграм! ✈️')" class="btn" style="flex:1; padding:8px; font-size:13px; border-radius:6px; background:#2AABEE; color:white; border:none; display:flex; justify-content:center; align-items:center; gap:5px;">
+                        ✈️ Надіслати
+                    </button>
+                </div>
+                ` : ''}
+
+            </div>
+            `;
+        }
         });
 
         html += '</div>';
@@ -2897,6 +2911,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
