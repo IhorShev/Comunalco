@@ -831,16 +831,13 @@ class App {
         if(id === 'premium') this.renderTariffs();
     }
 
-    
     loadHistoryItem(index) {
-        // 1. Знаходимо потрібний місяць (підтримує і індекс, і ID)
         let item = (typeof index === 'string' || index > 1000) 
             ? this.currentData.history.find(x => x.id == index) 
             : this.currentData.history[index];
             
         if(!item) return;
 
-        // 2. Вмикаємо візуальний режим архіву
         document.body.classList.add('archive-mode');
 
         const tempState = JSON.parse(JSON.stringify(this.state));
@@ -850,7 +847,6 @@ class App {
 
         this.currentData = tempState.objects[this.state.currentObjIdx];
         this.renderAll();
-        document.getElementById('historyModal').style.display = 'none';
 
         const title = document.getElementById('object-title');
         if(title) {
@@ -863,23 +859,49 @@ class App {
         const updateBtn = document.querySelector('.desktop-only span[title="Оновити"]');
         if(updateBtn) updateBtn.style.display = 'none';
 
-        // 🔥 3. ДОДАЄМО КРАСИВУ КНОПКУ ВИХОДУ
+        // 🔥 СТВОРЮЄМО КНОПКУ ВИХОДУ
         let exitBtn = document.getElementById('exit-archive-btn');
         if (!exitBtn) {
             exitBtn = document.createElement('button');
             exitBtn.id = 'exit-archive-btn';
             exitBtn.innerHTML = '🔙 Вийти з Архіву';
-            
-            // Змінили top на 60px, щоб кнопка була рівно ПІД жовтою смугою, і додали максимальний z-index
             exitBtn.style.cssText = 'position:fixed; top:60px; left:50%; transform:translateX(-50%); z-index:9999999; background:#EF4444; color:white; border:none; padding:12px 28px; border-radius:30px; font-weight:bold; font-size:16px; box-shadow:0 10px 25px rgba(239, 68, 68, 0.5); cursor:pointer; display:flex; gap:8px; align-items:center; transition: 0.2s;';
-            
             exitBtn.onclick = () => window.location.reload(); 
             document.body.appendChild(exitBtn);
         }
         exitBtn.style.display = 'flex';
 
-        // 🔥 4. ПРИМУСОВО ХОВАЄМО ВІКНО АРХІВУ
+        // 🔥 ХОВАЄМО ВІКНО АРХІВУ
         document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+    }
+
+    // --- ГЕНЕРАЦІЯ EXCEL (CSV) ФАЙЛУ ---
+    exportToExcel(historyId) {
+        const item = this.currentData.history.find(x => x.id == historyId);
+        if(!item || !item.apartments) return alert("Помилка: дані не знайдено.");
+
+        let csv = '\uFEFF'; 
+        csv += `ЗВІТ ЗА: ${item.monthName}\n\n`;
+        csv += "Квартира;Телефон;Світло Д(Стало);Світло Н(Стало);Вода(Стало);Газ(Стало);Нараховано;Сплачено;Борг\n";
+
+        item.apartments.forEach(a => {
+            const ed = (a.curr && a.curr.ed) ? a.curr.ed : 0;
+            const en = (a.curr && a.curr.en) ? a.curr.en : 0;
+            const w = (a.curr && a.curr.w) ? a.curr.w : 0;
+            const g = (a.curr && a.curr.g) ? a.curr.g : 0;
+
+            const bill = (a.bill || 0).toFixed(2).replace('.', ',');
+            const paid = (a.paid || 0).toFixed(2).replace('.', ',');
+            const debt = (a.debt || 0).toFixed(2).replace('.', ',');
+
+            csv += `${a.name};${a.phone || '-'};${ed};${en};${w};${g};${bill};${paid};${debt}\n`;
+        });
+
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = `Komunalka_${item.monthName.replace(/\s+/g, '_')}.csv`;
+        link.click();
     }
 
     createDefaultObject(name) {
@@ -2935,6 +2957,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
