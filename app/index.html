@@ -940,6 +940,42 @@ class App {
             if (tgModal) tgModal.style.display = 'flex';
         }, 500);
     }
+    // --- ВІДКРИТТЯ МЕНЮ ТЕЛЕГРАМУ ЗІ СПИСКОМ ---
+    openTelegramMenu() {
+        const select = document.getElementById('tgRecipientSelect');
+        if (select) {
+            // Очищаємо список і ставимо першим пунктом "Всім"
+            select.innerHTML = '<option value="all">Всім підключеним (Масово)</option>';
+            const currentApts = this.state.objects[this.state.currentObjIdx].apartments;
+            
+            // Додаємо в список ТІЛЬКИ ті квартири, у яких підключений бот
+            currentApts.forEach(apt => {
+                if (apt.tg_id || apt.chat_id || apt.messenger) {
+                    select.innerHTML += `<option value="${apt.name}">${apt.name}</option>`;
+                }
+            });
+        }
+        document.getElementById('tgActionModal').style.display = 'flex';
+    }
+
+    // --- РОЗУМНА ВІДПРАВКА (Всім або Одній) ---
+    smartSendReceipts() {
+        const recipient = document.getElementById('tgRecipientSelect').value;
+        const currentApts = this.state.objects[this.state.currentObjIdx].apartments;
+        
+        if (recipient === 'all') {
+            // Якщо обрано "Всім", просто виділяємо всі підключені
+            currentApts.forEach(a => { if(a.tg_id || a.chat_id) a.selected = true; });
+        } else {
+            // 🔥 МАГІЯ: Виділяємо ТІЛЬКИ одну обрану квартиру, а з інших знімаємо галочки
+            currentApts.forEach(a => {
+                a.selected = (a.name === recipient);
+            });
+        }
+        
+        // Викликаємо вашу стандартну функцію відправки (вона сама побачить, хто виділений)
+        this.sendBatch();
+    }
     
     createDefaultObject(name) {
         return {
@@ -3000,6 +3036,7 @@ window.addEventListener('load', () => {
     </div>
 </body>
 </html>
+
 
 
 
