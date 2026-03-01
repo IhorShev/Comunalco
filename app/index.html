@@ -863,20 +863,23 @@ class App {
         const updateBtn = document.querySelector('.desktop-only span[title="Оновити"]');
         if(updateBtn) updateBtn.style.display = 'none';
 
-        // 🔥 3. ДОДАЄМО КРАСИВУ КНОПКУ ВИХОДУ (Замість дратівливого Alert)
+        // 🔥 3. ДОДАЄМО КРАСИВУ КНОПКУ ВИХОДУ
         let exitBtn = document.getElementById('exit-archive-btn');
         if (!exitBtn) {
             exitBtn = document.createElement('button');
             exitBtn.id = 'exit-archive-btn';
             exitBtn.innerHTML = '🔙 Вийти з Архіву';
-            exitBtn.style.cssText = 'position:fixed; top:20px; left:50%; transform:translateX(-50%); z-index:99999; background:#EF4444; color:white; border:none; padding:12px 28px; border-radius:30px; font-weight:bold; font-size:16px; box-shadow:0 10px 25px rgba(239, 68, 68, 0.5); cursor:pointer; display:flex; gap:8px; align-items:center; transition: 0.2s;';
             
-            // Кнопка сама зробить оновлення при натисканні
+            // Змінили top на 60px, щоб кнопка була рівно ПІД жовтою смугою, і додали максимальний z-index
+            exitBtn.style.cssText = 'position:fixed; top:60px; left:50%; transform:translateX(-50%); z-index:9999999; background:#EF4444; color:white; border:none; padding:12px 28px; border-radius:30px; font-weight:bold; font-size:16px; box-shadow:0 10px 25px rgba(239, 68, 68, 0.5); cursor:pointer; display:flex; gap:8px; align-items:center; transition: 0.2s;';
+            
             exitBtn.onclick = () => window.location.reload(); 
-            
             document.body.appendChild(exitBtn);
         }
         exitBtn.style.display = 'flex';
+
+        // 🔥 4. ПРИМУСОВО ХОВАЄМО ВІКНО АРХІВУ
+        document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
     }
 
     createDefaultObject(name) {
@@ -2932,6 +2935,7 @@ window.addEventListener('load', () => {
 </div>
 </body>
 </html>
+
 
 
 
