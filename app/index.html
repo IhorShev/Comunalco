@@ -885,6 +885,7 @@ class App {
             archiveApts.forEach(old => {
                 const curr = currentApts.find(c => c.name === old.name);
                 if (curr) {
+                    old.telegram_chat_id = curr.telegram_chat_id || curr.tg_id || curr.chat_id; // 🔥 НОВИЙ РЯДОК
                     old.tg_id = curr.tg_id;
                     old.chat_id = curr.chat_id;
                     old.messenger = curr.messenger;
@@ -1473,7 +1474,7 @@ class App {
         document.getElementById('apartments-container').innerHTML = (this.currentData.apartments || []).map((a, i) => { 
             
             // 1. Статус підключення до бота
-            const isConnected = !!a.telegram_chat_id;
+            const isConnected = !!(a.telegram_chat_id || a.tg_id || a.chat_id);
             
             // 2. Логіка кольору балансу (Борг - червоний, Переплата - зелений)
             const currentBill = parseFloat(a.bill || 0);
@@ -1982,8 +1983,9 @@ class App {
         const FUNCTION_URL = "https://aougdxtsmzjgoykaslbt.supabase.co/functions/v1/telegram-bot";
         const a = this.currentData.apartments[i];
         
-        if (!a.telegram_chat_id) {
-            if (!isSilentMode) alert(`⚠️ ${a.name}: Немає Telegram ID. Натисніть кнопку "Link" у таблиці.`);
+        const chatId = a.telegram_chat_id || a.tg_id || a.chat_id;
+        if (!chatId) {
+            if (!isSilentMode) alert(`⚠️ ${a.name}: Немає Telegram ID. Натисніть "Підключити Телеграм-Бот".`);
             return false;
         }
 
@@ -1996,7 +1998,7 @@ class App {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     action: "send_message",
-                    chat_id: a.telegram_chat_id,
+                    chat_id: chatId,
                     text: this.checks[i] // Текст квитанції
                 })
             });
@@ -3065,6 +3067,7 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
+
 
 
 
