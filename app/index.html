@@ -190,6 +190,21 @@
         .btn-order-tg { background: #229ED9; color: white; margin-bottom: 10px; }
         .btn-order-email { background: transparent; border: 2px solid #cbd5e1; color: var(--text); }
         
+        /* --- СІТКА ДЛЯ ФІНАНСІВ --- */
+        .finance-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        @media (max-width: 600px) {
+            .finance-grid {
+                grid-template-columns: 1fr 1fr; /* На мобільному 2 стовпчики */
+            }
+            .finance-grid .debt-col {
+                grid-column: 1 / -1; /* Борг займає всю ширину зверху */
+            }
+        }
+        
         /* --- АДАПТИВНЕ МЕНЮ (PRO версія) --- */
         .top-menu-bar { display: flex; justify-content: space-between; align-items: center; position: relative; padding: 10px 0; }
         .theme-icon-svg { width: 24px; height: 24px; stroke: var(--text); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.3s ease; }
@@ -1533,32 +1548,39 @@ class App {
                 </div>
 
                 <div style="margin-top:20px; padding:15px; background:rgba(0,0,0,0.03); border-radius:12px; border:1px solid var(--border);">
-                    <div style="display:flex; gap:10px; margin-bottom:10px;">
-                        
-                        <div class="col">
-                            <label style="color:var(--danger)">Борг / -Переплата</label>
+                    <div class="finance-grid">
+                        <div class="debt-col">
+                            <label style="font-size:10px; text-transform:uppercase; color:var(--text-sec);">Борг / Переплата</label>
                             <input type="number" value="${a.debt||0}" 
-                                style="border-color:var(--danger); font-weight:bold; text-align:center; font-size:16px; color:var(--danger);" 
-                                oninput="app.updateApt(${i},'debt',this.value)">
+                                style="border: 1px solid ${Math.abs(parseFloat(a.debt||0)) < 0.01 ? 'var(--border)' : (parseFloat(a.debt||0) > 0 ? 'var(--danger)' : 'var(--success)')}; 
+                                       color: ${Math.abs(parseFloat(a.debt||0)) < 0.01 ? 'var(--text)' : (parseFloat(a.debt||0) > 0 ? 'var(--danger)' : 'var(--success)')}; 
+                                       font-weight:bold; text-align:center; font-size:16px; width:100%; box-sizing:border-box;" 
+                                oninput="app.updateApt(${i},'debt',this.value); 
+                                         this.style.color = this.value > 0.01 ? 'var(--danger)' : (this.value < -0.01 ? 'var(--success)' : 'var(--text)'); 
+                                         this.style.borderColor = Math.abs(this.value) < 0.01 ? 'var(--border)' : this.style.color;">
                         </div>
 
-                        <div class="col">
-                            <label>Поточний місяць</label>
-                            <div id="live-bill-${i}" style="font-size:16px; font-weight:bold; padding:10px; background:var(--bg); border-radius:8px; text-align:center; border:1px solid var(--border);">
+                        <div>
+                            <label style="font-size:10px; text-transform:uppercase; color:var(--text-sec);">Поточний місяць</label>
+                            <div id="live-bill-${i}" style="font-size:16px; font-weight:bold; background:var(--bg); border-radius:12px; text-align:center; border:1px solid var(--border); display:flex; align-items:center; justify-content:center; height:45px; box-sizing:border-box; color:var(--text);">
                                 ${currentBill.toFixed(2)}
                             </div>
                         </div>
 
-                        <div class="col">
-                            <label style="color:var(--success)">Сплачено</label>
+                        <div>
+                            <label style="font-size:10px; text-transform:uppercase; color:var(--text-sec);">Сплачено</label>
                             <input type="number" value="${a.paid||0}" 
-                                style="border-color:var(--success); font-weight:bold; text-align:center; font-size:16px; color:var(--success);" 
-                                oninput="app.updateApt(${i},'paid',this.value)">
+                                style="border: 1px solid ${parseFloat(a.paid||0) > 0.01 ? 'var(--success)' : 'var(--border)'}; 
+                                       color: ${parseFloat(a.paid||0) > 0.01 ? 'var(--success)' : 'var(--text)'}; 
+                                       font-weight:bold; text-align:center; font-size:16px; width:100%; box-sizing:border-box;" 
+                                oninput="app.updateApt(${i},'paid',this.value); 
+                                         this.style.color = this.value > 0.01 ? 'var(--success)' : 'var(--text)'; 
+                                         this.style.borderColor = this.value > 0.01 ? 'var(--success)' : 'var(--border)';">
                         </div>
                     </div>
                     
-                    <div style="text-align:center; padding-top:8px; border-top:1px dashed var(--border);">
-                        <label style="font-size:10px; text-transform:uppercase;">${balanceLabel}</label>
+                    <div style="text-align:center; padding-top:12px; border-top:1px dashed var(--border); margin-top:10px;">
+                        <label style="font-size:10px; text-transform:uppercase; font-weight:bold; color:var(--text-sec);">${balanceLabel}</label>
                         <div id="live-balance-${i}" style="font-size:24px; font-weight:900; color:${balanceColor};">
                             ${Math.abs(totalBalance).toFixed(2)} грн
                         </div>
@@ -3074,6 +3096,7 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
+
 
 
 
