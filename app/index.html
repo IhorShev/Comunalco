@@ -1479,10 +1479,9 @@ class App {
             const currentBill = parseFloat(a.bill || 0);
             const oldDebt = parseFloat(a.debt || 0);
             const paid = parseFloat(a.paid || 0);
-            
+
             // Фінальний баланс: (Борг + Нараховано) - Сплачено
             const totalBalance = (oldDebt + currentBill) - paid;
-            
             const isDebt = totalBalance > 0.01;
             const isOverpay = totalBalance < -0.01;
             
@@ -1526,6 +1525,12 @@ class App {
                 </div>
                 <button class="btn btn-add-counter" onclick="app.addCustomCounter('apt', ${i})">+ Лічильник</button>
 
+                <div style="margin-top:15px; border-top:1px dashed var(--border); padding-top:10px;">
+                    <div style="font-size:11px; font-weight:700; color:var(--text-sec); margin-bottom:5px;">ДОДАТКОВІ ПОСЛУГИ</div>
+                    ${(a.services || []).map((s,si)=>`<div class="custom-row"><input type="text" value="${s.name}" placeholder="Назва" onchange="app.updateAS(${i},${si},'name',this.value)"><input type="number" value="${s.val}" placeholder="Сума" onchange="app.updateAS(${i},${si},'val',this.value)"><span class="del-icon" onclick="app.delAS(${i},${si})">&times;</span></div>`).join('')}
+                    <button class="btn btn-add" onclick="app.addAS(${i})">+ Послуга</button>
+                </div>
+
                 <div style="margin-top:20px; padding:15px; background:rgba(0,0,0,0.03); border-radius:12px; border:1px solid var(--border);">
                     <div style="display:flex; gap:10px; margin-bottom:10px;">
                         <div class="col">
@@ -1550,7 +1555,7 @@ class App {
                     </div>
                 </div>
 
-<div style="margin-top: 15px; margin-bottom: 10px; padding: 10px; background: ${a.can_submit_readings ? 'rgba(34, 197, 94, 0.1)' : 'rgba(0,0,0,0.03)'}; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--border);">
+                <div style="margin-top: 15px; margin-bottom: 10px; padding: 10px; background: ${a.can_submit_readings ? 'rgba(34, 197, 94, 0.1)' : 'rgba(0,0,0,0.03)'}; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--border);">
                     <label style="font-size: 12px; font-weight: bold; color: var(--text); cursor: pointer; margin: 0;">
                         🤖 Дозвіл боту приймати показники
                     </label>
@@ -1565,9 +1570,6 @@ class App {
                     </label>
                 </div>
 
-      <div style="margin-top: 15px; margin-bottom: 10px; padding: 10px; background: ${a.can_submit_readings ? 'rgba(34, 197, 94, 0.1)' : 'rgba(0,0,0,0.03)'}; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--border);">
-                    <label style="font-size: 12px; font-weight: bold; color: var(--text); cursor: pointer; margin: 0;">
-                                        
                 <div style="margin-top:15px;">
                     <button class="btn btn-outline" 
                         style="border-color:${isConnected ? 'var(--success)' : '#2AABEE'}; color:${isConnected ? 'var(--success)' : '#2AABEE'}; background: ${isConnected ? 'rgba(16, 185, 129, 0.1)' : 'transparent'};" 
@@ -1578,7 +1580,7 @@ class App {
 
             </div></details>`;
         }).join(''); 
-        
+       
         // Оновлюємо видимість кнопок масових дій
         const controls = document.getElementById('batch-controls');
         if(controls) controls.style.display = (this.currentData.apartments.length > 0) ? 'flex' : 'none';
@@ -3061,6 +3063,7 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
+
 
 
 
