@@ -1534,16 +1534,25 @@ class App {
 
                 <div style="margin-top:20px; padding:15px; background:rgba(0,0,0,0.03); border-radius:12px; border:1px solid var(--border);">
                     <div style="display:flex; gap:10px; margin-bottom:10px;">
+                        
                         <div class="col">
-                            <label>Нараховано (поточне)</label>
-                            <div id="live-bill-${i}" style="font-size:18px; font-weight:bold; padding:10px; background:var(--bg); border-radius:8px; text-align:center; border:1px solid var(--border);">
+                            <label style="color:var(--danger)">Борг / -Переплата</label>
+                            <input type="number" value="${a.debt||0}" 
+                                style="border-color:var(--danger); font-weight:bold; text-align:center; font-size:16px; color:var(--danger);" 
+                                oninput="app.updateApt(${i},'debt',this.value)">
+                        </div>
+
+                        <div class="col">
+                            <label>Поточний місяць</label>
+                            <div id="live-bill-${i}" style="font-size:16px; font-weight:bold; padding:10px; background:var(--bg); border-radius:8px; text-align:center; border:1px solid var(--border);">
                                 ${currentBill.toFixed(2)}
                             </div>
                         </div>
+
                         <div class="col">
                             <label style="color:var(--success)">Сплачено</label>
                             <input type="number" value="${a.paid||0}" 
-                                style="border-color:var(--success); font-weight:bold; text-align:center; font-size:18px;" 
+                                style="border-color:var(--success); font-weight:bold; text-align:center; font-size:16px; color:var(--success);" 
                                 oninput="app.updateApt(${i},'paid',this.value)">
                         </div>
                     </div>
@@ -2454,12 +2463,11 @@ class App {
     startNewMonth() { 
         if (!confirm("⚠️ Закрити місяць?\n\n1. Поточні квитанції будуть збережені в Історію.\n2. Поля будуть очищені для нового місяця.")) return;
 
-        // 1. РОЗРАХУНОК СУМИ (Щоб не було 0.00 грн в історії)
+        // 1. РОЗРАХУНОК СУМИ
         const d = this.currentData;
         const t = d.tariffs;
-        let totalBill = 0; // Загальна каса
+        let totalBill = 0; 
 
-        // 1.1 Підрахунок МЗК (для коректного розподілу)
         let totalIn={ed:0,en:0,w:0,g:0}, gServSum=0, totalApts={ed:0,en:0,w:0,g:0};
         (d.groups || []).forEach(g => { 
             totalIn.ed += Math.max(0,(g.curr.ed||0)-(g.prev.ed||0)); 
@@ -2474,13 +2482,12 @@ class App {
             totalApts.w += Math.max(0,(a.curr.w||0)-(a.prev.w||0)); 
             totalApts.g += Math.max(0,(a.curr.g||0)-(a.prev.g||0)); 
         });
-        (d.extra_tariffs || []).forEach(et => gServSum += (et.val || 0));
+        (d.extra_tariffs || []).forEach(et => gServSum += (parseFloat(et.val) || 0));
 
         let mzk = { ed: Math.max(0,totalIn.ed-totalApts.ed), en: Math.max(0,totalIn.en-totalApts.en), w: Math.max(0,totalIn.w-totalApts.w), g: Math.max(0,totalIn.g-totalApts.g) };
         let mzkCost = (mzk.ed*t.el_d) + (mzk.en*t.el_n) + (mzk.w*t.w) + (mzk.g*t.g) + gServSum;
         let mzkPerApt = (d.apartments || []).length ? mzkCost/d.apartments.length : 0;
 
-        // 1.2 Підрахунок по кожній квартирі і запис суми
         (d.apartments || []).forEach(a => {
              const c = { ed: Math.max(0,(a.curr.ed||0)-(a.prev.ed||0)), en: Math.max(0,(a.curr.en||0)-(a.prev.en||0)), w: Math.max(0,(a.curr.w||0)-(a.prev.w||0)), g: Math.max(0,(a.curr.g||0)-(a.prev.g||0)) };
              
@@ -2488,32 +2495,33 @@ class App {
              let custCost = 0;
              (a.custom_counters || []).forEach(cc => { custCost += Math.max(0, cc.curr - cc.prev) * cc.price; });
              let sCost = 0;
-             (a.services || []).forEach(s => sCost += (s.val||0));
+             (a.services || []).forEach(s => sCost += (parseFloat(s.val)||0));
 
-             // 🔥 ЗБЕРІГАЄМО СУМУ ДЛЯ КВАРТИРИ (щоб Мешканець бачив)
-             // Сума = Лічильники + Послуги + МЗК (Борг в історії нарахувань зазвичай не враховують, але якщо треба - додайте + a.debt)
              a.bill = mCost + custCost + sCost + mzkPerApt; 
-             
              totalBill += a.bill;
         });
 
         // 2. СТВОРЕННЯ АРХІВНОГО ЗАПИСУ
         if (!this.currentData.history) this.currentData.history = [];
-        
         const snapshot = {
             id: Date.now(),
-            date: new Date().toISOString(), // 🔥 ВИПРАВЛЕНО ДАТУ (Тепер не буде Invalid Date)
+            date: new Date().toISOString(),
             monthName: new Date().toLocaleString('uk-UA', { month: 'long', year: 'numeric' }),
-            total_bill: totalBill,          // 🔥 ВИПРАВЛЕНО 0.00 грн (Записуємо пораховану суму)
-            apartments: JSON.parse(JSON.stringify(this.currentData.apartments)), // Тут вже будуть записані a.bill
+            total_bill: totalBill,
+            apartments: JSON.parse(JSON.stringify(this.currentData.apartments)),
             groups: JSON.parse(JSON.stringify(this.currentData.groups || [])),
             tariffs: { ...this.currentData.tariffs }
         };
-
         this.currentData.history.unshift(snapshot);
 
-        // 3. ОЧИЩЕННЯ ПОЛІВ (Перенесення Стало -> Було)
+        // 🔥 3. ПЕРЕНОСИМО ЗАЛИШКИ ТА ОЧИЩАЄМО ПОЛЯ
         this.currentData.apartments.forEach(a => { 
+            // Розраховуємо новий борг: (Старий борг + Щойно нараховане) - Оплачене
+            let currentBill = parseFloat(a.bill || 0);
+            let oldDebt = parseFloat(a.debt || 0);
+            let paid = parseFloat(a.paid || 0);
+            a.debt = (oldDebt + currentBill) - paid; // Це стане базою для нового місяця!
+
             ['ed','en','w','g'].forEach(k=>{
                 if(a.curr[k] !== undefined && a.curr[k] !== "") a.prev[k]=a.curr[k]; 
                 a.curr[k]=0; 
@@ -2524,7 +2532,7 @@ class App {
             });
             a.paid=0; 
         });
-        
+
         (this.currentData.groups || []).forEach(g => { 
             ['ed','en','w','g'].forEach(k=>{
                  if(g.curr[k] !== undefined && g.curr[k] !== "") g.prev[k]=g.curr[k];
@@ -2536,7 +2544,6 @@ class App {
             });
         });
 
-        // 4. ЗБЕРЕЖЕННЯ І ПЕРЕЗАВАНТАЖЕННЯ
         this.save();
         alert(`✅ Місяць успішно закрито!\nСума нарахувань: ${totalBill.toFixed(2)} грн`);
         window.location.href = window.location.pathname + '?v=' + Date.now();
@@ -3067,6 +3074,7 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
+
 
 
 
