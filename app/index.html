@@ -392,7 +392,7 @@
 
         <div style="display:flex; gap:10px; width: 100%;">
             <button class="btn btn-success" style="flex:1; padding:12px; font-weight:bold; font-size:15px; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);" onclick="app.calculate(); document.getElementById('resultModal').style.display='flex'">
-                ✅ Розрахувати
+                📊 Закрити місяць
             </button>
             <button id="tg-menu-btn" class="btn" style="flex:1; background:#2AABEE; color:white; padding:12px; font-weight:bold; font-size:15px; box-shadow: 0 4px 10px rgba(42, 171, 238, 0.3);" onclick="app.openTelegramMenu()">
                 ✈️ Надіслати
@@ -1610,8 +1610,14 @@ class App {
                     </button>
                 </div>
 
+                <div style="margin-top:10px;">
+                    <button class="btn" style="width:100%; background:var(--card); color:var(--text); border:1px solid var(--border); font-size:13px; font-weight:bold; box-shadow: 0 2px 5px rgba(0,0,0,0.05);" onclick="app.openSendFormatModal(${i})">
+                        📤 Відправити квитанцію
+                    </button>
+                </div>
+
             </div></details>`;
-        }).join(''); 
+        }).join('');
        
         // Оновлюємо видимість кнопок масових дій
         const controls = document.getElementById('batch-controls');
@@ -1949,7 +1955,21 @@ class App {
         } catch (e) { console.error(e);
         }
     } 
-   async sendCheck(i, forceMethod = null) {
+   // --- ВИБІР ФОРМАТУ ВІДПРАВКИ ---
+    openSendFormatModal(i) {
+        this.currentSendAptIndex = i; // Запам'ятовуємо, яку квартиру відправляємо
+        document.getElementById('sendFormatModal').style.display = 'flex';
+    }
+
+    processSendFormat(format) {
+        document.getElementById('sendFormatModal').style.display = 'none';
+        if (format === 'text') {
+            this.sendCheck(this.currentSendAptIndex);
+        } else if (format === 'pdf') {
+            this.sharePDF(this.currentSendAptIndex);
+        }
+    }
+    async sendCheck(i, forceMethod = null) {
         const txt = this.checks[i];
         if (!txt) { alert("Помилка: Квитанція не знайдена"); return; }
         
@@ -3055,6 +3075,23 @@ window.addEventListener('load', () => {
     </div>
 </div>
 
+    <div id="sendFormatModal" class="modal" style="z-index: 4500;">
+        <div class="modal-content" style="max-width: 320px; text-align: center; padding: 25px;">
+            <span class="modal-close" onclick="document.getElementById('sendFormatModal').style.display='none'">&times;</span>
+            <div style="font-size: 40px; margin-bottom: 10px;">📤</div>
+            <h3 style="margin-top:0; margin-bottom: 20px;">Формат квитанції</h3>
+            
+            <div style="display:flex; flex-direction:column; gap:12px;">
+                <button class="btn" style="background:var(--bg); color:var(--text); border:1px solid var(--border); padding: 15px; font-size: 15px; font-weight: bold;" onclick="app.processSendFormat('text')">
+                    💬 Текстове повідомлення
+                </button>
+                <button class="btn" style="background:var(--bg); color:var(--text); border:1px solid var(--border); padding: 15px; font-size: 15px; font-weight: bold;" onclick="app.processSendFormat('pdf')">
+                    📸 Картинка (Чек)
+                </button>
+            </div>
+        </div>
+    </div>
+    
     <div id="tgActionModal" class="modal" style="z-index: 9999;">
         <div class="modal-content" style="max-width: 320px; text-align: center; padding: 30px 20px;">
             <span class="modal-close" onclick="document.getElementById('tgActionModal').style.display='none'">&times;</span>
@@ -3096,6 +3133,7 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
+
 
 
 
