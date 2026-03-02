@@ -1718,6 +1718,7 @@ class App {
         const target = type === 'group' ? this.currentData.groups[pIdx] : this.currentData.apartments[pIdx];
         target.custom_counters[cIdx][key] = (key === 'name') ? val : parseFloat(val);
         this.save();
+        this.calculate(); // 🔥 ДОДАНО: Миттєвий перерахунок
     }
 
     delCustomCounter(type, pIdx, cIdx) {
@@ -1725,6 +1726,7 @@ class App {
         const target = type === 'group' ? this.currentData.groups[pIdx] : this.currentData.apartments[pIdx];
         target.custom_counters.splice(cIdx, 1);
         this.save();
+        this.calculate(); // 🔥 ДОДАНО: Миттєвий перерахунок
         type === 'group' ? this.renderGroups() : this.renderApartments();
     }
 
@@ -3063,6 +3065,7 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
+
 
 
 
