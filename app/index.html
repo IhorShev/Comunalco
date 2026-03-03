@@ -1627,56 +1627,20 @@ class App {
         this.calculate();
     }
     renderMR(i, obj, mode, label, key) { 
-        // 🔥 АВТО-РЕМОНТ ДАНИХ (ЗАХИСТ ВІД ЗБОЇВ) 🔥
         if (!obj.prev) obj.prev = {ed:0, en:0, w:0, g:0};
         if (!obj.curr) obj.curr = {ed:0, en:0, w:0, g:0};
-        // -----------------------------------------------
 
         const p = parseFloat(obj.prev[key] || 0);
         const c = parseFloat(obj.curr[key] || 0); 
-        const fn = mode==='prev'?`app.updateGroupMetric(${i},`:`app.updateAptMetric(${i},`; 
-        
-        // --- ПРОФЕСІЙНА АНАЛІТИКА ---
-        let trendHtml = '';
-        if (c > 0) {
-            const currentCons = c - p; // Поточне споживання
-            let diffHtml = '';
-            
-            // 1. Різниця (Стало - Було)
-            if (currentCons !== 0) {
-                diffHtml = `<span style="opacity:0.7">(${currentCons > 0 ? '+' : ''}${currentCons})</span>`;
-            }
+        const fn = mode==='prev'?`app.updateGroupMetric(${i},`:`app.updateAptMetric(${i},`;
 
-            // 2. Порівняння з МИНУЛИМ МІСЯЦЕМ (Архів)
-            if (this.currentData.history && this.currentData.history.length > 0) {
-                const lastMonth = this.currentData.history[0]; // Беремо останній запис
-                let lastObj = null;
-                
-                // Шукаємо цей самий об'єкт в історії за ID
-                if (mode === 'apt') lastObj = lastMonth.apartments.find(a => a.id === obj.id);
-                else lastObj = (lastMonth.groups || []).find(g => g.id === obj.id);
-
-                if (lastObj) {
-                    // Захист і тут
-                    if (!lastObj.prev) lastObj.prev = {ed:0, en:0, w:0, g:0};
-                    if (!lastObj.curr) lastObj.curr = {ed:0, en:0, w:0, g:0};
-
-                    const lastCons = (lastObj.curr[key] || 0) - (lastObj.prev[key] || 0);
-                    const delta = currentCons - lastCons; // Різниця споживання
-                    
-                    if (delta > 0) {
-                        trendHtml = `<div class="trend-indicator trend-up"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg> ${Math.abs(delta)}</div>`;
-                    } else if (delta < 0) {
-                        trendHtml = `<div class="trend-indicator trend-down"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M19 12l-7 7-7-7"/></svg> ${Math.abs(delta)}</div>`;
-                    } else {
-                        trendHtml = `<div class="trend-indicator trend-neutral">=</div>`;
-                    }
-                }
-            }
-            // Якщо немає історії, показуємо просто різницю
-            if (!trendHtml && diffHtml) {
-                trendHtml = `<div class="trend-indicator" style="color:var(--primary)">${diffHtml}</div>`;
-            }
+        // ПРОСТА І ЗРОЗУМІЛА РІЗНИЦЯ (СПОЖИТО)
+        let diffHtml = '';
+        if (c > p) {
+            const diff = (c - p).toFixed(2).replace(/\.?0+$/, ''); 
+            diffHtml = `<div style="font-size:11px; font-weight:800; color:var(--primary); margin-top:4px; text-align:right;">(+${diff})</div>`;
+        } else if (c > 0 && c < p) {
+            diffHtml = `<div style="font-size:10px; font-weight:bold; color:var(--danger); margin-top:4px; text-align:right;">⚠️ Менше ніж Було</div>`;
         }
 
         return `<div class="row" style="align-items:center;">
@@ -1684,7 +1648,7 @@ class App {
             <div class="col"><input type="number" placeholder="Було" value="${p||0}" onchange="${fn}'prev','${key}',this.value)" style="background:var(--bg)"></div>
             <div class="col">
                 <input type="number" placeholder="Стало" value="${c||0}" onchange="${fn}'curr','${key}',this.value)">
-                ${trendHtml}
+                ${diffHtml}
             </div>
         </div>`;
     }
@@ -1693,32 +1657,13 @@ class App {
         const p = parseFloat(cData.prev || 0);
         const c = parseFloat(cData.curr || 0);
         
-        // --- АНАЛІТИКА ДЛЯ ЛІЧИЛЬНИКІВ ---
-        let trendHtml = '';
-        if (c > 0) {
-            const currentCons = c - p;
-            
-            if (this.currentData.history && this.currentData.history.length > 0) {
-                const lastMonth = this.currentData.history[0];
-                let parent = null;
-                // Знаходимо батьківський елемент в історії
-                if (type === 'group') parent = (lastMonth.groups || [])[parentIdx]; 
-                else parent = lastMonth.apartments[parentIdx];
-
-                if (parent && parent.custom_counters && parent.custom_counters[cIdx]) {
-                    const lastCC = parent.custom_counters[cIdx];
-                    // Перевіряємо, чи це той самий лічильник
-                    if (lastCC.name === cData.name) {
-                        const lastCons = (lastCC.curr || 0) - (lastCC.prev || 0);
-                        const delta = currentCons - lastCons;
-
-                        if (delta > 0) trendHtml = `<div class="trend-indicator trend-up"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg> ${Math.abs(delta)}</div>`;
-                        else if (delta < 0) trendHtml = `<div class="trend-indicator trend-down"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M19 12l-7 7-7-7"/></svg> ${Math.abs(delta)}</div>`;
-                        else trendHtml = `<div class="trend-indicator trend-neutral">=</div>`;
-                    }
-                }
-            }
-            if (!trendHtml) trendHtml = `<div class="trend-indicator" style="color:var(--primary)">(+${currentCons})</div>`;
+        // ПРОСТА РІЗНИЦЯ
+        let diffHtml = '';
+        if (c > p) {
+            const diff = (c - p).toFixed(2).replace(/\.?0+$/, ''); 
+            diffHtml = `<div style="font-size:11px; font-weight:800; color:var(--primary); margin-top:4px; text-align:right;">(+${diff})</div>`;
+        } else if (c > 0 && c < p) {
+            diffHtml = `<div style="font-size:10px; font-weight:bold; color:var(--danger); margin-top:4px; text-align:right;">⚠️ Менше ніж Було</div>`;
         }
 
         return `
@@ -1732,7 +1677,7 @@ class App {
                 <div class="col"><input type="number" value="${cData.prev}" placeholder="Було" onchange="app.updateCustomCounter('${type}', ${parentIdx}, ${cIdx}, 'prev', this.value)" style="background:var(--bg)"></div>
                 <div class="col">
                     <input type="number" value="${cData.curr}" placeholder="Стало" onchange="app.updateCustomCounter('${type}', ${parentIdx}, ${cIdx}, 'curr', this.value)">
-                    ${trendHtml}
+                    ${diffHtml}
                 </div>
             </div>
         </div>`;
@@ -3169,6 +3114,7 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
+
 
 
 
