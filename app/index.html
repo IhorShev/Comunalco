@@ -2513,18 +2513,19 @@ class App {
     async startNewMonth() { 
         if (!confirm("⚠️ Закрити місяць?\n\n1. Поточні квитанції будуть збережені в Історію.\n2. Поля будуть очищені для нового місяця.")) return;
 
-        // Змінюємо текст кнопки, щоб користувач бачив процес
         const modalBtn = document.querySelector('#resultModal .btn-danger');
-        if (modalBtn) { modalBtn.innerText = "⏳ Йде збереження в хмару..."; modalBtn.disabled = true; }
+        if (modalBtn) { modalBtn.innerText = "⏳ Обробка..."; modalBtn.disabled = true; }
 
         try {
             const d = this.currentData;
             const t = d.tariffs;
             let totalBill = 0; 
 
-            // 1. Рахуємо загальні витрати (МЗК)
+            // 1. Рахуємо загальні витрати (МЗК) - Із захистом від пустих полів
             let totalIn={ed:0,en:0,w:0,g:0}, gServSum=0, totalApts={ed:0,en:0,w:0,g:0};
             (d.groups || []).forEach(g => { 
+                if (!g.curr) g.curr = {ed:0, en:0, w:0, g:0};
+                if (!g.prev) g.prev = {ed:0, en:0, w:0, g:0};
                 totalIn.ed += Math.max(0,(g.curr.ed||0)-(g.prev.ed||0)); 
                 totalIn.en += Math.max(0,(g.curr.en||0)-(g.prev.en||0)); 
                 totalIn.w += Math.max(0,(g.curr.w||0)-(g.prev.w||0)); 
@@ -2532,6 +2533,8 @@ class App {
                 if(g.services) g.services.forEach(s => gServSum += (parseFloat(s.val)||0));
             });
             (d.apartments || []).forEach(a => { 
+                if (!a.curr) a.curr = {ed:0, en:0, w:0, g:0};
+                if (!a.prev) a.prev = {ed:0, en:0, w:0, g:0};
                 totalApts.ed += Math.max(0,(a.curr.ed||0)-(a.prev.ed||0)); 
                 totalApts.en += Math.max(0,(a.curr.en||0)-(a.prev.en||0)); 
                 totalApts.w += Math.max(0,(a.curr.w||0)-(a.prev.w||0)); 
@@ -2543,13 +2546,13 @@ class App {
             let mzkCost = (mzk.ed*t.el_d) + (mzk.en*t.el_n) + (mzk.w*t.w) + (mzk.g*t.g) + gServSum;
             let mzkPerApt = (d.apartments || []).length ? mzkCost/d.apartments.length : 0;
 
-            // 2. Рахуємо квартири (ТІЛЬКИ a.bill, борг поки не чіпаємо!)
+            // 2. Рахуємо квартири
             (d.apartments || []).forEach(a => {
                  const c = { ed: Math.max(0,(a.curr.ed||0)-(a.prev.ed||0)), en: Math.max(0,(a.curr.en||0)-(a.prev.en||0)), w: Math.max(0,(a.curr.w||0)-(a.prev.w||0)), g: Math.max(0,(a.curr.g||0)-(a.prev.g||0)) };
                  
                  let mCost = (c.ed*t.el_d)+(c.en*t.el_n)+(c.w*t.w)+(c.g*t.g);
                  let custCost = 0;
-                 (a.custom_counters || []).forEach(cc => { custCost += Math.max(0, cc.curr - cc.prev) * cc.price; });
+                 (a.custom_counters || []).forEach(cc => { custCost += Math.max(0, (cc.curr||0) - (cc.prev||0)) * (cc.price||0); });
                  let sCost = 0;
                  (a.services || []).forEach(s => sCost += (parseFloat(s.val)||0));
 
@@ -2557,14 +2560,14 @@ class App {
                  totalBill += a.bill;
             });
 
-            // 3. СТВОРЕННЯ АРХІВНОГО ЗАПИСУ (Фіксуємо поточний стан для історії)
+            // 3. СТВОРЕННЯ АРХІВНОГО ЗАПИСУ
             if (!this.currentData.history) this.currentData.history = [];
             const snapshot = {
                 id: Date.now(),
                 date: new Date().toISOString(),
                 monthName: new Date().toLocaleString('uk-UA', { month: 'long', year: 'numeric' }),
                 total_bill: totalBill,
-                apartments: JSON.parse(JSON.stringify(this.currentData.apartments)), // Тут збережуться поточні борги та оплати
+                apartments: JSON.parse(JSON.stringify(this.currentData.apartments)),
                 groups: JSON.parse(JSON.stringify(this.currentData.groups || [])),
                 tariffs: { ...this.currentData.tariffs }
             };
@@ -2572,46 +2575,49 @@ class App {
 
             // 4. ПЕРЕРАХУНОК НОВИХ БОРГІВ ТА ОЧИЩЕННЯ ПОЛІВ
             this.currentData.apartments.forEach(a => { 
-                // 🔥 ВАЖЛИВО: Рахуємо залишок тільки ПІСЛЯ створення архіву!
                 let oldDebt = parseFloat(a.debt || 0);
                 let paid = parseFloat(a.paid || 0);
-                a.debt = (oldDebt + a.bill) - paid; 
+                let currentBill = parseFloat(a.bill || 0);
+                a.debt = (oldDebt + currentBill) - paid; 
 
                 // Переносимо показники (Стало -> Було) і обнуляємо "Стало"
                 ['ed','en','w','g'].forEach(k=>{
-                    if(a.curr[k] !== undefined && a.curr[k] !== "") a.prev[k]=a.curr[k]; 
-                    a.curr[k]=0; 
+                    if(a.curr[k] !== undefined && a.curr[k] !== "") a.prev[k] = parseFloat(a.curr[k] || 0); 
+                    a.curr[k] = 0; 
                 }); 
                 (a.custom_counters||[]).forEach(c=>{
-                    if(c.curr !== undefined && c.curr !== "") c.prev=c.curr;
-                    c.curr=0;
+                    if(c.curr !== undefined && c.curr !== "") c.prev = parseFloat(c.curr || 0);
+                    c.curr = 0;
                 });
                 
                 a.paid = 0; 
-                a.bill = 0; // Скидаємо нарахування для нового місяця
+                a.bill = 0; 
             });
 
             (this.currentData.groups || []).forEach(g => { 
                 ['ed','en','w','g'].forEach(k=>{
-                     if(g.curr[k] !== undefined && g.curr[k] !== "") g.prev[k]=g.curr[k];
-                     g.curr[k]=0;
+                     if(g.curr[k] !== undefined && g.curr[k] !== "") g.prev[k] = parseFloat(g.curr[k] || 0);
+                     g.curr[k] = 0;
                 }); 
                 (g.custom_counters||[]).forEach(c=>{
-                    if(c.curr !== undefined && c.curr !== "") c.prev=c.curr;
-                    c.curr=0;
+                    if(c.curr !== undefined && c.curr !== "") c.prev = parseFloat(c.curr || 0);
+                    c.curr = 0;
                 });
             });
 
-            // 5. ПРИМУСОВЕ ЗБЕРЕЖЕННЯ В ХМАРУ (БЕЗ 5-секундної затримки)
+            // 5. 🔥 ОНОВЛЕННЯ ЕКРАНУ МИТТЄВО (ДО ХМАРИ) 🔥
             localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.state));
+            this.renderAll();
+            document.getElementById('resultModal').style.display = 'none';
+            
+            if (modalBtn) modalBtn.innerText = "☁️ Збереження...";
+            
+            // 6. ВІДПРАВКА В ХМАРУ
             if (window.currentUser && window.cloudSave) {
                 await window.cloudSave(this.state);
             }
 
-            // 6. ОНОВЛЕННЯ ЕКРАНУ БЕЗ ПЕРЕЗАВАНТАЖЕННЯ (Не викидає з акаунту)
-            this.renderAll();
-            document.getElementById('resultModal').style.display = 'none';
-            alert(`✅ Місяць успішно закрито і збережено у хмару!\nСума нарахувань: ${totalBill.toFixed(2)} грн`);
+            alert(`✅ Місяць успішно закрито!\nСума нарахувань: ${totalBill.toFixed(2)} грн`);
 
         } catch (error) {
             console.error(error);
@@ -3163,6 +3169,7 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
+
 
 
 
