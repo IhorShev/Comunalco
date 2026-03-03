@@ -2123,6 +2123,14 @@ class App {
         document.body.appendChild(ta); ta.select(); 
         document.execCommand('copy'); document.body.removeChild(ta);
     }
+    // --- ГЕНЕРАЦІЯ ІНСТРУКЦІЇ ДЛЯ БОТА ---
+    copyBotLink(aptId, aptName) {
+        const link = `https://t.me/Comunalco_bot?start=${aptId}`;
+        const msg = `👋 Вітаю! Це система Comunalco для обліку комунальних послуг вашої квартири (${aptName}).\n\nЩоб отримувати квитанції та зручно передавати показники лічильників, будь ласка, підключіть нашого Телеграм-бота.\n\n👉 Натисніть на посилання нижче, а потім кнопку «Розпочати» (або Start) у самому низу екрана:\n${link}`;
+        
+        this.copyTextToClipboard(msg);
+        alert('✅ Інструкцію з посиланням скопійовано!\nПросто вставте цей текст у чат мешканцю (Viber, Telegram тощо).');
+    }
     // --- ШЕРИНГ (ДЛЯ НОУТБУКА) ---
     openShareModal(text) {
         const textArea = document.getElementById('share-text-area');
@@ -3106,6 +3114,7 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
+
 
 
 
