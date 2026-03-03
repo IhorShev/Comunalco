@@ -1780,7 +1780,13 @@ class App {
     delReq(i){if(confirm("Видалити?")){this.currentData.requisites.splice(i,1);this.save();this.renderRequisites();}}
     
     updateGroup(i,k,v){this.currentData.groups[i][k]=v;this.save();}
-    updateGroupMetric(i,t,k,v){this.currentData.groups[i][t][k]=parseFloat(v);this.save(); this.calculate();}
+    updateGroupMetric(i,t,k,v) {
+        if (!this.currentData.groups[i][t]) this.currentData.groups[i][t] = {};
+        this.currentData.groups[i][t][k] = parseFloat(v) || 0;
+        this.save();
+        this.renderGroups(); 
+        this.calculate();
+    }
     addGroup(){this.currentData.groups.push({id:Date.now(),name:"Загальнобудинкові (МЗК)",prev:{},curr:{}, custom_counters:[], services:[]});this.save();this.renderGroups();}
     delGroup(i){if(confirm("Видалити групу?")){this.currentData.groups.splice(i,1);this.save();this.renderGroups(); this.calculate();}}
     
@@ -1795,10 +1801,12 @@ class App {
         this.save();
         this.calculate(); // Перераховуємо баланс відразу
     }
-    updateAptMetric(i,t,k,v){
-        this.currentData.apartments[i][t][k]=parseFloat(v);
+    updateAptMetric(i,t,k,v) {
+        if (!this.currentData.apartments[i][t]) this.currentData.apartments[i][t] = {};
+        this.currentData.apartments[i][t][k] = parseFloat(v) || 0;
         this.save();
-        this.calculate(); // Перераховуємо суму відразу
+        this.renderApartments(); 
+        this.calculate(); 
     }
     addAS(i){this.currentData.apartments[i].services.push({name:"",val:0});this.save();this.renderApartments(); this.calculate();}
     updateAS(ai,si,k,v){this.currentData.apartments[ai].services[si][k]=k==='val'?parseFloat(v):v;this.save(); this.calculate();}
@@ -3155,6 +3163,7 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
+
 
 
 
