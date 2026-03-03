@@ -1551,7 +1551,7 @@ class App {
                     <div class="finance-grid">
                         <div class="debt-col">
                             <label style="font-size:10px; text-transform:uppercase; color:var(--text-sec);">Борг / Переплата</label>
-                            <input type="number" value="${a.debt||0}" 
+                            <input type="number" step="0.01" value="${Number(parseFloat(a.debt||0).toFixed(2))}" 
                                 style="border: 1px solid ${Math.abs(parseFloat(a.debt||0)) < 0.01 ? 'var(--border)' : (parseFloat(a.debt||0) > 0 ? 'var(--danger)' : 'var(--success)')}; 
                                        color: ${Math.abs(parseFloat(a.debt||0)) < 0.01 ? 'var(--text)' : (parseFloat(a.debt||0) > 0 ? 'var(--danger)' : 'var(--success)')}; 
                                        font-weight:bold; text-align:center; font-size:16px; width:100%; box-sizing:border-box;" 
@@ -1569,7 +1569,7 @@ class App {
 
                         <div>
                             <label style="font-size:10px; text-transform:uppercase; color:var(--text-sec);">Сплачено</label>
-                            <input type="number" value="${a.paid||0}" 
+                            <input type="number" step="0.01" value="${Number(parseFloat(a.paid||0).toFixed(2))}" 
                                 style="border: 1px solid ${parseFloat(a.paid||0) > 0.01 ? 'var(--success)' : 'var(--border)'}; 
                                        color: ${parseFloat(a.paid||0) > 0.01 ? 'var(--success)' : 'var(--text)'}; 
                                        font-weight:bold; text-align:center; font-size:16px; width:100%; box-sizing:border-box;" 
@@ -1578,14 +1578,6 @@ class App {
                                          this.style.borderColor = this.value > 0.01 ? 'var(--success)' : 'var(--border)';">
                         </div>
                     </div>
-                    
-                    <div style="text-align:center; padding-top:12px; border-top:1px dashed var(--border); margin-top:10px;">
-                        <label style="font-size:10px; text-transform:uppercase; font-weight:bold; color:var(--text-sec);">${balanceLabel}</label>
-                        <div id="live-balance-${i}" style="font-size:24px; font-weight:900; color:${balanceColor};">
-                            ${Math.abs(totalBalance).toFixed(2)} грн
-                        </div>
-                    </div>
-                </div>
 
                 <div style="margin-top: 15px; margin-bottom: 10px; padding: 10px; background: ${a.can_submit_readings ? 'rgba(34, 197, 94, 0.1)' : 'rgba(0,0,0,0.03)'}; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--border);">
                     <label style="font-size: 12px; font-weight: bold; color: var(--text); cursor: pointer; margin: 0;">
@@ -3114,6 +3106,7 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
+
 
 
 
