@@ -1597,7 +1597,7 @@ class App {
                 <div style="margin-top:15px;">
                     <button class="btn btn-outline" 
                         style="border-color:${isConnected ? 'var(--success)' : '#2AABEE'}; color:${isConnected ? 'var(--success)' : '#2AABEE'}; background: ${isConnected ? 'rgba(16, 185, 129, 0.1)' : 'transparent'};" 
-                        onclick="navigator.clipboard.writeText('https://t.me/Comunalco_bot?start=${a.id}'); alert('Посилання скопійовано! Надішліть його мешканцю.')">
+                        onclick="app.copyBotLink('${a.id}', '${a.name}')">
                         ${isConnected ? '✅ Квартира підключена' : '🔗 Підключити Телеграм-Бот'}
                     </button>
                 </div>
@@ -3114,6 +3114,7 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
+
 
 
 
