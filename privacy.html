@@ -7,58 +7,86 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Montserrat', sans-serif; background-color: #050a14; color: #e0e6ed; line-height: 1.6; padding: 40px 20px; }
-        .container { max-width: 800px; margin: 0 auto; background: #0f172a; padding: 40px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); }
-        h1, h2 { color: #fff; }
-        h1 { text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px; margin-bottom: 30px;}
-        a { color: #00f0ff; text-decoration: none; }
-        .lang-section { margin-bottom: 60px; }
+        .container { max-width: 900px; margin: 0 auto; background: #0f172a; padding: 40px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        h1, h2, h3 { color: #fff; margin-top: 30px; }
+        h1 { text-align: center; border-bottom: 2px solid #00f0ff; padding-bottom: 20px; margin-bottom: 30px; text-transform: uppercase; letter-spacing: 2px;}
+        a { color: #00f0ff; text-decoration: none; font-weight: bold; }
+        .lang-section { margin-bottom: 80px; }
+        .back-btn { display: inline-block; margin-bottom: 20px; padding: 10px 20px; border: 1px solid #00f0ff; border-radius: 8px; color: #00f0ff; font-weight: 600; }
+        hr { border: 0; border-top: 1px dashed rgba(255,255,255,0.1); margin: 50px 0; }
+        ul { padding-left: 20px; }
+        li { margin-bottom: 8px; }
     </style>
 </head>
 <body>
     <div class="container">
-        <div style="text-align:center; margin-bottom:20px;">
-            <a href="index.html" style="font-weight:900; font-size:1.5rem; color:#fff; text-decoration:none;">⬅ Back to Comunalco</a>
-        </div>
+        <a href="index.html" class="back-btn">⬅ Back to Comunalco</a>
 
         <div class="lang-section">
             <h1>Privacy Policy</h1>
             <p><strong>Last Updated: March 4, 2026</strong></p>
             
-            <h2>1. Information We Collect</h2>
-            <p>When you register via Google Login, we collect your email address and basic profile information to create your account. We also store the utility data (metrics, tariffs, tenant names) that you input into the system.</p>
+            <h2>1. Introduction</h2>
+            <p>At Comunalco, we respect your privacy and are committed to protecting your personal data. This policy explains how we handle your information when you use our web application.</p>
             
-            <h2>2. Payment Information</h2>
-            <p>We do not collect or store your credit card details. All payments are securely processed by our Merchant of Record, <strong>Lemon Squeezy</strong>. Please refer to Lemon Squeezy's Privacy Policy for information on how they handle your payment data.</p>
+            <h2>2. Data We Collect</h2>
+            <ul>
+                <li><strong>Identity Data:</strong> Email address and name provided via Google OAuth login.</li>
+                <li><strong>Application Data:</strong> Utility metrics, tariffs, property names, and tenant information that you manually enter.</li>
+                <li><strong>Technical Data:</strong> IP address, browser type, and usage statistics collected via basic analytics tools.</li>
+            </ul>
             
-            <h2>3. How We Use Your Data</h2>
-            <p>Your data is used solely to provide the Comunalco service (calculating bills, generating receipts, saving history). We do not sell, rent, or share your personal data with third parties for marketing purposes.</p>
+            <h2>3. Payment Information</h2>
+            <p>We do not store credit card or bank details. All transactions are securely handled by <strong>Lemon Squeezy</strong>. They act as the Merchant of Record and have their own privacy policy regarding your financial data.</p>
+            
+            <h2>4. Data Storage and Security</h2>
+            <p>Your data is stored securely using <strong>Supabase</strong> cloud infrastructure. We implement industry-standard security measures to prevent unauthorized access, disclosure, or modification of your data.</p>
 
-            <h2>4. Data Deletion</h2>
-            <p>You can request the complete deletion of your account and all associated data at any time by contacting us.</p>
+            <h2>5. Your Rights (GDPR)</h2>
+            <p>Under the GDPR, you have the following rights:</p>
+            <ul>
+                <li>The right to access the data we hold about you.</li>
+                <li>The right to rectify inaccurate data.</li>
+                <li>The right to request the deletion of your data ("Right to be forgotten").</li>
+                <li>The right to data portability.</li>
+            </ul>
 
-            <h2>5. Contact</h2>
-            <p>For privacy-related concerns, email us at <a href="mailto:support@comunalco.com">support@comunalco.com</a>.</p>
+            <h2>6. Cookies</h2>
+            <p>We use essential cookies to maintain your login session and store your theme preferences (Dark/Light mode).</p>
+
+            <h2>7. Contact</h2>
+            <p>For data requests or privacy questions, please email us at <a href="mailto:support@comunalco.com">support@comunalco.com</a>.</p>
         </div>
 
-        <hr style="border:0; border-top:1px dashed rgba(255,255,255,0.2); margin: 40px 0;">
+        <hr>
 
         <div class="lang-section">
             <h1>Політика конфіденційності</h1>
             <p><strong>Останнє оновлення: 4 березня 2026 р.</strong></p>
             
-            <h2>1. Яку інформацію ми збираємо</h2>
-            <p>Під час реєстрації через Google ми отримуємо вашу email-адресу для створення акаунту. Ми також зберігаємо дані про комунальні послуги (показники, тарифи, імена), які ви самостійно вносите в систему.</p>
+            <h2>1. Вступ</h2>
+            <p>В Comunalco ми поважаємо вашу приватність і прагнемо захищати ваші персональні дані. Ця політика пояснює, як ми збираємо та використовуємо вашу інформацію.</p>
             
-            <h2>2. Платіжна інформація</h2>
-            <p>Ми не збираємо і не зберігаємо дані ваших банківських карток. Усі платежі безпечно обробляються нашим партнером — <strong>Lemon Squeezy</strong>. Ознайомтеся з Політикою конфіденційності Lemon Squeezy, щоб дізнатися, як вони обробляють ваші платіжні дані.</p>
+            <h2>2. Дані, які ми збираємо</h2>
+            <ul>
+                <li><strong>Ідентифікаційні дані:</strong> Email-адреса та ім'я, отримані через вхід Google.</li>
+                <li><strong>Дані додатку:</strong> Показники лічильників, тарифи, назви об'єктів та мешканців, які ви вносите самостійно.</li>
+                <li><strong>Технічні дані:</strong> IP-адреса та тип браузера для забезпечення безпеки та стабільної роботи.</li>
+            </ul>
             
-            <h2>3. Як ми використовуємо ваші дані</h2>
-            <p>Ваші дані використовуються виключно для забезпечення роботи сервісу Comunalco (розрахунок квитанцій, збереження історії). Ми не продаємо та не передаємо ваші особисті дані третім особам для маркетингу.</p>
+            <h2>3. Платіжна інформація</h2>
+            <p>Ми не зберігаємо дані ваших карток. Усі платежі обробляються сервісом <strong>Lemon Squeezy</strong>, який є офіційним продавцем і відповідає за безпеку ваших транзакцій.</p>
+            
+            <h2>4. Зберігання даних</h2>
+            <p>Ваші дані надійно зберігаються у хмарній інфраструктурі <strong>Supabase</strong>. Ми використовуємо сучасні методи шифрування для захисту інформації від несанкціонованого доступу.</p>
 
-            <h2>4. Видалення даних</h2>
-            <p>Ви можете в будь-який момент надіслати запит на повне видалення вашого акаунту та всієї пов'язаної бази даних, звернувшись до нашої підтримки.</p>
+            <h2>5. Ваші права</h2>
+            <p>Ви маєте право на перегляд, зміну або повне видалення своїх даних з нашої системи. Для цього ви можете звернутися до нашої служби підтримки.</p>
 
-            <h2>5. Контакти</h2>
+            <h2>6. Файли Cookies</h2>
+            <p>Ми використовуємо файли cookies виключно для технічних потреб: підтримки сесії входу та збереження вибраної вами теми інтерфейсу.</p>
+
+            <h2>7. Контакти</h2>
             <p>З питань конфіденційності пишіть нам на <a href="mailto:support@comunalco.com">support@comunalco.com</a>.</p>
         </div>
     </div>
