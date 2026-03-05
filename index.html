@@ -3,1085 +3,205 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
     <title>Comunalco — Smart Utility Billing & Management</title>
-    <meta name="description" content="Безкоштовний додаток для обліку комунальних послуг. Розрахунок МЗК, світло, вода, газ. Формування PDF-квитанцій та розсилка в Telegram. Працює офлайн.">
-    <meta name="keywords" content="облік комуналки, лічильники, комунальні послуги, розрахунок квартплати, програма для ОСББ, комунальний калькулятор, Comunalco">
-    <meta name="author" content="Comunalco Team">
-
-    <script>
-    !function(f,b,e,v,n,t,s)
-    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-    n.queue=[];t=b.createElement(e);t.async=!0;
-    t.src=v;s=b.getElementsByTagName(e)[0];
-    s.parentNode.insertBefore(t,s)}(window, document,'script',
-    'https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', '1396763625234594');
-    fbq('track', 'PageView');
-    </script>
-    <noscript>
-        <img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1396763625234594&ev=PageView&noscript=1"/>
-    </noscript>
-    <meta property="og:type" content="website">
-    <meta property="og:site_name" content="Comunalco">
-    <meta property="og:url" content="https://comunalco.com/">
-    <meta property="og:title" content="Comunalco — Твоя комуналка під контролем">
-    <meta property="og:description" content="Забудь про зошити. Внось показники, діли витрати та формуй квитанції за секунди.">
-    <meta property="og:image" content="https://comunalco.com/hero-img.png">
-    
+    <meta name="description" content="Professional utility billing system.">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="logo.png">
-    <link rel="apple-touch-icon" href="logo.png">
 
     <style>
-        /* --- ЗМІННІ КОЛЬОРІВ (ТЕМНА ТЕМА - ЗА ЗМОВЧУВАННЯМ) --- */
         :root {
-            --bg-dark: #050a14;
-            --bg-card: #0f172a;
-            --text-main: #e0e6ed;
-            --text-sec: #94a3b8;
-            --accent: #00f0ff;
-            --accent-glow: rgba(0, 240, 255, 0.6);
+            --bg-dark: #050a14; --bg-card: #0f172a; --text-main: #e0e6ed; --text-sec: #94a3b8;
+            --accent: #00f0ff; --accent-glow: rgba(0, 240, 255, 0.6);
             --gradient-btn: linear-gradient(90deg, #007cf0, #00dfd8);
-            --neon-outline: #67e8f9;
-            --neon-solid: #2dd4bf;
-            --border-color: rgba(255,255,255,0.05);
+            --neon-outline: #67e8f9; --border-color: rgba(255,255,255,0.05);
             --header-bg: rgba(5, 10, 20, 0.90);
         }
-
-        /* --- ЗМІННІ КОЛЬОРІВ (СВІТЛА ТЕМА) --- */
         [data-theme="light"] {
-            --bg-dark: #f0f4f8;
-            --bg-card: #ffffff;
-            --text-main: #1e293b;
-            --text-sec: #475569;
-            --accent: #0284c7;
-            --accent-glow: rgba(2, 132, 199, 0.3);
+            --bg-dark: #f0f4f8; --bg-card: #ffffff; --text-main: #1e293b; --text-sec: #475569;
+            --accent: #0284c7; --accent-glow: rgba(2, 132, 199, 0.3);
             --gradient-btn: linear-gradient(90deg, #0284c7, #0ea5e9);
-            --neon-outline: #0369a1;
-            --neon-solid: #0f766e;
-            --border-color: rgba(0,0,0,0.1);
+            --neon-outline: #0369a1; --border-color: rgba(0,0,0,0.1);
             --header-bg: rgba(240, 244, 248, 0.90);
         }
-
-        * { 
-            box-sizing: border-box; 
-        }
-
-        html, body {
-            margin: 0; 
-            padding: 0; 
-            width: 100%; 
-            overflow-x: hidden;
-            font-family: 'Montserrat', sans-serif;
-            background-color: var(--bg-dark); 
-            color: var(--text-main);
-            scroll-behavior: smooth; 
-            padding-top: 100px;
-            /* Плавна анімація для теми і мови */
-            transition: background-color 0.4s ease, color 0.4s ease, opacity 0.3s ease;
-        }
-
-        /* Клас для ефекту ВАУ при зміні мови */
-        .fade-out { 
-            opacity: 0; 
-        }
-
-        img { 
-            max-width: 100%; 
-            height: auto; 
-            display: block; 
-        }
-
-        a { 
-            text-decoration: none; 
-            color: inherit; 
-            transition: 0.3s; 
-        }
-
-        ul { 
-            list-style: none; 
-            padding: 0; 
-            margin: 0; 
-        }
-
-        .container { 
-            max-width: 1200px; 
-            width: 100%; 
-            margin: 0 auto; 
-            padding: 0 20px; 
-        }
-
-        header {
-            padding: 10px 0; 
-            border-bottom: 1px solid var(--border-color);
-            background: var(--header-bg); 
-            position: fixed; 
-            top: 0; 
-            left: 0;
-            width: 100%; 
-            z-index: 1000; 
-            backdrop-filter: blur(15px);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); 
-            transition: background 0.3s, border-color 0.3s;
-        }
-
-        .nav-wrapper { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-        }
-
-        .logo-brand { 
-            display: flex; 
-            align-items: center; 
-            gap: 15px; 
-            position: relative; 
-        }
-
-        .logo-text-wrapper { 
-            display: flex; 
-            flex-direction: column; 
-            align-items: flex-start; 
-            line-height: 1.1; 
-        }
-        
-        .logo-icon-img {
-            width: 60px; 
-            height: 60px; 
-            object-fit: cover; 
-            border-radius: 50%;
-            mix-blend-mode: screen; 
-            filter: contrast(1.5) brightness(0.9) drop-shadow(0 0 5px var(--accent-glow));
-            flex-shrink: 0; 
-            transition: transform 0.3s ease, filter 0.3s, mix-blend-mode 0.3s;
-        }
-        
-        [data-theme="light"] .logo-icon-img { 
-            mix-blend-mode: multiply; 
-            filter: invert(1) hue-rotate(180deg) contrast(1.2); 
-        }
-
-        .logo-brand:hover .logo-icon-img { 
-            transform: scale(1.1); 
-        }
-
-        .brand-top { 
-            font-weight: 900; 
-            text-transform: uppercase; 
-            letter-spacing: 0.05em; 
-            font-size: 1.4rem; 
-        }
-
-        .brand-bottom { 
-            font-weight: 700; 
-            font-size: 0.9rem; 
-            margin-top: -2px; 
-        }
-
-        .outline-neon, .outline-neon-sub { 
-            color: transparent; 
-            -webkit-text-stroke: 1px var(--neon-outline); 
-            text-shadow: 0 0 10px rgba(103, 232, 249, 0.4); 
-        }
-
-        .solid-neon-sub { 
-            color: var(--neon-solid); 
-            text-shadow: 0 0 15px rgba(45, 212, 191, 0.6); 
-        }
-
-        [data-theme="light"] .outline-neon, [data-theme="light"] .outline-neon-sub { 
-            -webkit-text-stroke: 1px var(--neon-outline); 
-            color: var(--neon-outline); 
-            text-shadow: none; 
-        }
-
-        .nav-right-group { 
-            display: flex; 
-            align-items: center; 
-            gap: 20px; 
-        }
-
-        nav ul { 
-            display: flex; 
-            gap: 20px; 
-        }
-
-        .nav-link { 
-            font-size: 0.8rem; 
-            font-weight: 700; 
-            color: var(--text-sec); 
-            text-transform: uppercase; 
-            letter-spacing: 1px; 
-            position: relative; 
-        }
-
-        .nav-link:hover, .nav-link.active { 
-            color: var(--accent); 
-            text-shadow: 0 0 10px var(--accent-glow); 
-        }
-
-        [data-theme="light"] .nav-link:hover, [data-theme="light"] .nav-link.active { 
-            text-shadow: none; 
-        }
-
-        .nav-link.active::after { 
-            content: ''; 
-            position: absolute; 
-            bottom: -5px; 
-            left: 0; 
-            width: 100%; 
-            height: 2px; 
-            background-color: var(--accent); 
-            box-shadow: 0 0 10px var(--accent); 
-        }
-
-        .controls-group { 
-            display: flex; 
-            align-items: center; 
-            gap: 15px; 
-            border-right: 1px solid var(--border-color); 
-            padding-right: 15px; 
-        }
-
-        .theme-switch { 
-            cursor: pointer; 
-            font-size: 1.2rem; 
-            transition: transform 0.3s; 
-        }
-
-        .theme-switch:hover { 
-            transform: scale(1.2); 
-        }
-
-        .lang-switch { 
-            display: flex; 
-            gap: 8px; 
-            font-size: 0.85rem; 
-            font-weight: bold; 
-        }
-
-        .lang-link { 
-            color: var(--text-sec); 
-            cursor: pointer; 
-            transition: 0.2s; 
-        }
-
-        .lang-link.active { 
-            color: var(--accent); 
-            transform: scale(1.1); 
-        }
-
-        .btn-login {
-            padding: 10px 25px; 
-            border: 2px solid var(--accent); 
-            color: var(--accent);
-            border-radius: 8px; 
-            font-weight: 800; 
-            font-size: 0.9rem; 
-            text-transform: uppercase;
-            background: rgba(0, 240, 255, 0.05); 
-            white-space: nowrap; 
-            transition: 0.3s;
-        }
-
-        .btn-login:hover { 
-            background: var(--accent); 
-            color: #fff; 
-            box-shadow: 0 0 20px var(--accent-glow); 
-        }
-
-        .hero { 
-            padding: 50px 0; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            gap: 60px; 
-            min-height: 80vh; 
-        }
-
-        .hero-content { 
-            flex: 1; 
-            max-width: 550px; 
-            z-index: 2; 
-        }
-
-        h1 { 
-            font-size: 3.2rem; 
-            line-height: 1.1; 
-            margin-bottom: 20px; 
-            font-weight: 900; 
-        }
-
-        h1 span { 
-            color: var(--accent); 
-            background-image: var(--gradient-btn); 
-            -webkit-background-clip: text; 
-            color: transparent; 
-        }
-
-        .hero p { 
-            font-size: 1.1rem; 
-            color: var(--text-sec); 
-            margin-bottom: 30px; 
-            line-height: 1.6; 
-        }
-
-        .btn-main { 
-            display: inline-block; 
-            background: var(--gradient-btn); 
-            padding: 18px 45px; 
-            border-radius: 50px; 
-            font-weight: 800; 
-            font-size: 1.1rem; 
-            text-transform: uppercase; 
-            box-shadow: 0 10px 30px var(--accent-glow); 
-            color: #fff; 
-        }
-
-        .hero-media { 
-            flex: 1; 
-            display: flex; 
-            justify-content: center; 
-            position: relative; 
-            max-width: 550px; 
-        }
-
-        .hero-video { 
-            width: 100%; 
-            border-radius: 20px; 
-            box-shadow: 0 0 40px rgba(0, 0, 0, 0.2); 
-            border: 1px solid var(--border-color); 
-        }
-
-        section { 
-            padding: 80px 0; 
-        }
-
-        .section-title { 
-            text-align: center; 
-            font-size: 2.2rem; 
-            margin-bottom: 50px; 
-            font-weight: 800; 
-            text-transform: uppercase; 
-        }
-
-        .section-title span { 
-            color: var(--accent); 
-        }
-
-        .grid-3 { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
-            gap: 25px; 
-        }
-
-        .card { 
-            background: var(--bg-card); 
-            padding: 35px 25px; 
-            border-radius: 16px; 
-            border: 1px solid var(--border-color); 
-            transition: 0.3s; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
-        }
-
-        .card:hover { 
-            border-color: var(--accent); 
-            transform: translateY(-5px); 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
-        }
-
-        .card h3 { 
-            margin: 15px 0 10px 0; 
-            color: var(--text-main); 
-            font-size: 1.2rem; 
-        }
-
-        .card p { 
-            color: var(--text-sec); 
-            line-height: 1.5; 
-            font-size: 0.95rem; 
-        }
-
-        .card-icon { 
-            font-size: 2rem; 
-            margin-bottom: 15px; 
-            color: var(--accent); 
-            background: rgba(0, 240, 255, 0.1); 
-            width: 60px; 
-            height: 60px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            border-radius: 12px; 
-        }
-
-        .price-card { 
-            background: var(--bg-card); 
-            padding: 40px 30px; 
-            border-radius: 20px; 
-            text-align: center; 
-            border: 1px solid var(--border-color); 
-            position: relative; 
-            display: flex; 
-            flex-direction: column; 
-        }
-
-        .price-card.popular { 
-            border-color: var(--accent); 
-            background: rgba(0, 150, 255, 0.03); 
-        }
-
-        .price { 
-            font-size: 2.5rem; 
-            font-weight: 900; 
-            margin: 20px 0; 
-            color: var(--text-main); 
-        }
-
-        .price span { 
-            font-size: 1rem; 
-            color: var(--text-sec); 
-            font-weight: 400; 
-        }
-
-        .price-features { 
-            margin-bottom: 20px; 
-            color: var(--text-sec); 
-            text-align: left; 
-            list-style: none; 
-            padding: 0; 
-            flex: 1; 
-        }
-
-        .price-features li { 
-            margin-bottom: 10px; 
-            display: flex; 
-            align-items: center; 
-            gap: 10px; 
-        }
-
-        .price-features li::before { 
-            content: "✔"; 
-            color: var(--accent); 
-        }
-
-        .badge { 
-            position: absolute; 
-            top: 15px; 
-            right: 15px; 
-            background: var(--accent); 
-            color: #fff; 
-            font-weight: bold; 
-            font-size: 0.7rem; 
-            padding: 5px 10px; 
-            border-radius: 10px; 
-        }
-
-        .calc-box { 
-            background: var(--bg-dark); 
-            padding: 15px; 
-            border-radius: 12px; 
-            margin-bottom: 20px; 
-            border: 1px dashed var(--border-color); 
-        }
-
-        .calc-box input[type="range"] { 
-            width: 100%; 
-            margin: 10px 0; 
-            accent-color: var(--accent); 
-        }
-
-        #price-res { 
-            color: var(--accent); 
-            font-size: 1.5rem; 
-            font-weight: 900; 
-        }
-
-        .install-list { 
-            list-style: none; 
-            padding: 0; 
-            text-align: left; 
-        }
-
-        .install-list li { 
-            margin-bottom: 15px; 
-            display: flex; 
-            align-items: flex-start; 
-            gap: 12px; 
-        }
-
-        .install-list li::before { 
-            content: "👉"; 
-            color: var(--accent); 
-            flex-shrink: 0; 
-            margin-top: 2px; 
-        }
-
-        .install-text { 
-            flex: 1; 
-            display: block; 
-        }
-
-        .install-step { 
-            color: var(--text-main); 
-            font-weight: 600; 
-            white-space: nowrap; 
-        }
-
-        .contact-grid { 
-            display: flex; 
-            justify-content: center; 
-            gap: 20px; 
-            flex-wrap: wrap; 
-        }
-
-        .contact-btn { 
-            display: flex; 
-            align-items: center; 
-            gap: 10px; 
-            padding: 15px 30px; 
-            border-radius: 12px; 
-            font-weight: bold; 
-            background: var(--bg-card); 
-            border: 1px solid var(--border-color); 
-        }
-
-        .contact-btn:hover { 
-            border-color: var(--accent); 
-            color: var(--accent); 
-        }
-
-        footer { 
-            padding: 40px 0; 
-            text-align: center; 
-            border-top: 1px solid var(--border-color); 
-            font-size: 0.8rem; 
-            color: var(--text-sec); 
-        }
-
-        @media (max-width: 900px) {
-            .nav-wrapper { 
-                flex-wrap: wrap; 
-                justify-content: center; 
-                gap: 15px; 
-            }
-            .logo-brand { 
-                justify-content: center; 
-                width: 100%; 
-                margin-bottom: 5px; 
-            }
-            .nav-right-group { 
-                width: 100%; 
-                justify-content: center; 
-                flex-wrap: wrap; 
-                gap: 15px; 
-                border: none; 
-                padding: 0; 
-            }
-            .hero { 
-                flex-direction: column; 
-                text-align: center; 
-                padding-top: 20px; 
-            }
-            h1 { 
-                font-size: 2.2rem; 
-            }
-            .hero p { 
-                margin: 0 auto 30px auto; 
-            }
-            nav { 
-                width: 100%; 
-                order: 3; 
-                overflow-x: auto; 
-                padding-bottom: 5px; 
-            }
-            nav ul { 
-                justify-content: space-between; 
-                gap: 20px; 
-                padding: 0 5px; 
-            }
-        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0; font-family: 'Montserrat', sans-serif; background-color: var(--bg-dark); color: var(--text-main);
+            scroll-behavior: smooth; padding-top: 100px; transition: 0.4s;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        header { padding: 10px 0; border-bottom: 1px solid var(--border-color); background: var(--header-bg); position: fixed; top: 0; width: 100%; z-index: 1000; backdrop-filter: blur(15px); }
+        .nav-wrapper { display: flex; justify-content: space-between; align-items: center; }
+        .logo-brand { display: flex; align-items: center; gap: 10px; font-weight: 900; font-size: 1.4rem; color: transparent; -webkit-text-stroke: 1px var(--neon-outline); }
+        .lang-switch { display: flex; gap: 8px; font-size: 0.75rem; font-weight: 800; }
+        .lang-link { color: var(--text-sec); cursor: pointer; transition: 0.2s; border-bottom: 2px solid transparent; }
+        .lang-link.active { color: var(--accent); border-color: var(--accent); }
+        .hero { padding: 80px 0; display: flex; align-items: center; gap: 40px; min-height: 80vh; }
+        .hero-content { flex: 1; max-width: 600px; }
+        h1 { font-size: 3rem; font-weight: 900; margin-bottom: 20px; }
+        h1 span { color: var(--accent); background: var(--gradient-btn); -webkit-background-clip: text; color: transparent; }
+        .btn-main { display: inline-block; background: var(--gradient-btn); padding: 18px 40px; border-radius: 50px; font-weight: 800; color: #fff; text-decoration: none; box-shadow: 0 10px 30px var(--accent-glow); }
+        .section-title { text-align: center; font-size: 2.2rem; margin-bottom: 50px; font-weight: 800; text-transform: uppercase; }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+        .card { background: var(--bg-card); padding: 30px; border-radius: 20px; border: 1px solid var(--border-color); transition: 0.3s; }
+        .price-card { background: var(--bg-card); padding: 40px 30px; border-radius: 24px; text-align: center; border: 1px solid var(--border-color); position: relative; }
+        .price-card.popular { border-color: var(--accent); transform: scale(1.05); }
+        .price { font-size: 2.8rem; font-weight: 900; margin: 20px 0; color: var(--accent); }
+        .calc-box { background: var(--bg-dark); padding: 25px; border-radius: 16px; margin: 20px 0; border: 1px dashed var(--border-color); }
+        input[type="range"] { width: 100%; accent-color: var(--accent); cursor: pointer; }
+        footer { padding: 50px 0; text-align: center; border-top: 1px solid var(--border-color); font-size: 0.85rem; color: var(--text-sec); }
+        .fade-out { opacity: 0; }
+        @media (max-width: 900px) { .hero { flex-direction: column; text-align: center; } h1 { font-size: 2.2rem; } .nav-wrapper { flex-direction: column; gap: 15px; } }
     </style>
-
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "SoftwareApplication",
-      "name": "Comunalco",
-      "operatingSystem": "Web, Android, iOS",
-      "applicationCategory": "FinanceApplication",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "UAH"
-      },
-      "description": "Безкоштовний онлайн сервіс для обліку комунальних послуг, розрахунку МЗК та формування квитанцій.",
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.8",
-        "ratingCount": "120"
-      }
-    }
-    </script>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1WTRBQ1KJJ"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-1WTRBQ1KJJ');
-    </script>
 </head>
 <body>
 
     <header>
         <div class="container nav-wrapper">
-            <a href="#" class="logo-brand">
-                <img src="logo.png" alt="Comunalco Logo" class="logo-icon-img">
-                <div class="logo-text-wrapper">
-                    <div class="brand-top outline-neon">COMUNALCO</div>
-                    <div class="brand-bottom">
-                        <span class="outline-neon-sub" data-i18n="logoTop">Комуналк</span><span class="solid-neon-sub" data-i18n="logoBot">Облік</span>
-                    </div>
+            <a href="#" class="logo-brand">COMUNALCO</a>
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <div class="lang-switch">
+                    <span class="lang-link active" onclick="setLanguage('uk')">UA</span>
+                    <span class="lang-link" onclick="setLanguage('en')">EN</span>
+                    <span class="lang-link" onclick="setLanguage('pl')">PL</span>
+                    <span class="lang-link" onclick="setLanguage('de')">DE</span>
+                    <span class="lang-link" onclick="setLanguage('es')">ES</span>
+                    <span class="lang-link" onclick="setLanguage('fr')">FR</span>
                 </div>
-            </a>
-            
-            <div class="nav-right-group">
-                <div class="controls-group">
-                    <div class="theme-switch" id="theme-toggle" title="Змінити тему">🌙</div>
-                    <div class="lang-switch">
-                        <span class="lang-link active" onclick="setLanguage('uk')">UA</span>
-                        <span class="lang-link" onclick="setLanguage('en')">EN</span>
-                    </div>
-                </div>
-                <a href="app/index.html" class="btn-login" data-i18n="btnLogin">Увійти</a>
-                <nav>
-                    <ul>
-                        <li><a href="#" class="nav-link active" data-i18n="navHome">Головна</a></li>
-                        <li><a href="#about" class="nav-link" data-i18n="navFeatures">Можливості</a></li>
-                        <li><a href="#pricing" class="nav-link" data-i18n="navPricing">Тарифи</a></li>
-                        <li><a href="#contact" class="nav-link" data-i18n="navContact">Контакти</a></li>
-                    </ul>
-                </nav>
+                <div id="theme-toggle" style="cursor:pointer; font-size:1.2rem;">🌙</div>
+                <a href="app/index.html" class="btn-main" style="padding:10px 25px; font-size:0.9rem;" data-i18n="btnLogin">Вхід</a>
             </div>
         </div>
     </header>
 
-    <section class="hero" id="home">
-        <div class="hero-content">
-            <h1 data-i18n="heroTitle">Цифровий облік <br><span>без паперів та нервів</span></h1>
-            <p data-i18n="heroDesc">Найзручніша професійна система для ОСББ, орендодавців та бізнес-центрів. Точність розрахунків у кожній цифрі.</p>
-            <a href="app/index.html" class="btn-main" data-i18n="heroBtn">Спробувати безкоштовно</a>
-        </div>
-        <div class="hero-media">
-            <video class="hero-video" autoplay muted loop playsinline>
-                <source src="1766175525528.mp4" type="video/mp4">
-            </video>
-        </div>
-    </section>
-
-    <section id="about">
-        <div class="container">
-            <h2 class="section-title" data-i18n="featuresTitle">Ваш персональний <span>цифровий помічник</span></h2>
-            <div class="grid-3">
-                <div class="card">
-                    <div class="card-icon">✈️</div>
-                    <h3 data-i18n="f1Title">Telegram Розсилка</h3>
-                    <p data-i18n="f1Desc">Надсилайте квитанції, нагадування про борги або оголошення прямо в месенджер мешканцям одним натисканням.</p>
-                </div>
-                <div class="card">
-                    <div class="card-icon">📂</div>
-                    <h3 data-i18n="f2Title">Розумний Архів</h3>
-                    <p data-i18n="f2Desc">Доступ до історії платежів за будь-який місяць. Оглядайте старі показники або вивантажуйте їх в Excel для звітності.</p>
-                </div>
-                <div class="card">
-                    <div class="card-icon">🧮</div>
-                    <h3 data-i18n="f3Title">Авто-розрахунок МЗК</h3>
-                    <p data-i18n="f3Desc">Система автоматично вираховує загальнобудинкові витрати та справедливо ділить їх між усіма точками обліку.</p>
-                </div>
-                <div class="card">
-                    <div class="card-icon">📊</div>
-                    <h3 data-i18n="f4Title">Звіти в Excel та PDF</h3>
-                    <p data-i18n="f4Desc">Генеруйте детальні квитанції для кожної квартири або загальну таблицю звітності для бухгалтера у форматі CSV/Excel.</p>
-                </div>
-                <div class="card">
-                    <div class="card-icon">🔌</div>
-                    <h3 data-i18n="f5Title">100% Автономність</h3>
-                    <p data-i18n="f5Desc">Додаток працює автономно у вашому браузері. Вносьте показники навіть у підвалі — дані збережуться і працюватимуть без інтернету.</p>
-                </div>
-                <div class="card">
-                    <div class="card-icon">📉</div>
-                    <h3 data-i18n="f6Title">Контроль Боргів</h3>
-                    <p data-i18n="f6Desc">Все просто: якщо людина винна гроші — сума додасться до чека. Якщо людина переплатила наперед — борг піде в мінус.</p>
-                </div>
-                <div class="card">
-                    <div class="card-icon">⚡</div>
-                    <h3 data-i18n="f7Title">Багатотарифний Облік</h3>
-                    <p data-i18n="f7Desc">Легко рахуйте світло за тарифами «День/Ніч», воду та газ. Також ви можете додавати свої послуги: інтернет, охорону чи прибирання.</p>
-                </div>
-                <div class="card">
-                    <div class="card-icon">🛡️</div>
-                    <h3 data-i18n="f8Title">Приватність Даних</h3>
-                    <p data-i18n="f8Desc">Ви самі контролюєте свої дані. Зберігайте бекапи в хмару (Google Диск) або локально на свій пристрій. Ваша база — ваші правила.</p>
-                </div>
-                <div class="card">
-                    <div class="card-icon">🗓️</div>
-                    <h3 data-i18n="f9Title">Закриття Місяця</h3>
-                    <p data-i18n="f9Desc">Коли місяць закінчився, натисніть кнопку — і всі вчорашні показники самі стануть «минулими», а суми оплат скинуться для нового розрахунку.</p>
-                </div>
+    <section class="hero">
+        <div class="container" style="display:flex; align-items:center; gap:50px; flex-wrap:wrap; justify-content:center;">
+            <div class="hero-content">
+                <h1 data-i18n="heroTitle">Цифровий облік <br><span>без паперів та нервів</span></h1>
+                <p style="font-size:1.1rem; color:var(--text-sec); margin-bottom:30px;" data-i18n="heroDesc">Найзручніша система для ОСББ та орендодавців.</p>
+                <a href="app/index.html" class="btn-main" data-i18n="heroBtn">Спробувати безкоштовно</a>
+            </div>
+            <div style="flex:1; max-width:500px;">
+                <video style="width:100%; border-radius:20px; border:1px solid var(--border-color);" autoplay muted loop playsinline>
+                    <source src="1766175525528.mp4" type="video/mp4">
+                </video>
             </div>
         </div>
     </section>
 
-    <section id="pricing" style="background: var(--bg-card);">
+    <section id="features" class="container">
+        <h2 class="section-title" data-i18n="featuresTitle">Можливості</h2>
+        <div class="grid-3">
+            <div class="card"><h3>✈️ Telegram</h3><p data-i18n="f1Desc">Надсилайте квитанції та нагадування прямо в месенджер.</p></div>
+            <div class="card"><h3>📂 Archive</h3><p data-i18n="f2Desc">Повна історія платежів та показників за всі місяці.</p></div>
+            <div class="card"><h3>🧮 Auto-Calc</h3><p data-i18n="f3Desc">Автоматичний розрахунок МЗК та загальних витрат.</p></div>
+        </div>
+    </section>
+
+    <section id="pricing" style="background: var(--bg-card); padding: 80px 0; margin-top: 80px;">
         <div class="container">
-            <h2 class="section-title" data-i18n="pricingTitle">Прості та <span>Прозорі</span> Тарифи</h2>
+            <h2 class="section-title" data-i18n="pricingTitle">Тарифи</h2>
             <div class="grid-3">
                 <div class="price-card">
-                    <h3>START</h3>
+                    <h3 data-i18n="p1Name">START</h3>
                     <div class="price">0 <span data-i18n="currency">грн</span></div>
-                    <ul class="price-features">
-                        <li data-i18n="p1_1">До 2 об'єктів/квартир</li>
-                        <li data-i18n="p1_2">Всі розрахунки (Світло, Вода, Газ)</li>
-                        <li data-i18n="p1_3">Telegram-бот (базовий)</li>
-                    </ul>
-                    <a href="app/index.html" class="btn-login" style="display:block; margin-top:auto" data-i18n="btnTry">Спробувати</a>
+                    <p data-i18n="p1_1">До 2 квартир</p>
+                    <a href="app/index.html" class="btn-main" style="background:transparent; border:2px solid var(--accent); color:var(--accent);" data-i18n="btnTry">Почати</a>
                 </div>
+
                 <div class="price-card popular">
-                    <div class="badge" data-i18n="badgeHit">ВИБІР КОРИСТУВАЧІВ</div>
-                    <h3 data-i18n="p2Name">Рантьє</h3>
-                    
+                    <div style="background:var(--accent); color:#000; font-size:10px; font-weight:900; padding:5px; border-radius:5px; position:absolute; top:-15px; left:50%; transform:translateX(-50%);" data-i18n="badgeHit">ПОПУЛЯРНИЙ</div>
+                    <h3 data-i18n="p2Name">PRO Калькулятор</h3>
                     <div class="calc-box">
-                        <label style="font-size: 0.8rem; color: var(--text-sec); display:block; text-align:left;" data-i18n="calcLabel">Вкажіть кількість квартир:</label>
-                        <input type="range" id="obj-range" min="1" max="50" value="10">
-                        <div style="margin-top:5px; font-size: 0.9rem;">
-                            <span data-i18n="calcTotal">Всього до сплати:</span> <span id="price-res">50</span> <span data-i18n="calcCurr">грн/міс</span>
-                        </div>
+                        <div id="obj-count" style="font-weight:900; font-size:1.2rem; margin-bottom:10px;">10 units</div>
+                        <input type="range" id="obj-range" min="1" max="100" value="10">
+                        <div class="price" id="price-res">200</div>
+                        <div id="calc-curr-label" style="font-size:0.9rem; color:var(--text-sec);">грн / місяць</div>
                     </div>
-
-                    <ul class="price-features">
-                        <li><span id="obj-count">До 10 об'єктів обліку</span></li>
-                        <li data-i18n="p2_2">Архів без обмежень</li>
-                        <li data-i18n="p2_3">Excel та PDF звіти</li>
-                        <li data-i18n="p2_4">Пріоритетна підтримка</li>
-                    </ul>
-                    <a href="app/index.html" class="btn-main" style="width:100%; margin-top:20px; font-size: 1rem; padding: 15px;" data-i18n="btnPlan">Обрати план</a>
+                    <a href="app/index.html" class="btn-main" style="width:100%;" data-i18n="btnPlan">Обрати план</a>
                 </div>
+
                 <div class="price-card">
-                    <h3>PRO / VIP</h3>
-                    <div class="price">∞</div>
-                    <ul class="price-features">
-                        <li data-i18n="p3_1">Безліміт об'єктів</li>
-                        <li data-i18n="p3_2">Для ОСББ та ТРЦ</li>
-                        <li data-i18n="p3_3">Lifetime ліцензія (назавжди)</li>
-                        <li data-i18n="p3_4">Індивідуальні доробки</li>
-                    </ul>
-                    <a href="#contact" class="btn-login" style="display:block; margin-top:auto" data-i18n="btnOrder">Замовити</a>
+                    <h3 data-i18n="p3Name">VIP / Lifetime</h3>
+                    <div class="price" id="vip-price">4900 грн</div>
+                    <p data-i18n="p3_3">Назавжди без підписок</p>
+                    <a href="mailto:support@comunalco.com" class="btn-main" style="background:transparent; border:2px solid var(--accent); color:var(--accent);" data-i18n="btnOrder">Замовити</a>
                 </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="install">
-        <div class="container">
-            <h2 class="section-title" data-i18n="installTitle">Як <span>Встановити?</span></h2>
-            <div class="grid-3">
-                <div class="card">
-                    <div class="card-icon">🤖</div>
-                    <h3>Android</h3>
-                    <ul class="install-list">
-                        <li><span class="install-text" data-i18n="i1_1">Відкрийте сайт у <strong>Chrome</strong>.</span></li>
-                        <li><span class="install-text" data-i18n="i1_2">Натисніть три крапки (⋮) вгорі.</span></li>
-                        <li><span class="install-text" data-i18n="i1_3">Оберіть <span class="install-step">"Встановити додаток"</span>.</span></li>
-                    </ul>
-                </div>
-                <div class="card">
-                    <div class="card-icon">🍎</div>
-                    <h3>iPhone / iPad</h3>
-                    <ul class="install-list">
-                        <li><span class="install-text" data-i18n="i2_1">Відкрийте сайт у <strong>Safari</strong>.</span></li>
-                        <li><span class="install-text" data-i18n="i2_2">Натисніть кнопку "Поділитися" (квадрат зі стрілкою).</span></li>
-                        <li><span class="install-text" data-i18n="i2_3">Оберіть <span class="install-step">"На початковий екран"</span>.</span></li>
-                    </ul>
-                </div>
-                <div class="card">
-                    <div class="card-icon">💻</div>
-                    <h3>Windows / Mac</h3>
-                    <ul class="install-list">
-                        <li><span class="install-text" data-i18n="i3_1">У рядку адреси браузера натисніть:</span></li>
-                        <li><span class="install-text" data-i18n="i3_2">Chrome: <span class="install-step">🖥️⬇ (Встановити)</span></span></li>
-                        <li><span class="install-text" data-i18n="i3_3">Edge: <span class="install-step">➕ (Плюс)</span></span></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="contact">
-        <div class="container" style="text-align: center;">
-            <h2 class="section-title" data-i18n="contactTitle">Завжди на <span>зв'язку</span></h2>
-            <p style="color:var(--text-sec); margin-bottom:40px; max-width:600px; margin-left:auto; margin-right:auto;" data-i18n="contactDesc">
-                Маєте запитання або ідеї щодо нових функцій? Пишіть нам, ми швидко відповідаємо.
-            </p>
-            <div class="contact-grid">
-                <a href="https://t.me/comunalco" target="_blank" class="contact-btn">
-                    <span style="font-size:1.2rem">✈️</span> Telegram Support
-                </a>
-                <a href="mailto:support@comunalco.com" class="contact-btn">
-                    <span style="font-size:1.2rem">✉️</span> support@comunalco.com
-                </a>
             </div>
         </div>
     </section>
 
     <footer>
-        <div class="container" style="display: flex; flex-direction: column; align-items: center; gap: 15px;">
-            <div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
-                <a href="terms.html" style="color: var(--text-sec); font-size: 0.85rem; text-decoration: underline;">Terms of Service</a>
-                <a href="privacy.html" style="color: var(--text-sec); font-size: 0.85rem; text-decoration: underline;">Privacy Policy</a>
-                <a href="mailto:support@comunalco.com" style="color: var(--text-sec); font-size: 0.85rem; text-decoration: underline;">support@comunalco.com</a>
+        <div class="container">
+            <div style="margin-bottom:20px; display:flex; gap:20px; justify-content:center;">
+                <a href="terms.html">Terms</a> <a href="privacy.html">Privacy</a>
             </div>
-            <p style="margin: 0; color: var(--text-sec); font-size: 0.8rem;">© 2026 Comunalco.com. Всі права захищені.</p>
+            <p>© 2026 Comunalco.com. <span data-i18n="footer">Всі права захищені.</span></p>
         </div>
     </footer>
 
     <script>
-        // --- 1. СЛОВНИК ПЕРЕКЛАДІВ ---
         const translations = {
             uk: {
-                logoTop: "Комуналк", 
-                logoBot: "Облік",
-                btnLogin: "Увійти", 
-                navHome: "Головна", 
-                navFeatures: "Можливості", 
-                navPricing: "Тарифи", 
-                navContact: "Контакти",
-                heroTitle: "Цифровий облік <br><span>без паперів та нервів</span>",
-                heroDesc: "Найзручніша професійна система для ОСББ, орендодавців та бізнес-центрів. Точність розрахунків у кожній цифрі.",
-                heroBtn: "Спробувати безкоштовно",
-                featuresTitle: "Ваш персональний <span>цифровий помічник</span>",
-                f1Title: "Telegram Розсилка", 
-                f1Desc: "Надсилайте квитанції, нагадування про борги або оголошення прямо в месенджер мешканцям одним натисканням.",
-                f2Title: "Розумний Архів", 
-                f2Desc: "Доступ до історії платежів за будь-який місяць. Оглядайте старі показники або вивантажуйте їх в Excel для звітності.",
-                f3Title: "Авто-розрахунок МЗК", 
-                f3Desc: "Система автоматично вираховує загальнобудинкові витрати та справедливо ділить їх між усіма точками обліку.",
-                f4Title: "Звіти в Excel та PDF", 
-                f4Desc: "Генеруйте детальні квитанції для кожної квартири або загальну таблицю звітності для бухгалтера у форматі CSV/Excel.",
-                f5Title: "100% Автономність", 
-                f5Desc: "Додаток працює автономно у вашому браузері. Вносьте показники навіть у підвалі — дані збережуться і працюватимуть без інтернету.",
-                f6Title: "Контроль Боргів", 
-                f6Desc: "Все просто: якщо людина винна гроші — сума додасться до чека. Якщо людина переплатила наперед — борг піде в мінус.",
-                f7Title: "Багатотарифний Облік", 
-                f7Desc: "Легко рахуйте світло за тарифами «День/Ніч», воду та газ. Також ви можете додавати свої послуги: інтернет, охорону чи прибирання.",
-                f8Title: "Приватність Даних", 
-                f8Desc: "Ви самі контролюєте свої дані. Зберігайте бекапи в хмару (Google Диск) або локально на свій пристрій. Ваша база — ваші правила.",
-                f9Title: "Закриття Місяця", 
-                f9Desc: "Коли місяць закінчився, натисніть кнопку — і всі вчорашні показники самі стануть «минулими», а суми оплат скинуться для нового розрахунку.",
-                pricingTitle: "Прості та <span>Прозорі</span> Тарифи", 
-                currency: "грн",
-                p1_1: "До 2 об'єктів/квартир", 
-                p1_2: "Всі розрахунки (Світло, Вода, Газ)", 
-                p1_3: "Telegram-бот (базовий)", 
-                btnTry: "Спробувати",
-                badgeHit: "ВИБІР КОРИСТУВАЧІВ", 
-                p2Name: "Рантьє", 
-                calcLabel: "Вкажіть кількість квартир:", 
-                calcTotal: "Всього до сплати:", 
-                calcCurr: "грн/міс",
-                p2_2: "Архів без обмежень", 
-                p2_3: "Excel та PDF звіти", 
-                p2_4: "Пріоритетна підтримка", 
-                btnPlan: "Обрати план",
-                p3_1: "Безліміт об'єктів", 
-                p3_2: "Для ОСББ та ТРЦ", 
-                p3_3: "Lifetime ліцензія (назавжди)", 
-                p3_4: "Індивідуальні доробки", 
-                btnOrder: "Замовити",
-                installTitle: "Як <span>Встановити?</span>",
-                i1_1: "Відкрийте сайт у <strong>Chrome</strong>.", 
-                i1_2: "Натисніть три крапки (⋮) вгорі.", 
-                i1_3: "Оберіть <span class='install-step'>\"Встановити додаток\"</span>.",
-                i2_1: "Відкрийте сайт у <strong>Safari</strong>.", 
-                i2_2: "Натисніть кнопку \"Поділитися\" (квадрат зі стрілкою).", 
-                i2_3: "Оберіть <span class='install-step'>\"На початковий екран\"</span>.",
-                i3_1: "У рядку адреси браузера натисніть:", 
-                i3_2: "Chrome: <span class='install-step'>🖥️⬇ (Встановити)</span>", 
-                i3_3: "Edge: <span class='install-step'>➕ (Плюс)</span>",
-                contactTitle: "Завжди на <span>зв'язку</span>", 
-                contactDesc: "Маєте запитання або ідеї щодо нових функцій? Пишіть нам, ми швидко відповідаємо.",
-                footer: "© 2026 Comunalco.com. Всі права захищені.",
-                calcDynText: "До {val} об'єктів обліку"
+                btnLogin: "Увійти", heroTitle: "Цифровий облік <br><span>без паперів</span>", heroDesc: "Найзручніша система для ОСББ та орендодавців.", heroBtn: "Спробувати безкоштовно", featuresTitle: "Можливості", f1Desc: "Надсилайте квитанції прямо в месенджер.", f2Desc: "Повна історія платежів за всі місяці.", f3Desc: "Автоматичний розрахунок МЗК.", pricingTitle: "Тарифи", p1Name: "БЕЗКОШТОВНО", btnTry: "Почати", badgeHit: "ПОПУЛЯРНИЙ", p2Name: "PRO ПЛАН", btnPlan: "Обрати план", p3Name: "LIFETIME", p3_3: "Назавжди без підписок", btnOrder: "Замовити", footer: "Всі права захищені.", calcDynText: "{val} квартир", currency: "грн"
             },
             en: {
-                logoTop: "Smart", 
-                logoBot: "Billing",
-                btnLogin: "Log In", 
-                navHome: "Home", 
-                navFeatures: "Features", 
-                navPricing: "Pricing", 
-                navContact: "Contact",
-                heroTitle: "Paperless & Stress-free <br><span>Utility Billing</span>",
-                heroDesc: "The most convenient professional system for HOAs, landlords, and business centers. Precision in every digit.",
-                heroBtn: "Try for free",
-                featuresTitle: "Your personal <span>digital assistant</span>",
-                f1Title: "Telegram Broadcast", 
-                f1Desc: "Send receipts, debt reminders, or announcements directly to residents' messengers with one click.",
-                f2Title: "Smart Archive", 
-                f2Desc: "Access payment history for any month. Review old readings or export them to Excel for reporting.",
-                f3Title: "Auto-calc Common Areas", 
-                f3Desc: "The system automatically calculates common area expenses and fairly distributes them among all units.",
-                f4Title: "Excel & PDF Reports", 
-                f4Desc: "Generate detailed receipts for each apartment or a general reporting table for the accountant in CSV/Excel.",
-                f5Title: "100% Offline", 
-                f5Desc: "The app works autonomously in your browser. Enter readings even in the basement — data will sync later.",
-                f6Title: "Debt Control", 
-                f6Desc: "It's simple: if a person owes money, the amount is added to the bill. If they overpaid, the debt goes negative.",
-                f7Title: "Multi-tariff Accounting", 
-                f7Desc: "Easily calculate electricity by Day/Night tariffs, water, and gas. Add custom services like internet or security.",
-                f8Title: "Data Privacy", 
-                f8Desc: "You control your data. Store backups in the cloud (Google Drive) or locally. Your database — your rules.",
-                f9Title: "Month Closing", 
-                f9Desc: "When the month ends, click a button — yesterday's readings become 'past', and payments reset for a new cycle.",
-                pricingTitle: "Simple & <span>Transparent</span> Pricing", 
-                currency: "UAH",
-                p1_1: "Up to 2 units/apartments", 
-                p1_2: "All calculations (Power, Water, Gas)", 
-                p1_3: "Telegram bot (basic)", 
-                btnTry: "Get Started",
-                badgeHit: "USER'S CHOICE", 
-                p2Name: "Landlord", 
-                calcLabel: "Select number of units:", 
-                calcTotal: "Total to pay:", 
-                calcCurr: "UAH/mo",
-                p2_2: "Unlimited archive", 
-                p2_3: "Excel & PDF reports", 
-                p2_4: "Priority support", 
-                btnPlan: "Choose plan",
-                p3_1: "Unlimited units", 
-                p3_2: "For HOAs & Malls", 
-                p3_3: "Lifetime license (forever)", 
-                p3_4: "Custom development", 
-                btnOrder: "Order now",
-                installTitle: "How to <span>Install?</span>",
-                i1_1: "Open site in <strong>Chrome</strong>.", 
-                i1_2: "Tap the three dots (⋮) at the top.", 
-                i1_3: "Select <span class='install-step'>\"Install app\"</span>.",
-                i2_1: "Open site in <strong>Safari</strong>.", 
-                i2_2: "Tap the 'Share' button (square with arrow).", 
-                i2_3: "Select <span class='install-step'>\"Add to Home Screen\"</span>.",
-                i3_1: "In the browser address bar click:", 
-                i3_2: "Chrome: <span class='install-step'>🖥️⬇ (Install)</span>", 
-                i3_3: "Edge: <span class='install-step'>➕ (Plus)</span>",
-                contactTitle: "Always in <span>touch</span>", 
-                contactDesc: "Have questions or ideas for new features? Write to us, we reply fast.",
-                footer: "© 2026 Comunalco.com. All rights reserved.",
-                calcDynText: "Up to {val} units"
+                btnLogin: "Login", heroTitle: "Smart Utility <br><span>Billing</span>", heroDesc: "The most convenient system for landlords.", heroBtn: "Try for free", featuresTitle: "Features", f1Desc: "Send receipts directly to messengers.", f2Desc: "Full payment history for all months.", f3Desc: "Automatic common area calculations.", pricingTitle: "Pricing", p1Name: "FREE", btnTry: "Start", badgeHit: "POPULAR", p2Name: "PRO PLAN", btnPlan: "Choose Plan", p3Name: "LIFETIME", p3_3: "Forever without subscriptions", btnOrder: "Order Now", footer: "All rights reserved.", calcDynText: "{val} units", currency: "$"
+            },
+            pl: {
+                btnLogin: "Zaloguj", heroTitle: "Cyfrowe <br><span>Rozliczenia</span>", heroDesc: "System dla wynajmujących i wspólnot.", heroBtn: "Wypróbuj za darmo", featuresTitle: "Funkcje", f1Desc: "Wysyłaj rachunki bezpośrednio do komunikatorów.", f2Desc: "Pełna historia płatności ze wszystkich miesięcy.", f3Desc: "Automatyczne obliczanie kosztów wspólnych.", pricingTitle: "Cennik", p1Name: "DARMO", btnTry: "Start", badgeHit: "HIT", p2Name: "PLAN PRO", btnPlan: "Wybierz plan", p3Name: "LIFETIME", p3_3: "Na zawsze bez subskrypcji", btnOrder: "Zamów", footer: "Wszelkie prawa zastrzeżone.", calcDynText: "{val} lokali", currency: "$"
+            },
+            de: {
+                btnLogin: "Login", heroTitle: "Digitale <br><span>Abrechnung</span>", heroDesc: "System für Vermieter und Hausverwaltungen.", heroBtn: "Kostenlos testen", featuresTitle: "Funktionen", f1Desc: "Rechnungen direkt an Messenger senden.", f2Desc: "Vollständige Zahlungshistorie für alle Monate.", f3Desc: "Automatische Nebenkostenabrechnung.", pricingTitle: "Preise", p1Name: "GRATIS", btnTry: "Start", badgeHit: "BELIEBT", p2Name: "PRO PLAN", btnPlan: "Plan wählen", p3Name: "LIFETIME", p3_3: "Ewig ohne Abonnements", btnOrder: "Bestellen", footer: "Alle Rechte vorbehalten.", calcDynText: "{val} Einheiten", currency: "$"
+            },
+            es: {
+                btnLogin: "Entrar", heroTitle: "Gestión <br><span>Digital</span>", heroDesc: "Sistema para propietarios y comunidades.", heroBtn: "Empezar gratis", featuresTitle: "Funciones", f1Desc: "Envía recibos directamente a mensajeros.", f2Desc: "Historial completo de pagos de todos los meses.", f3Desc: "Cálculo automático de zonas comunes.", pricingTitle: "Precios", p1Name: "GRATIS", btnTry: "Empezar", badgeHit: "POPULAR", p2Name: "PLAN PRO", btnPlan: "Elegir plan", p3Name: "LIFETIME", p3_3: "Para siempre sin suscripciones", btnOrder: "Pedir", footer: "Todos los derechos reservados.", calcDynText: "{val} unidades", currency: "$"
+            },
+            fr: {
+                btnLogin: "Connexion", heroTitle: "Facturation <br><span>Numérique</span>", heroDesc: "Système pour bailleurs et copropriétés.", heroBtn: "Essai gratuit", featuresTitle: "Fonctions", f1Desc: "Envoyez des reçus directement aux messageries.", f2Desc: "Historique complet des paiements.", f3Desc: "Calcul automatique des charges.", pricingTitle: "Tarifs", p1Name: "GRATUIT", btnTry: "Débuter", badgeHit: "POPULAIRE", p2Name: "PLAN PRO", btnPlan: "Choisir un plan", p3Name: "LIFETIME", p3_3: "À vie sans abonnements", btnOrder: "Commander", footer: "Tous droits réservés.", calcDynText: "{val} unités", currency: "$"
             }
         };
 
         let currentLang = localStorage.getItem('lang') || 'uk';
 
-        // --- 2. ФУНКЦІЯ ПЕРЕМИКАННЯ МОВИ ---
         function setLanguage(lang) {
             currentLang = lang;
             localStorage.setItem('lang', lang);
-            
-            // Оновлюємо стилі кнопок
-            document.querySelectorAll('.lang-link').forEach(el => el.classList.remove('active'));
-            document.querySelector(`.lang-link[onclick="setLanguage('${lang}')"]`).classList.add('active');
-
-            // Ефект ВАУ (плавне затухання перед зміною тексту)
+            document.querySelectorAll('.lang-link').forEach(el => el.classList.toggle('active', el.innerText.toLowerCase() === lang));
             document.body.classList.add('fade-out');
-            
             setTimeout(() => {
-                // Перекладаємо всі елементи з атрибутом data-i18n
                 document.querySelectorAll('[data-i18n]').forEach(el => {
                     const key = el.getAttribute('data-i18n');
-                    if (translations[lang][key]) {
-                        el.innerHTML = translations[lang][key];
-                    }
+                    if (translations[lang][key]) el.innerHTML = translations[lang][key];
                 });
-
-                // Оновлюємо динамічний текст калькулятора
+                document.getElementById('vip-price').innerText = (lang === 'uk') ? "4900 грн" : "$149.00";
                 updateCalcText();
-
-                // Повертаємо видимість
                 document.body.classList.remove('fade-out');
-            }, 300); // 300мс на затухання
+            }, 300);
         }
 
-        // Запуск мови при старті
-        if (currentLang !== 'uk') setLanguage(currentLang);
-
-        // --- 3. ПЕРЕМИКАЧ СВІТЛОЇ/ТЕМНОЇ ТЕМИ ---
-        const themeToggle = document.getElementById('theme-toggle');
-        const currentTheme = localStorage.getItem('theme') || 'dark';
-
-        if (currentTheme === 'light') {
-            document.body.setAttribute('data-theme', 'light');
-            themeToggle.innerText = '☀️';
-        }
-
-        themeToggle.addEventListener('click', () => {
-            if (document.body.getAttribute('data-theme') === 'light') {
-                document.body.removeAttribute('data-theme');
-                localStorage.setItem('theme', 'dark');
-                themeToggle.innerText = '🌙';
-            } else {
-                document.body.setAttribute('data-theme', 'light');
-                localStorage.setItem('theme', 'light');
-                themeToggle.innerText = '☀️';
-            }
-        });
-
-        // --- 4. КАЛЬКУЛЯТОР ТАРИФІВ ---
-        const range = document.getElementById('obj-range');
-        const res = document.getElementById('price-res');
-        const countTxt = document.getElementById('obj-count');
-        
         function updateCalcText() {
-            let val = parseInt(range.value);
-            let price = val <= 10 ? 50 : 50 + (val - 10) * 5;
-            res.innerText = price;
-            // Беремо шаблон з перекладу і підставляємо цифру
-            countTxt.innerText = translations[currentLang].calcDynText.replace('{val}', val);
+            const val = parseInt(document.getElementById('obj-range').value);
+            const isUA = (currentLang === 'uk');
+            const base = isUA ? 25 : 1.00;
+            
+            let rate = base;
+            if (val >= 6) rate = isUA ? 20 : 0.80;
+            if (val >= 21) rate = isUA ? 15 : 0.60;
+            if (val >= 51) rate = isUA ? 10 : 0.40;
+
+            const total = val * rate;
+            document.getElementById('price-res').innerText = isUA ? Math.ceil(total) : total.toFixed(2);
+            document.getElementById('calc-curr-label').innerText = isUA ? "грн / місяць" : "$ / month";
+            document.getElementById('obj-count').innerText = translations[currentLang].calcDynText.replace('{val}', val);
         }
 
-        range.addEventListener('input', updateCalcText);
-
-        // --- 5. ПІДСВІЧУВАННЯ МЕНЮ ПРИ СКРОЛІ ---
-        const navLinks = document.querySelectorAll('.nav-link');
-        const sections = document.querySelectorAll('section');
-
-        window.addEventListener('scroll', () => {
-            let current = '';
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop;
-                if (pageYOffset >= (sectionTop - 150)) {
-                    current = section.getAttribute('id');
-                }
-            });
-
-            if (pageYOffset < 100) {
-               navLinks.forEach(link => {
-                   link.classList.remove('active');
-                   if(link.getAttribute('href') === '#') link.classList.add('active');
-               });
-               return;
-            }
-
-            navLinks.forEach(link => {
-                link.classList.remove('active');
-                if (link.getAttribute('href').includes(current)) {
-                    link.classList.add('active');
-                }
-            });
-        });
+        document.getElementById('obj-range').oninput = updateCalcText;
+        document.getElementById('theme-toggle').onclick = () => {
+            const isLight = document.body.getAttribute('data-theme') === 'light';
+            document.body.setAttribute('data-theme', isLight ? 'dark' : 'light');
+            document.getElementById('theme-toggle').innerText = isLight ? '🌙' : '☀️';
+        };
+        setLanguage(currentLang);
     </script>
 </body>
 </html>
-
