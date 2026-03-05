@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Comunalco — Smart Utility Billing & Management</title>
-    <meta name="description" content="Professional utility billing system.">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="logo.png">
 
@@ -31,34 +30,54 @@
         .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
         header { padding: 10px 0; border-bottom: 1px solid var(--border-color); background: var(--header-bg); position: fixed; top: 0; width: 100%; z-index: 1000; backdrop-filter: blur(15px); }
         .nav-wrapper { display: flex; justify-content: space-between; align-items: center; }
-        .logo-brand { display: flex; align-items: center; gap: 10px; font-weight: 900; font-size: 1.4rem; color: transparent; -webkit-text-stroke: 1px var(--neon-outline); }
+        
+        .logo-brand { display: flex; align-items: center; gap: 15px; }
+        .logo-img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; }
+        .brand-text { font-weight: 900; font-size: 1.4rem; color: transparent; -webkit-text-stroke: 1px var(--neon-outline); text-transform: uppercase; }
+
         .lang-switch { display: flex; gap: 8px; font-size: 0.75rem; font-weight: 800; }
         .lang-link { color: var(--text-sec); cursor: pointer; transition: 0.2s; border-bottom: 2px solid transparent; }
         .lang-link.active { color: var(--accent); border-color: var(--accent); }
-        .hero { padding: 80px 0; display: flex; align-items: center; gap: 40px; min-height: 80vh; }
+
+        .hero { padding: 60px 0; display: flex; align-items: center; gap: 40px; min-height: 80vh; }
         .hero-content { flex: 1; max-width: 600px; }
-        h1 { font-size: 3rem; font-weight: 900; margin-bottom: 20px; }
+        h1 { font-size: 3.2rem; font-weight: 900; margin-bottom: 20px; line-height: 1.1; }
         h1 span { color: var(--accent); background: var(--gradient-btn); -webkit-background-clip: text; color: transparent; }
-        .btn-main { display: inline-block; background: var(--gradient-btn); padding: 18px 40px; border-radius: 50px; font-weight: 800; color: #fff; text-decoration: none; box-shadow: 0 10px 30px var(--accent-glow); }
-        .section-title { text-align: center; font-size: 2.2rem; margin-bottom: 50px; font-weight: 800; text-transform: uppercase; }
-        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
-        .card { background: var(--bg-card); padding: 30px; border-radius: 20px; border: 1px solid var(--border-color); transition: 0.3s; }
-        .price-card { background: var(--bg-card); padding: 40px 30px; border-radius: 24px; text-align: center; border: 1px solid var(--border-color); position: relative; }
-        .price-card.popular { border-color: var(--accent); transform: scale(1.05); }
-        .price { font-size: 2.8rem; font-weight: 900; margin: 20px 0; color: var(--accent); }
-        .calc-box { background: var(--bg-dark); padding: 25px; border-radius: 16px; margin: 20px 0; border: 1px dashed var(--border-color); }
+        
+        .btn-main { display: inline-block; background: var(--gradient-btn); padding: 18px 45px; border-radius: 50px; font-weight: 800; color: #fff; text-decoration: none; box-shadow: 0 10px 30px var(--accent-glow); text-transform: uppercase; transition: 0.3s; }
+        .btn-main:hover { transform: translateY(-3px); box-shadow: 0 15px 40px var(--accent-glow); }
+
+        .section-title { text-align: center; font-size: 2.5rem; margin-bottom: 60px; font-weight: 900; text-transform: uppercase; }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; }
+        
+        .card { background: var(--bg-card); padding: 35px; border-radius: 20px; border: 1px solid var(--border-color); transition: 0.3s; }
+        .card:hover { border-color: var(--accent); transform: translateY(-5px); }
+        .card-icon { font-size: 2.5rem; margin-bottom: 20px; display: block; }
+        .card h3 { font-size: 1.3rem; margin-bottom: 15px; color: var(--text-main); }
+        .card p { font-size: 0.95rem; color: var(--text-sec); line-height: 1.6; }
+
+        .price-card { background: var(--bg-card); padding: 50px 30px; border-radius: 24px; text-align: center; border: 1px solid var(--border-color); position: relative; display: flex; flex-direction: column; }
+        .price-card.popular { border-color: var(--accent); box-shadow: 0 0 40px rgba(0, 240, 255, 0.15); transform: scale(1.03); }
+        .price { font-size: 3rem; font-weight: 900; margin: 20px 0; color: var(--accent); }
+        
+        .calc-box { background: var(--bg-dark); padding: 25px; border-radius: 16px; margin: 25px 0; border: 1px dashed var(--border-color); }
         input[type="range"] { width: 100%; accent-color: var(--accent); cursor: pointer; }
-        footer { padding: 50px 0; text-align: center; border-top: 1px solid var(--border-color); font-size: 0.85rem; color: var(--text-sec); }
-        .fade-out { opacity: 0; }
-        @media (max-width: 900px) { .hero { flex-direction: column; text-align: center; } h1 { font-size: 2.2rem; } .nav-wrapper { flex-direction: column; gap: 15px; } }
+
+        footer { padding: 60px 0; text-align: center; border-top: 1px solid var(--border-color); font-size: 0.9rem; color: var(--text-sec); }
+        .fade-out { opacity: 0; transition: 0.3s; }
+
+        @media (max-width: 900px) { .hero { flex-direction: column; text-align: center; } h1 { font-size: 2.4rem; } .nav-wrapper { flex-direction: column; gap: 20px; } }
     </style>
 </head>
 <body>
 
     <header>
         <div class="container nav-wrapper">
-            <a href="#" class="logo-brand">COMUNALCO</a>
-            <div style="display: flex; align-items: center; gap: 20px;">
+            <a href="#" class="logo-brand">
+                <img src="logo.png" alt="Comunalco" class="logo-img">
+                <span class="brand-text">COMUNALCO</span>
+            </a>
+            <div style="display: flex; align-items: center; gap: 25px;">
                 <div class="lang-switch">
                     <span class="lang-link active" onclick="setLanguage('uk')">UA</span>
                     <span class="lang-link" onclick="setLanguage('en')">EN</span>
@@ -67,64 +86,70 @@
                     <span class="lang-link" onclick="setLanguage('es')">ES</span>
                     <span class="lang-link" onclick="setLanguage('fr')">FR</span>
                 </div>
-                <div id="theme-toggle" style="cursor:pointer; font-size:1.2rem;">🌙</div>
-                <a href="app/index.html" class="btn-main" style="padding:10px 25px; font-size:0.9rem;" data-i18n="btnLogin">Вхід</a>
+                <div id="theme-toggle" style="cursor:pointer; font-size:1.3rem;">🌙</div>
+                <a href="app/index.html" class="btn-main" style="padding:12px 30px; font-size:0.9rem;" data-i18n="btnLogin">Вхід</a>
             </div>
         </div>
     </header>
 
     <section class="hero">
-        <div class="container" style="display:flex; align-items:center; gap:50px; flex-wrap:wrap; justify-content:center;">
+        <div class="container" style="display:flex; align-items:center; gap:60px; flex-wrap:wrap; justify-content:center;">
             <div class="hero-content">
                 <h1 data-i18n="heroTitle">Цифровий облік <br><span>без паперів та нервів</span></h1>
-                <p style="font-size:1.1rem; color:var(--text-sec); margin-bottom:30px;" data-i18n="heroDesc">Найзручніша система для ОСББ та орендодавців.</p>
-                <a href="app/index.html" class="btn-main" data-i18n="heroBtn">Спробувати безкоштовно</a>
+                <p style="font-size:1.2rem; color:var(--text-sec); margin-bottom:35px; line-height:1.6;" data-i18n="heroDesc">Професійна система для ОСББ та орендодавців. Точність у кожній цифрі.</p>
+                <a href="app/index.html" class="btn-main" data-i18n="heroBtn">Спробувати 45 днів безкоштовно</a>
             </div>
-            <div style="flex:1; max-width:500px;">
-                <video style="width:100%; border-radius:20px; border:1px solid var(--border-color);" autoplay muted loop playsinline>
+            <div style="flex:1; max-width:550px;">
+                <video style="width:100%; border-radius:24px; border:1px solid var(--border-color); box-shadow: 0 20px 50px rgba(0,0,0,0.3);" autoplay muted loop playsinline>
                     <source src="1766175525528.mp4" type="video/mp4">
                 </video>
             </div>
         </div>
     </section>
 
-    <section id="features" class="container">
-        <h2 class="section-title" data-i18n="featuresTitle">Можливості</h2>
+    <section id="features" class="container" style="padding: 100px 0;">
+        <h2 class="section-title" data-i18n="featuresTitle">Ваш персональний <span>цифровий помічник</span></h2>
         <div class="grid-3">
-            <div class="card"><h3>✈️ Telegram</h3><p data-i18n="f1Desc">Надсилайте квитанції та нагадування прямо в месенджер.</p></div>
-            <div class="card"><h3>📂 Archive</h3><p data-i18n="f2Desc">Повна історія платежів та показників за всі місяці.</p></div>
-            <div class="card"><h3>🧮 Auto-Calc</h3><p data-i18n="f3Desc">Автоматичний розрахунок МЗК та загальних витрат.</p></div>
+            <div class="card"><span class="card-icon">✈️</span><h3 data-i18n="f1Title">Telegram Розсилка</h3><p data-i18n="f1Desc">Квитанції та нагадування прямо в месенджер мешканцям.</p></div>
+            <div class="card"><span class="card-icon">📂</span><h3 data-i18n="f2Title">Розумний Архів</h3><p data-i18n="f2Desc">Повна історія платежів та показників за будь-який місяць.</p></div>
+            <div class="card"><span class="card-icon">🧮</span><h3 data-i18n="f3Title">Авто-розрахунок МЗК</h3><p data-i18n="f3Desc">Справедливий розподіл загальнобудинкових витрат.</p></div>
+            <div class="card"><span class="card-icon">📊</span><h3 data-i18n="f4Title">Звіти в Excel/PDF</h3><p data-i18n="f4Desc">Детальні відомості для бухгалтера та мешканців.</p></div>
+            <div class="card"><span class="card-icon">🔌</span><h3 data-i18n="f5Title">100% Автономність</h3><p data-i18n="f5Desc">Працює в браузері навіть без стабільного інтернету.</p></div>
+            <div class="card"><span class="card-icon">📉</span><h3 data-i18n="f6Title">Контроль Боргів</h3><p data-i18n="f6Desc">Автоматичне додавання боргів та переплат до нових чеків.</p></div>
+            <div class="card"><span class="card-icon">⚡</span><h3 data-i18n="f7Title">Багатотарифний Облік</h3><p data-i18n="f7Desc">День/Ніч для електрики та будь-які кастомні послуги.</p></div>
+            <div class="card"><span class="card-icon">🛡️</span><h3 data-i18n="f8Title">Приватність Даних</h3><p data-i18n="f8Desc">Тільки ви контролюєте свою базу та бекапи.</p></div>
+            <div class="card"><span class="card-icon">🗓️</span><h3 data-i18n="f9Title">Закриття Місяця</h3><p data-i18n="f9Desc">В один клік перенос показників на новий період.</p></div>
         </div>
     </section>
 
-    <section id="pricing" style="background: var(--bg-card); padding: 80px 0; margin-top: 80px;">
+    <section id="pricing" style="background: var(--bg-card); padding: 100px 0;">
         <div class="container">
-            <h2 class="section-title" data-i18n="pricingTitle">Тарифи</h2>
+            <h2 class="section-title" data-i18n="pricingTitle">Прозорі <span>Тарифи</span></h2>
             <div class="grid-3">
                 <div class="price-card">
-                    <h3 data-i18n="p1Name">START</h3>
+                    <h3 data-i18n="p1Name">TEST DRIVE</h3>
                     <div class="price">0 <span data-i18n="currency">грн</span></div>
-                    <p data-i18n="p1_1">До 2 квартир</p>
-                    <a href="app/index.html" class="btn-main" style="background:transparent; border:2px solid var(--accent); color:var(--accent);" data-i18n="btnTry">Почати</a>
+                    <p style="color:var(--text-sec); flex:1;" data-i18n="p1_1">Спробуйте всі функції PRO безкоштовно протягом 45 днів.</p>
+                    <a href="app/index.html" class="btn-main" style="background:transparent; border:2px solid var(--accent); color:var(--accent); margin-top:30px;" data-i18n="btnTry">Почати тест</a>
                 </div>
 
                 <div class="price-card popular">
-                    <div style="background:var(--accent); color:#000; font-size:10px; font-weight:900; padding:5px; border-radius:5px; position:absolute; top:-15px; left:50%; transform:translateX(-50%);" data-i18n="badgeHit">ПОПУЛЯРНИЙ</div>
-                    <h3 data-i18n="p2Name">PRO Калькулятор</h3>
+                    <div style="background:var(--accent); color:#000; font-size:11px; font-weight:900; padding:6px 12px; border-radius:6px; position:absolute; top:-20px; left:50%; transform:translateX(-50%);" data-i18n="badgeHit">НАЙКРАЩИЙ ВИБІР</div>
+                    <h3 data-i18n="p2Name">PRO ПЛАН</h3>
                     <div class="calc-box">
-                        <div id="obj-count" style="font-weight:900; font-size:1.2rem; margin-bottom:10px;">10 units</div>
+                        <div id="obj-count" style="font-weight:900; font-size:1.3rem; margin-bottom:12px; color:var(--accent);">10 квартир</div>
                         <input type="range" id="obj-range" min="1" max="100" value="10">
-                        <div class="price" id="price-res">200</div>
-                        <div id="calc-curr-label" style="font-size:0.9rem; color:var(--text-sec);">грн / місяць</div>
+                        <div class="price" id="price-res">250</div>
+                        <div id="calc-curr-label" style="font-size:0.9rem; color:var(--text-sec); font-weight:600;">грн / місяць</div>
                     </div>
                     <a href="app/index.html" class="btn-main" style="width:100%;" data-i18n="btnPlan">Обрати план</a>
                 </div>
 
                 <div class="price-card">
-                    <h3 data-i18n="p3Name">VIP / Lifetime</h3>
+                    <h3 data-i18n="p3Name">VIP / LIFETIME</h3>
                     <div class="price" id="vip-price">4900 грн</div>
-                    <p data-i18n="p3_3">Назавжди без підписок</p>
-                    <a href="mailto:support@comunalco.com" class="btn-main" style="background:transparent; border:2px solid var(--accent); color:var(--accent);" data-i18n="btnOrder">Замовити</a>
+                    <p style="color:var(--text-sec); flex:1;" data-i18n="p3_3">Оплата один раз. Доступ назавжди без обмежень та підписок.</p>
+                    <a href="mailto:support@comunalco.com" class="btn-main" style="background:transparent; border:2px solid var(--accent); color:var(--accent); margin-top:30px;" data-i18n="btnOrder">Замовити</a>
                 </div>
             </div>
         </div>
@@ -132,8 +157,10 @@
 
     <footer>
         <div class="container">
-            <div style="margin-bottom:20px; display:flex; gap:20px; justify-content:center;">
-                <a href="terms.html">Terms</a> <a href="privacy.html">Privacy</a>
+            <div style="margin-bottom:25px; display:flex; gap:25px; justify-content:center; font-weight:600;">
+                <a href="terms.html" style="color:var(--accent);">Terms</a>
+                <a href="privacy.html" style="color:var(--accent);">Privacy</a>
+                <a href="mailto:support@comunalco.com">support@comunalco.com</a>
             </div>
             <p>© 2026 Comunalco.com. <span data-i18n="footer">Всі права захищені.</span></p>
         </div>
@@ -142,22 +169,22 @@
     <script>
         const translations = {
             uk: {
-                btnLogin: "Увійти", heroTitle: "Цифровий облік <br><span>без паперів</span>", heroDesc: "Найзручніша система для ОСББ та орендодавців.", heroBtn: "Спробувати безкоштовно", featuresTitle: "Можливості", f1Desc: "Надсилайте квитанції прямо в месенджер.", f2Desc: "Повна історія платежів за всі місяці.", f3Desc: "Автоматичний розрахунок МЗК.", pricingTitle: "Тарифи", p1Name: "БЕЗКОШТОВНО", btnTry: "Почати", badgeHit: "ПОПУЛЯРНИЙ", p2Name: "PRO ПЛАН", btnPlan: "Обрати план", p3Name: "LIFETIME", p3_3: "Назавжди без підписок", btnOrder: "Замовити", footer: "Всі права захищені.", calcDynText: "{val} квартир", currency: "грн"
+                btnLogin: "Увійти", heroTitle: "Цифровий облік <br><span>без паперів та нервів</span>", heroDesc: "Найзручніша система для ОСББ та орендодавців.", heroBtn: "Спробувати 45 днів безкоштовно", featuresTitle: "Ваш персональний <span>цифровий помічник</span>", f1Title: "Telegram Розсилка", f1Desc: "Квитанції та нагадування прямо в месенджер мешканцям.", f2Title: "Розумний Архів", f2Desc: "Повна історія платежів та показників за будь-який місяць.", f3Title: "Авто-розрахунок МЗК", f3Desc: "Справедливий розподіл загальнобудинкових витрат.", f4Title: "Звіти в Excel/PDF", f4Desc: "Детальні відомості для бухгалтера та мешканців.", f5Title: "100% Автономність", f5Desc: "Працює в браузері навіть без стабільного інтернету.", f6Title: "Контроль Боргів", f6Desc: "Автоматичне додавання боргів та переплат до нових чеків.", f7Title: "Багатотарифний Облік", f7Desc: "День/Ніч для електрики та будь-які кастомні послуги.", f8Title: "Приватність Даних", f8Desc: "Тільки ви контролюєте свою базу та бекапи.", f9Title: "Закриття Місяця", f9Desc: "В один клік перенос показників на новий період.", pricingTitle: "Прозорі <span>Тарифи</span>", p1Name: "TEST DRIVE", p1_1: "Спробуйте всі функції PRO безкоштовно протягом 45 днів.", btnTry: "Почати тест", badgeHit: "НАЙКРАЩИЙ ВИБІР", p2Name: "PRO ПЛАН", btnPlan: "Обрати план", p3Name: "VIP / LIFETIME", p3_3: "Оплата один раз. Доступ назавжди без обмежень та підписок.", btnOrder: "Замовити", footer: "Всі права захищені.", calcDynText: "{val} квартир", currency: "грн"
             },
             en: {
-                btnLogin: "Login", heroTitle: "Smart Utility <br><span>Billing</span>", heroDesc: "The most convenient system for landlords.", heroBtn: "Try for free", featuresTitle: "Features", f1Desc: "Send receipts directly to messengers.", f2Desc: "Full payment history for all months.", f3Desc: "Automatic common area calculations.", pricingTitle: "Pricing", p1Name: "FREE", btnTry: "Start", badgeHit: "POPULAR", p2Name: "PRO PLAN", btnPlan: "Choose Plan", p3Name: "LIFETIME", p3_3: "Forever without subscriptions", btnOrder: "Order Now", footer: "All rights reserved.", calcDynText: "{val} units", currency: "$"
+                btnLogin: "Login", heroTitle: "Smart Utility <br><span>Billing</span>", heroDesc: "The most convenient system for HOAs and landlords.", heroBtn: "Try 45 days for free", featuresTitle: "Your personal <span>digital assistant</span>", f1Title: "Telegram Broadcast", f1Desc: "Receipts and reminders directly to residents' messenger.", f2Title: "Smart Archive", f2Desc: "Full payment history for any month.", f3Title: "Auto-calc Common Areas", f3Desc: "Fair distribution of common area expenses.", f4Title: "Excel/PDF Reports", f4Desc: "Detailed reports for accountants and tenants.", f5Title: "100% Offline", f5Desc: "Works in browser without stable internet.", f6Title: "Debt Control", f6Desc: "Automatic debt and overpayment adjustment.", f7Title: "Multi-tariff Support", f7Desc: "Day/Night electricity and any custom services.", f8Title: "Data Privacy", f8Desc: "You control your database and backups.", f9Title: "Month Closing", f9Desc: "One-click transition to the next period.", pricingTitle: "Transparent <span>Pricing</span>", p1Name: "TEST DRIVE", p1_1: "Try all PRO features for free for 45 days.", btnTry: "Start Trial", badgeHit: "BEST CHOICE", p2Name: "PRO PLAN", btnPlan: "Choose Plan", p3Name: "VIP / LIFETIME", p3_3: "One-time payment. Lifetime access without limits.", btnOrder: "Order Now", footer: "All rights reserved.", calcDynText: "{val} units", currency: "$"
             },
             pl: {
-                btnLogin: "Zaloguj", heroTitle: "Cyfrowe <br><span>Rozliczenia</span>", heroDesc: "System dla wynajmujących i wspólnot.", heroBtn: "Wypróbuj za darmo", featuresTitle: "Funkcje", f1Desc: "Wysyłaj rachunki bezpośrednio do komunikatorów.", f2Desc: "Pełna historia płatności ze wszystkich miesięcy.", f3Desc: "Automatyczne obliczanie kosztów wspólnych.", pricingTitle: "Cennik", p1Name: "DARMO", btnTry: "Start", badgeHit: "HIT", p2Name: "PLAN PRO", btnPlan: "Wybierz plan", p3Name: "LIFETIME", p3_3: "Na zawsze bez subskrypcji", btnOrder: "Zamów", footer: "Wszelkie prawa zastrzeżone.", calcDynText: "{val} lokali", currency: "$"
+                btnLogin: "Zaloguj", heroTitle: "Cyfrowe Rozliczenia <br><span>Bez Stresu</span>", heroDesc: "Najwygodniejszy system dla wspólnot i wynajmujących.", heroBtn: "Wypróbuj 45 dni za darmo", featuresTitle: "Twój Osobisty <span>Asystent</span>", f1Title: "Wysyłka Telegram", f1Desc: "Rachunki i przypomnienia bezpośrednio do mieszkańców.", f2Title: "Inteligentne Archiwum", f2Desc: "Pełna historia płatności z każdego miesiąca.", f3Title: "Auto-rozliczenie MZA", f3Desc: "Sprawiedliwy podział kosztów ogólnobudynkowych.", f4Title: "Raporty Excel/PDF", f4Desc: "Szczegółowe zestawienia dla księgowości.", f5Title: "100% Offline", f5Desc: "Działa w przeglądarce nawet bez internetu.", f6Title: "Kontrola Długów", f6Desc: "Automatyczne doliczanie długów i nadpłat.", f7Title: "Wiele Taryf", f7Desc: "Prąd Dzień/Noc i dowolne usługi niestandardowe.", f8Title: "Prywatność", f8Desc: "Ty kontrolujesz swoją bazę danych.", f9Title: "Zamknięcie Miesiąca", f9Desc: "Jedno kliknięcie przenosi dane na nowy okres.", pricingTitle: "Jasne <span>Ceny</span>", p1Name: "TEST DRIVE", p1_1: "Wypróbuj wszystkie funkcje PRO za darmo przez 45 dni.", btnTry: "Rozpocznij test", badgeHit: "NAJLEPSZY WYBÓR", p2Name: "PLAN PRO", btnPlan: "Wybierz plan", p3Name: "VIP / NA ZAWSZE", p3_3: "Płatność jednorazowa. Dożywotni dostęp bez limitów.", btnOrder: "Zamów", footer: "Wszelkie prawa zastrzeżone.", calcDynText: "{val} lokali", currency: "$"
             },
             de: {
-                btnLogin: "Login", heroTitle: "Digitale <br><span>Abrechnung</span>", heroDesc: "System für Vermieter und Hausverwaltungen.", heroBtn: "Kostenlos testen", featuresTitle: "Funktionen", f1Desc: "Rechnungen direkt an Messenger senden.", f2Desc: "Vollständige Zahlungshistorie für alle Monate.", f3Desc: "Automatische Nebenkostenabrechnung.", pricingTitle: "Preise", p1Name: "GRATIS", btnTry: "Start", badgeHit: "BELIEBT", p2Name: "PRO PLAN", btnPlan: "Plan wählen", p3Name: "LIFETIME", p3_3: "Ewig ohne Abonnements", btnOrder: "Bestellen", footer: "Alle Rechte vorbehalten.", calcDynText: "{val} Einheiten", currency: "$"
+                btnLogin: "Login", heroTitle: "Digitale Abrechnung <br><span>Stressfrei</span>", heroDesc: "Das bequemste System für Vermieter und Hausverwaltungen.", heroBtn: "45 Tage kostenlos testen", featuresTitle: "Ihr digitaler <span>Assistent</span>", f1Title: "Telegram-Versand", f1Desc: "Rechnungen und Mahnungen direkt an die Bewohner.", f2Title: "Intelligentes Archiv", f2Desc: "Vollständige Zahlungshistorie für jeden Monat.", f3Title: "Nebenkosten-Verteilung", f3Desc: "Gerechte Verteilung der Gemeinschaftskosten.", f4Title: "Excel/PDF Berichte", f4Desc: "Detaillierte Berichte für Buchhaltung und Mieter.", f5Title: "100% Offline", f5Desc: "Funktioniert im Browser ohne stabiles Internet.", f6Title: "Schuldenkontrolle", f6Desc: "Automatische Verrechnung von Schulden.", f7Title: "Mehrtarif-Support", f7Desc: "Tag/Nacht-Strom und eigene Dienstleistungen.", f8Title: "Datenschutz", f8Desc: "Sie kontrollieren Ihre Datenbank und Backups.", f9Title: "Monatsabschluss", f9Desc: "Ein Klick für den Übergang zum nächsten Zeitraum.", pricingTitle: "Klare <span>Preise</span>", p1Name: "TEST DRIVE", p1_1: "Testen Sie alle PRO-Funktionen 45 Tage lang kostenlos.", btnTry: "Test starten", badgeHit: "BESTE WAHL", p2Name: "PRO PLAN", btnPlan: "Plan wählen", p3Name: "VIP / LIFETIME", p3_3: "Einmalzahlung. Lebenslanger Zugriff ohne Limits.", btnOrder: "Bestellen", footer: "Alle Rechte vorbehalten.", calcDynText: "{val} Einheiten", currency: "$"
             },
             es: {
-                btnLogin: "Entrar", heroTitle: "Gestión <br><span>Digital</span>", heroDesc: "Sistema para propietarios y comunidades.", heroBtn: "Empezar gratis", featuresTitle: "Funciones", f1Desc: "Envía recibos directamente a mensajeros.", f2Desc: "Historial completo de pagos de todos los meses.", f3Desc: "Cálculo automático de zonas comunes.", pricingTitle: "Precios", p1Name: "GRATIS", btnTry: "Empezar", badgeHit: "POPULAR", p2Name: "PLAN PRO", btnPlan: "Elegir plan", p3Name: "LIFETIME", p3_3: "Para siempre sin suscripciones", btnOrder: "Pedir", footer: "Todos los derechos reservados.", calcDynText: "{val} unidades", currency: "$"
+                btnLogin: "Entrar", heroTitle: "Gestión Digital <br><span>Sin Estrés</span>", heroDesc: "El sistema más cómodo para propietarios y comunidades.", heroBtn: "Probar 45 días gratis", featuresTitle: "Tu Asistente <span>Digital</span>", f1Title: "Envío Telegram", f1Desc: "Recibos y recordatorios directamente a los vecinos.", f2Title: "Archivo Inteligente", f2Desc: "Historial completo de pagos de cualquier mes.", f3Title: "Reparto de Gastos", f3Desc: "Distribución justa de los gastos comunes.", f4Title: "Informes Excel/PDF", f4Desc: "Informes detallados para contabilidad.", f5Title: "100% Offline", f5Desc: "Funciona en el navegador sin internet estable.", f6Title: "Control de Deudas", f6Desc: "Ajuste automático de deudas y pagos.", f7Title: "Multitarifa", f7Desc: "Electricidad Día/Noche y servicios personalizados.", f8Title: "Privacidad", f8Desc: "Tú controlas tu base de datos y copias.", f9Title: "Cierre de Mes", f9Desc: "Un clic para pasar al siguiente periodo.", pricingTitle: "Precios <span>Transparentes</span>", p1Name: "TEST DRIVE", p1_1: "Prueba todas las funciones PRO gratis durante 45 días.", btnTry: "Iniciar test", badgeHit: "MEJOR OPCIÓN", p2Name: "PLAN PRO", btnPlan: "Elegir plan", p3Name: "VIP / POR VIDA", p3_3: "Pago único. Acceso de por vida sin límites.", btnOrder: "Pedir", footer: "Todos los derechos reservados.", calcDynText: "{val} unidades", currency: "$"
             },
             fr: {
-                btnLogin: "Connexion", heroTitle: "Facturation <br><span>Numérique</span>", heroDesc: "Système pour bailleurs et copropriétés.", heroBtn: "Essai gratuit", featuresTitle: "Fonctions", f1Desc: "Envoyez des reçus directement aux messageries.", f2Desc: "Historique complet des paiements.", f3Desc: "Calcul automatique des charges.", pricingTitle: "Tarifs", p1Name: "GRATUIT", btnTry: "Débuter", badgeHit: "POPULAIRE", p2Name: "PLAN PRO", btnPlan: "Choisir un plan", p3Name: "LIFETIME", p3_3: "À vie sans abonnements", btnOrder: "Commander", footer: "Tous droits réservés.", calcDynText: "{val} unités", currency: "$"
+                btnLogin: "Connexion", heroTitle: "Facturation Numérique <br><span>Sans Stress</span>", heroDesc: "Le système le plus pratique pour les bailleurs et copropriétés.", heroBtn: "Essai gratuit 45 jours", featuresTitle: "Votre Assistant <span>Digital</span>", f1Title: "Envoi Telegram", f1Desc: "Quittances et rappels directement aux résidents.", f2Title: "Archives Intelligentes", f2Desc: "Historique complet des paiements mensuels.", f3Title: "Répartition des Charges", f3Desc: "Distribution équitable des frais communs.", f4Title: "Rapports Excel/PDF", f4Desc: "Rapports détaillés pour la comptabilité.", f5Title: "100% Hors-ligne", f5Desc: "Fonctionne dans le navigateur sans internet.", f6Title: "Contrôle des Dettes", f6Desc: "Ajustement automatique des dettes.", f7Title: "Gestion Multitarif", f7Desc: "Électricité Jour/Nuit et services personnalisés.", f8Title: "Confidentialité", f8Desc: "Vous contrôlez vos données et sauvegardes.", f9Title: "Clôture du Mois", f9Desc: "Un clic pour passer au mois suivant.", pricingTitle: "Tarifs <span>Transparents</span>", p1Name: "TEST DRIVE", p1_1: "Essayez toutes les fonctions PRO gratuitement pendant 45 jours.", btnTry: "Démarrer l'essai", badgeHit: "MEILLEUR CHOIX", p2Name: "PLAN PRO", btnPlan: "Choisir un plan", p3Name: "VIP / À VIE", p3_3: "Paiement unique. Accès à vie sans limites.", btnOrder: "Commander", footer: "Tous droits réservés.", calcDynText: "{val} unités", currency: "$"
             }
         };
 
@@ -167,12 +194,14 @@
             currentLang = lang;
             localStorage.setItem('lang', lang);
             document.querySelectorAll('.lang-link').forEach(el => el.classList.toggle('active', el.innerText.toLowerCase() === lang));
+            
             document.body.classList.add('fade-out');
             setTimeout(() => {
                 document.querySelectorAll('[data-i18n]').forEach(el => {
                     const key = el.getAttribute('data-i18n');
                     if (translations[lang][key]) el.innerHTML = translations[lang][key];
                 });
+                
                 document.getElementById('vip-price').innerText = (lang === 'uk') ? "4900 грн" : "$149.00";
                 updateCalcText();
                 document.body.classList.remove('fade-out');
