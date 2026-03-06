@@ -2081,7 +2081,13 @@ class App {
     // 2. Допоміжна функція для галочок
     toggleAllCheckboxes(source) {
         const checkboxes = document.querySelectorAll('.mass-send-chk');
-        checkboxes.forEach(cb => cb.checked = source.checked);
+        checkboxes.forEach(cb => {
+            cb.checked = source.checked; // Ставимо візуально
+            const idx = parseInt(cb.value);
+            if (this.currentData.apartments[idx]) {
+                this.currentData.apartments[idx].tg_selected = source.checked; // Зберігаємо в пам'ять
+            }
+        });
     }
 
     // 3. ФУНКЦІЯ МАСОВОЇ РОЗСИЛКИ (Тепер викликає sendToBot)
@@ -3120,6 +3126,7 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
+
 
 
 
