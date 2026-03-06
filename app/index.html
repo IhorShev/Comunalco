@@ -1510,7 +1510,10 @@ class App {
             <summary style="display:flex; align-items:center; padding:12px;">
                 <div style="flex:1;">
                     <div style="display:flex; align-items:center; gap:10px;">
+    <div style="display:flex; align-items:center; gap:10px;">
     <div style="font-weight:700; font-size:16px;">🚪 ${a.name}</div>
+    ${isConnected ? `<input type="checkbox" class="mass-send-chk" value="${i}" style="width:18px; height:18px; cursor:pointer;" ${a.tg_selected !== false ? 'checked' : ''} onchange="app.currentData.apartments[${i}].tg_selected = this.checked">` : ''}
+</div>
     ${isConnected ? `<input type="checkbox" id="sel-apt-${i}" style="width:18px; height:18px; cursor:pointer;" ${a.tg_selected ? 'checked' : ''} onchange="app.currentData.apartments[${i}].tg_selected = this.checked">` : ''}
 </div>
                     <div style="font-size:11px; margin-top:2px;">
@@ -3117,6 +3120,7 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
+
 
 
 
