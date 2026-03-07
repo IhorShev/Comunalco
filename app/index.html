@@ -261,18 +261,20 @@
 </head>
 <body>
 
-    <div class="top-menu-bar">
+    <div class="top-menu-bar" style="position: sticky; top: 0; background: var(--bg); z-index: 1000; padding: 10px 15px; border-bottom: 1px solid var(--border); margin: -10px -10px 20px -10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
         <div style="display:flex; align-items:center; gap:12px;">
             <button onclick="app.toggleTheme()" style="background:none; border:none; cursor:pointer; padding:0; display:flex; align-items:center;" title="Змінити тему">
                 <svg class="theme-icon-svg" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
             </button>
-            <span id="auth-btn" onclick="window.googleLogin()" style="border: 1px solid var(--primary); padding: 5px 12px; border-radius: 20px; color: var(--primary); font-size: 13px; font-weight:bold; cursor:pointer; display:flex; flex-direction:column; align-items:center; transition:0.2s; min-width: 90px; max-width: 150px; overflow: hidden; background: var(--card);">
-    <div style="display:flex; align-items:center; gap:5px;">
-        👤 <span id="user-name-display">Вхід</span>
-    </div>
-    <div id="sub-expire-display" style="font-size: 10px; color: inherit; display: none; opacity: 0.8; font-weight: normal; margin-top: 1px;"></div>
-</span>
-            </span>
+            <div style="display:flex; flex-direction:column; align-items:center;">
+                <span id="auth-btn" onclick="window.googleLogin()" style="border: 1px solid var(--primary); padding: 5px 12px; border-radius: 20px; color: var(--primary); font-size: 13px; font-weight:bold; cursor:pointer; display:flex; flex-direction:column; align-items:center; transition:0.2s; min-width: 90px; max-width: 150px; overflow: hidden; background: var(--card);">
+                    <div style="display:flex; align-items:center; gap:5px;">
+                         👤 <span id="user-name-display">Вхід</span>
+                    </div>
+                    <div id="sub-expire-display" style="font-size: 10px; color: inherit; display: none; opacity: 0.8; font-weight: normal; margin-top: 1px;"></div>
+                </span>
+                <span id="save-status" style="font-size:10px; font-weight:800; color:var(--text-sec); opacity:0; transition: opacity 0.3s ease; margin-top:2px;">✅ Збережено</span>
+            </div>
         </div>
 
         <div style="display:flex; align-items:center;">
@@ -3138,6 +3140,7 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
+
 
 
 
