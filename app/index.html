@@ -849,7 +849,7 @@ class App {
             return;
         }
         document.getElementById('menuModal').style.display='flex';
-        ['info','premium','contacts'].forEach(k => {
+        ['info','premium','contacts','backups'].forEach(k => {
             const el = document.getElementById('menu-content-'+k);
             if(el) el.style.display='none';
         });
@@ -3156,6 +3156,7 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
+
 
 
 
