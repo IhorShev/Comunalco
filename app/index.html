@@ -978,44 +978,200 @@ class App {
         }, 500);
     }
 
-    // --- ВІДКРИТТЯ МЕНЮ ТЕЛЕГРАМУ ЗІ СПИСКОМ ---
+    // =======================================================
+    // --- 1. ВІДКРИТТЯ МЕНЮ ТА СПИСКУ КВАРТИР ---
+    // =======================================================
     openTelegramMenu() {
-        const select = document.getElementById('tgRecipientSelect');
-        if (select) {
-            select.innerHTML = '<option value="all">Всім підключеним (Масово)</option>';
-            const currentApts = this.state.objects[this.state.currentObjIdx].apartments;
-            
-            currentApts.forEach(apt => {
-                if (apt.tg_id || apt.chat_id || apt.messenger) {
-                    select.innerHTML += `<option value="${apt.name}">${apt.name}</option>`;
-                }
-            });
+        const list = document.getElementById('tg-recipients-list');
+        const selectAll = document.getElementById('tg-select-all');
+        if (!list) return;
+
+        list.innerHTML = '';
+        if(selectAll) selectAll.checked = false;
+
+        const currentApts = this.currentData.apartments;
+        let connectedCount = 0;
+
+        // Перебираємо квартири і малюємо галочки ТІЛЬКИ для підключених
+        currentApts.forEach((apt, i) => {
+            const isConnected = !!(apt.telegram_chat_id || apt.tg_id || apt.chat_id);
+            if (isConnected) {
+                connectedCount++;
+                const debt = parseFloat(apt.debt || 0);
+                const isDebtor = debt > 100; // Умова: борг більше 100 грн
+                
+                // Якщо є борг > 100, підсвічуємо червоним бейджем
+                const debtHtml = isDebtor 
+                    ? `<span style="color:var(--danger); font-size:12px; font-weight:bold; margin-left:auto; background:rgba(239,68,68,0.1); padding:3px 8px; border-radius:6px;">Борг: ${debt.toFixed(0)} грн</span>` 
+                    : '';
+                
+                list.innerHTML += `
+                <label style="display:flex; align-items:center; gap:10px; padding:10px; cursor:pointer; border-radius:8px; transition:0.2s; border: 1px solid transparent;" onmouseover="this.style.background='var(--card)'; this.style.borderColor='var(--border)'" onmouseout="this.style.background='transparent'; this.style.borderColor='transparent'">
+                    <input type="checkbox" class="modal-tg-chk" value="${i}" data-debt="${debt}" style="width:20px; height:20px; cursor:pointer; accent-color:var(--primary);">
+                    <span style="font-size:15px; font-weight:600; color:var(--text);">🚪 ${apt.name}</span>
+                    ${debtHtml}
+                </label>`;
+            }
+        });
+
+        // Якщо ніхто не підключений
+        if (connectedCount === 0) {
+            list.innerHTML = '<div style="text-align:center; padding:15px; color:var(--text-sec); font-size:13px;">🤷‍♂️ Жодна квартира ще не підключила бота.</div>';
+            if(selectAll) selectAll.disabled = true;
+        } else {
+            if(selectAll) selectAll.disabled = false;
         }
+
         document.getElementById('tgActionModal').style.display = 'flex';
     }
 
-    // --- УНІВЕРСАЛЬНА РОЗУМНА ВІДПРАВКА ---
-    smartAction(type) {
-        const recipient = document.getElementById('tgRecipientSelect').value;
-        const currentApts = this.state.objects[this.state.currentObjIdx].apartments;
+    toggleTgModalAll(checked) {
+        document.querySelectorAll('.modal-tg-chk').forEach(cb => cb.checked = checked);
+    }
+
+    // КНОПКА: ВИБРАТИ ТІЛЬКИ БОРЖНИКІВ > 100 ГРН
+    selectDebtorsOnly() {
+        const selectAll = document.getElementById('tg-select-all');
+        if(selectAll) selectAll.checked = false;
         
-        // 1. Ставимо галочки в пам'яті
-        currentApts.forEach(a => {
-            if (recipient === 'all') {
-                a.selected = !!(a.tg_id || a.chat_id || a.messenger);
+        let found = 0;
+        document.querySelectorAll('.modal-tg-chk').forEach(cb => {
+            const debt = parseFloat(cb.getAttribute('data-debt'));
+            if (debt > 100) {
+                cb.checked = true;
+                found++;
             } else {
-                a.selected = (a.name === recipient);
+                cb.checked = false;
             }
         });
-        
-        // 2. Імітуємо чекбокс "Вибрати всі", щоб обійти системні захисти
-        const selectAllCb = document.querySelector('input[type="checkbox"]');
-        if (selectAllCb) selectAllCb.checked = true;
+        if(found === 0) {
+            alert("✅ Серед підключених до Telegram квартир немає боргів понад 100 грн.");
+        }
+    }
 
-        // 3. Запускаємо потрібну команду миттєво
-        if (type === 'receipts') this.sendBatch();
-        if (type === 'announcement') this.broadcastAnnouncement();
-        if (type === 'debt') this.remindDebtors();
+    getTgSelectedIndices() {
+        return Array.from(document.querySelectorAll('.modal-tg-chk:checked')).map(cb => parseInt(cb.value));
+    }
+
+    // =======================================================
+    // --- 2. РОЗПОДІЛ ДІЙ ДЛЯ ВИБРАНИХ ГАЛОЧОК ---
+    // =======================================================
+    smartAction(type) {
+        const indices = this.getTgSelectedIndices();
+        if (indices.length === 0) {
+            return alert("⚠️ Спочатку виберіть хоча б одну квартиру зі списку!");
+        }
+
+        if (type === 'receipts') this.sendBatchModal(indices);
+        if (type === 'announcement') this.openAnnouncementModal(indices);
+        if (type === 'debt') this.remindDebtorsModal(indices);
+    }
+
+    // --- А) ВІДПРАВКА КВИТАНЦІЙ ---
+    async sendBatchModal(indices) {
+        if(!confirm(`📨 Відправити квитанції обраним квартирам (${indices.length} шт.)?`)) return;
+        document.getElementById('tgActionModal').style.display = 'none';
+        
+        // Синхронізуємо ці галочки зі старим кодом, щоб ваша функція sendBatch відпрацювала правильно
+        this.currentData.apartments.forEach((a, i) => {
+            a.tg_selected = indices.includes(i);
+        });
+        
+        // Викликаємо вашу існуючу функцію масової розсилки
+        if(typeof this.sendBatch === 'function') {
+            this.sendBatch(); 
+        }
+    }
+
+    // --- Б) ВЕЛИКЕ ВІКНО ДЛЯ ПОВІДОМЛЕНЬ ---
+    openAnnouncementModal(indices) {
+        document.getElementById('tgActionModal').style.display = 'none';
+        this.announcementTargets = indices; // Запам'ятовуємо, кому слати
+        
+        const countEl = document.getElementById('announcement-target-count');
+        if(countEl) countEl.innerText = indices.length;
+        
+        const textEl = document.getElementById('announcement-text');
+        if(textEl) textEl.value = '';
+        
+        document.getElementById('announcementModal').style.display = 'flex';
+    }
+
+    async sendAnnouncement() {
+        const textEl = document.getElementById('announcement-text');
+        const text = textEl ? textEl.value.trim() : '';
+        
+        if(!text) return alert("⚠️ Введіть текст повідомлення!");
+
+        const indices = this.announcementTargets || [];
+        if(indices.length === 0) return;
+
+        const btn = document.getElementById('btn-send-announcement');
+        if(btn) {
+            btn.disabled = true;
+            btn.innerText = "⏳ Відправка...";
+        }
+
+        let successCount = 0;
+        const FUNCTION_URL = "https://aougdxtsmzjgoykaslbt.supabase.co/functions/v1/telegram-bot";
+
+        for (let i of indices) {
+            const a = this.currentData.apartments[i];
+            const chatId = a.telegram_chat_id || a.tg_id || a.chat_id;
+            if (chatId) {
+                try {
+                    const response = await fetch(FUNCTION_URL, {
+                        method: "POST", headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ action: "send_message", chat_id: chatId, text: text })
+                    });
+                    if (response.ok) successCount++;
+                } catch (e) {}
+            }
+            // Пауза 300мс між відправками (захист від блокування Телеграмом)
+            await new Promise(r => setTimeout(r, 300));
+        }
+
+        if(btn) {
+            btn.innerText = "🚀 Надіслати";
+            btn.disabled = false;
+        }
+        document.getElementById('announcementModal').style.display = 'none';
+        alert(`✅ Оголошення надіслано!\nУспішно доставлено: ${successCount} з ${indices.length}`);
+    }
+
+    // --- В) НАГАДУВАННЯ ПРО БОРГ (Тільки боржникам з вибраних) ---
+    async remindDebtorsModal(indices) {
+        const debtors = [];
+        indices.forEach(i => {
+            const a = this.currentData.apartments[i];
+            // Бронебійна перевірка: відправляємо ТІЛЬКИ якщо борг більше 100
+            if (parseFloat(a.debt) > 100) {
+                const chatId = a.telegram_chat_id || a.tg_id || a.chat_id;
+                if (chatId) debtors.push({ chat_id: chatId, amount: a.debt });
+            }
+        });
+
+        if (debtors.length === 0) {
+            alert("🤷‍♂️ Серед вибраних квартир немає тих, у кого борг перевищує 100 грн.");
+            return;
+        }
+
+        if(!confirm(`🔔 Виявлено ${debtors.length} квартир з боргом понад 100 грн. Надіслати їм нагадування?`)) return;
+
+        document.getElementById('tgActionModal').style.display = 'none';
+        const FUNCTION_URL = "https://aougdxtsmzjgoykaslbt.supabase.co/functions/v1/telegram-bot";
+        
+        try {
+            const response = await fetch(FUNCTION_URL, {
+                method: "POST", headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ action: "remind_debtors", debtors: debtors })
+            });
+            if (!response.ok) throw new Error("Помилка сервера");
+            
+            alert(`✅ Нагадування успішно відправлено ${debtors.length} боржникам!`);
+        } catch (e) {
+            alert("❌ Помилка: " + e.message);
+        }
     }
     
     createDefaultObject(name) {
@@ -3184,6 +3340,7 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
+
 
 
 
