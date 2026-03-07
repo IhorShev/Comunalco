@@ -380,26 +380,16 @@
     
     <div style="height: 120px;"></div>
 
-    <div class="sticky-footer" style="flex-direction: column; gap: 8px; padding: 12px; border-radius: 24px; bottom: 10px; max-width: 500px; left: 50%; transform: translateX(-50%); background: var(--card); border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+    <div class="sticky-footer" style="flex-direction: row; padding: 12px; border-radius: 24px; bottom: 10px; width: 95%; max-width: 500px; left: 50%; transform: translateX(-50%); background: var(--card); border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
         
-        <div style="display:flex; gap:10px; width: 100%;">
-            <button class="btn btn-warning" style="flex:1; padding:12px; font-size:14px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" onclick="app.downloadBackup()">
-                💾 Зберегти Файл
-            </button>
-            <button class="btn btn-outline" style="flex:1; padding:12px; font-size:14px; background:var(--card); color:var(--text); border:1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.05);" onclick="document.getElementById('file-input').click()">
-                📂 Відкрити Файл
-            </button>
-            <input type="file" id="file-input" style="display:none" onchange="app.loadBackup(this)">
-        </div>
+        <button class="btn btn-success" style="flex:1; padding:15px; font-weight:bold; font-size:15px; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);" onclick="app.calculate(); document.getElementById('resultModal').style.display='flex'">
+            📊 Закрити місяць
+        </button>
+        <button id="tg-menu-btn" class="btn" style="flex:1; background:#2AABEE; color:white; padding:15px; font-weight:bold; font-size:15px; box-shadow: 0 4px 10px rgba(42, 171, 238, 0.3);" onclick="app.openTelegramMenu()">
+            ✈️ Надіслати
+        </button>
 
-        <div style="display:flex; gap:10px; width: 100%;">
-            <button class="btn btn-success" style="flex:1; padding:12px; font-weight:bold; font-size:15px; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);" onclick="app.calculate(); document.getElementById('resultModal').style.display='flex'">
-                📊 Закрити місяць
-            </button>
-            <button id="tg-menu-btn" class="btn" style="flex:1; background:#2AABEE; color:white; padding:12px; font-weight:bold; font-size:15px; box-shadow: 0 4px 10px rgba(42, 171, 238, 0.3);" onclick="app.openTelegramMenu()">
-                ✈️ Надіслати
-            </button>
-        </div>
+    </div>
 
     </div>
    
@@ -3140,6 +3130,7 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
+
 
 
 
