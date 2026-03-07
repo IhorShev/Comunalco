@@ -3116,29 +3116,57 @@ window.addEventListener('load', () => {
     </div>
     
     <div id="tgActionModal" class="modal" style="z-index: 9999;">
-        <div class="modal-content" style="max-width: 320px; text-align: center; padding: 30px 20px;">
+        <div class="modal-content" style="max-width: 420px; width: 95%; text-align: center; padding: 25px;">
             <span class="modal-close" onclick="document.getElementById('tgActionModal').style.display='none'">&times;</span>
 
-            <div style="font-size: 40px; margin-bottom: 10px;">✈️</div>
-            <h3 style="margin-top:0; margin-bottom: 5px;">Телеграм Бот</h3>
+            <div style="font-size: 40px; margin-bottom: 5px;">✈️</div>
+            <h3 style="margin-top:0; margin-bottom: 15px;">Телеграм Розсилка</h3>
             
-            <div style="margin-bottom: 20px; text-align: left; background: var(--bg); padding: 12px; border-radius: 8px; border: 1px solid var(--border);">
-                <label style="font-size: 12px; color: var(--text-sec); display: block; margin-bottom: 6px; font-weight: bold;">Кому відправити:</label>
-                <select id="tgRecipientSelect" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--border); background: var(--card); color: var(--text); font-size: 14px; cursor: pointer;">
-                    <option value="all">Всім підключеним (Масово)</option>
-                </select>
+            <div style="text-align: left; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 15px; margin-bottom: 20px;">
+                <label style="font-size: 13px; color: var(--text-sec); display: block; margin-bottom: 10px; font-weight: bold;">1. Оберіть отримувачів:</label>
+                
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid var(--border);">
+                    <label style="display:flex; align-items:center; gap:8px; font-weight:bold; cursor:pointer; color:var(--primary); font-size:14px;">
+                        <input type="checkbox" id="tg-select-all" onchange="app.toggleTgModalAll(this.checked)" style="width:18px; height:18px; cursor:pointer; accent-color:var(--primary);"> 
+                        Всі
+                    </label>
+                    <button class="btn btn-outline" style="padding: 6px 12px; font-size: 11px; width:auto; border-color:var(--danger); color:var(--danger); font-weight:bold; margin:0;" onclick="app.selectDebtorsOnly()">
+                        🚨 Борг > 100 грн
+                    </button>
+                </div>
+                
+                <div id="tg-recipients-list" style="max-height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; padding-right:5px;">
+                    </div>
             </div>
 
-            <div style="display:flex; flex-direction:column; gap:12px;">
-                <button class="btn" style="background:#2AABEE; color:white; padding: 14px;" onclick="app.smartAction('receipts'); document.getElementById('tgActionModal').style.display='none'">
+            <label style="font-size: 13px; color: var(--text-sec); display: block; margin-bottom: 10px; font-weight: bold; text-align:left;">2. Що відправити обраним?</label>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <button class="btn" style="background:#2AABEE; color:white; padding: 14px; font-weight:bold; font-size:14px;" onclick="app.smartAction('receipts')">
                     📨 Відправити квитанції
                 </button>
-                <button class="btn btn-warning" style="padding: 14px;" onclick="app.smartAction('announcement'); document.getElementById('tgActionModal').style.display='none'">
-                    📢 Зробити повідомлення
+                <button class="btn btn-warning" style="padding: 14px; font-weight:bold; font-size:14px;" onclick="app.smartAction('announcement')">
+                    📢 Написати повідомлення
                 </button>
-                <button class="btn btn-danger" style="padding: 14px;" onclick="app.smartAction('debt'); document.getElementById('tgActionModal').style.display='none'">
+                <button class="btn btn-danger" style="padding: 14px; font-weight:bold; font-size:14px;" onclick="app.smartAction('debt')">
                     🔔 Нагадати про борг
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="announcementModal" class="modal" style="z-index: 10000;">
+        <div class="modal-content" style="max-width: 500px; width: 95%; padding: 25px;">
+            <span class="modal-close" onclick="document.getElementById('announcementModal').style.display='none'">&times;</span>
+            <h3 style="margin-top:0; color:var(--text); display:flex; align-items:center; gap:10px;">
+                📢 Нове повідомлення
+            </h3>
+            <p style="font-size:13px; color:var(--text-sec); margin-bottom:15px;">Текст буде надіслано <b id="announcement-target-count" style="color:var(--primary); font-size:15px;">0</b> обраним квартирам:</p>
+            
+            <textarea id="announcement-text" placeholder="Шановні мешканці, завтра буде відключення води... &#10;(Натискайте Enter для абзаців)" style="width:100%; height:220px; padding:15px; border-radius:12px; border:1px solid var(--border); background:var(--bg); color:var(--text); font-family:inherit; font-size:15px; resize:vertical; box-sizing:border-box; margin-bottom:20px; outline:none;"></textarea>
+            
+            <div style="display:flex; justify-content:flex-end; gap:10px;">
+                <button class="btn btn-outline" style="width:auto; padding:12px 20px;" onclick="document.getElementById('announcementModal').style.display='none'">Скасувати</button>
+                <button id="btn-send-announcement" class="btn btn-warning" style="width:auto; padding:12px 30px; font-weight:bold;" onclick="app.sendAnnouncement()">🚀 Надіслати</button>
             </div>
         </div>
     </div>
@@ -3156,6 +3184,7 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
+
 
 
 
