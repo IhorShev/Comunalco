@@ -1060,45 +1060,51 @@ class App {
     save() {
         // 🔥 ЗАХИСТ: Ніколи не зберігаємо дані, якщо ми в режимі Архіву!
         if (document.body.classList.contains('archive-mode')) return;
-        // 1. Миттєве локальне збереження (зберігаємо сумісність з вашим ключем)
+        
+        // 1. Миттєве локальне збереження
         if(this.STORAGE_KEY) {
              localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.state));
         }
 
-        // 2. АВТО-ЗБЕРЕЖЕННЯ В ХМАРУ (5 секунд тиші)
+        // --- АНІМАЦІЯ ІНДИКАТОРА ---
+        const statusEl = document.getElementById('save-status');
+        if (statusEl) {
+            statusEl.innerText = "☁️ Синхронізація...";
+            statusEl.style.color = "var(--text-sec)";
+            statusEl.style.opacity = "1";
+        }
+
+        // 2. АВТО-ЗБЕРЕЖЕННЯ В ХМАРУ (з затримкою, щоб не спамити базу)
         if (window.currentUser && window.cloudSave) {
-            
-            const btn = document.querySelector('.sticky-footer button.btn-warning');
-            
-            // Якщо почали писати - показуємо "Олівець"
-            if(btn) {
-                if(btn.innerText !== "☁️ Зберігаю..." && btn.innerText !== "✅ Готово") {
-                    btn.innerText = "✍️ Запис...";
-                    btn.style.opacity = "0.8";
-                }
-            }
-
-            // Скидаємо таймер, якщо ви продовжуєте друкувати
             if (this.saveTimer) clearTimeout(this.saveTimer);
-
-            // Заводимо таймер на 5 секунд
+            
             this.saveTimer = setTimeout(async () => {
-                if(btn) btn.innerText = "☁️ Зберігаю...";
-                
                 try {
                     await window.cloudSave(this.state);
-                    
-                    if(btn) {
-                        btn.innerText = "✅ Готово";
-                        btn.style.opacity = "1";
-                        // Через 3 секунди повертаємо напис
-                        setTimeout(() => btn.innerText = "💾 Авто Save", 3000);
+                    if(statusEl) {
+                        statusEl.innerText = "✅ Збережено";
+                        statusEl.style.color = "var(--success)";
+                        
+                        // Ховаємо напис через 2 секунди
+                        setTimeout(() => {
+                            statusEl.style.opacity = "0";
+                        }, 2000);
                     }
                 } catch (e) {
                     console.error("Помилка автозбереження", e);
-                    if(btn) btn.innerText = "⚠️ Помилка";
+                    if(statusEl) {
+                        statusEl.innerText = "⚠️ Помилка";
+                        statusEl.style.color = "var(--danger)";
+                    }
                 }
-            }, 5000);
+            }, 3000); // 3 секунди після останнього вводу символу
+        } else {
+            // Якщо користувач не увійшов у систему (тільки локально)
+            if(statusEl) {
+                statusEl.innerText = "✅ Локально";
+                statusEl.style.color = "var(--text-sec)";
+                setTimeout(() => statusEl.style.opacity = "0", 2000);
+            }
         }
     }
     get currentData() { return this.state.objects[this.state.currentObjIdx]; }
@@ -3139,6 +3145,7 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
+
 
 
 
