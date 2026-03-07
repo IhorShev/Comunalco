@@ -290,6 +290,7 @@
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg> Доступ
 </span>
                 <span onclick="app.openMenu('info')" style="cursor:pointer; font-size:14px;">ℹ️ Інфо</span>
+                <span onclick="app.openMenu('backups')" style="cursor:pointer; font-size:14px;">📦 Локальні копії</span>
                 <span onclick="app.openMenu('contacts')" style="cursor:pointer; font-size:14px;">📞 Контакти</span>
             </div>
 
@@ -310,6 +311,7 @@
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg> Доступ
 </div>
             <div onclick="app.openMenu('info'); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; border-bottom:1px solid var(--border); cursor:pointer; display:flex; gap:10px;">ℹ️ Інфо</div>
+            <div onclick="app.openMenu('backups'); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; border-bottom:1px solid var(--border); cursor:pointer; display:flex; gap:10px;">📦 Локальні копії</div>
             <div onclick="app.openMenu('contacts'); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; cursor:pointer; display:flex; gap:10px;">📞 Контакти</div>
         </div>
     </div>
@@ -3154,6 +3156,7 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
+
 
 
 
