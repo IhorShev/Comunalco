@@ -470,6 +470,23 @@
                 </p>
             </div>
 
+            <div id="menu-content-backups" style="display:none; text-align:center; padding: 10px 0;">
+                <div style="font-size: 40px; margin-bottom: 10px;">📦</div>
+                <h3 style="margin-top:0; color: var(--text);">Локальні копії</h3>
+                <p style="font-size:13px; color:var(--text-sec); margin-bottom:25px;">
+                    Якщо ви хочете додатково зберегти дані на свій пристрій вручну (для офлайн використання) або відновити їх з файлу.
+                </p>
+                <div style="display:flex; flex-direction:column; gap:12px;">
+                    <button class="btn btn-warning" style="padding:15px; font-size:14px;" onclick="app.downloadBackup()">
+                        💾 Зберегти файл на пристрій
+                    </button>
+                    <label class="btn btn-outline" style="padding:15px; font-size:14px; margin:0; cursor:pointer; text-align:center; color:var(--text); border-color:var(--border);">
+                        📂 Відкрити файл з пристрою
+                        <input type="file" style="display:none" onchange="app.loadBackup(this)">
+                    </label>
+                </div>
+            </div>
+
             <div id="menu-content-contacts" style="display:none">
                 <div style="text-align:center;">
                     <p>Виникли питання або пропозиції?</p>
@@ -3137,6 +3154,7 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
+
 
 
 
