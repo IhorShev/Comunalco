@@ -1747,9 +1747,14 @@ class App {
 
     // 🔥 ГОЛОВНІ ФУНКЦІЇ ДЛЯ КВАРТИР
     updateApt(i,k,v){
-        this.currentData.apartments[i][k]=(k==='debt'||k==='paid')?parseFloat(v):v;
+        if (k === 'debt' || k === 'paid') {
+            v = String(v).replace(',', '.'); // Міняємо кому на крапку автоматично
+            this.currentData.apartments[i][k] = parseFloat(v) || 0;
+        } else {
+            this.currentData.apartments[i][k] = v;
+        }
         this.save();
-        this.calculate(); // Перераховуємо баланс відразу
+        this.calculate();
     }
     updateAptMetric(i,t,k,v) {
         if (!this.currentData.apartments[i][t]) this.currentData.apartments[i][t] = {};
@@ -3133,6 +3138,7 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
+
 
 
 
