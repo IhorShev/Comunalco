@@ -1296,33 +1296,71 @@ class App {
     prevObject() { if(this.state.currentObjIdx>0){this.state.currentObjIdx--; this.save(); this.renderAll();} }
     nextObject() { if(this.state.currentObjIdx<this.state.objects.length-1){this.state.currentObjIdx++; this.save(); this.renderAll();} }
     
+    // --- ПЕРЕВІРКА ТА ОНОВЛЕННЯ СТАТУСУ ПІДПИСКИ ---
     updateStatus() {
-        const cnt = this.state.objects.reduce((s,o)=>s+o.apartments.length,0);
-        const bad = document.getElementById('status-badge');
-        const lim = document.getElementById('limit-counter');
-        const lic = this.state.license || {type:'free'};
-        let limit = this.LIMITS[lic.type] || 2;
-        bad.innerText = lic.type === 'free' ? 'FREE' : lic.type.toUpperCase();
-        bad.className = `status-badge ${lic.type === 'free' ? '' : (lic.type==='vip'?'status-vip':'status-pro')}`;
-        lim.innerText = limit > 1000 ? "∞" : `${cnt}/${limit}`;
-    }
-
-    addApartment() { 
-        if(!this.checkLimit()) return;
-        this.currentData.apartments.push({id:Date.now(), name:`Кв. ${this.currentData.apartments.length+1}`, group_id:1, messenger:'viber', email:'', phone:'', prev:{}, curr:{}, custom_counters:[], services:[], paid:0, debt:0}); 
-        this.save(); this.renderApartments(); this.updateStatus();
-    }
-
-    checkLimit() {
-        const cnt = this.state.objects.reduce((s,o)=>s+o.apartments.length,0);
-        const lic = this.state.license || {type:'free'};
-        const limit = this.LIMITS[lic.type] || this.LIMITS.free;
-        if(cnt >= limit) {
-            alert(`Досягнуто ліміт тарифу. Перейдіть в меню PRO.`);
-            this.openMenu('premium');
-            return false;
+        // 1. Видача 45 днів тріалу для нових користувачів
+        if (!this.state.sub_expire) {
+            this.state.sub_expire = Date.now() + (45 * 24 * 60 * 60 * 1000); // 45 днів
+            this.state.license = { type: 'trial' };
+            this.save();
         }
-        return true;
+
+        const now = Date.now();
+        const timeLeft = this.state.sub_expire - now;
+        const daysLeft = Math.ceil(timeLeft / (1000 * 60 * 60 * 24));
+        const cnt = this.state.objects.reduce((s, o) => s + o.apartments.length, 0);
+
+        // 2. Логіка бейджика в шапці (Нагадування)
+        const expireDisplay = document.getElementById('sub-expire-display');
+        const badge = document.getElementById('status-badge');
+        const lim = document.getElementById('limit-counter');
+
+        if (expireDisplay) {
+            expireDisplay.style.display = 'block';
+            if (daysLeft <= 0) {
+                expireDisplay.innerHTML = '⚠️ Тариф закінчився!';
+                expireDisplay.style.color = 'var(--danger)';
+            } else if (daysLeft <= 7) {
+                expireDisplay.innerHTML = `⚠️ Залишилось ${daysLeft} дн.`;
+                expireDisplay.style.color = 'var(--warning)';
+            } else {
+                expireDisplay.innerHTML = `PRO: ${daysLeft} дн.`;
+                expireDisplay.style.color = 'var(--success)';
+            }
+        }
+
+        if (badge) {
+            if (daysLeft > 0) {
+                badge.innerText = `PRO (${daysLeft} дн.)`;
+                badge.className = 'status-badge status-pro';
+            } else {
+                badge.innerText = 'FREE';
+                badge.className = 'status-badge';
+            }
+        }
+
+        if (lim) {
+            // Якщо є PRO (або тріал), то безліміт. Якщо ні - максимум 2 квартири.
+            lim.innerText = daysLeft > 0 ? "∞" : `${cnt}/2`;
+        }
+    }
+
+    // --- БЛОКУВАННЯ, ЯКЩО ТАРИФ ЗАКІНЧИВСЯ ---
+    checkLimit() {
+        this.updateStatus(); // Перевіряємо актуальні дні
+        
+        const now = Date.now();
+        const cnt = this.state.objects.reduce((s, o) => s + o.apartments.length, 0);
+
+        // Якщо підписка закінчилася (і пройшло 45 днів), дозволяємо максимум 2 квартири
+        if (this.state.sub_expire && now > this.state.sub_expire) {
+            if (cnt >= 2) {
+                alert("⏳ Ваш тестовий період (45 днів) завершився!\nНа безкоштовному тарифі доступно лише 2 квартири.\n\nПерейдіть у меню '💎 Тарифи', щоб продовжити роботу без обмежень.");
+                this.openMenu('premium');
+                return false; // Блокуємо створення
+            }
+        }
+        return true; // Дозволяємо створення
     }
 
     // --- RENDERING ---
@@ -3340,6 +3378,7 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
+
 
 
 
