@@ -1697,7 +1697,51 @@ class App {
         </details>`).join(''); 
     }
 
-    <div class="content">
+    renderApartments() { 
+        // --- ГЕНЕРАЦІЯ PIN-КОДІВ ДЛЯ НОВИХ/СТАРИХ КВАРТИР ---
+        let needSave = false;
+        if (!this.currentData.apartments) this.currentData.apartments = []; // Захист від пустої бази
+        this.currentData.apartments.forEach(a => {
+            if (!a.pin) {
+                a.pin = Math.floor(1000 + Math.random() * 9000).toString();
+                needSave = true;
+            }
+        });
+        if (needSave) this.save();
+
+        document.getElementById('apartments-container').innerHTML = (this.currentData.apartments || []).map((a, i) => { 
+            
+            // 1. Статус підключення до бота
+            const isConnected = !!(a.telegram_chat_id || a.tg_id || a.chat_id);
+            
+            // 2. Логіка кольору балансу (Борг - червоний, Переплата - зелений)
+            const currentBill = parseFloat(a.bill || 0);
+            const oldDebt = parseFloat(a.debt || 0);
+            const paid = parseFloat(a.paid || 0);
+            const totalBalance = (oldDebt + currentBill) - paid;
+            const isDebt = totalBalance > 0.01;
+            const isOverpay = totalBalance < -0.01;
+            
+            let balanceColor = "var(--text)";
+            let balanceLabel = "До сплати";
+            if (isDebt) { balanceColor = "var(--danger)"; balanceLabel = "БОРГ"; }
+            if (isOverpay) { balanceColor = "var(--success)"; balanceLabel = "ПЕРЕПЛАТА"; }
+
+            return `<details open style="border-left: 4px solid ${isConnected ? 'var(--success)' : 'var(--primary)'}; margin-bottom:15px;">
+            <summary style="display:flex; align-items:center; padding:12px;">
+                <div style="flex:1;">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <div style="font-weight:700; font-size:16px;">🚪 ${a.name}</div>
+                        ${isConnected ? `<input type="checkbox" class="mass-send-chk" value="${i}" style="width:18px; height:18px; cursor:pointer;" ${a.tg_selected !== false ? 'checked' : ''} onchange="app.currentData.apartments[${i}].tg_selected = this.checked">` : ''}
+                    </div>
+                    <div style="font-size:11px; margin-top:2px;">
+                        ${isConnected ? '<span style="color:var(--success); font-weight:bold;">✅ Бот підключено</span>' : '<span style="color:var(--text-sec);">⚠️ Не підключено</span>'}
+                    </div>
+                </div>
+                <span class="del-icon" onclick="app.delApt(${i})">&times;</span>
+            </summary>
+            
+            <div class="content">
                 <div class="row">
                     <div class="col">
                         <label>Телефон (Логін)</label>
@@ -1755,32 +1799,17 @@ class App {
                                 style="border: 1px solid ${parseFloat(a.paid||0) > 0.01 ? 'var(--success)' : 'var(--border)'}; 
                                        color: ${parseFloat(a.paid||0) > 0.01 ? 'var(--success)' : 'var(--text)'}; 
                                        font-weight:bold; text-align:center; font-size:16px; width:100%; box-sizing:border-box;" 
-                                onchange="app.updateApt(${i},'paid',this.value)"
-                                oninput="this.style.color = this.value > 0.01 ? 'var(--success)' : 'var(--text)'; this.style.borderColor = this.value > 0.01 ? 'var(--success)' : 'var(--border)';">
+                                oninput="app.updateApt(${i},'paid',this.value); this.style.color = this.value > 0.01 ? 'var(--success)' : 'var(--text)'; this.style.borderColor = this.value > 0.01 ? 'var(--success)' : 'var(--border)';">
                         </div>
                     </div>
-
-                        <div>
-                            <label style="font-size:10px; text-transform:uppercase; color:var(--text-sec);">Сплачено</label>
-                            <input type="number" step="0.01" value="${Number(parseFloat(a.paid||0).toFixed(2))}" 
-                                style="border: 1px solid ${parseFloat(a.paid||0) > 0.01 ? 'var(--success)' : 'var(--border)'}; 
-                                       color: ${parseFloat(a.paid||0) > 0.01 ? 'var(--success)' : 'var(--text)'}; 
-                                       font-weight:bold; text-align:center; font-size:16px; width:100%; box-sizing:border-box;" 
-                                oninput="app.updateApt(${i},'paid',this.value); 
-                                         this.style.color = this.value > 0.01 ? 'var(--success)' : 'var(--text)'; 
-                                         this.style.borderColor = this.value > 0.01 ? 'var(--success)' : 'var(--border)';">
-                        </div>
-                    </div>
+                </div>
 
                 <div style="margin-top: 15px; margin-bottom: 10px; padding: 10px; background: ${a.can_submit_readings ? 'rgba(34, 197, 94, 0.1)' : 'rgba(0,0,0,0.03)'}; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--border);">
                     <label style="font-size: 12px; font-weight: bold; color: var(--text); cursor: pointer; margin: 0;">
                         🤖 Дозвіл боту приймати показники
                     </label>
                     <label class="switch" style="position: relative; display: inline-block; width: 40px; height: 20px;">
-                        <input type="checkbox" 
-                               onchange="app.toggleBotPermission('${a.id}', this)" 
-                               ${a.can_submit_readings ? 'checked' : ''}
-                               style="opacity: 0; width: 0; height: 0;">
+                        <input type="checkbox" onchange="app.toggleBotPermission('${a.id}', this)" ${a.can_submit_readings ? 'checked' : ''} style="opacity: 0; width: 0; height: 0;">
                         <span class="slider round" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: ${a.can_submit_readings ? '#22c55e' : '#ccc'}; transition: .4s; border-radius: 34px;">
                             <span style="position: absolute; content: ''; height: 16px; width: 16px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; transform: ${a.can_submit_readings ? 'translateX(20px)' : 'translateX(0)'};"></span>
                         </span>
@@ -1788,9 +1817,7 @@ class App {
                 </div>
 
                 <div style="margin-top:15px;">
-                    <button class="btn btn-outline" 
-                        style="border-color:${isConnected ? 'var(--success)' : '#2AABEE'}; color:${isConnected ? 'var(--success)' : '#2AABEE'}; background: ${isConnected ? 'rgba(16, 185, 129, 0.1)' : 'transparent'};" 
-                        onclick="app.copyBotLink('${a.id}', '${a.name}')">
+                    <button class="btn btn-outline" style="border-color:${isConnected ? 'var(--success)' : '#2AABEE'}; color:${isConnected ? 'var(--success)' : '#2AABEE'}; background: ${isConnected ? 'rgba(16, 185, 129, 0.1)' : 'transparent'};" onclick="app.copyBotLink('${a.id}', '${a.name}')">
                         ${isConnected ? '✅ Квартира підключена' : '🔗 Підключити Телеграм-Бот'}
                     </button>
                 </div>
@@ -1801,7 +1828,7 @@ class App {
                     </button>
                 </div>
 
-         <div style="margin-top:15px; border-top: 1px dashed var(--border); padding-top:15px;">
+                <div style="margin-top:15px; border-top: 1px dashed var(--border); padding-top:15px;">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
                         <div style="font-size:12px; color:var(--primary); font-weight:bold; text-transform:uppercase;">🔐 Доступ (MyComunalco)</div>
                         <div style="font-size:11px; color:var(--text-sec); cursor:pointer; font-weight:bold;" onclick="app.generateNewPin(${i})" title="Згенерувати новий пароль">🔄 Новий PIN</div>
@@ -1815,18 +1842,17 @@ class App {
                     <button class="btn btn-outline" style="width:100%; padding:12px; font-size:13px; border-color:var(--primary); color:var(--primary);" onclick="app.sendAccessData(${i})">
                         📤 Надіслати доступ мешканцю
                     </button>
-                </div>               
+                </div>
 
             </div></details>`;
         }).join('');
-       
-        // Оновлюємо видимість кнопок масових дій
+        
         const controls = document.getElementById('batch-controls');
         if(controls) controls.style.display = (this.currentData.apartments.length > 0) ? 'flex' : 'none';
         
-        // Запускаємо розрахунок, щоб цифри відразу стали правильними
         this.calculate();
     }
+    
     renderMR(i, obj, mode, label, key) { 
         if (!obj.prev) obj.prev = {ed:0, en:0, w:0, g:0};
         if (!obj.curr) obj.curr = {ed:0, en:0, w:0, g:0};
@@ -3381,6 +3407,7 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
+
 
 
 
