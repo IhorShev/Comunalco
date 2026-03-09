@@ -1963,6 +1963,25 @@ class App {
     updateAS(ai,si,k,v){this.currentData.apartments[ai].services[si][k]=k==='val'?parseFloat(v):v;this.save(); this.calculate();}
     delAS(ai,si){this.currentData.apartments[ai].services.splice(si,1);this.save();this.renderApartments(); this.calculate();}
     delApt(i){if(confirm("Видалити квартиру?")){this.currentData.apartments.splice(i,1);this.save();this.renderApartments(); this.updateStatus(); this.calculate();}}
+    // --- ГЕНЕРАЦІЯ НОВОГО ПІН-КОДУ ---
+    generateNewPin(i) {
+        if(!confirm("Згенерувати новий PIN-код для цієї квартири?\nПопередній пароль перестане працювати (корисно при зміні мешканця).")) return;
+        this.currentData.apartments[i].pin = Math.floor(1000 + Math.random() * 9000).toString();
+        this.save();
+        this.renderApartments();
+    }
+
+    // --- ВІДПРАВКА ДАНИХ ДОСТУПУ ---
+    sendAccessData(i) {
+        const a = this.currentData.apartments[i];
+        if(!a.phone) return alert("⚠️ Спочатку вкажіть телефон мешканця вгорі картки!");
+        
+        const link = "https://comunalco.com/app/tenant.html";
+        const msg = `🏠 Ваш особистий кабінет MyComunalco\n\n🌍 Вхід: ${link}\n📞 Ваш Логін: ${a.phone}\n🔑 Ваш PIN-код: ${a.pin}\n\nТут ви можете зручно передавати показники, переглядати квитанції та слідкувати за балансом.`;
+        
+        // Відкриваємо наше стандартне вікно вибору месенджера (Telegram/Viber/Копіювати)
+        this.openShareModal(msg);
+    }
     // --- ДОЗВІЛ НА ПЕРЕДАЧУ ПОКАЗНИКІВ ЧЕРЕЗ БОТА ---
     async toggleBotPermission(aptId, checkboxElement) {
         const isAllowed = checkboxElement.checked;
@@ -3362,6 +3381,7 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
+
 
 
 
