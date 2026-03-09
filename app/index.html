@@ -1991,26 +1991,29 @@ class App {
     delApt(i){if(confirm("Видалити квартиру?")){this.currentData.apartments.splice(i,1);this.save();this.renderApartments(); this.updateStatus(); this.calculate();}}
     // --- ГЕНЕРАЦІЯ НОВОГО ПІН-КОДУ ---
     generateNewPin(i) {
-        if(!confirm("Згенерувати новий PIN-код для цієї квартири?\nПопередній пароль перестане працювати (корисно при зміні мешканця).")) return;
+        if(!confirm("Згенерувати новий PIN-код для цієї квартири?")) return;
         
-        // 1. Генеруємо пароль
-        this.currentData.apartments[i].pin = Math.floor(1000 + Math.random() * 9000).toString();
-        
-        // 2. Зберігаємо в хмару
-        if (typeof app !== 'undefined' && app.save) {
-            app.save();
-        } else {
-            this.save();
+        try {
+            // 1. Генеруємо новий ПІН
+            const newPin = Math.floor(1000 + Math.random() * 9000).toString();
+            this.currentData.apartments[i].pin = newPin;
+            
+            console.log("✅ Новий ПІН згенеровано:", newPin);
+
+            // 2. Запускаємо збереження (це активує напис "Синхронізація")
+            this.save(); 
+            
+            // 3. Перемальовуємо список квартир, щоб побачити новий ПІН на екрані
+            this.renderApartments();
+            
+            console.log("✅ Екран оновлено успішно");
+
+        } catch (error) {
+            // Якщо станеться будь-яка помилка, ми виведемо її в консоль
+            // і примусово приберемо напис "Синхронізація", щоб він не висів
+            console.error("❌ Помилка у generateNewPin:", error);
+            if (this.showSync) this.showSync(false);
         }
-        
-        // 3. Плавно оновлюємо екран без помилок
-        setTimeout(() => {
-            if (typeof app !== 'undefined' && app.renderApartments) {
-                app.renderApartments();
-            } else {
-                this.renderApartments();
-            }
-        }, 300);
     }
     // --- ВІДПРАВКА ДАНИХ ДОСТУПУ ---
     sendAccessData(i) {
@@ -3422,6 +3425,7 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
+
 
 
 
