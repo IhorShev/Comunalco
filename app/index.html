@@ -1990,29 +1990,33 @@ class App {
     delAS(ai,si){this.currentData.apartments[ai].services.splice(si,1);this.save();this.renderApartments(); this.calculate();}
     delApt(i){if(confirm("Видалити квартиру?")){this.currentData.apartments.splice(i,1);this.save();this.renderApartments(); this.updateStatus(); this.calculate();}}
     // --- ГЕНЕРАЦІЯ НОВОГО ПІН-КОДУ ---
-    generateNewPin(i) {
+    async generateNewPin(i) {
         if(!confirm("Згенерувати новий PIN-код для цієї квартири?")) return;
         
         try {
-            // 1. Генеруємо новий ПІН
+            // 1. Генеруємо новий ПІН локально
             const newPin = Math.floor(1000 + Math.random() * 9000).toString();
             this.currentData.apartments[i].pin = newPin;
             
-            console.log("✅ Новий ПІН згенеровано:", newPin);
-
-            // 2. Запускаємо збереження (це активує напис "Синхронізація")
-            this.save(); 
-            
-            // 3. Перемальовуємо список квартир, щоб побачити новий ПІН на екрані
+            // 2. Оновлюємо екран, щоб користувач бачив зміни миттєво
             this.renderApartments();
-            
-            console.log("✅ Екран оновлено успішно");
+
+            // 3. ПРИМУСОВЕ ЗБЕРЕЖЕННЯ В ХМАРУ
+            // Ми використовуємо await, щоб дочекатися кінця синхронізації
+            if (typeof window.cloudSave === 'function') {
+                console.log("📤 Відправка ПІН-коду в базу...");
+                await window.cloudSave(this.currentData);
+                console.log("✅ Синхронізація завершена!");
+            } else {
+                this.save();
+            }
 
         } catch (error) {
-            // Якщо станеться будь-яка помилка, ми виведемо її в консоль
-            // і примусово приберемо напис "Синхронізація", щоб він не висів
-            console.error("❌ Помилка у generateNewPin:", error);
-            if (this.showSync) this.showSync(false);
+            console.error("❌ Помилка збереження ПІН-коду:", error);
+            alert("Помилка синхронізації з базою. Перевірте консоль (F12).");
+            // Примусово ховаємо напис синхронізації, якщо він завис
+            const syncIcon = document.querySelector('.sync-indicator'); // або ваш клас
+            if(syncIcon) syncIcon.style.display = 'none';
         }
     }
     // --- ВІДПРАВКА ДАНИХ ДОСТУПУ ---
@@ -3426,6 +3430,7 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
+
 
 
 
