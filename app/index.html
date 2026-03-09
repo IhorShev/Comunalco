@@ -1992,11 +1992,26 @@ class App {
     // --- ГЕНЕРАЦІЯ НОВОГО ПІН-КОДУ ---
     generateNewPin(i) {
         if(!confirm("Згенерувати новий PIN-код для цієї квартири?\nПопередній пароль перестане працювати (корисно при зміні мешканця).")) return;
+        
+        // 1. Генеруємо пароль
         this.currentData.apartments[i].pin = Math.floor(1000 + Math.random() * 9000).toString();
-        this.save();
-        this.renderApartments();
+        
+        // 2. Зберігаємо в хмару
+        if (typeof app !== 'undefined' && app.save) {
+            app.save();
+        } else {
+            this.save();
+        }
+        
+        // 3. Плавно оновлюємо екран без помилок
+        setTimeout(() => {
+            if (typeof app !== 'undefined' && app.renderApartments) {
+                app.renderApartments();
+            } else {
+                this.renderApartments();
+            }
+        }, 300);
     }
-
     // --- ВІДПРАВКА ДАНИХ ДОСТУПУ ---
     sendAccessData(i) {
         const a = this.currentData.apartments[i];
@@ -3407,6 +3422,7 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
+
 
 
 
