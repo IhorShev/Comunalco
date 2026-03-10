@@ -3269,74 +3269,95 @@ window.addEventListener('load', () => {
       }
   };
 
-  // 6. ЗБЕРЕЖЕННЯ (UPLOAD) - "Упаковка"
-  window.cloudSave = async (data) => {
-      if(!window.currentUser) return;
-      const userId = window.currentUser.id;
-      
-      const btn = document.querySelector('.sticky-footer button.btn-warning');
-      const oldText = btn ? btn.innerText : '';
-      if(btn) btn.innerText = "☁️...";
+  // --- ЗАХИСНИЙ БЛОКУВАЛЬНИК ---
+    window.isSavingNow = false; 
 
-      console.log("🚀 Відправка повного бекапу...");
+    // 6. ЗБЕРЕЖЕННЯ (UPLOAD) - "Упаковка"
+    window.cloudSave = async (data) => {
+        if(!window.currentUser) return;
 
-      for (const house of data.objects) {
-          // Пакуємо додаткові дані будинку
-          const extraData = {
-              extra: house.extra_tariffs,
-              req: house.requisites
-          };
+        // БРОНЯ ВІД ЗАВИСАНЬ: Якщо збереження вже йде - нове чекає своєї черги
+        if (window.isSavingNow) {
+            console.log("⏳ Пропускаємо, бо попереднє збереження ще йде...");
+            return;
+        }
+        window.isSavingNow = true;
 
-          // 1. Зберігаємо БУДИНОК + ГРУПИ + ІСТОРІЮ + ЕКСТРА
-          await sbClient.from('houses').upsert({ 
-              id: String(house.id), 
-              owner_id: userId, 
-              name: house.name,
-              groups_data: house.groups, // Зберігаємо весь масив груп з лічильниками
-              extra_data: extraData,
-              history_data: house.history // Зберігаємо архів квитанцій
-          });
+        const userId = window.currentUser.id;
+        const btn = document.querySelector('.sticky-footer button.btn-warning');
+        const oldText = btn ? btn.innerText : '';
+        if(btn) btn.innerText = "☁️...";
 
-          // 2. Тарифи (як і раніше)
-          const tariffsData = [
-              { service_name: 'el_d', price_per_unit: house.tariffs.el_d },
-              { service_name: 'el_n', price_per_unit: house.tariffs.el_n },
-              { service_name: 'w', price_per_unit: house.tariffs.w },
-              { service_name: 'g', price_per_unit: house.tariffs.g }
-          ].map(t => ({ house_id: String(house.id), service_name: t.service_name, price_per_unit: t.price_per_unit }));
+        console.log("🚀 Відправка повного бекапу...");
 
-          await sbClient.from('service_tariffs').delete().eq('house_id', String(house.id));
-          await sbClient.from('service_tariffs').insert(tariffsData);
+        try {
+            for (const house of data.objects) {
+                const extraData = {
+                    extra: house.extra_tariffs,
+                    req: house.requisites
+                };
 
-          if (house.apartments && house.apartments.length > 0) {
-              const aptsToSave = house.apartments.map(a => ({
-                  id: String(a.id),
-                  house_id: String(house.id),
-                  name: a.name,
-                  phone: a.phone || '',
-                  pin: a.pin || '',
-                  email: a.email || '',
-                  messenger: a.messenger || 'viber',
-                  debt: parseFloat(a.debt || 0),
-                  paid: parseFloat(a.paid || 0),
-                  total_bill: parseFloat(a.bill || 0), // 🔥 ОСЬ ЦЕ ГОЛОВНЕ
-                  telegram_chat_id: a.telegram_chat_id, 
-                  
-                  current_data: {
-                      prev: a.prev,
-                      curr: a.curr,
-                      custom: a.custom_counters,
-                      serv: a.services
-                  }
-              }));
-              const { error } = await sbClient.from('apartments').upsert(aptsToSave);
-              if(error) console.error("Помилка квартир:", error);
-          }
-      }
-      
-      console.log("✅ Все збережено!");
-      if(btn) { btn.innerText = "✅ OK"; setTimeout(() => btn.innerText = oldText, 2000); }
-  };
+                // 1. Зберігаємо БУДИНОК
+                const res1 = await sbClient.from('houses').upsert({
+                    id: String(house.id),
+                    owner_id: userId,
+                    name: house.name,
+                    groups_data: house.groups,
+                    extra_data: extraData,
+                    history_data: house.history
+                });
+                if (res1.error) console.error("⚠️ Помилка будинку:", res1.error);
+
+                // 2. Тарифи
+                const tariffsData = [
+                    { service_name: 'el_d', price_per_unit: house.tariffs.el_d },
+                    { service_name: 'el_n', price_per_unit: house.tariffs.el_n },
+                    { service_name: 'w', price_per_unit: house.tariffs.w },
+                    { service_name: 'g', price_per_unit: house.tariffs.g }
+                ].map(t => ({ house_id: String(house.id), service_name: t.service_name, price_per_unit: t.price_per_unit }));
+
+                await sbClient.from('service_tariffs').delete().eq('house_id', String(house.id));
+                const res2 = await sbClient.from('service_tariffs').insert(tariffsData);
+                if (res2.error) console.error("⚠️ Помилка тарифів:", res2.error);
+
+                // 3. Квартири
+                if (house.apartments && house.apartments.length > 0) {
+                    const aptsToSave = house.apartments.map(a => ({
+                        id: String(a.id),
+                        house_id: String(house.id),
+                        name: a.name,
+                        phone: a.phone || '',
+                        pin: String(a.pin || ''), // БРОНЯ: Точно конвертуємо в текст
+                        email: a.email || '',
+                        messenger: a.messenger || 'viber',
+                        debt: parseFloat(a.debt || 0),
+                        paid: parseFloat(a.paid || 0),
+                        total_bill: parseFloat(a.bill || 0),
+                        telegram_chat_id: a.telegram_chat_id || null, // БРОНЯ: База любить null, а не undefined
+                        current_data: {
+                            prev: a.prev,
+                            curr: a.curr,
+                            custom: a.custom_counters,
+                            serv: a.services
+                        }
+                    }));
+                    const res3 = await sbClient.from('apartments').upsert(aptsToSave);
+                    if(res3.error) console.error("⚠️ Помилка квартир:", res3.error);
+                }
+            }
+            
+            console.log("✅ Все збережено!");
+            if(btn) { 
+                btn.innerText = "✅ OK"; 
+                setTimeout(() => btn.innerText = oldText, 2000); 
+            }
+        } catch (err) {
+            console.error("❌ Критична помилка в cloudSave:", err);
+        } finally {
+            // Знімаємо блокування за БУДЬ-ЯКИХ умов, щоб програма не зависла назавжди!
+            window.isSavingNow = false; 
+        }
+    };
 </script>
 
 <div id="resultModal" class="modal">
@@ -3436,6 +3457,7 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
+
 
 
 
