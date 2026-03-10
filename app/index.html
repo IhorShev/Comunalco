@@ -1302,11 +1302,13 @@ class App {
     // --- ПЕРЕВІРКА ТА ОНОВЛЕННЯ СТАТУСУ ПІДПИСКИ ---
     updateStatus() {
         const isGlobalPro = this.state.licenseDate === '2140-03-28';
-        const totalApts = this.state.objects.reduce((s, o) => s + (o.apartments ? o.apartments.length : 0), 0);
-        const maxApts = 50; // Ваш ліміт за тарифом
-
-        const now = Date.now();
-        const daysLeft = Math.ceil((this.state.sub_expire - now) / (1000 * 60 * 60 * 24));
+        const aptCount = this.state.objects.reduce((s, o) => s + (o.apartments ? o.apartments.length : 0), 0);
+        const objCount = this.state.objects.length;
+        
+        // ВАША ФОРМУЛА: 1 Об'єкт + Кількість квартир
+        const totalUnits = objCount + aptCount; 
+        const price6m = totalUnits * 36; 
+        const price12m = totalUnits * 57.7; 
 
         const expireDisplay = document.getElementById('sub-expire-display');
         const badge = document.getElementById('status-badge');
@@ -1315,33 +1317,34 @@ class App {
         if (isGlobalPro) {
             if (expireDisplay) {
                 expireDisplay.innerHTML = `<span style="color:var(--primary); font-weight:800;">💎 PRO АКТИВНО</span> | <span style="font-size:11px; opacity:0.8;">Безліміт до 2140 р.</span>`;
-                expireDisplay.style.display = 'block';
             }
             if (badge) {
                 badge.innerText = "PRO";
                 badge.className = 'status-badge status-pro';
             }
             if (lim) {
-                lim.innerHTML = `🏢 Квартири: <b style="${totalApts >= maxApts ? 'color:var(--danger)' : ''}">${totalApts}</b> / ${maxApts}`;
+                // Для вас показуємо реальну кількість одиниць
+                lim.innerHTML = `🏢 Одиниці: <b>${totalUnits}</b> / ∞`;
             }
         } else {
+            const now = Date.now();
+            const daysLeft = Math.ceil((this.state.sub_expire - now) / (1000 * 60 * 60 * 24));
+
             if (expireDisplay) {
                 expireDisplay.style.display = 'block';
                 if (daysLeft <= 0) {
-                    expireDisplay.innerHTML = '⚠️ Тариф закінчився';
-                    expireDisplay.style.color = 'var(--danger)';
+                    expireDisplay.innerHTML = `⚠️ Тестовий період закінчився. <b style="cursor:pointer; color:var(--primary)" onclick="app.openMenu('premium')">Подовжити?</b>`;
                 } else {
-                    expireDisplay.innerHTML = `Залишилось ${daysLeft} дн.`;
-                    expireDisplay.style.color = daysLeft <= 7 ? 'var(--warning)' : 'var(--success)';
+                    expireDisplay.innerHTML = `Залишилось <b>${daysLeft} дн.</b> | План: ${totalUnits} од.`;
                 }
             }
-            if (badge) {
-                badge.innerText = daysLeft > 0 ? `TRIAL (${daysLeft} дн.)` : "FREE";
-                badge.className = 'status-badge';
+            
+            if (lim) {
+                // Математика тарифу для користувача
+                lim.innerHTML = `<span onclick="app.openMenu('premium')" style="cursor:pointer">💳 Тариф: <b>${price6m} грн</b> / 6 міс</span>`;
             }
-            if (lim) lim.innerText = totalApts > 2 ? `Квартир: ${totalApts}` : "";
         }
-    }
+    } // <-- Ось вона, третя дужка, що закриває всю функцію!
 
     // --- БЛОКУВАННЯ, ЯКЩО ТАРИФ ЗАКІНЧИВСЯ ---
     checkLimit() {
@@ -3431,6 +3434,7 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
+
 
 
 
