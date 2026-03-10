@@ -3325,15 +3325,16 @@ window.addEventListener('load', () => {
                     const aptsToSave = house.apartments.map(a => ({
                         id: String(a.id),
                         house_id: String(house.id),
+                        owner_id: userId, // 🛡 ДОДАЛИ ЦЕ! Часто RLS вимагає знати власника
                         name: a.name,
                         phone: a.phone || '',
-                        pin: String(a.pin || ''), // БРОНЯ: Точно конвертуємо в текст
+                        pin: String(a.pin || ''),
                         email: a.email || '',
                         messenger: a.messenger || 'viber',
                         debt: parseFloat(a.debt || 0),
                         paid: parseFloat(a.paid || 0),
                         total_bill: parseFloat(a.bill || 0),
-                        telegram_chat_id: a.telegram_chat_id || null, // БРОНЯ: База любить null, а не undefined
+                        telegram_chat_id: a.telegram_chat_id || null,
                         current_data: {
                             prev: a.prev,
                             curr: a.curr,
@@ -3341,6 +3342,10 @@ window.addEventListener('load', () => {
                             serv: a.services
                         }
                     }));
+                    
+                    // Виводимо в консоль те, що ми пакуємо для бази
+                    console.log("📦 Пакет квартир для бази:", aptsToSave); 
+                    
                     const res3 = await sbClient.from('apartments').upsert(aptsToSave);
                     if(res3.error) console.error("⚠️ Помилка квартир:", res3.error);
                 }
@@ -3457,6 +3462,7 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
+
 
 
 
