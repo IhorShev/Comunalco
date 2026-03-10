@@ -3,44 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>My Comunalco | Кабінет</title>
+    <title>My Comunalco</title>
     <meta name="theme-color" content="#0f172a">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Inter:wght@400;600&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    
     <style>
         :root {
             --primary: #0099ff; --bg: #0f172a; --card: #1e293b; --text: #f8fafc;
             --text-sec: #94a3b8; --border: #334155; --success: #10b981; --danger: #ef4444; --warning: #f59e0b;
         }
-        
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 0; display: flex; flex-direction: column; min-height: 100vh; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 0; }
         .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 20px; box-sizing: border-box; }
-        
         .dashboard-grid { display: grid; grid-template-columns: 1fr; gap: 20px; align-items: start; }
         @media (min-width: 768px) { .dashboard-grid { grid-template-columns: repeat(2, 1fr); } }
         @media (min-width: 1024px) { .dashboard-grid { grid-template-columns: repeat(3, 1fr); } }
-
-        .card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: flex; flex-direction: column; height: 100%; box-sizing: border-box; }
-        .card-title { margin-top: 0; margin-bottom: 15px; font-size: 16px; display: flex; align-items: center; gap: 8px; color: var(--text); }
-
-        .btn { background: var(--primary); color: #fff; border: none; padding: 14px; border-radius: 12px; font-size: 14px; font-weight: bold; cursor: pointer; width: 100%; display: flex; justify-content: center; align-items: center; gap: 10px; transition: 0.2s; box-sizing: border-box; }
-        .btn:hover { filter: brightness(1.1); }
-        .btn:active { transform: scale(0.98); }
+        
+        .card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; display: flex; flex-direction: column; position: relative; }
+        .card-title { margin-top: 0; margin-bottom: 20px; font-size: 14px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; }
+        
+        .btn { background: var(--primary); color: #fff; border: none; padding: 14px; border-radius: 12px; font-size: 14px; font-weight: bold; cursor: pointer; width: 100%; transition: opacity 0.2s; }
+        .btn:hover { opacity: 0.9; }
         .btn-success { background: var(--success); }
         .btn-danger { background: var(--danger); }
         .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        input, select, textarea { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--border); background: rgba(0,0,0,0.2); color: var(--text); font-size: 14px; box-sizing: border-box; margin-bottom: 15px; font-family: 'Inter', sans-serif; }
-        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); }
-
-        /* Логіка відображення екранів */
+        input, select, textarea { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: rgba(0,0,0,0.2); color: var(--text); font-size: 14px; box-sizing: border-box; margin-bottom: 15px; font-family: 'Inter', sans-serif;}
+        
         #login-screen { display: flex; flex-direction: column; justify-content: center; min-height: 80vh; max-width: 400px; margin: 0 auto; }
         #dashboard-screen { display: none; }
-        #loader { display: none; text-align: center; color: var(--primary); font-weight: bold; margin-top: 15px; }
+        #loader { display: none; text-align: center; color: var(--primary); font-weight: bold; margin-top: 10px; }
 
-        .receipt-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); }
-        .receipt-item:last-child { border-bottom: none; }
+        /* Стилі для лічильників */
+        .meter-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        .meter-box { background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: 10px; padding: 12px; }
+        .meter-label { font-size: 11px; color: var(--text-sec); margin-bottom: 5px; }
+        .meter-val { font-size: 18px; font-weight: 700; font-family: 'Montserrat', sans-serif; }
+        .meter-val.blue { color: #3b82f6; } .meter-val.green { color: var(--success); } .meter-val.orange { color: var(--warning); }
     </style>
 </head>
 <body>
@@ -56,158 +55,134 @@
 
         <div class="card">
             <label style="font-size: 12px; color: var(--text-sec); font-weight: bold; margin-bottom: 8px; display: block;">Телефон (Логін)</label>
-            <input type="tel" id="login-phone" placeholder="380..." value="380">
+            <input type="tel" id="login-phone" placeholder="380...">
             
             <label style="font-size: 12px; color: var(--text-sec); font-weight: bold; margin-bottom: 8px; display: block;">PIN-код</label>
             <input type="password" id="login-pin" placeholder="••••" maxlength="4" style="font-size: 24px; letter-spacing: 8px; text-align: center;">
 
-            <button class="btn" onclick="login()">Увійти в кабінет</button>
-            <div id="loader">⏳ З'єднання з базою...</div>
+            <button class="btn" onclick="login()">Увійти</button>
+            <div id="loader">⏳ Завантаження...</div>
         </div>
     </div>
 
     <div id="dashboard-screen" class="container">
-        
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px; padding-bottom:15px; border-bottom:1px solid var(--border);">
-            <div>
-                <div style="font-family:'Montserrat', sans-serif; font-size:22px; font-weight:900;">
-                    <span style="color:var(--text);">My</span><span style="color:var(--primary);">Comunalco</span>
-                </div>
+            <div style="font-family:'Montserrat', sans-serif; font-size:20px; font-weight:900;">
+                <span style="color:var(--text);">My</span><span style="color:var(--primary);">Comunalco</span>
             </div>
-            <div style="display:flex; align-items:center; gap:10px;">
-                <div style="text-align:right;">
-                    <div id="dash-apt-name" style="font-weight:bold; font-size:14px;">Квартира --</div>
-                    <div id="dash-bot-status" style="font-size:11px; color:var(--success);">✅ Бот підключено</div>
-                </div>
-                <div onclick="logout()" style="width:40px; height:40px; border-radius:50%; background:rgba(239, 68, 68, 0.1); display:flex; align-items:center; justify-content:center; color:var(--danger); cursor:pointer; font-size:18px;" title="Вийти">🚪</div>
+            <div style="text-align:right;">
+                <div id="dash-name" style="font-weight:bold; font-size:14px;">Квартира</div>
+                <div style="font-size:11px; color:var(--text-sec); cursor:pointer;" onclick="logout()">🚪 Вийти з акаунту</div>
             </div>
         </div>
 
         <div class="dashboard-grid">
-
-            <div class="card" id="balance-card" style="border-color:var(--danger); position:relative; overflow:hidden;">
+            
+            <div class="card" id="balance-card" style="border-color:var(--danger); overflow:hidden;">
                 <div id="balance-line" style="position:absolute; top:0; left:0; width:100%; height:4px; background:var(--danger);"></div>
                 <h3 class="card-title">💰 Ваш баланс</h3>
-                <div style="text-align:center; flex-grow:1; display:flex; flex-direction:column; justify-content:center;">
+                <div style="text-align:center; flex-grow:1; display:flex; flex-direction:column; justify-content:center; margin-bottom: 20px;">
                     <div id="balance-label" style="font-size:12px; color:var(--text-sec); text-transform:uppercase; font-weight:bold; margin-bottom:5px;">Поточний борг</div>
                     <div style="font-size:42px; font-weight:900; font-family:'Montserrat', sans-serif; color:var(--text); margin-bottom:5px;">
-                        <span id="dash-total">0.00</span><span style="font-size:20px; color:var(--text-sec);"> ₴</span>
+                        <span id="dash-debt">0.00</span><span style="font-size:20px; color:var(--text-sec);"> ₴</span>
                     </div>
-                    <div style="font-size:12px; color:var(--text-sec); margin-bottom:20px;">Нараховано за місяць: <span id="dash-month">0.00</span> ₴</div>
                 </div>
-                <button class="btn btn-success" style="font-size:16px; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);">💳 Сплатити в 1 клік</button>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn btn-success" style="flex:3;" onclick="payOnline()">💳 Сплатити в 1 клік</button>
+                    <button class="btn btn-outline" style="flex:1; padding:0;" title="QR для оплати" onclick="alert('Генерація QR коду в розробці')">QR</button>
+                </div>
             </div>
 
             <div class="card">
                 <h3 class="card-title">⚡ Подані показники</h3>
-                <div style="display:flex; gap:10px; margin-bottom:5px;">
-                    <div style="flex:1;">
-                        <label style="font-size:11px; color:var(--text-sec);">Е/Е (День) <span style="font-size:10px;">Минулий: <span id="prev-ed">0</span></span></label>
-                        <input type="number" id="curr-ed" readonly style="font-weight:bold; font-size:18px; color:var(--success);">
+                <div class="meter-grid">
+                    <div class="meter-box">
+                        <div class="meter-label">Е/Е (День)</div>
+                        <div class="meter-val green" id="meter-ed">0</div>
                     </div>
-                    <div style="flex:1;">
-                        <label style="font-size:11px; color:var(--text-sec);">Е/Е (Ніч) <span style="font-size:10px;">Минулий: <span id="prev-en">0</span></span></label>
-                        <input type="number" id="curr-en" readonly style="font-weight:bold; font-size:18px; color:var(--success);">
+                    <div class="meter-box">
+                        <div class="meter-label">Е/Е (Ніч)</div>
+                        <div class="meter-val green" id="meter-en">0</div>
                     </div>
-                </div>
-                <div style="display:flex; gap:10px;">
-                    <div style="flex:1;">
-                        <label style="font-size:11px; color:var(--text-sec);">Вода (м³) <span style="font-size:10px;">Минулий: <span id="prev-w">0</span></span></label>
-                        <input type="number" id="curr-w" readonly style="font-weight:bold; font-size:18px; color:var(--primary);">
+                    <div class="meter-box">
+                        <div class="meter-label">Вода (м³)</div>
+                        <div class="meter-val blue" id="meter-w">0</div>
                     </div>
-                    <div style="flex:1;">
-                        <label style="font-size:11px; color:var(--text-sec);">Газ (м³) <span style="font-size:10px;">Минулий: <span id="prev-g">0</span></span></label>
-                        <input type="number" id="curr-g" readonly style="font-weight:bold; font-size:18px; color:var(--warning);">
+                    <div class="meter-box">
+                        <div class="meter-label">Газ (м³)</div>
+                        <div class="meter-val orange" id="meter-g">0</div>
                     </div>
                 </div>
-                <div style="font-size: 11px; color: var(--text-sec); text-align: center; margin-top: 10px;">
-                    * Подача нових показників здійснюється через Телеграм-бота.
+                
+                <div id="submit-permission-block" style="margin-top: auto;">
+                    <p id="submit-status-text" style="font-size: 11px; color: var(--text-sec); text-align: center; margin-bottom: 10px;">
+                        * Керуючий обмежив прийом нових показників.
+                    </p>
+                    <button id="btn-submit-readings" class="btn btn-outline" disabled>Передати показники</button>
                 </div>
             </div>
 
-            <div class="card" style="opacity: 0.8;">
-                <h3 class="card-title">📊 Аналітика споживання (Демо)</h3>
-                <select style="margin-bottom:10px; padding:10px;">
-                    <option>Електроенергія (День)</option>
-                    <option>Водопостачання</option>
+            <div class="card">
+                <h3 class="card-title">📊 Аналітика споживання <span style="font-size:10px; font-weight:normal; color:var(--warning);">(Демо)</span></h3>
+                <select>
+                    <option>Електроенергія (Місяць)</option>
+                    <option>Вода (Місяць)</option>
+                    <option>Газ (Місяць)</option>
                 </select>
-                <div style="flex-grow:1; display:flex; align-items:flex-end; gap:10px; padding-top:20px; height:120px; border-bottom:1px solid var(--border);">
-                    <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; gap:5px;">
-                        <div style="width:100%; background:var(--success); height:20%; border-radius:4px 4px 0 0;"></div>
-                        <span style="font-size:10px; color:var(--text-sec);">Мін.</span>
-                    </div>
-                    <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; gap:5px;">
-                        <div style="width:100%; background:var(--primary); height:75%; border-radius:4px 4px 0 0; position:relative;">
-                            <span style="position:absolute; top:-20px; left:50%; transform:translateX(-50%); font-size:10px; font-weight:bold; color:var(--primary);">ВИ</span>
-                        </div>
-                        <span style="font-size:10px; font-weight:bold; color:var(--text);">145</span>
-                    </div>
-                    <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; gap:5px;">
-                        <div style="width:100%; background:var(--warning); height:50%; border-radius:4px 4px 0 0;"></div>
-                        <span style="font-size:10px; color:var(--text-sec);">Серед.</span>
-                    </div>
-                    <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; gap:5px;">
-                        <div style="width:100%; background:var(--danger); height:100%; border-radius:4px 4px 0 0;"></div>
-                        <span style="font-size:10px; color:var(--text-sec);">Макс.</span>
-                    </div>
+                <div style="flex-grow:1; display:flex; align-items:center; justify-content:center; border: 1px dashed var(--border); border-radius: 10px; background:rgba(0,0,0,0.1); margin-bottom: 10px; min-height: 120px;">
+                    <span style="color:var(--text-sec); font-size:12px;">Тут буде графік порівняння</span>
                 </div>
-                <div style="font-size:11px; color:var(--text-sec); text-align:center; margin-top:10px;">В розробці</div>
+                <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-sec);">
+                    <div>Мін. по буд: <b>0</b></div>
+                    <div>Середнє: <b>0</b></div>
+                    <div>Макс: <b>0</b></div>
+                </div>
             </div>
 
-            <div class="card" style="opacity: 0.8;">
-                <h3 class="card-title">🧾 Архів квитанцій (Демо)</h3>
-                <div style="flex-grow:1; overflow-y:auto; max-height: 200px; padding-right:5px;">
-                    <div class="receipt-item">
-                        <div>
-                            <div style="font-weight:bold; font-size:14px;">Лютий 2026</div>
-                            <div style="font-size:11px; color:var(--text-sec);">Сума: 1240.50 ₴</div>
-                        </div>
-                        <button class="btn btn-outline" style="width:auto; padding:6px 12px; font-size:12px;">📥 PDF</button>
+            <div class="card">
+                <h3 class="card-title">📄 Архів квитанцій <span style="font-size:10px; font-weight:normal; color:var(--warning);">(Демо)</span></h3>
+                <div style="flex-grow:1; overflow-y:auto; max-height: 200px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--border);">
+                        <div><div style="font-size:13px; font-weight:bold;">Поточний місяць</div><div style="font-size:11px; color:var(--text-sec);">В процесі формування...</div></div>
+                        <button class="btn btn-outline" style="width:auto; padding:5px 10px; font-size:11px;" disabled>PDF</button>
                     </div>
-                    <div class="receipt-item">
-                        <div>
-                            <div style="font-weight:bold; font-size:14px;">Січень 2026</div>
-                            <div style="font-size:11px; color:var(--success);">Оплачено: 1520.00 ₴</div>
-                        </div>
-                        <button class="btn btn-outline" style="width:auto; padding:6px 12px; font-size:12px;">📥 PDF</button>
-                    </div>
+                    <div style="text-align:center; margin-top:30px; color:var(--text-sec); font-size:12px;">Історія порожня</div>
                 </div>
-                <div style="font-size:11px; color:var(--text-sec); text-align:center; margin-top:10px;">В розробці</div>
             </div>
 
-            <div class="card" style="background:rgba(0,153,255,0.02); opacity: 0.8;">
-                <h3 class="card-title">💬 Повідомлення / Чат (Демо)</h3>
-                <label style="font-size:11px; color:var(--text-sec);">Кому відправити:</label>
-                <select style="padding:10px;">
+            <div class="card">
+                <h3 class="card-title">💬 Повідомлення / Чат <span style="font-size:10px; font-weight:normal; color:var(--warning);">(Демо)</span></h3>
+                <label style="font-size:11px; color:var(--text-sec); margin-bottom:5px; display:block;">Кому відправити:</label>
+                <select>
                     <option>👑 Керуючому (Особисто)</option>
-                    <option>📢 Всім сусідам у під'їзді</option>
+                    <option>Всі мешканці будинку</option>
                 </select>
-                <textarea placeholder="Функція в розробці..." style="flex-grow:1; min-height:80px; resize:none;" disabled></textarea>
-                <button class="btn" style="margin-top:auto;" disabled>🚀 Відправити</button>
+                <textarea placeholder="Напишіть ваше повідомлення..." rows="3" style="resize:none; flex-grow:1;"></textarea>
+                <button class="btn">🚀 Відправити</button>
             </div>
 
-            <div class="card" style="border-color:var(--warning); opacity: 0.8;">
-                <h3 class="card-title">📝 Активне голосування (Демо)</h3>
-                <div style="font-weight:bold; font-size:14px; margin-bottom:5px;">Ремонт даху (Збір по 500 грн)</div>
-                <div style="font-size:12px; color:var(--text-sec); margin-bottom:15px; line-height:1.4;">
-                    Пропонується найняти бригаду для заміни руберойду.
+            <div class="card">
+                <h3 class="card-title">🗳 Активне голосування <span style="font-size:10px; font-weight:normal; color:var(--warning);">(Демо)</span></h3>
+                <div style="font-size:14px; font-weight:bold; margin-bottom:5px;">Ремонт даху (Збір по 500 грн)</div>
+                <div style="font-size:12px; color:var(--text-sec); margin-bottom:15px; flex-grow:1;">Пропонується найняти бригаду для заміни руберойду.</div>
+                
+                <div style="display:flex; gap:10px;">
+                    <button class="btn btn-success">👍 ЗА</button>
+                    <button class="btn btn-danger">👎 ПРОТИ</button>
                 </div>
-                <div style="display:flex; gap:10px; margin-bottom:15px;">
-                    <button class="btn btn-success" style="flex:1;" disabled>👍 ЗА</button>
-                    <button class="btn btn-danger" style="flex:1;" disabled>👎 ПРОТИ</button>
-                </div>
-                <div style="font-size:11px; color:var(--text-sec); text-align:center;">В розробці</div>
             </div>
 
         </div> 
     </div>
 
     <script>
-        const API_URL = "https://aougdxtsmzjgoykaslbt.supabase.co/functions/v1/telegram-bot";
+        // УВАГА: Замініть на свій реальний URL функції з Supabase, якщо він змінився!
+        const SUPABASE_FUNCTION_URL = "https://aougdxtsmzjgoykaslbt.supabase.co/functions/v1/telegram-bot";
+        let currentTenant = null;
 
         async function login() {
-            const phone = document.getElementById('login-phone').value;
-            const pin = document.getElementById('login-pin').value;
+            const phone = document.getElementById('login-phone').value.trim();
+            const pin = document.getElementById('login-pin').value.trim();
             const loader = document.getElementById('loader');
 
             if (!phone || !pin) return alert("Введіть телефон та PIN-код!");
@@ -215,7 +190,7 @@
             loader.style.display = 'block';
 
             try {
-                const response = await fetch(API_URL, {
+                const response = await fetch(SUPABASE_FUNCTION_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ action: 'tenant_login', phone: phone, pin: pin })
@@ -225,13 +200,14 @@
                 loader.style.display = 'none';
 
                 if (data.success) {
+                    currentTenant = data.apartment;
                     showDashboard(data.apartment);
                 } else {
                     alert("Помилка: " + (data.error || "Невірний логін або пароль"));
                 }
             } catch (error) {
                 loader.style.display = 'none';
-                alert("Помилка з'єднання з сервером.");
+                alert("Помилка з'єднання з сервером. Спробуйте пізніше.");
                 console.error(error);
             }
         }
@@ -240,58 +216,63 @@
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('dashboard-screen').style.display = 'block';
 
-            // 1. Назва та статус
-            document.getElementById('dash-apt-name').innerText = "Квартира " + (apt.name || '--');
-            const botStatus = document.getElementById('dash-bot-status');
-            if(apt.telegram_chat_id) {
-                botStatus.innerHTML = "✅ Бот підключено";
-                botStatus.style.color = "var(--success)";
-            } else {
-                botStatus.innerHTML = "⚠️ Бот не підключено";
-                botStatus.style.color = "var(--danger)";
-            }
-
-            // 2. Баланс
+            // 1. Ім'я квартири
+            document.getElementById('dash-name').innerText = apt.name || 'Квартира';
+            
+            // 2. БАЛАНС
             const oldDebt = parseFloat(apt.debt || 0);
-            const currentBill = parseFloat(apt.total_bill || 0);
+            const currentBill = parseFloat(apt.bill || 0);
             const paid = parseFloat(apt.paid || 0);
             const totalBalance = (oldDebt + currentBill) - paid;
 
-            document.getElementById('dash-total').innerText = Math.abs(totalBalance).toFixed(2);
-            document.getElementById('dash-month').innerText = currentBill.toFixed(2);
-
+            const debtEl = document.getElementById('dash-debt');
             const cardEl = document.getElementById('balance-card');
             const lineEl = document.getElementById('balance-line');
             const labelEl = document.getElementById('balance-label');
-            const textEl = document.getElementById('dash-total');
+
+            debtEl.innerText = Math.abs(totalBalance).toFixed(2);
 
             if (totalBalance > 0.01) {
                 cardEl.style.borderColor = 'var(--danger)'; lineEl.style.background = 'var(--danger)';
-                labelEl.innerText = 'ПОТОЧНИЙ БОРГ'; textEl.style.color = 'var(--text)';
+                labelEl.innerText = 'ПОТОЧНИЙ БОРГ'; debtEl.style.color = 'var(--text)';
             } else if (totalBalance < -0.01) {
                 cardEl.style.borderColor = 'var(--success)'; lineEl.style.background = 'var(--success)';
-                labelEl.innerText = 'ПЕРЕПЛАТА'; textEl.style.color = 'var(--success)';
+                labelEl.innerText = 'ПЕРЕПЛАТА'; debtEl.style.color = 'var(--success)';
             } else {
-                cardEl.style.borderColor = 'var(--success)'; lineEl.style.background = 'var(--success)';
-                labelEl.innerText = 'ВСЕ ОПЛАЧЕНО'; textEl.style.color = 'var(--success)';
+                cardEl.style.borderColor = 'var(--border)'; lineEl.style.background = 'var(--border)';
+                labelEl.innerText = 'ДО СПЛАТИ'; debtEl.style.color = 'var(--text)';
             }
 
-            // 3. Показники (Беремо з JSON)
-            const cData = apt.current_data || {};
-            const prev = cData.prev || {};
-            const curr = cData.curr || {};
+            // 3. ПОКАЗНИКИ
+            const curr = apt.current_data?.curr || {ed:0, en:0, w:0, g:0};
+            document.getElementById('meter-ed').innerText = curr.ed || 0;
+            document.getElementById('meter-en').innerText = curr.en || 0;
+            document.getElementById('meter-w').innerText = curr.w || 0;
+            document.getElementById('meter-g').innerText = curr.g || 0;
 
-            document.getElementById('prev-ed').innerText = prev.ed || 0;
-            document.getElementById('curr-ed').value = curr.ed || '';
-            document.getElementById('prev-en').innerText = prev.en || 0;
-            document.getElementById('curr-en').value = curr.en || '';
-            document.getElementById('prev-w').innerText = prev.w || 0;
-            document.getElementById('curr-w').value = curr.w || '';
-            document.getElementById('prev-g').innerText = prev.g || 0;
-            document.getElementById('curr-g').value = curr.g || '';
+            // Логіка дозволу передачі показників
+            const btnSubmit = document.getElementById('btn-submit-readings');
+            const statusText = document.getElementById('submit-status-text');
+            
+            if (apt.can_submit_readings === true || apt.can_submit_readings === 'true') {
+                btnSubmit.disabled = false;
+                btnSubmit.className = "btn btn-primary";
+                statusText.innerText = "* Зараз ви можете внести нові показники";
+                statusText.style.color = "var(--success)";
+            } else {
+                btnSubmit.disabled = true;
+                btnSubmit.className = "btn btn-outline";
+                statusText.innerText = "* Керуючий обмежив прийом нових показників";
+                statusText.style.color = "var(--text-sec)";
+            }
+        }
+
+        function payOnline() {
+            alert("Тут буде генерація платіжного посилання або відкриття банківського додатку за реквізитами будинку.");
         }
 
         function logout() {
+            currentTenant = null;
             document.getElementById('login-screen').style.display = 'flex';
             document.getElementById('dashboard-screen').style.display = 'none';
             document.getElementById('login-pin').value = '';
