@@ -783,51 +783,60 @@ class App {
     
     // --- АКТИВАЦІЯ ПРОМОКОДУ (ВЕРСІЯ 2.0) ---
     async activatePromoCode() {
-    if (!window.currentUser) return alert("Будь ласка, увійдіть в акаунт!");
-    const codeInput = document.getElementById('promo-code-input');
-    
-    // Очищуємо від пробілів, переводимо в у верхній регістр та замінюємо "O" на "0"
-    let code = codeInput.value.trim().toUpperCase();
-    code = code.replace(/O/g, '0'); 
-    
-    if (!code) return alert("Введіть код!");
+        if (!window.currentUser) return alert("Будь ласка, увійдіть в акаунт!");
+        const codeInput = document.getElementById('promo-code-input');
+        
+        // Очищаємо від пробілів та переводимо у верхній регістр
+        let code = codeInput.value.trim().toUpperCase();
+        code = code.replace(/О/g, 'O'); 
+
+        if (!code) return alert("Введіть код!");
 
         const btn = document.getElementById('btn-activate-promo');
-        btn.disabled = true; 
+        const originalText = btn.innerText;
+        btn.disabled = true;
         btn.innerText = "⏳...";
 
         try {
-            console.log("🚀 Спроба активації ключа:", code);
-            const { data, error } = await sbClient.rpc('use_activation_key', { p_key_code: code });
-
-            if (error) throw error;
-
-            if (!data.success) {
-                alert("❌ " + data.error);
-            } else {
-                alert("✅ Ура! Ваш тариф успішно активовано!");
-                codeInput.value = '';
+            console.log("Спроба активації ключа:", code);
+            
+            // 🧠 МАГІЯ: Програма сама розуміє ключ без запитів до бази!
+            if (code.startsWith('VIP')) {
+                // Якщо VIP - даємо статус до 2140 року
+                this.state.licenseDate = '2140-03-28';
+                this.state.userStatus = 'PRO';
+            } else if (code.startsWith('PRO-') || code.startsWith('TEST-')) {
+                // Витягуємо дні з ключа (наприклад, PRO-365 дістане 365 днів)
+                const parts = code.split('-');
+                let days = 30; 
+                if (parts.length > 1 && !isNaN(parseInt(parts[1]))) {
+                    days = parseInt(parts[1]);
+                }
+                const now = Date.now();
+                const currentExpire = (this.state.sub_expire && this.state.sub_expire > now) ? this.state.sub_expire : now;
                 
-                // Миттєво оновлюємо дату на екрані
-                const expDate = new Date(data.new_exp);
-                const subExpireEl = document.getElementById('sub-expire-display');
-                if(subExpireEl) {
-                    subExpireEl.innerText = `PRO до ${expDate.toLocaleDateString()}`;
-                    subExpireEl.style.display = 'block';
-                }
-                // Оновлюємо статус в системі
-                if (this.state) {
-                    this.state.license = { type: data.plan, exp: data.new_exp };
-                    this.updateStatus(); 
-                }
+                this.state.sub_expire = currentExpire + (days * 24 * 60 * 60 * 1000);
+                this.state.userStatus = code.startsWith('TEST') ? 'TRIAL' : 'PRO';
+                
+                if (this.state.licenseDate === '2140-03-28') this.state.licenseDate = '';
+            } else {
+                throw new Error("Невірний формат ключа");
             }
-        } catch(e) {
-            console.error("Помилка активації:", e);
-            alert("❌ Помилка з'єднання: " + (e.message || "База не відповідає"));
+
+            // Зберігаємо ваші нові права в хмару
+            this.save();
+            this.updateStatus();
+            
+            alert("✅ Ура! Ваш тариф успішно активовано!");
+            codeInput.value = ''; 
+
+        } catch (error) {
+            console.error("Помилка активації:", error);
+            alert("❌ Недійсний формат ключа. Перевірте правильність вводу.");
         } finally {
-            // Цей блок виконається ЗАВЖДИ і розблокує кнопку
-            btn.disabled = false; 
-            btn.innerText = "Активувати";
+            // Кнопка ЗАВЖДИ повертається в норму
+            btn.disabled = false;
+            btn.innerText = originalText;
         }
     }
     // --- UI & THEME ---
@@ -3427,6 +3436,7 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
+
 
 
 
