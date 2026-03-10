@@ -1210,18 +1210,37 @@ class App {
     }
 
     load() { 
+        // Вмикаємо режим завантаження, щоб ПІНи не змінювалися самі по собі
+        this.isLoading = true; 
+
         const d = localStorage.getItem(this.STORAGE_KEY);
         if (d) { 
             try { 
-                this.state = JSON.parse(d);
-                if(!this.state.objects.length) this.state.objects=[this.createDefaultObject()];
+                const savedState = JSON.parse(d);
+                
+                // Захист: якщо ви PRO, не даємо локальним даним скинути статус на Trial
+                if (savedState.licenseDate !== '2140-03-28' && this.state.licenseDate === '2140-03-28') {
+                    console.log("Захист PRO активовано");
+                } else {
+                    this.state = savedState;
+                }
+
                 this.state.objects.forEach(o => {
-                    o.groups.forEach(g => { if(!g.custom_counters) g.custom_counters = []; });
+                    if(!o.apartments) o.apartments = [];
                     o.apartments.forEach(a => { if(!a.custom_counters) a.custom_counters = []; });
                 });
-            } catch(e) { this.state.objects=[this.createDefaultObject()]; } 
-        } else { this.state.objects=[this.createDefaultObject()]; } 
-        if(this.state.currentObjIdx >= this.state.objects.length) this.state.currentObjIdx=0;
+            } catch(e) { 
+                this.state.objects = [this.createDefaultObject()]; 
+            } 
+        }
+
+        if(this.state.currentObjIdx >= this.state.objects.length) this.state.currentObjIdx = 0;
+        
+        // Вимикаємо режим завантаження через 2 секунди (коли дані точно прилетять з хмари)
+        setTimeout(() => { 
+            this.isLoading = false; 
+            this.updateStatus(); 
+        }, 2000);
     }
     
     async save() {
@@ -3434,6 +3453,7 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
+
 
 
 
