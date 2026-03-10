@@ -1705,14 +1705,18 @@ class App {
     renderApartments() { 
         // --- ГЕНЕРАЦІЯ PIN-КОДІВ ДЛЯ НОВИХ/СТАРИХ КВАРТИР ---
         let needSave = false;
-        if (!this.currentData.apartments) this.currentData.apartments = []; // Захист від пустої бази
-        this.currentData.apartments.forEach(a => {
-            if (!a.pin) {
-                a.pin = Math.floor(1000 + Math.random() * 9000).toString();
-                needSave = true;
-            }
-        });
-        if (needSave) this.save();
+        if (!this.currentData.apartments) this.currentData.apartments = [];
+
+        // 🛑 ВАЖЛИВО: Не генеруємо ПІНи, поки йде завантаження з хмари (isLoading)
+        if (!this.isLoading) {
+            this.currentData.apartments.forEach(a => {
+                if (!a.pin || a.pin === '') {
+                    a.pin = Math.floor(1000 + Math.random() * 9000).toString();
+                    needSave = true;
+                }
+            });
+            if (needSave) this.save();
+        }
 
         document.getElementById('apartments-container').innerHTML = (this.currentData.apartments || []).map((a, i) => { 
             
@@ -3435,6 +3439,7 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
+
 
 
 
