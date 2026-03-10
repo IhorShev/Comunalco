@@ -1228,7 +1228,7 @@ class App {
         // 1. ЗАХИСТ: Ніколи не зберігаємо дані в режимі Архіву
         if (document.body.classList.contains('archive-mode')) return;
 
-        // 2. Миттєве локальне збереження (на випадок збою інтернету)
+        // 2. Миттєве локальне збереження
         if (this.STORAGE_KEY) {
             localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.state));
         }
@@ -1241,34 +1241,32 @@ class App {
             statusEl.style.opacity = "1";
         }
 
-        // 4. АВТО-ЗБЕРЕЖЕННЯ В ХМАРУ (з таймером 3 сек)
+        // 4. АВТО-ЗБЕРЕЖЕННЯ В ХМАРУ
         if (window.currentUser && window.cloudSave) {
             if (this.saveTimer) clearTimeout(this.saveTimer);
 
             this.saveTimer = setTimeout(async () => {
                 try {
-                    // Викликаємо функцію збереження та чекаємо результат
+                    // ВАЖЛИВО: Чекаємо на відповідь від хмари
                     await window.cloudSave(this.state);
                     
                     if (statusEl) {
                         statusEl.innerText = "✅ Збережено";
                         statusEl.style.color = "var(--success)";
-                        
-                        // Ховаємо напис через 2 секунди
-                        setTimeout(() => {
-                            if (statusEl.innerText === "✅ Збережено") statusEl.style.opacity = "0";
+                        setTimeout(() => { 
+                            if(statusEl.innerText === "✅ Збережено") statusEl.style.opacity = "0"; 
                         }, 2000);
                     }
                 } catch (e) {
-                    console.error("Помилка автозбереження:", e);
+                    console.error("Помилка синхронізації:", e);
+                    // Якщо сталася помилка — ми ПРИМУСОВО міняємо напис, щоб він не висів вічно
                     if (statusEl) {
-                        statusEl.innerText = "⚠️ Помилка";
+                        statusEl.innerText = "⚠️ Помилка бази";
                         statusEl.style.color = "var(--danger)";
-                        // При помилці не ховаємо напис довше, щоб ви помітили
                         setTimeout(() => { statusEl.style.opacity = "0"; }, 5000);
                     }
                 }
-            }, 3000);
+            }, 1500); // Зменшив затримку, щоб швидше реагувало на "Сплачено"
         } else {
             // Тільки локальний режим
             if (statusEl) {
@@ -3439,6 +3437,7 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
+
 
 
 
