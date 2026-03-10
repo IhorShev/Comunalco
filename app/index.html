@@ -1723,20 +1723,7 @@ class App {
     }
 
     renderApartments() {
-        let needSave = false;
-
-        // 🛑 ОСЬ ВІН, ЗАПОБІЖНИК! ВІН ОБОВ'ЯЗКОВИЙ:
-        if (!this.isLoading) {
-            this.currentData.apartments.forEach(a => {
-                if (a.pin === undefined || a.pin === null) {
-                    a.pin = Math.floor(1000 + Math.random() * 9000).toString();
-                    needSave = true;
-                }
-            });
-            if (needSave) this.save();
-        }
-        
-        document.getElementById('apartments-container').innerHTML = (this.currentData.apartments || []).map((a, i) => { 
+            document.getElementById('apartments-container').innerHTML = (this.currentData.apartments || []).map((a, i) => { 
             
             // 1. Статус підключення до бота
             const isConnected = !!(a.telegram_chat_id || a.tg_id || a.chat_id);
@@ -3457,6 +3444,7 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
+
 
 
 
