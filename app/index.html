@@ -1859,7 +1859,7 @@ class App {
                     
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; background:rgba(0,153,255,0.05); padding:10px 15px; border-radius:8px; border:1px solid var(--primary);">
                         <div style="font-size:11px; color:var(--text-sec);">PIN-код:</div>
-                        <div style="font-size:22px; font-weight:900; letter-spacing:4px; color:var(--text);">${a.pin}</div>
+                        <div style="font-size:22px; font-weight:900; letter-spacing:4px; color:var(--text);">${a.pin && a.pin !== 'undefined' ? a.pin : '&nbsp;'}</div>
                     </div>
                     
                     <button class="btn btn-outline" style="width:100%; padding:12px; font-size:13px; border-color:var(--primary); color:var(--primary);" onclick="app.sendAccessData(${i})">
@@ -3436,6 +3436,7 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
+
 
 
 
