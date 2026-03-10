@@ -3325,7 +3325,7 @@ window.addEventListener('load', () => {
                     const aptsToSave = house.apartments.map(a => ({
                         id: String(a.id),
                         house_id: String(house.id),
-                        owner_id: userId, // 🛡 ДОДАЛИ ЦЕ! Часто RLS вимагає знати власника
+                        // ❌ ВИДАЛИЛИ owner_id, бо цієї колонки немає в базі
                         name: a.name,
                         phone: a.phone || '',
                         pin: String(a.pin || ''),
@@ -3342,9 +3342,6 @@ window.addEventListener('load', () => {
                             serv: a.services
                         }
                     }));
-                    
-                    // Виводимо в консоль те, що ми пакуємо для бази
-                    console.log("📦 Пакет квартир для бази:", aptsToSave); 
                     
                     const res3 = await sbClient.from('apartments').upsert(aptsToSave);
                     if(res3.error) console.error("⚠️ Помилка квартир:", res3.error);
@@ -3462,6 +3459,7 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
+
 
 
 
