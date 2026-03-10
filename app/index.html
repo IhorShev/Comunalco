@@ -1224,56 +1224,61 @@ class App {
         if(this.state.currentObjIdx >= this.state.objects.length) this.state.currentObjIdx=0;
     }
     
-    save() {
-        // 🔥 ЗАХИСТ: Ніколи не зберігаємо дані, якщо ми в режимі Архіву!
+    async save() {
+        // 1. ЗАХИСТ: Ніколи не зберігаємо дані в режимі Архіву
         if (document.body.classList.contains('archive-mode')) return;
-        
-        // 1. Миттєве локальне збереження
-        if(this.STORAGE_KEY) {
-             localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.state));
+
+        // 2. Миттєве локальне збереження (на випадок збою інтернету)
+        if (this.STORAGE_KEY) {
+            localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.state));
         }
 
-        // --- АНІМАЦІЯ ІНДИКАТОРА ---
+        // 3. --- АНІМАЦІЯ ІНДИКАТОРА ---
         const statusEl = document.getElementById('save-status');
         if (statusEl) {
-            statusEl.innerText = "☁️ Синхронізація...";
+            statusEl.innerText = "● СИНХРОНІЗАЦІЯ...";
             statusEl.style.color = "var(--text-sec)";
             statusEl.style.opacity = "1";
         }
 
-        // 2. АВТО-ЗБЕРЕЖЕННЯ В ХМАРУ (з затримкою, щоб не спамити базу)
+        // 4. АВТО-ЗБЕРЕЖЕННЯ В ХМАРУ (з таймером 3 сек)
         if (window.currentUser && window.cloudSave) {
             if (this.saveTimer) clearTimeout(this.saveTimer);
-            
+
             this.saveTimer = setTimeout(async () => {
                 try {
+                    // Викликаємо функцію збереження та чекаємо результат
                     await window.cloudSave(this.state);
-                    if(statusEl) {
+                    
+                    if (statusEl) {
                         statusEl.innerText = "✅ Збережено";
                         statusEl.style.color = "var(--success)";
                         
                         // Ховаємо напис через 2 секунди
                         setTimeout(() => {
-                            statusEl.style.opacity = "0";
+                            if (statusEl.innerText === "✅ Збережено") statusEl.style.opacity = "0";
                         }, 2000);
                     }
                 } catch (e) {
-                    console.error("Помилка автозбереження", e);
-                    if(statusEl) {
+                    console.error("Помилка автозбереження:", e);
+                    if (statusEl) {
                         statusEl.innerText = "⚠️ Помилка";
                         statusEl.style.color = "var(--danger)";
+                        // При помилці не ховаємо напис довше, щоб ви помітили
+                        setTimeout(() => { statusEl.style.opacity = "0"; }, 5000);
                     }
                 }
-            }, 3000); // 3 секунди після останнього вводу символу
+            }, 3000);
         } else {
-            // Якщо користувач не увійшов у систему (тільки локально)
-            if(statusEl) {
+            // Тільки локальний режим
+            if (statusEl) {
                 statusEl.innerText = "✅ Локально";
                 statusEl.style.color = "var(--text-sec)";
-                setTimeout(() => statusEl.style.opacity = "0", 2000);
+                setTimeout(() => { statusEl.style.opacity = "0"; }, 2000);
             }
         }
     }
+    
     get currentData() { return this.state.objects[this.state.currentObjIdx]; }
     
     updateObjectName(v) { this.currentData.name = v; this.save(); }
@@ -3430,6 +3435,7 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
+
 
 
 
