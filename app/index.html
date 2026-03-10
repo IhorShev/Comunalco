@@ -1247,6 +1247,7 @@ class App {
         setTimeout(() => { 
             this.isLoading = false; 
             if(typeof this.updateStatus === 'function') this.updateStatus(); 
+            if(typeof this.renderApartments === 'function') this.renderApartments(); 
         }, 2000);
     }    
     async save() {
@@ -3456,6 +3457,7 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
+
 
 
 
