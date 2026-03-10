@@ -1326,14 +1326,15 @@ class App {
     
     // --- ПЕРЕВІРКА ТА ОНОВЛЕННЯ СТАТУСУ ПІДПИСКИ ---
     updateStatus() {
+        // 🛑 БРОНЬОВАНИЙ ЗАХИСТ: Якщо даних ще немає - виходимо, щоб не зламати код
+        if (!this.state || !this.state.objects) return;
+
         const isGlobalPro = this.state.licenseDate === '2140-03-28';
         const aptCount = this.state.objects.reduce((s, o) => s + (o.apartments ? o.apartments.length : 0), 0);
         const objCount = this.state.objects.length;
         
-        // ВАША ФОРМУЛА: 1 Об'єкт + Кількість квартир
         const totalUnits = objCount + aptCount; 
         const price6m = totalUnits * 36; 
-        const price12m = totalUnits * 57.7; 
 
         const expireDisplay = document.getElementById('sub-expire-display');
         const badge = document.getElementById('status-badge');
@@ -1348,7 +1349,6 @@ class App {
                 badge.className = 'status-badge status-pro';
             }
             if (lim) {
-                // Для вас показуємо реальну кількість одиниць
                 lim.innerHTML = `🏢 Одиниці: <b>${totalUnits}</b> / ∞`;
             }
         } else {
@@ -1365,12 +1365,10 @@ class App {
             }
             
             if (lim) {
-                // Математика тарифу для користувача
                 lim.innerHTML = `<span onclick="app.openMenu('premium')" style="cursor:pointer">💳 Тариф: <b>${price6m} грн</b> / 6 міс</span>`;
             }
         }
-    } // <-- Ось вона, третя дужка, що закриває всю функцію!
-
+    }
     // --- БЛОКУВАННЯ, ЯКЩО ТАРИФ ЗАКІНЧИВСЯ ---
     checkLimit() {
         this.updateStatus();
@@ -3459,6 +3457,7 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
+
 
 
 
