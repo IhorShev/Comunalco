@@ -1210,38 +1210,32 @@ class App {
     }
 
     load() { 
-        this.isLoading = true; // Захист ПІН-кодів увімкнено
+        this.isLoading = true; // Захист ПІН-кодів
 
         const d = localStorage.getItem(this.STORAGE_KEY);
         if (d) { 
             try { 
-                const savedState = JSON.parse(d);
+                const parsed = JSON.parse(d);
+                this.state = parsed || {}; // Захист від порожнього кешу
                 
-                // Захист PRO-статусу
-                if (this.state && this.state.licenseDate === '2140-03-28') {
-                    savedState.licenseDate = '2140-03-28';
-                    savedState.userStatus = 'PRO';
-                }
-                
-                this.state = savedState;
-
-                if(!this.state.objects || !this.state.objects.length) {
+                if (!this.state.objects || !this.state.objects.length) {
                     this.state.objects = [this.createDefaultObject()];
                 }
                 
-                // Відновлено життєво важливий блок для Груп та Квартир!
                 this.state.objects.forEach(o => {
+                    // Відновлюємо структуру, якщо вона пошкоджена
                     if (!o.groups) o.groups = [];
-                    o.groups.forEach(g => { if(!g.custom_counters) g.custom_counters = []; });
-                    
                     if (!o.apartments) o.apartments = [];
+                    
+                    o.groups.forEach(g => { if(!g.custom_counters) g.custom_counters = []; });
                     o.apartments.forEach(a => { if(!a.custom_counters) a.custom_counters = []; });
                 });
             } catch(e) { 
-                console.error("Помилка завантаження:", e);
-                this.state.objects = [this.createDefaultObject()]; 
+                console.error("Помилка парсингу локальних даних:", e);
+                this.state = { objects: [this.createDefaultObject()] }; 
             } 
         } else { 
+            if (!this.state) this.state = {};
             this.state.objects = [this.createDefaultObject()]; 
         }
         
@@ -1249,7 +1243,7 @@ class App {
             this.state.currentObjIdx = 0;
         }
         
-        // Вимикаємо захист через 2 секунди
+        // Вимикаємо режим завантаження через 2 секунди
         setTimeout(() => { 
             this.isLoading = false; 
             if(typeof this.updateStatus === 'function') this.updateStatus(); 
@@ -3465,6 +3459,7 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
+
 
 
 
