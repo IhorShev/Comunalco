@@ -131,57 +131,57 @@
                     </div>
             </div>
 
-            <div class="card">
-                <h3 class="card-title">📄 Архів квитанцій</h3>
-                <div id="archive-list" style="flex-grow:1; overflow-y:auto; max-height: 250px; padding-right: 5px;">
-                    </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; align-items: stretch; margin-top: 20px;">
+    
+    <div class="card" style="display: flex; flex-direction: column;">
+        <h3 class="card-title">📄 Архів квитанцій</h3>
+        <div id="archive-list" style="flex-grow: 1; overflow-y: auto; max-height: 350px; padding-right: 5px;">
             </div>
-
-            <div class="card">
-                <h3 class="card-title">💬 Повідомлення Керуючому</h3>
-                <label style="font-size:11px; color:var(--text-sec); margin-bottom:5px; display:block;">Отримувач:</label>
-                <select id="msg-recipient" style="margin-bottom:10px;">
-                    <option value="manager">👑 Керуючому (Особисто)</option>
-                    <option value="all">👥 Всім мешканцям (Чат будинку)</option>
-                </select>
-                <textarea id="msg-text" placeholder="Напишіть ваше питання або скаргу..." rows="3" style="resize:none; flex-grow:1; margin-bottom:10px; background:rgba(0,0,0,0.3); border:1px solid var(--border); color:var(--text); padding:10px; border-radius:10px;"></textarea>
-                <button class="btn" onclick="sendMessage()">🚀 Відправити повідомлення</button>
-            </div>
-
-            <div class="card" id="voting-block">
-                <h3 class="card-title">🗳 Активне голосування</h3>
-                <div id="voting-content">
-                    <div id="vote-title" style="font-size:15px; font-weight:bold; margin-bottom:8px;">Ремонт даху (Збір по 500 грн)</div>
-                    <div id="vote-desc" style="font-size:12px; color:var(--text-sec); margin-bottom:20px; line-height:1.4;">
-                        Пропонується найняти бригаду для заміни руберойду над 2-м під'їздом.
-                    </div>
-                    
-                    <div style="display:flex; gap:10px;">
-                        <button class="btn btn-success" style="flex:1;" onclick="submitVote('yes')">👍 ЗА</button>
-                        <button class="btn btn-danger" style="flex:1;" onclick="submitVote('no')">👎 ПРОТИ</button>
-                    </div>
-                </div>
-
-                <div id="vote-results" style="display:none;">
-                    <div style="font-size:13px; font-weight:bold; margin-bottom:15px; color:var(--success);">Дякуємо! Ваш голос враховано.</div>
-                    <div style="margin-bottom:10px;">
-                        <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:5px;"><span>ЗА (75%)</span><span>15 гол.</span></div>
-                        <div style="width:100%; height:8px; background:var(--border); border-radius:4px; overflow:hidden;">
-                            <div style="width:75%; height:100%; background:var(--success);"></div>
-                        </div>
-                    </div>
-                    <div style="margin-bottom:20px;">
-                        <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:5px;"><span>ПРОТИ (25%)</span><span>5 гол.</span></div>
-                        <div style="width:100%; height:8px; background:var(--border); border-radius:4px; overflow:hidden;">
-                            <div style="width:25%; height:100%; background:var(--danger);"></div>
-                        </div>
-                    </div>
-                    <button class="btn btn-outline" style="font-size:12px;" onclick="downloadVotePdf()">📄 Завантажити звіт PDF</button>
-                </div>
-            </div>
-            
-        </div> 
     </div>
+
+    <div class="card" style="display: flex; flex-direction: column;">
+        <h3 class="card-title">💬 Написати повідомлення</h3>
+        <label style="font-size:11px; color:var(--text-sec); margin-bottom:5px;">Отримувач:</label>
+        <select id="msg-recipient" style="margin-bottom:10px;" onchange="toggleAptInput()">
+            <option value="manager">👑 Керуючому (Особисто)</option>
+            <option value="all">👥 Всім мешканцям (Чат будинку)</option>
+            <option value="apt">🚪 Конкретній квартирі...</option>
+        </select>
+        
+        <input type="number" id="msg-apt-number" placeholder="№ квартири" style="display:none; margin-bottom:10px; background:rgba(0,0,0,0.2);">
+
+        <textarea id="msg-text" placeholder="Ваше запитання або скарга..." rows="4" style="resize:none; flex-grow:1; margin-bottom:10px; background:rgba(0,0,0,0.3); border:1px solid var(--border); color:var(--text); padding:10px; border-radius:10px;"></textarea>
+        <button class="btn btn-primary" onclick="sendMessage()">🚀 Відправити</button>
+    </div>
+
+    <div class="card" style="display: flex; flex-direction: column;">
+        <h3 class="card-title">🗳 Активне голосування</h3>
+        <div id="voting-area" style="flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between;">
+            <div id="vote-info">
+                <div style="font-size:15px; font-weight:bold; margin-bottom:8px;">Ремонт даху (Збір по 500 грн)</div>
+                <div style="font-size:12px; color:var(--text-sec); margin-bottom:15px;">
+                    Проголосувало: <b>45</b> з <b>60</b> (75%)
+                </div>
+                
+                <div style="display: flex; width: 100%; height: 12px; border-radius: 6px; overflow: hidden; margin-bottom: 5px; background: #333;">
+                    <div id="vote-bar-yes" style="width: 70%; background: var(--success); transition: width 0.5s;"></div>
+                    <div id="vote-bar-no" style="width: 30%; background: var(--danger); transition: width 0.5s;"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--text-sec); margin-bottom: 20px;">
+                    <span>ЗА: 32 (70%)</span>
+                    <span>ПРОТИ: 13 (30%)</span>
+                </div>
+            </div>
+
+            <div id="vote-actions" style="display:flex; gap:10px; margin-bottom:15px;">
+                <button class="btn btn-success" style="flex:1;" onclick="submitVote('yes')">👍 ЗА</button>
+                <button class="btn btn-danger" style="flex:1;" onclick="submitVote('no')">👎 ПРОТИ</button>
+            </div>
+
+            <button class="btn btn-outline" style="font-size:11px; padding:8px;" onclick="downloadVotePdf()">📄 Завантажити протокол PDF</button>
+        </div>
+    </div>
+</div>
 
     <script>
         // УВАГА: Замініть на свій реальний URL функції з Supabase, якщо він змінився!
