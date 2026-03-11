@@ -439,17 +439,55 @@
                 diffEl.style.color = 'var(--success)';
             }
         }
-
+// ==========================================
+        // 1. ВІДПРАВКА ПОКАЗНИКІВ ЛІЧИЛЬНИКІВ
+        // ==========================================
         async function saveNewMeters() {
-            alert("Показники готові до відправки! Наступним кроком ми підключимо збереження в Supabase.");
+            try {
+                const services = ['ed', 'en', 'w', 'g'];
+                const readingsToSave = [];
+
+                services.forEach(s => {
+                    const input = document.getElementById('new-' + s);
+                    if (input && input.value) {
+                        readingsToSave.push({
+                            user_id: currentTenant.id,
+                            service_type: s,
+                            reading_value: parseFloat(input.value)
+                        });
+                    }
+                });
+
+                if (readingsToSave.length === 0) {
+                    return alert("Будь ласка, введіть хоча б один новий показник.");
+                }
+
+                const { error } = await _supabase.from('meter_readings').insert(readingsToSave);
+                if (error) throw error;
+
+                alert("✅ Показники успішно відправлені та збережені!");
+                
+                services.forEach(s => {
+                    const input = document.getElementById('new-' + s);
+                    if (input) input.value = '';
+                });
+
+            } catch (err) {
+                console.error("Помилка відправки показників:", err);
+                alert("Помилка бази даних: " + err.message);
+            }
         }
-        // --- ЛОГІКА АРХІВУ ---
+
+        // ==========================================
+        // 2. ЛОГІКА АРХІВУ (Виправлена)
+        // ==========================================
+        function renderArchive() {
             const archiveContainer = document.getElementById('archive-list');
+            if (!archiveContainer) return;
             archiveContainer.innerHTML = '';
             
-            // Беремо історію з даних квартири (якщо вона там є)
-            const history = apt.history || [
-                { date: 'Лютий 2026', sum: apt.total_bill, status: 'Не сплачено' },
+            const history = currentTenant?.history || [
+                { date: 'Лютий 2026', sum: currentTenant?.total_bill || '0.00', status: 'Не сплачено' },
                 { date: 'Січень 2026', sum: '1520.00', status: 'Сплачено' }
             ];
 
@@ -465,31 +503,71 @@
                     </div>
                 `);
             });
-        // --- ПОВІДОМЛЕННЯ ---
+        }
+        // Запускаємо архів із затримкою, щоб встигли завантажитися дані мешканця
+        setTimeout(renderArchive, 500);
+
+        // ==========================================
+        // 3. ВІДПРАВКА ПОВІДОМЛЕНЬ
+        // ==========================================
         function toggleAptInput() {
             const recipient = document.getElementById('msg-recipient').value;
             const aptInput = document.getElementById('msg-apt-number');
-            aptInput.style.display = (recipient === 'apt') ? 'block' : 'none';
+            if (aptInput) aptInput.style.display = (recipient === 'apt') ? 'block' : 'none';
         }
 
-        function sendMessage() {
+        async function sendMessage() {
             const text = document.getElementById('msg-text').value.trim();
             const to = document.getElementById('msg-recipient').value;
             const apt = document.getElementById('msg-apt-number').value;
             
             if (!text) return alert("Будь ласка, введіть текст повідомлення!");
             
-            let targetName = (to === 'manager') ? 'Керуючому' : (to === 'all' ? 'Всім мешканцям' : `Кв. ${apt}`);
-            alert(`✅ Відправлено!\nОтримувач: ${targetName}\nТекст: ${text}`);
-            document.getElementById('msg-text').value = '';
+            try {
+                const { error } = await _supabase.from('messages').insert([{
+                    sender_id: currentTenant.id,
+                    recipient_type: to === 'apt' ? 'apt_' + apt : to,
+                    message_text: text
+                }]);
+
+                if (error) throw error;
+
+                let targetName = (to === 'manager') ? 'Керуючому' : (to === 'all' ? 'Всім мешканцям' : 'Кв. ' + apt);
+                alert("✅ Повідомлення відправлено!\\nОтримувач: " + targetName);
+                
+                document.getElementById('msg-text').value = '';
+                if(document.getElementById('msg-apt-number')) document.getElementById('msg-apt-number').value = '';
+            } catch (err) {
+                console.error("Помилка повідомлення:", err);
+                alert("Помилка відправки: " + err.message);
+            }
         }
 
-        // --- ГОЛОСУВАННЯ ---
-        function submitVote(choice) {
-            alert(`Дякуємо! Ваш голос "${choice === 'yes' ? 'ЗА' : 'ПРОТИ'}" враховано.`);
-            // Вимикаємо кнопки після голосування
-            document.getElementById('vote-actions').style.opacity = '0.4';
-            document.getElementById('vote-actions').style.pointerEvents = 'none';
+        // ==========================================
+        // 4. СИСТЕМА ГОЛОСУВАННЯ
+        // ==========================================
+        async function submitVote(choice) {
+            try {
+                const { error } = await _supabase.from('votes').insert([{
+                    user_id: currentTenant.id,
+                    poll_id: 'roof_repair',
+                    choice: choice
+                }]);
+
+                if (error && error.code === '23505') {
+                    return alert("❌ Ви вже проголосували у цьому опитуванні!");
+                } else if (error) {
+                    throw error;
+                }
+
+                alert("✅ Дякуємо! Ваш голос враховано і записано в базу.");
+                
+                document.getElementById('vote-actions').style.opacity = '0.4';
+                document.getElementById('vote-actions').style.pointerEvents = 'none';
+            } catch (err) {
+                console.error("Помилка голосування:", err);
+                alert("Помилка: " + err.message);
+            }
         }
 
         function downloadVotePdf() {
