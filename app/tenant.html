@@ -453,7 +453,7 @@
                 const readingsToSave = [];
 
                 services.forEach(s => {
-                    const input = document.getElementById('new-' + s);
+                    const input = document.getElementById('meter-input-' + s);
                     if (input && input.value) {
                         readingsToSave.push({
                             user_id: currentTenant.id,
@@ -473,7 +473,7 @@
                 alert("✅ Показники успішно відправлені та збережені!");
                 
                 services.forEach(s => {
-                    const input = document.getElementById('new-' + s);
+                    const input = document.getElementById('meter-input-' + s);
                     if (input) input.value = '';
                 });
 
