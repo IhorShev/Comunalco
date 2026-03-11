@@ -226,7 +226,7 @@
 
             if (totalBalance > 0.01) {
                 cardEl.style.borderColor = 'var(--danger)'; lineEl.style.background = 'var(--danger)';
-                labelEl.innerText = 'ПОТОЧНИЙ БОРГ'; debtEl.style.color = 'var(--text)';
+                labelEl.innerText = 'ПОТОЧНИЙ БОРГ'; debtEl.style.color = 'var(--danger)';
             } else if (totalBalance < -0.01) {
                 cardEl.style.borderColor = 'var(--success)'; lineEl.style.background = 'var(--success)';
                 labelEl.innerText = 'ПЕРЕПЛАТА'; debtEl.style.color = 'var(--success)';
