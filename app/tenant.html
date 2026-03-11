@@ -474,24 +474,34 @@
                 `);
             });
         // --- ПОВІДОМЛЕННЯ ---
+        function toggleAptInput() {
+            const recipient = document.getElementById('msg-recipient').value;
+            const aptInput = document.getElementById('msg-apt-number');
+            aptInput.style.display = (recipient === 'apt') ? 'block' : 'none';
+        }
+
         function sendMessage() {
             const text = document.getElementById('msg-text').value.trim();
             const to = document.getElementById('msg-recipient').value;
+            const apt = document.getElementById('msg-apt-number').value;
+            
             if (!text) return alert("Будь ласка, введіть текст повідомлення!");
-
-            alert(`🚀 Повідомлення відправлено!\nКому: ${to === 'manager' ? 'Керуючому' : 'Всім мешканцям'}\nТекст: ${text}`);
+            
+            let targetName = (to === 'manager') ? 'Керуючому' : (to === 'all' ? 'Всім мешканцям' : `Кв. ${apt}`);
+            alert(`✅ Відправлено!\nОтримувач: ${targetName}\nТекст: ${text}`);
             document.getElementById('msg-text').value = '';
         }
 
         // --- ГОЛОСУВАННЯ ---
         function submitVote(choice) {
-            alert(`Ваш голос "${choice === 'yes' ? 'ЗА' : 'ПРОТИ'}" прийнято!`);
-            document.getElementById('voting-content').style.display = 'none';
-            document.getElementById('vote-results').style.display = 'block';
+            alert(`Дякуємо! Ваш голос "${choice === 'yes' ? 'ЗА' : 'ПРОТИ'}" враховано.`);
+            // Вимикаємо кнопки після голосування
+            document.getElementById('vote-actions').style.opacity = '0.4';
+            document.getElementById('vote-actions').style.pointerEvents = 'none';
         }
 
         function downloadVotePdf() {
-            alert("Генерується PDF-звіт з результатами голосування...");
+            alert("Генерується офіційний протокол голосування з підписами... (PDF)");
         }
     </script>
     <div id="payment-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,15,30,0.8); z-index:1000; align-items:center; justify-content:center; padding:20px; box-sizing:border-box; backdrop-filter: blur(5px);">
