@@ -398,5 +398,32 @@
             alert("Показники готові до відправки! Наступним кроком ми підключимо збереження в Supabase.");
         }
     </script>
+    <div id="payment-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,15,30,0.8); z-index:1000; align-items:center; justify-content:center; padding:20px; box-sizing:border-box; backdrop-filter: blur(5px);">
+        <div class="card" style="width:100%; max-width:400px; text-align:center; position:relative;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h3 class="card-title" style="margin:0; font-size:18px;">💳 Оплата послуг</h3>
+                <div style="cursor:pointer; font-size:24px; line-height:1; color:var(--text-sec);" onclick="document.getElementById('payment-modal').style.display='none'">&times;</div>
+            </div>
+
+            <div style="font-size:14px; color:var(--text-sec); margin-bottom:20px;">
+                Сума до сплати: <br>
+                <b style="font-size:36px; color:var(--text); font-family:'Montserrat', sans-serif;"><span id="pay-amount">0.00</span> <span style="font-size: 20px;">₴</span></b>
+            </div>
+
+            <div style="background:white; padding:15px; border-radius:15px; display:inline-block; margin-bottom:20px;">
+                <img id="pay-qr" src="" alt="Банківський QR Code" style="width:200px; height:200px; display:block;">
+            </div>
+
+            <div style="font-size:12px; color:var(--text-sec); margin-bottom:15px; text-align:left; background:rgba(0,0,0,0.2); padding:10px; border-radius:10px;">
+                <div style="margin-bottom:5px;"><b>Отримувач:</b> <span id="pay-receiver">ОСББ (завантаження...)</span></div>
+                <div style="margin-bottom:5px;"><b>IBAN:</b> <span id="pay-iban" style="user-select:all; font-family:monospace;">UA...</span></div>
+                <div><b>Призначення:</b> <span id="pay-purpose">Оплата послуг</span></div>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <button class="btn" style="background:var(--card); color:var(--text); border:1px solid var(--border);" onclick="copyIban()">📋 Скопіювати IBAN</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
