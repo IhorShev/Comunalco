@@ -79,109 +79,101 @@
 
         <div class="dashboard-grid">
             
-            <div class="card" id="balance-card" style="border-color:var(--danger); overflow:hidden;">
-                <div id="balance-line" style="position:absolute; top:0; left:0; width:100%; height:4px; background:var(--danger);"></div>
+           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; align-items: start; margin-bottom: 30px;">
+
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+            <div class="card" id="balance-card" style="border-top: 4px solid var(--border); position: relative; overflow: hidden; margin-bottom: 0;">
                 <h3 class="card-title">💰 Ваш баланс</h3>
-                <div style="text-align:center; flex-grow:1; display:flex; flex-direction:column; justify-content:center; margin-bottom: 20px;">
-                    <div id="balance-label" style="font-size:12px; color:var(--text-sec); text-transform:uppercase; font-weight:bold; margin-bottom:5px;">Поточний борг</div>
-                    <div style="font-size:42px; font-weight:900; font-family:'Montserrat', sans-serif; color:var(--text); margin-bottom:5px;">
-                        <span id="dash-debt">0.00</span><span style="font-size:20px; color:var(--text-sec);"> ₴</span>
-                    </div>
+                <div id="balance-label" style="text-align:center; font-size:12px; color:var(--text-sec); text-transform:uppercase; font-weight:bold; margin-bottom:5px;">ЗАВАНТАЖЕННЯ...</div>
+                <div style="text-align:center; font-size:42px; font-weight:900; font-family:'Montserrat', sans-serif; margin-bottom:15px;">
+                    <span id="dash-debt">0.00</span> <span style="font-size:20px; color:var(--text-sec);">₴</span>
                 </div>
                 <div style="display:flex; gap:10px;">
-                    <button class="btn btn-success" style="flex:3;" onclick="payOnline()">💳 Сплатити в 1 клік</button>
-                    <button class="btn btn-outline" style="flex:1; padding:0;" title="QR для оплати" onclick="payOnline()">QR</button>
+                    <button class="btn btn-success" style="flex:1; display:flex; align-items:center; justify-content:center; gap:10px;" onclick="payOnline()">
+                        <span style="font-size:18px;">💳</span> Сплатити в 1 клік
+                    </button>
+                    <button class="btn btn-outline" style="width:60px; padding:0;" title="QR для оплати" onclick="payOnline()">QR</button>
                 </div>
+                <div id="balance-line" style="position:absolute; bottom:0; left:0; width:100%; height:4px; background:var(--border);"></div>
             </div>
 
-            <div class="card">
+            <div class="card" style="margin-bottom: 0; flex-grow: 1; display: flex; flex-direction: column;">
                 <h3 class="card-title">⚡ Подані показники</h3>
-                
-                <div id="meters-container" style="display:flex; flex-direction:column; gap:12px; margin-bottom:15px;">
-                    </div>
-                
+                <div id="meters-container" style="display:flex; flex-direction:column; gap:12px; margin-bottom:15px; flex-grow: 1;"></div>
                 <div id="submit-permission-block" style="margin-top: auto;">
                     <p id="submit-status-text" style="font-size: 11px; color: var(--text-sec); text-align: center; margin-bottom: 10px;"></p>
-                    <button id="btn-submit-readings" class="btn btn-primary" style="display:none;" onclick="saveNewMeters()">🚀 Відправити показники</button>
+                    <button id="btn-submit-readings" class="btn btn-primary" style="display:none; width: 100%;" onclick="saveNewMeters()">🚀 Відправити показники</button>
                 </div>
             </div>
+        </div>
 
-            <div class="card">
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+            <div class="card" style="margin-bottom: 0;">
                 <h3 class="card-title">📊 Аналітика споживання</h3>
-                
                 <div style="display:flex; gap:10px; margin-bottom:15px;">
-                    <select id="analytics-service" style="margin-bottom:0;" onchange="updateAnalytics()">
+                    <select id="analytics-service" style="margin-bottom:0; flex:1;" onchange="updateAnalytics()">
                         <option value="ed">Е/Е (День)</option>
                         <option value="en">Е/Е (Ніч)</option>
-                        <option value="w">Вода (м³)</option>
-                        <option value="g">Газ (м³)</option>
+                        <option value="w">Вода</option>
+                        <option value="g">Газ</option>
                     </select>
-                    <select id="analytics-period" style="margin-bottom:0;" onchange="updateAnalytics()">
+                    <select id="analytics-period" style="margin-bottom:0; flex:1;" onchange="updateAnalytics()">
                         <option value="1">За місяць</option>
                         <option value="3">За 3 місяці</option>
                         <option value="6">За півроку</option>
-                        <option value="12">За рік</option>
                     </select>
                 </div>
-
-                <div id="analytics-chart" style="flex-grow:1; display:flex; align-items:flex-end; justify-content:space-between; padding: 15px 10px 0 10px; height: 120px; border-bottom: 2px solid var(--border); margin-bottom: 10px;">
-                    </div>
-                
-                <div id="analytics-legend" style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-sec); text-align:center;">
-                    </div>
+                <div id="analytics-chart" style="height: 120px; display:flex; align-items:flex-end; gap:5px; padding-top:20px; border-bottom:1px solid var(--border); margin-bottom:10px;"></div>
+                <div id="analytics-legend" style="display:flex; justify-content:space-between; font-size:10px; color:var(--text-sec); text-transform:uppercase;"></div>
             </div>
 
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; align-items: stretch; margin-top: 20px;">
-    
-    <div class="card" style="display: flex; flex-direction: column;">
-        <h3 class="card-title">📄 Архів квитанцій</h3>
-        <div id="archive-list" style="flex-grow: 1; overflow-y: auto; max-height: 350px; padding-right: 5px;">
+            <div class="card" style="margin-bottom: 0; flex-grow: 1; display: flex; flex-direction: column;">
+                <h3 class="card-title">📄 Архів квитанцій</h3>
+                <div id="archive-list" style="flex-grow: 1; overflow-y: auto; max-height: 350px; padding-right: 5px;"></div>
             </div>
-    </div>
-
-    <div class="card" style="display: flex; flex-direction: column;">
-        <h3 class="card-title">💬 Написати повідомлення</h3>
-        <label style="font-size:11px; color:var(--text-sec); margin-bottom:5px;">Отримувач:</label>
-        <select id="msg-recipient" style="margin-bottom:10px;" onchange="toggleAptInput()">
-            <option value="manager">👑 Керуючому (Особисто)</option>
-            <option value="all">👥 Всім мешканцям (Чат будинку)</option>
-            <option value="apt">🚪 Конкретній квартирі...</option>
-        </select>
-        
-        <input type="number" id="msg-apt-number" placeholder="№ квартири" style="display:none; margin-bottom:10px; background:rgba(0,0,0,0.2);">
-
-        <textarea id="msg-text" placeholder="Ваше запитання або скарга..." rows="4" style="resize:none; flex-grow:1; margin-bottom:10px; background:rgba(0,0,0,0.3); border:1px solid var(--border); color:var(--text); padding:10px; border-radius:10px;"></textarea>
-        <button class="btn btn-primary" onclick="sendMessage()">🚀 Відправити</button>
-    </div>
-
-    <div class="card" style="display: flex; flex-direction: column;">
-        <h3 class="card-title">🗳 Активне голосування</h3>
-        <div id="voting-area" style="flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between;">
-            <div id="vote-info">
-                <div style="font-size:15px; font-weight:bold; margin-bottom:8px;">Ремонт даху (Збір по 500 грн)</div>
-                <div style="font-size:12px; color:var(--text-sec); margin-bottom:15px;">
-                    Проголосувало: <b>45</b> з <b>60</b> (75%)
-                </div>
-                
-                <div style="display: flex; width: 100%; height: 12px; border-radius: 6px; overflow: hidden; margin-bottom: 5px; background: #333;">
-                    <div id="vote-bar-yes" style="width: 70%; background: var(--success); transition: width 0.5s;"></div>
-                    <div id="vote-bar-no" style="width: 30%; background: var(--danger); transition: width 0.5s;"></div>
-                </div>
-                <div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--text-sec); margin-bottom: 20px;">
-                    <span>ЗА: 32 (70%)</span>
-                    <span>ПРОТИ: 13 (30%)</span>
-                </div>
-            </div>
-
-            <div id="vote-actions" style="display:flex; gap:10px; margin-bottom:15px;">
-                <button class="btn btn-success" style="flex:1;" onclick="submitVote('yes')">👍 ЗА</button>
-                <button class="btn btn-danger" style="flex:1;" onclick="submitVote('no')">👎 ПРОТИ</button>
-            </div>
-
-            <button class="btn btn-outline" style="font-size:11px; padding:8px;" onclick="downloadVotePdf()">📄 Завантажити протокол PDF</button>
         </div>
-    </div>
-</div>
+
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+            <div class="card" style="margin-bottom: 0;">
+                <h3 class="card-title">💬 Написати повідомлення</h3>
+                <label style="font-size:11px; color:var(--text-sec); margin-bottom:5px;">Отримувач:</label>
+                <select id="msg-recipient" style="margin-bottom:10px;" onchange="toggleAptInput()">
+                    <option value="manager">👑 Керуючому (Особисто)</option>
+                    <option value="all">👥 Всім мешканцям (Чат будинку)</option>
+                    <option value="apt">🚪 Конкретній квартирі...</option>
+                </select>
+                <input type="number" id="msg-apt-number" placeholder="№ квартири" style="display:none; margin-bottom:10px; background:rgba(0,0,0,0.2);">
+                <textarea id="msg-text" placeholder="Ваше запитання або скарга..." rows="3" style="resize:none; width: 100%; box-sizing: border-box; margin-bottom:10px; background:rgba(0,0,0,0.3); border:1px solid var(--border); color:var(--text); padding:10px; border-radius:10px;"></textarea>
+                <button class="btn btn-primary" onclick="sendMessage()">🚀 Відправити</button>
+            </div>
+
+            <div class="card" style="margin-bottom: 0; flex-grow: 1; display: flex; flex-direction: column;">
+                <h3 class="card-title">🗳 Активне голосування</h3>
+                <div id="voting-area" style="flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div id="vote-info">
+                        <div style="font-size:15px; font-weight:bold; margin-bottom:8px;">Ремонт даху (Збір по 500 грн)</div>
+                        <div style="font-size:12px; color:var(--text-sec); margin-bottom:15px;">
+                            Проголосувало: <b>45</b> з <b>60</b> (75%)
+                        </div>
+                        <div style="display: flex; width: 100%; height: 12px; border-radius: 6px; overflow: hidden; margin-bottom: 5px; background: #333;">
+                            <div id="vote-bar-yes" style="width: 70%; background: var(--success); transition: width 0.5s;"></div>
+                            <div id="vote-bar-no" style="width: 30%; background: var(--danger); transition: width 0.5s;"></div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--text-sec); margin-bottom: 20px;">
+                            <span>ЗА: 32 (70%)</span>
+                            <span>ПРОТИ: 13 (30%)</span>
+                        </div>
+                    </div>
+                    <div id="vote-actions" style="display:flex; gap:10px; margin-bottom:15px;">
+                        <button class="btn btn-success" style="flex:1;" onclick="submitVote('yes')">👍 ЗА</button>
+                        <button class="btn btn-danger" style="flex:1;" onclick="submitVote('no')">👎 ПРОТИ</button>
+                    </div>
+                    <button class="btn btn-outline" style="font-size:11px; padding:8px;" onclick="downloadVotePdf()">📄 Завантажити протокол PDF</button>
+                </div>
+            </div>
+        </div>
+
+    </div> 
 
     <script>
         // УВАГА: Замініть на свій реальний URL функції з Supabase, якщо він змінився!
