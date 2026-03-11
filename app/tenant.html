@@ -213,7 +213,7 @@
             
             // 2. БАЛАНС
             const oldDebt = parseFloat(apt.debt || 0);
-            const currentBill = parseFloat(apt.bill || 0);
+            const currentBill = parseFloat(apt.total_bill || 0);
             const paid = parseFloat(apt.paid || 0);
             const totalBalance = (oldDebt + currentBill) - paid;
 
