@@ -363,7 +363,7 @@
             if (!currentTenant) return;
 
             const oldDebt = parseFloat(currentTenant.debt || 0);
-            const currentBill = parseFloat(currentTenant.bill || 0);
+            const currentBill = parseFloat(currentTenant.total_bill || 0);
             const paid = parseFloat(currentTenant.paid || 0);
             const totalBalance = (oldDebt + currentBill) - paid;
 
