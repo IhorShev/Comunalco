@@ -132,38 +132,54 @@
             </div>
 
             <div class="card">
-                <h3 class="card-title">📄 Архів квитанцій <span style="font-size:10px; font-weight:normal; color:var(--warning);">(Демо)</span></h3>
-                <div style="flex-grow:1; overflow-y:auto; max-height: 200px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--border);">
-                        <div><div style="font-size:13px; font-weight:bold;">Поточний місяць</div><div style="font-size:11px; color:var(--text-sec);">В процесі формування...</div></div>
-                        <button class="btn btn-outline" style="width:auto; padding:5px 10px; font-size:11px;" disabled>PDF</button>
+                <h3 class="card-title">📄 Архів квитанцій</h3>
+                <div id="archive-list" style="flex-grow:1; overflow-y:auto; max-height: 250px; padding-right: 5px;">
                     </div>
-                    <div style="text-align:center; margin-top:30px; color:var(--text-sec); font-size:12px;">Історія порожня</div>
-                </div>
             </div>
 
             <div class="card">
-                <h3 class="card-title">💬 Повідомлення / Чат <span style="font-size:10px; font-weight:normal; color:var(--warning);">(Демо)</span></h3>
-                <label style="font-size:11px; color:var(--text-sec); margin-bottom:5px; display:block;">Кому відправити:</label>
-                <select>
-                    <option>👑 Керуючому (Особисто)</option>
-                    <option>Всі мешканці будинку</option>
+                <h3 class="card-title">💬 Повідомлення Керуючому</h3>
+                <label style="font-size:11px; color:var(--text-sec); margin-bottom:5px; display:block;">Отримувач:</label>
+                <select id="msg-recipient" style="margin-bottom:10px;">
+                    <option value="manager">👑 Керуючому (Особисто)</option>
+                    <option value="all">👥 Всім мешканцям (Чат будинку)</option>
                 </select>
-                <textarea placeholder="Напишіть ваше повідомлення..." rows="3" style="resize:none; flex-grow:1;"></textarea>
-                <button class="btn">🚀 Відправити</button>
+                <textarea id="msg-text" placeholder="Напишіть ваше питання або скаргу..." rows="3" style="resize:none; flex-grow:1; margin-bottom:10px; background:rgba(0,0,0,0.3); border:1px solid var(--border); color:var(--text); padding:10px; border-radius:10px;"></textarea>
+                <button class="btn" onclick="sendMessage()">🚀 Відправити повідомлення</button>
             </div>
 
-            <div class="card">
-                <h3 class="card-title">🗳 Активне голосування <span style="font-size:10px; font-weight:normal; color:var(--warning);">(Демо)</span></h3>
-                <div style="font-size:14px; font-weight:bold; margin-bottom:5px;">Ремонт даху (Збір по 500 грн)</div>
-                <div style="font-size:12px; color:var(--text-sec); margin-bottom:15px; flex-grow:1;">Пропонується найняти бригаду для заміни руберойду.</div>
-                
-                <div style="display:flex; gap:10px;">
-                    <button class="btn btn-success">👍 ЗА</button>
-                    <button class="btn btn-danger">👎 ПРОТИ</button>
+            <div class="card" id="voting-block">
+                <h3 class="card-title">🗳 Активне голосування</h3>
+                <div id="voting-content">
+                    <div id="vote-title" style="font-size:15px; font-weight:bold; margin-bottom:8px;">Ремонт даху (Збір по 500 грн)</div>
+                    <div id="vote-desc" style="font-size:12px; color:var(--text-sec); margin-bottom:20px; line-height:1.4;">
+                        Пропонується найняти бригаду для заміни руберойду над 2-м під'їздом.
+                    </div>
+                    
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn btn-success" style="flex:1;" onclick="submitVote('yes')">👍 ЗА</button>
+                        <button class="btn btn-danger" style="flex:1;" onclick="submitVote('no')">👎 ПРОТИ</button>
+                    </div>
+                </div>
+
+                <div id="vote-results" style="display:none;">
+                    <div style="font-size:13px; font-weight:bold; margin-bottom:15px; color:var(--success);">Дякуємо! Ваш голос враховано.</div>
+                    <div style="margin-bottom:10px;">
+                        <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:5px;"><span>ЗА (75%)</span><span>15 гол.</span></div>
+                        <div style="width:100%; height:8px; background:var(--border); border-radius:4px; overflow:hidden;">
+                            <div style="width:75%; height:100%; background:var(--success);"></div>
+                        </div>
+                    </div>
+                    <div style="margin-bottom:20px;">
+                        <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:5px;"><span>ПРОТИ (25%)</span><span>5 гол.</span></div>
+                        <div style="width:100%; height:8px; background:var(--border); border-radius:4px; overflow:hidden;">
+                            <div style="width:25%; height:100%; background:var(--danger);"></div>
+                        </div>
+                    </div>
+                    <button class="btn btn-outline" style="font-size:12px;" onclick="downloadVotePdf()">📄 Завантажити звіт PDF</button>
                 </div>
             </div>
-
+            
         </div> 
     </div>
 
