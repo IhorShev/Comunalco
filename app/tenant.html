@@ -123,20 +123,28 @@
             </div>
 
             <div class="card">
-                <h3 class="card-title">📊 Аналітика споживання <span style="font-size:10px; font-weight:normal; color:var(--warning);">(Демо)</span></h3>
-                <select>
-                    <option>Електроенергія (Місяць)</option>
-                    <option>Вода (Місяць)</option>
-                    <option>Газ (Місяць)</option>
-                </select>
-                <div style="flex-grow:1; display:flex; align-items:center; justify-content:center; border: 1px dashed var(--border); border-radius: 10px; background:rgba(0,0,0,0.1); margin-bottom: 10px; min-height: 120px;">
-                    <span style="color:var(--text-sec); font-size:12px;">Тут буде графік порівняння</span>
+                <h3 class="card-title">📊 Аналітика споживання</h3>
+                
+                <div style="display:flex; gap:10px; margin-bottom:15px;">
+                    <select id="analytics-service" style="margin-bottom:0;" onchange="updateAnalytics()">
+                        <option value="ed">Е/Е (День)</option>
+                        <option value="en">Е/Е (Ніч)</option>
+                        <option value="w">Вода (м³)</option>
+                        <option value="g">Газ (м³)</option>
+                    </select>
+                    <select id="analytics-period" style="margin-bottom:0;" onchange="updateAnalytics()">
+                        <option value="1">За місяць</option>
+                        <option value="3">За 3 місяці</option>
+                        <option value="6">За півроку</option>
+                        <option value="12">За рік</option>
+                    </select>
                 </div>
-                <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-sec);">
-                    <div>Мін. по буд: <b>0</b></div>
-                    <div>Середнє: <b>0</b></div>
-                    <div>Макс: <b>0</b></div>
-                </div>
+
+                <div id="analytics-chart" style="flex-grow:1; display:flex; align-items:flex-end; justify-content:space-between; padding: 15px 10px 0 10px; height: 120px; border-bottom: 2px solid var(--border); margin-bottom: 10px;">
+                    </div>
+                
+                <div id="analytics-legend" style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-sec); text-align:center;">
+                    </div>
             </div>
 
             <div class="card">
