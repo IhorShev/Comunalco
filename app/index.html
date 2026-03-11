@@ -1797,35 +1797,27 @@ class App {
                     <button class="btn btn-add" onclick="app.addAS(${i})">+ Послуга</button>
                 </div>
 
-                <div style="margin-top:20px; padding:15px; background:rgba(0,0,0,0.03); border-radius:12px; border:1px solid var(--border);">
-                    <div class="finance-grid">
-                        <div class="debt-col">
-                            <label style="font-size:10px; text-transform:uppercase; color:var(--text-sec);">Борг / Переплата</label>
-                            <input type="number" step="0.01" value="${Number(parseFloat(a.debt||0).toFixed(2))}" 
-                                style="border: 1px solid ${Math.abs(parseFloat(a.debt||0)) < 0.01 ? 'var(--border)' : (parseFloat(a.debt||0) > 0 ? 'var(--danger)' : 'var(--success)')}; 
-                                       color: ${Math.abs(parseFloat(a.debt||0)) < 0.01 ? 'var(--text)' : (parseFloat(a.debt||0) > 0 ? 'var(--danger)' : 'var(--success)')}; 
-                                       font-weight:bold; text-align:center; font-size:16px; width:100%; box-sizing:border-box;" 
-                                onchange="app.updateApt(${i},'debt',this.value)"
-                                oninput="this.style.color = this.value > 0.01 ? 'var(--danger)' : (this.value < -0.01 ? 'var(--success)' : 'var(--text)'); this.style.borderColor = Math.abs(this.value) < 0.01 ? 'var(--border)' : this.style.color;">
-                        </div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-top:20px; background:rgba(0,15,30,0.3); padding:15px; border-radius:12px; border:1px solid rgba(255,255,255,0.05);">
+    <div>
+        <div style="font-size:10px; color:var(--text-sec); text-transform:uppercase; margin-bottom:5px; font-weight:bold;">Борг / Переплата</div>
+        <input type="number" step="0.01" value="${a.debt || ''}" placeholder="0" style="background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:8px; padding:10px; font-size:15px; font-weight:bold; color:${(parseFloat(a.debt)||0) < 0 ? 'var(--success)' : 'var(--text)'}; width:100%; box-sizing:border-box;" onchange="app.updateAptData(${i}, 'debt', this.value)">
+    </div>
+    <div>
+        <div style="font-size:10px; color:var(--text-sec); text-transform:uppercase; margin-bottom:5px; font-weight:bold;">Поточний місяць</div>
+        <div id="live-bill-${i}" style="background:rgba(0,0,0,0.2); border:1px solid var(--border); border-radius:8px; padding:10px; font-size:15px; font-weight:bold; color:var(--text); width:100%; box-sizing:border-box; text-align:center;">${(a.bill || 0).toFixed(2)}</div>
+    </div>
 
-                        <div>
-                            <label style="font-size:10px; text-transform:uppercase; color:var(--text-sec);">Поточний місяць</label>
-                            <div id="live-bill-${i}" style="font-size:16px; font-weight:bold; background:var(--bg); border-radius:12px; text-align:center; border:1px solid var(--border); display:flex; align-items:center; justify-content:center; height:45px; box-sizing:border-box; color:var(--text);">
-                                ${currentBill.toFixed(2)}
-                            </div>
-                        </div>
-
-                        <div>
-                            <label style="font-size:10px; text-transform:uppercase; color:var(--text-sec);">Сплачено</label>
-                            <input type="number" step="0.01" value="${Number(parseFloat(a.paid||0).toFixed(2))}" 
-                                style="border: 1px solid ${parseFloat(a.paid||0) > 0.01 ? 'var(--success)' : 'var(--border)'}; 
-                                       color: ${parseFloat(a.paid||0) > 0.01 ? 'var(--success)' : 'var(--text)'}; 
-                                       font-weight:bold; text-align:center; font-size:16px; width:100%; box-sizing:border-box;" 
-                                oninput="app.updateApt(${i},'paid',this.value); this.style.color = this.value > 0.01 ? 'var(--success)' : 'var(--text)'; this.style.borderColor = this.value > 0.01 ? 'var(--success)' : 'var(--border)';">
-                        </div>
-                    </div>
-                </div>
+    <div>
+        <div style="font-size:10px; color:var(--text-sec); text-transform:uppercase; margin-bottom:5px; font-weight:bold;">Сплачено</div>
+        <input type="number" step="0.01" value="${a.paid || ''}" placeholder="0" style="background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:8px; padding:10px; font-size:15px; font-weight:bold; color:var(--success); width:100%; box-sizing:border-box;" onchange="app.updateAptData(${i}, 'paid', this.value)">
+    </div>
+    <div>
+        <div style="font-size:10px; color:var(--text-sec); text-transform:uppercase; margin-bottom:5px; font-weight:bold;">До сплати</div>
+        <div style="background:rgba(0,0,0,0.4); border:1px solid var(--border); border-radius:8px; padding:10px; font-size:15px; font-weight:bold; color:var(--text); width:100%; box-sizing:border-box; text-align:center;">
+            ${Math.abs(parseFloat(a.debt || 0) + parseFloat(a.bill || 0) - parseFloat(a.paid || 0)).toFixed(2)}
+        </div>
+    </div>
+</div>
 
                 <div style="margin-top: 15px; margin-bottom: 10px; padding: 10px; background: ${a.can_submit_readings ? 'rgba(34, 197, 94, 0.1)' : 'rgba(0,0,0,0.03)'}; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--border);">
                     <label style="font-size: 12px; font-weight: bold; color: var(--text); cursor: pointer; margin: 0;">
@@ -3460,6 +3452,7 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
+
 
 
 
