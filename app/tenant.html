@@ -451,6 +451,48 @@
         async function saveNewMeters() {
             alert("Показники готові до відправки! Наступним кроком ми підключимо збереження в Supabase.");
         }
+        // --- ЛОГІКА АРХІВУ ---
+            const archiveContainer = document.getElementById('archive-list');
+            archiveContainer.innerHTML = '';
+            
+            // Беремо історію з даних квартири (якщо вона там є)
+            const history = apt.history || [
+                { date: 'Лютий 2026', sum: apt.total_bill, status: 'Не сплачено' },
+                { date: 'Січень 2026', sum: '1520.00', status: 'Сплачено' }
+            ];
+
+            history.forEach(item => {
+                const isPaid = item.status === 'Сплачено';
+                archiveContainer.insertAdjacentHTML('beforeend', `
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid var(--border);">
+                        <div>
+                            <div style="font-size:13px; font-weight:bold;">${item.date}</div>
+                            <div style="font-size:11px; color:${isPaid ? 'var(--success)' : 'var(--warning)'};">${item.status}: ${item.sum} ₴</div>
+                        </div>
+                        <button class="btn btn-outline" style="width:auto; padding:6px 12px; font-size:11px;" onclick="alert('Завантаження PDF...')">PDF</button>
+                    </div>
+                `);
+            });
+        // --- ПОВІДОМЛЕННЯ ---
+        function sendMessage() {
+            const text = document.getElementById('msg-text').value.trim();
+            const to = document.getElementById('msg-recipient').value;
+            if (!text) return alert("Будь ласка, введіть текст повідомлення!");
+
+            alert(`🚀 Повідомлення відправлено!\nКому: ${to === 'manager' ? 'Керуючому' : 'Всім мешканцям'}\nТекст: ${text}`);
+            document.getElementById('msg-text').value = '';
+        }
+
+        // --- ГОЛОСУВАННЯ ---
+        function submitVote(choice) {
+            alert(`Ваш голос "${choice === 'yes' ? 'ЗА' : 'ПРОТИ'}" прийнято!`);
+            document.getElementById('voting-content').style.display = 'none';
+            document.getElementById('vote-results').style.display = 'block';
+        }
+
+        function downloadVotePdf() {
+            alert("Генерується PDF-звіт з результатами голосування...");
+        }
     </script>
     <div id="payment-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,15,30,0.8); z-index:1000; align-items:center; justify-content:center; padding:20px; box-sizing:border-box; backdrop-filter: blur(5px);">
         <div class="card" style="width:100%; max-width:400px; text-align:center; position:relative;">
