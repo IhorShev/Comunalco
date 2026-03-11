@@ -491,6 +491,8 @@
         // 2. ЛОГІКА АРХІВУ (Читання з бази)
         // ==========================================
         async function loadArchive() {
+            if (!currentTenant) return;
+            
             const archiveContainer = document.getElementById('archive-list');
             if (!archiveContainer) return;
             
