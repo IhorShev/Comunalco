@@ -368,6 +368,35 @@
             document.getElementById('dashboard-screen').style.display = 'none';
             document.getElementById('login-pin').value = '';
         }
+        // --- ЛОГІКА КАЛЬКУЛЯТОРА ПОКАЗНИКІВ ---
+        function calcMeterDiff(id, currentVal) {
+            const inputEl = document.getElementById(`meter-input-${id}`);
+            const diffEl = document.getElementById(`meter-diff-${id}`);
+            const newVal = parseFloat(inputEl.value);
+            
+            // Якщо поле пусте
+            if (isNaN(newVal)) {
+                diffEl.innerText = `0`;
+                diffEl.style.color = 'var(--text-sec)';
+                return;
+            }
+            
+            const diff = newVal - currentVal;
+            
+            // Якщо ввели менше, ніж було (помилка)
+            if (diff < 0) {
+                diffEl.innerText = 'Помилка';
+                diffEl.style.color = 'var(--danger)';
+            } else {
+                // Все добре
+                diffEl.innerText = `+${diff.toFixed(1).replace('.0', '')}`;
+                diffEl.style.color = 'var(--success)';
+            }
+        }
+
+        async function saveNewMeters() {
+            alert("Показники готові до відправки! Наступним кроком ми підключимо збереження в Supabase.");
+        }
     </script>
 </body>
 </html>
