@@ -273,8 +273,72 @@
                 statusText.innerText = "* Керуючий обмежив прийом нових показників";
                 statusText.style.color = "var(--text-sec)";
             }
+        updateAnalytics();
         }
+// --- ЛОГІКА АНАЛІТИКИ ---
+        function updateAnalytics() {
+            const service = document.getElementById('analytics-service').value;
+            const period = document.getElementById('analytics-period').value;
+            const chart = document.getElementById('analytics-chart');
+            const legend = document.getElementById('analytics-legend');
 
+            if (!currentTenant) return;
+
+            // 1. Беремо РЕАЛЬНІ показники цієї квартири з пам'яті
+            const prev = currentTenant.current_data?.prev || {};
+            const curr = currentTenant.current_data?.curr || {};
+            
+            // Рахуємо скільки людина спожила за місяць (Поточні - Попередні)
+            let myConsumption = (parseFloat(curr[service]) || 0) - (parseFloat(prev[service]) || 0);
+            if (myConsumption < 0) myConsumption = 0;
+
+            // 2. ДЕМО-ДАНІ БУДИНКУ (Тимчасово, поки не підключимо бекенд)
+            // Множимо на період (місяці), щоб графік реагував на зміну селектора
+            const multiplier = parseInt(period);
+            myConsumption = myConsumption * multiplier; 
+            
+            let minVal = Math.floor(myConsumption * 0.3); // Хтось не жив
+            let avgVal = Math.floor(myConsumption * 1.2); // Середнє по будинку
+            let maxVal = Math.floor(myConsumption * 2.5); // Хтось майнить біткоїни :)
+
+            // Якщо у нас нуль, даємо штучні дані для краси графіка
+            if (myConsumption === 0) {
+                myConsumption = 150 * multiplier; minVal = 50 * multiplier; avgVal = 200 * multiplier; maxVal = 400 * multiplier;
+            }
+
+            // Шукаємо найбільше число, щоб вирахувати 100% висоти стовпчика
+            const maxScale = Math.max(minVal, myConsumption, avgVal, maxVal) * 1.1;
+
+            const bars = [
+                { label: 'Мін.', val: minVal, color: 'var(--text-sec)' },
+                { label: 'ВИ', val: myConsumption, color: 'var(--primary)' },
+                { label: 'Середнє', val: avgVal, color: 'var(--success)' },
+                { label: 'Макс.', val: maxVal, color: 'var(--danger)' }
+            ];
+
+            // 3. Малюємо графік
+            chart.innerHTML = '';
+            legend.innerHTML = '';
+
+            bars.forEach(b => {
+                const heightPct = maxScale > 0 ? (b.val / maxScale) * 100 : 0;
+                
+                // Стовпчик з анімацією
+                chart.insertAdjacentHTML('beforeend', `
+                    <div style="display:flex; flex-direction:column; align-items:center; width:20%;">
+                        <div style="font-size:11px; margin-bottom:5px; font-weight:bold; color:${b.color}">${b.val}</div>
+                        <div style="width:100%; height:${heightPct}%; background:${b.color}; border-radius:4px 4px 0 0; transition: height 0.6s ease-out;"></div>
+                    </div>
+                `);
+
+                // Підпис
+                const isMe = b.label === 'ВИ';
+                legend.insertAdjacentHTML('beforeend', `
+                    <div style="width:20%; ${isMe ? 'color:var(--primary); font-weight:bold;' : ''}">${b.label}</div>
+                `);
+            });
+        }
+        
         function payOnline() {
             alert("Тут буде генерація платіжного посилання або відкриття банківського додатку за реквізитами будинку.");
         }
