@@ -235,25 +235,60 @@
                 labelEl.innerText = 'ДО СПЛАТИ'; debtEl.style.color = 'var(--text)';
             }
 
-            // 3. ПОКАЗНИКИ
+            // 3. РОЗУМНІ ПОКАЗНИКИ
+            const prev = apt.current_data?.prev || {ed:0, en:0, w:0, g:0};
             const curr = apt.current_data?.curr || {ed:0, en:0, w:0, g:0};
-            document.getElementById('meter-ed').innerText = curr.ed || 0;
-            document.getElementById('meter-en').innerText = curr.en || 0;
-            document.getElementById('meter-w').innerText = curr.w || 0;
-            document.getElementById('meter-g').innerText = curr.g || 0;
+            const canSubmit = (apt.can_submit_readings === true || apt.can_submit_readings === 'true');
 
-            // Логіка дозволу передачі показників
+            const metersList = [
+                { id: 'ed', name: 'Е/Е (День)', unit: 'кВт·год' },
+                { id: 'en', name: 'Е/Е (Ніч)', unit: 'кВт·год' },
+                { id: 'w', name: 'Вода', unit: 'м³' },
+                { id: 'g', name: 'Газ', unit: 'м³' }
+            ];
+
+            const metersContainer = document.getElementById('meters-container');
+            metersContainer.innerHTML = ''; // Очищаємо перед малюванням
+
+            metersList.forEach(m => {
+                const valPrev = prev[m.id] || 0;
+                const valCurr = curr[m.id] || 0;
+                
+                // Якщо є дозвіл — малюємо поле вводу
+                let inputHTML = '';
+                if (canSubmit) {
+                    inputHTML = `
+                        <div style="display:flex; align-items:center; gap:10px; margin-top:10px; border-top:1px dashed rgba(255,255,255,0.1); padding-top:10px;">
+                            <input type="number" id="meter-input-${m.id}" placeholder="Новий показник..." style="margin:0; flex:1; padding:10px; font-size:14px; background:rgba(0,0,0,0.4);" oninput="calcMeterDiff('${m.id}', ${valCurr})">
+                            <div id="meter-diff-${m.id}" style="width:50px; font-size:13px; font-weight:bold; color:var(--text-sec); text-align:right;">0</div>
+                        </div>
+                    `;
+                }
+
+                metersContainer.insertAdjacentHTML('beforeend', `
+                    <div style="background:rgba(0,0,0,0.2); border:1px solid var(--border); border-radius:12px; padding:12px;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:5px; align-items:center;">
+                            <span style="font-size:13px; font-weight:bold;">${m.name}</span>
+                            <span style="font-size:11px; color:var(--text-sec);">Попер: <b style="color:var(--text);">${valPrev}</b></span>
+                        </div>
+                        <div style="font-size:22px; font-weight:900; font-family:'Montserrat', sans-serif; color:var(--primary);">
+                            ${valCurr} <span style="font-size:11px; font-weight:normal; color:var(--text-sec);">${m.unit}</span>
+                        </div>
+                        ${inputHTML}
+                    </div>
+                `);
+            });
+
+            // Налаштування кнопки збереження
             const btnSubmit = document.getElementById('btn-submit-readings');
             const statusText = document.getElementById('submit-status-text');
             
-            if (apt.can_submit_readings === true || apt.can_submit_readings === 'true') {
-                btnSubmit.disabled = false;
-                btnSubmit.className = "btn btn-primary";
-                statusText.innerText = "* Зараз ви можете внести нові показники";
+            if (canSubmit) {
+                btnSubmit.style.display = 'block';
+                statusText.innerText = "* Впишіть нові цифри та натисніть кнопку відправки";
                 statusText.style.color = "var(--success)";
             } else {
-                btnSubmit.disabled = true;
-                btnSubmit.className = "btn btn-outline";
+                btnSubmit.style.display = 'none';
                 statusText.innerText = "* Керуючий обмежив прийом нових показників";
                 statusText.style.color = "var(--text-sec)";
             }
