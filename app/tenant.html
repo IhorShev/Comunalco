@@ -488,33 +488,56 @@
         }
 
         // ==========================================
-        // 2. ЛОГІКА АРХІВУ (Виправлена)
+        // 2. ЛОГІКА АРХІВУ (Читання з бази)
         // ==========================================
-        function renderArchive() {
+        async function loadArchive() {
             const archiveContainer = document.getElementById('archive-list');
             if (!archiveContainer) return;
-            archiveContainer.innerHTML = '';
             
-            const history = currentTenant?.history || [
-                { date: 'Лютий 2026', sum: currentTenant?.total_bill || '0.00', status: 'Не сплачено' },
-                { date: 'Січень 2026', sum: '1520.00', status: 'Сплачено' }
-            ];
+            // Показуємо статус завантаження
+            archiveContainer.innerHTML = '<div style="padding:10px; font-size:12px; color:var(--text-sec); text-align:center;">Завантаження квитанцій...</div>';
+            
+            try {
+                // Запитуємо всі рахунки цього мешканця з бази Supabase
+                const { data, error } = await _supabase
+                    .from('bills')
+                    .select('*')
+                    .eq('user_id', String(currentTenant.id))
+                    .order('created_at', { ascending: false }); // Нові зверху
 
-            history.forEach(item => {
-                const isPaid = item.status === 'Сплачено';
-                archiveContainer.insertAdjacentHTML('beforeend', `
-                    <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid var(--border);">
-                        <div>
-                            <div style="font-size:13px; font-weight:bold;">${item.date}</div>
-                            <div style="font-size:11px; color:${isPaid ? 'var(--success)' : 'var(--warning)'};">${item.status}: ${item.sum} ₴</div>
+                if (error) throw error;
+                archiveContainer.innerHTML = ''; // Очищаємо
+
+                // Якщо рахунків немає
+                if (!data || data.length === 0) {
+                    archiveContainer.innerHTML = '<div style="padding:10px; font-size:12px; color:var(--text-sec); text-align:center;">У вас ще немає виставлених рахунків.</div>';
+                    return;
+                }
+
+                // Малюємо кожен рахунок
+                data.forEach(item => {
+                    const isPaid = item.is_paid;
+                    const statusText = isPaid ? 'Сплачено' : 'Не сплачено';
+                    const statusColor = isPaid ? 'var(--success)' : 'var(--danger)';
+                    
+                    archiveContainer.insertAdjacentHTML('beforeend', `
+                        <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid var(--border);">
+                            <div>
+                                <div style="font-size:13px; font-weight:bold;">${item.period_name}</div>
+                                <div style="font-size:11px; color:${statusColor};">${statusText}: ${item.amount} ₴</div>
+                            </div>
+                            <button class="btn btn-outline" style="width:auto; padding:6px 12px; font-size:11px;" onclick="alert('Завантаження PDF...')">PDF</button>
                         </div>
-                        <button class="btn btn-outline" style="width:auto; padding:6px 12px; font-size:11px;" onclick="alert('Завантаження PDF...')">PDF</button>
-                    </div>
-                `);
-            });
+                    `);
+                });
+            } catch (err) {
+                console.error("Помилка завантаження архіву:", err);
+                archiveContainer.innerHTML = '<div style="padding:10px; font-size:12px; color:var(--danger); text-align:center;">Помилка підключення до бази</div>';
+            }
         }
-        // Запускаємо архів із затримкою, щоб встигли завантажитися дані мешканця
-        setTimeout(renderArchive, 500);
+        
+        // Запускаємо архів після короткої паузи (щоб мешканець встиг "залогінитись")
+        setTimeout(loadArchive, 800);
 
         // ==========================================
         // 3. ВІДПРАВКА ПОВІДОМЛЕНЬ
