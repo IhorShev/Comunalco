@@ -1800,21 +1800,21 @@ class App {
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-top:20px; background:rgba(0,15,30,0.3); padding:15px; border-radius:12px; border:1px solid rgba(255,255,255,0.05);">
     <div>
         <div style="font-size:10px; color:var(--text-sec); text-transform:uppercase; margin-bottom:5px; font-weight:bold;">Борг / Переплата</div>
-        <input type="number" step="0.01" value="${a.debt || ''}" placeholder="0" style="background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:8px; padding:10px; font-size:15px; font-weight:bold; color:${(parseFloat(a.debt)||0) < 0 ? 'var(--success)' : 'var(--text)'}; width:100%; box-sizing:border-box;" onchange="app.updateAptData(${i}, 'debt', this.value)">
+        <input type="number" step="0.01" value="${a.debt ? parseFloat(a.debt).toFixed(2) : ''}" placeholder="0" style="background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:8px; padding:10px; font-size:15px; font-weight:bold; color:${(parseFloat(a.debt)||0) < 0 ? 'var(--success)' : 'var(--text)'}; width:100%; box-sizing:border-box;" onchange="app.updateAptData(${i}, 'debt', this.value)">
     </div>
     <div>
         <div style="font-size:10px; color:var(--text-sec); text-transform:uppercase; margin-bottom:5px; font-weight:bold;">Поточний місяць</div>
-        <div id="live-bill-${i}" style="background:rgba(0,0,0,0.2); border:1px solid var(--border); border-radius:8px; padding:10px; font-size:15px; font-weight:bold; color:var(--text); width:100%; box-sizing:border-box; text-align:center;">${(a.bill || 0).toFixed(2)}</div>
+        <div id="live-bill-${i}" style="background:rgba(0,0,0,0.2); border:1px solid var(--border); border-radius:8px; padding:10px; font-size:15px; font-weight:bold; color:var(--text); width:100%; box-sizing:border-box; text-align:center;">${currentBill.toFixed(2)}</div>
     </div>
 
     <div>
         <div style="font-size:10px; color:var(--text-sec); text-transform:uppercase; margin-bottom:5px; font-weight:bold;">Сплачено</div>
-        <input type="number" step="0.01" value="${a.paid || ''}" placeholder="0" style="background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:8px; padding:10px; font-size:15px; font-weight:bold; color:var(--success); width:100%; box-sizing:border-box;" onchange="app.updateAptData(${i}, 'paid', this.value)">
+        <input type="number" step="0.01" value="${a.paid ? parseFloat(a.paid).toFixed(2) : ''}" placeholder="0" style="background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:8px; padding:10px; font-size:15px; font-weight:bold; color:var(--success); width:100%; box-sizing:border-box;" onchange="app.updateAptData(${i}, 'paid', this.value)">
     </div>
     <div>
         <div style="font-size:10px; color:var(--text-sec); text-transform:uppercase; margin-bottom:5px; font-weight:bold;">До сплати</div>
-        <div style="background:rgba(0,0,0,0.4); border:1px solid var(--border); border-radius:8px; padding:10px; font-size:15px; font-weight:bold; color:var(--text); width:100%; box-sizing:border-box; text-align:center;">
-            ${Math.abs(parseFloat(a.debt || 0) + parseFloat(a.bill || 0) - parseFloat(a.paid || 0)).toFixed(2)}
+        <div style="background:rgba(0,0,0,0.4); border:1px solid ${ (parseFloat(a.debt||0) + currentBill - parseFloat(a.paid||0)) > 0.01 ? 'var(--danger)' : ((parseFloat(a.debt||0) + currentBill - parseFloat(a.paid||0)) < -0.01 ? 'var(--success)' : 'var(--border)') }; border-radius:8px; padding:10px; font-size:15px; font-weight:bold; color:${ (parseFloat(a.debt||0) + currentBill - parseFloat(a.paid||0)) > 0.01 ? 'var(--danger)' : ((parseFloat(a.debt||0) + currentBill - parseFloat(a.paid||0)) < -0.01 ? 'var(--success)' : 'var(--text)') }; width:100%; box-sizing:border-box; text-align:center;">
+            ${(parseFloat(a.debt || 0) + currentBill - parseFloat(a.paid || 0)).toFixed(2)}
         </div>
     </div>
 </div>
@@ -3452,6 +3452,7 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
+
 
 
 
