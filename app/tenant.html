@@ -864,10 +864,12 @@ async function submitVote(choice) {
         <div style="display: flex; flex: 1; overflow: hidden;">
             
             <div style="width: 35%; border-right: 1px solid var(--border); display: flex; flex-direction: column; background: rgba(0,0,0,0.2);">
-                <div style="padding: 10px; border-bottom: 1px solid var(--border); display: flex; gap: 5px;">
-                    <input type="number" id="new-chat-apt" placeholder="№ кв..." style="width: 60px; padding: 5px 10px; border-radius: 5px; border: 1px solid var(--border); background: var(--bg-main); color: var(--text);">
-                    <button class="btn btn-primary" style="padding: 5px 10px; flex: 1; font-size: 12px;" onclick="startNewTenantChat()">+ Написати</button>
-                </div>
+                <div class="chat-sidebar-header">
+    <input type="number" id="new-chat-apt" placeholder="№ кв..." style="padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-main); color: var(--text);">
+    <button class="btn btn-primary" style="padding: 8px; font-size: 13px; font-weight: 600;" onclick="startNewTenantChat()">
+        Написати
+    </button>
+</div>
                 <div id="tenant-chat-sidebar" style="overflow-y: auto; flex: 1;">
                     <div style="padding:20px; text-align:center; color:var(--text-sec); font-size:12px;">Завантаження...</div>
                 </div>
