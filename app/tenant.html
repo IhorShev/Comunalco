@@ -663,35 +663,123 @@ function startNewTenantChat() {
     input.value = ''; // Очищаємо поле пошуку
 }
         // ==========================================
-        // 4. СИСТЕМА ГОЛОСУВАННЯ
-        // ==========================================
-        async function submitVote(choice) {
-            try {
-                const { error } = await _supabase.from('votes').insert([{
-                    user_id: currentTenant.id,
-                    poll_id: 'roof_repair',
-                    choice: choice
-                }]);
+// 4. СИСТЕМА ГОЛОСУВАННЯ (МЕШКАНЕЦЬ)
+// ==========================================
+let currentActivePollId = null;
 
-                if (error && error.code === '23505') {
-                    return alert("❌ Ви вже проголосували у цьому опитуванні!");
-                } else if (error) {
-                    throw error;
-                }
+async function loadTenantPoll() {
+    if (!currentTenant) return;
+    const votingArea = document.getElementById('voting-area');
+    if (!votingArea) return;
 
-                alert("✅ Дякуємо! Ваш голос враховано і записано в базу.");
-                
-                document.getElementById('vote-actions').style.opacity = '0.4';
-                document.getElementById('vote-actions').style.pointerEvents = 'none';
-            } catch (err) {
-                console.error("Помилка голосування:", err);
-                alert("Помилка: " + err.message);
-            }
+    try {
+        // 1. Шукаємо останнє АКТИВНЕ опитування
+        const { data: polls, error: pollError } = await _supabase
+            .from('polls')
+            .select('*')
+            .eq('status', 'active')
+            .order('created_at', { ascending: false })
+            .limit(1);
+
+        if (pollError) throw pollError;
+
+        if (!polls || polls.length === 0) {
+            votingArea.innerHTML = '<div style="text-align:center; color:var(--text-sec); font-size:13px;">Наразі немає активних голосувань 🎉</div>';
+            return;
         }
 
-        function downloadVotePdf() {
-            alert("Генерується офіційний протокол голосування з підписами... (PDF)");
+        const poll = polls[0];
+        currentActivePollId = poll.id;
+
+        // 2. Перевіряємо, чи ця квартира вже голосувала
+        const { data: myVote, error: voteError } = await _supabase
+            .from('votes')
+            .select('*')
+            .eq('poll_id', poll.id)
+            .eq('user_id', String(currentTenant.id));
+
+        if (voteError) throw voteError;
+        const hasVoted = myVote && myVote.length > 0;
+
+        // 3. Якщо вже голосували, отримуємо загальну статистику
+        let yesCount = 0, noCount = 0;
+        const { data: allVotes } = await _supabase.from('votes').select('*').eq('poll_id', poll.id);
+        
+        if (allVotes) {
+            allVotes.forEach(v => {
+                if (v.choice === 'yes') yesCount++;
+                if (v.choice === 'no') noCount++;
+            });
         }
+        const totalVotes = yesCount + noCount;
+        const yesPercent = totalVotes === 0 ? 0 : Math.round((yesCount / totalVotes) * 100);
+        const noPercent = totalVotes === 0 ? 0 : Math.round((noCount / totalVotes) * 100);
+
+        // 4. Відображення
+        if (hasVoted) {
+            // ВЖЕ ПРОГОЛОСУВАВ: Показуємо результати
+            votingArea.innerHTML = `
+                <div style="flex-grow:1;">
+                    <div style="font-size:15px; font-weight:bold; margin-bottom:8px; color:var(--text);">${poll.title}</div>
+                    
+                    <div style="font-size:13px; color:var(--success); margin:15px 0; text-align:center; font-weight:bold; background:rgba(46, 213, 115, 0.1); padding:10px; border-radius:8px; border:1px solid var(--success);">
+                        ✅ Ваш голос враховано
+                    </div>
+                    
+                    <div style="font-size:12px; color:var(--text-sec); margin-bottom:5px;">Всього голосів: <b>${totalVotes}</b></div>
+                    <div style="display:flex; width:100%; height:12px; border-radius:6px; overflow:hidden; margin-bottom:5px; background:#333;">
+                        <div style="width:${yesPercent}%; background:var(--success); transition:1s;"></div>
+                        <div style="width:${noPercent}%; background:var(--danger); transition:1s;"></div>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--text-sec); margin-bottom:20px;">
+                        <span>ЗА: ${yesCount} (${yesPercent}%)</span>
+                        <span>ПРОТИ: ${noCount} (${noPercent}%)</span>
+                    </div>
+                </div>
+                <button class="btn btn-outline" style="width:100%; font-size:12px;" onclick="downloadVotePdf()">📄 Завантажити PDF</button>
+            `;
+        } else {
+            // ЩЕ НЕ ПРОГОЛОСУВАВ: Показуємо кнопки
+            votingArea.innerHTML = `
+                <div style="flex-grow:1;">
+                    <div style="font-size:15px; font-weight:bold; margin-bottom:8px; color:var(--text);">${poll.title}</div>
+                    <div style="font-size:12px; color:var(--text-sec); margin-bottom:15px; white-space:pre-wrap; line-height:1.4;">${poll.description || ''}</div>
+                </div>
+                <div style="display:flex; gap:10px; margin-top:10px;">
+                    <button class="btn btn-primary" style="flex:1; background:var(--success); border:none; font-weight:bold;" onclick="submitVote('yes')">👍 ЗА</button>
+                    <button class="btn btn-primary" style="flex:1; background:var(--danger); border:none; font-weight:bold;" onclick="submitVote('no')">👎 ПРОТИ</button>
+                </div>
+            `;
+        }
+    } catch (err) {
+        console.error(err);
+        votingArea.innerHTML = '<div style="color:red; text-align:center;">Помилка бази даних</div>';
+    }
+}
+
+async function submitVote(choice) {
+    if (!currentTenant || !currentActivePollId) return;
+    
+    try {
+        const { error } = await _supabase.from('votes').insert([{
+            poll_id: currentActivePollId,
+            user_id: String(currentTenant.id),
+            choice: choice
+        }]);
+
+        if (error && error.code === '23505') {
+            alert("❌ Ви вже проголосували!");
+        } else if (error) {
+            throw error;
+        } else {
+            alert("✅ Дякуємо! Ваш голос успішно записано.");
+            loadTenantPoll(); // Миттєво оновлюємо картку, щоб показати прогрес-бари!
+        }
+    } catch (err) {
+        console.error(err);
+        alert("Помилка відправки.");
+    }
+}
     </script>
      <div id="tenant-chat-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
     <div style="background: var(--bg-card); width: 95%; max-width: 900px; height: 85vh; border-radius: 15px; display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
