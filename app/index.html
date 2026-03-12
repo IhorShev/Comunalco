@@ -316,6 +316,10 @@
                 </span>
                 <span id="save-status" style="font-size:10px; font-weight:800; color:var(--text-sec); opacity:0; transition: opacity 0.3s ease; margin-top:2px;">✅ Збережено</span>
             </div>
+           <div style="position: relative; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.1); margin-left: 10px;" onclick="document.getElementById('chat-modal').style.display='flex'">
+    <span style="font-size: 20px;">💬</span>
+    <span id="global-chat-badge" class="chat-badge" style="display:none;">0</span>
+</div> 
         </div>
 
         <div style="display:flex; align-items:center;">
@@ -3493,6 +3497,7 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
+
 
 
 
