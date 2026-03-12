@@ -850,5 +850,19 @@ async function submitVote(choice) {
             </div>
         </div>
     </div>
+
+            <script>
+    // Реєстрація Service Worker для можливості встановлення PWA
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js').then(reg => {
+                console.log('Service Worker зареєстровано!', reg.scope);
+            }).catch(err => {
+                console.log('Помилка Service Worker:', err);
+            });
+        });
+    }
+</script>
+            
 </body>
 </html>
