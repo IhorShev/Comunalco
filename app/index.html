@@ -3536,7 +3536,7 @@ window.addEventListener('load', () => {
             
             <div style="width: 35%; border-right: 1px solid var(--border); background: rgba(0,0,0,0.2); display:flex; flex-direction:column;">
                 <div style="padding:15px; border-bottom:1px solid var(--border);">
-                    <button class="btn btn-primary" style="width:100%; font-size:13px;" onclick="alert('Тут будемо створювати опитування!')">+ Створити нове</button>
+                    <button class="btn btn-primary" style="width:100%; font-size:13px;" onclick="showCreatePollForm()">+ Створити нове</button>
                 </div>
                 <div id="admin-polls-list" style="flex:1; overflow-y:auto; padding:10px; display:flex; flex-direction:column; gap:10px;">
                     <div style="text-align:center; color:var(--text-sec); font-size:12px; margin-top:20px;">Завантаження...</div>
@@ -3700,6 +3700,7 @@ async function sendAdminMessage() {
     </script>
 </body>
 </html>
+
 
 
 
