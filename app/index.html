@@ -3510,7 +3510,7 @@ window.addEventListener('load', () => {
                 
                 <div class="chat-input-area" id="admin-chat-input-area" style="display:none;">
                     <input type="text" id="admin-msg-text" placeholder="Напишіть повідомлення мешканцю..." style="margin:0; flex:1; padding:10px; border-radius:8px; border:1px solid var(--border); background:var(--bg-main); color:var(--text);">
-                    <button class="btn btn-primary" style="width:auto; padding:0 20px;" onclick="alert('Функція відправки підключається!')">➤</button>
+                    <button class="btn btn-primary" style="width:auto; padding:0 20px;" onclick="sendAdminMessage()">➤</button>
                 </div>
             </div>
             
@@ -3659,6 +3659,7 @@ async function sendAdminMessage() {
     </script>
 </body>
 </html>
+
 
 
 
