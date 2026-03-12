@@ -3491,7 +3491,7 @@ window.addEventListener('load', () => {
     
     <div style="display: flex; align-items: center; gap: 15px;">
         <h3 style="margin:0; font-size:18px; white-space: nowrap;">💬 Центр зв'язку</h3>
-        <button class="btn btn-primary" style="width: auto !important; min-width: 120px; padding: 6px 15px; font-size: 13px; border-radius: 8px; margin: 0;" onclick="document.getElementById('poll-modal').style.display='flex'">📊 Опитування</button>
+        <button class="btn btn-primary" style="width: auto !important; min-width: 120px; padding: 6px 15px; font-size: 13px; border-radius: 8px; margin: 0;" onclick="document.getElementById('poll-modal').style.display='flex'; loadAdminPolls();">📊 Опитування</button>
     </div>
     
     <button class="btn btn-outline" style="width: auto !important; min-width: 100px; padding: 6px 15px; font-size: 13px; border-radius: 8px; margin: 0;" onclick="document.getElementById('chat-modal').style.display='none'">✕ Закрити</button>
@@ -3854,6 +3854,7 @@ async function openAdminPollDetails(pollId) {
     </script>
 </body>
 </html>
+
 
 
 
