@@ -3599,7 +3599,7 @@ async function loadAdminChats() {
             if (!isFromManager && !m.is_read) {
                 chats.get(aptId).unread += 1;
             }
-        });
+        }
 
         sidebar.innerHTML = '';
         if (chats.size === 0) {
@@ -3834,6 +3834,7 @@ async function openAdminPollDetails(pollId) {
     </script>
 </body>
 </html>
+
 
 
 
