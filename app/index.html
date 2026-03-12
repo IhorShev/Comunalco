@@ -3528,9 +3528,138 @@ window.addEventListener('load', () => {
                 });
             });
         }
+    // ==========================================
+// 💬 ЛОГІКА МЕСЕНДЖЕРА (КЕРУЮЧИЙ)
+// ==========================================
+let currentChatAptId = null;
+
+// 1. Завантаження списку чатів у ліву панель
+async function loadAdminChats() {
+    const sidebar = document.getElementById('admin-chat-sidebar');
+    sidebar.innerHTML = '<div style="padding:20px; text-align:center;">Завантаження...</div>';
+
+    try {
+        const { data: msgs, error } = await _supabase
+            .from('messages')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        const chats = new Map();
+        
+        msgs.forEach(m => {
+            const isFromManager = m.sender_id === 'manager';
+            const aptId = isFromManager ? m.recipient_type : m.sender_id;
+            
+            if (!chats.has(aptId)) {
+                chats.set(aptId, { aptId: aptId, unread: 0, lastMsg: m.message_text });
+            }
+            if (!isFromManager && !m.is_read) {
+                chats.get(aptId).unread += 1;
+            }
+        });
+
+        sidebar.innerHTML = '';
+        if (chats.size === 0) {
+            sidebar.innerHTML = '<div style="padding:20px; text-align:center; color:var(--text-sec);">Немає діалогів</div>';
+            return;
+        }
+
+        chats.forEach(chat => {
+            const unreadBadge = chat.unread > 0 ? `<div class="unread-dot"></div>` : '';
+            sidebar.insertAdjacentHTML('beforeend', `
+                <div class="chat-list-item" onclick="openAdminChat('${chat.aptId}')" id="chat-item-${chat.aptId}">
+                    <div>
+                        <div style="font-weight:bold; margin-bottom:5px;">Квартира ${chat.aptId}</div>
+                        <div style="font-size:11px; color:var(--text-sec); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:150px;">
+                            ${chat.lastMsg}
+                        </div>
+                    </div>
+                    ${unreadBadge}
+                </div>
+            `);
+        });
+    } catch (err) {
+        console.error("Помилка:", err);
+        sidebar.innerHTML = '<div style="color:red; padding:10px;">Помилка бази</div>';
+    }
+}
+
+// 2. Відкриття конкретного діалогу (права панель)
+async function openAdminChat(aptId) {
+    currentChatAptId = aptId;
+    
+    // Підсвічуємо активний чат
+    document.querySelectorAll('.chat-list-item').forEach(el => el.classList.remove('active'));
+    document.getElementById('chat-item-' + aptId).classList.add('active');
+
+    // Відкриваємо зону вводу і зону повідомлень
+    document.getElementById('admin-chat-input-area').style.display = 'flex';
+    const msgArea = document.getElementById('admin-chat-messages');
+    msgArea.innerHTML = '<div style="text-align:center; color:var(--text-sec); padding:20px;">Завантаження...</div>';
+
+    try {
+        const { data: msgs, error } = await _supabase
+            .from('messages')
+            .select('*')
+            .or(`and(sender_id.eq.${aptId},recipient_type.eq.manager),and(sender_id.eq.manager,recipient_type.eq.${aptId})`)
+            .order('created_at', { ascending: true }); // Найстаріші зверху
+
+        if (error) throw error;
+        msgArea.innerHTML = '';
+        
+        msgs.forEach(m => {
+            const isFromManager = m.sender_id === 'manager';
+            const bubbleClass = isFromManager ? 'msg-manager' : 'msg-tenant';
+            const timeString = new Date(m.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            msgArea.insertAdjacentHTML('beforeend', `
+                <div class="msg-bubble ${bubbleClass}">
+                    ${m.message_text}
+                    <div style="font-size:9px; opacity:0.7; text-align:right; margin-top:5px;">${timeString}</div>
+                </div>
+            `);
+        });
+        
+        // Прокрутка вниз до останнього повідомлення
+        msgArea.scrollTop = msgArea.scrollHeight;
+
+        // Позначаємо всі повідомлення від цієї квартири як прочитані
+        await _supabase.from('messages').update({ is_read: true }).eq('sender_id', aptId);
+        
+    } catch (err) {
+        console.error(err);
+        msgArea.innerHTML = '<div style="color:red;">Помилка</div>';
+    }
+}
+
+// 3. Відправка повідомлення мешканцю
+async function sendAdminMessage() {
+    if (!currentChatAptId) return;
+    const input = document.getElementById('admin-msg-text');
+    const text = input.value.trim();
+    if (!text) return;
+
+    try {
+        const { error } = await _supabase
+            .from('messages')
+            .insert([{ sender_id: 'manager', recipient_type: String(currentChatAptId), message_text: text, is_read: false }]);
+
+        if (error) throw error;
+        
+        input.value = ''; // Очищаємо поле
+        openAdminChat(currentChatAptId); // Оновлюємо цей діалог
+        loadAdminChats(); // Оновлюємо список зліва
+    } catch (err) {
+        console.error(err);
+        alert('Помилка відправки');
+    }
+}
     </script>
 </body>
 </html>
+
 
 
 
