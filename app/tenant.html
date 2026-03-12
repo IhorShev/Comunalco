@@ -80,6 +80,38 @@
     max-width: 500px;
     margin: 0 auto;
 }
+        /* Дизайн заголовку бокової панелі чату */
+.chat-sidebar-header {
+    display: flex;
+    flex-direction: column; /* По замовчуванню (мобілка): один під одним */
+    gap: 8px;
+    padding: 12px;
+    border-bottom: 1px solid var(--border);
+}
+
+.chat-sidebar-header input {
+    width: 100% !important; /* На мобілці на всю ширину */
+    box-sizing: border-box;
+}
+
+.chat-sidebar-header button {
+    width: 100%;
+}
+
+/* Налаштування для ноутбуків/ПК (ширина екрану більше 992px) */
+@media (min-width: 992px) {
+    .chat-sidebar-header {
+        flex-direction: row; /* В один рядок */
+        align-items: center;
+    }
+    .chat-sidebar-header input {
+        flex: 2; /* Поле в 2 рази більше за кнопку */
+    }
+    .chat-sidebar-header button {
+        flex: 1; /* Кнопка компактна */
+        white-space: nowrap;
+    }
+}
     </style>
 </head>
 <body>
