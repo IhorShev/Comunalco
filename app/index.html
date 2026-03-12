@@ -3487,10 +3487,16 @@ window.addEventListener('load', () => {
     
     <div id="chat-modal" class="chat-modal">
     <div class="chat-container">
-        <div class="chat-header">
-            <h3 style="margin:0; font-size:18px;">💬 Центр зв'язку</h3>
-            <button class="btn btn-outline" style="padding:5px 15px;" onclick="document.getElementById('chat-modal').style.display='none'">✕ Закрити</button>
-        </div>
+        <div class="chat-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; width: 100%;">
+    
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <h3 style="margin:0; font-size:18px; display: flex; align-items: center; gap: 5px;">💬 Центр зв'язку</h3>
+        <button class="btn btn-primary" style="padding: 6px 15px; font-size: 13px; border-radius: 8px;" onclick="document.getElementById('poll-modal').style.display='flex'">📊 Опитування</button>
+    </div>
+    
+    <button class="btn btn-outline" style="padding: 6px 15px; width: auto; font-size: 13px; border-radius: 8px;" onclick="document.getElementById('chat-modal').style.display='none'">✕ Закрити</button>
+
+</div>
         
         <div class="chat-body">
             
@@ -3665,6 +3671,7 @@ async function sendAdminMessage() {
     </script>
 </body>
 </html>
+
 
 
 
