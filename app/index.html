@@ -3531,14 +3531,12 @@ window.addEventListener('load', () => {
     // ==========================================
 // 💬 ЛОГІКА МЕСЕНДЖЕРА (КЕРУЮЧИЙ)
 // ==========================================
-    const SUPABASE_URL = 'https://aougdxtsmzjgoykaslbt.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFvdWdkeHRzbXpqZ295a2FzbGJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA5MTg0NzMsImV4cCI6MjA4NjQ5NDQ3M30.47XlL0ddVxtOi1b-7DYw7NmHioSzjnS4c7um9WO2VVI';
-    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+var _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     auth: {
-        persistSession: false // Вимикаємо стандартну сесію, щоб уникнути конфлікту (AbortError)
+        persistSession: false
     }
 });
-    
+
 let currentChatAptId = null;
 
 // 1. Завантаження списку чатів у ліву панель
@@ -3667,6 +3665,7 @@ async function sendAdminMessage() {
     </script>
 </body>
 </html>
+
 
 
 
