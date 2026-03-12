@@ -864,11 +864,36 @@ async function submitVote(choice) {
         <div style="display: flex; flex: 1; overflow: hidden;">
             
             <div style="width: 35%; border-right: 1px solid var(--border); display: flex; flex-direction: column; background: rgba(0,0,0,0.2);">
-                <div class="chat-sidebar-header">
-    <input type="number" id="new-chat-apt" placeholder="№ кв..." style="padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-main); color: var(--text);">
-    <button class="btn btn-primary" style="padding: 8px; font-size: 13px; font-weight: 600;" onclick="startNewTenantChat()">
-        Написати
-    </button>
+                <style>
+    .responsive-chat-header {
+        display: flex;
+        flex-direction: column; /* Квартира зверху, кнопка знизу на мобілці */
+        gap: 8px;
+        padding: 10px;
+        border-bottom: 1px solid var(--border);
+        box-sizing: border-box;
+    }
+    .responsive-chat-header input,
+    .responsive-chat-header button {
+        width: 100% !important; /* На мобілці розтягуємо на всю ширину */
+        box-sizing: border-box;
+        margin: 0;
+    }
+    @media (min-width: 768px) {
+        .responsive-chat-header {
+            flex-direction: row; /* На ноуті в один рядок */
+        }
+        .responsive-chat-header input {
+            flex: 2 !important; /* Поле більше */
+        }
+        .responsive-chat-header button {
+            flex: 1 !important; /* Кнопка компактна */
+        }
+    }
+</style>
+<div class="responsive-chat-header">
+    <input type="number" id="new-chat-apt" placeholder="№ кв..." style="padding: 8px 10px; border-radius: 5px; border: 1px solid var(--border); background: var(--bg-main); color: var(--text);">
+    <button class="btn btn-primary" style="padding: 8px 10px; font-size: 13px; font-weight: bold;" onclick="startNewTenantChat()">Написати ➔</button>
 </div>
                 <div id="tenant-chat-sidebar" style="overflow-y: auto; flex: 1;">
                     <div style="padding:20px; text-align:center; color:var(--text-sec); font-size:12px;">Завантаження...</div>
