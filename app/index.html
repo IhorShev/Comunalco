@@ -3483,7 +3483,40 @@ window.addEventListener('load', () => {
             </div>
         </div>
     </div>
+    
+    <div id="chat-modal" class="chat-modal">
+    <div class="chat-container">
+        <div class="chat-header">
+            <h3 style="margin:0; font-size:18px;">💬 Центр зв'язку</h3>
+            <button class="btn btn-outline" style="padding:5px 15px;" onclick="document.getElementById('chat-modal').style.display='none'">✕ Закрити</button>
+        </div>
+        
+        <div class="chat-body">
+            
+            <div class="chat-sidebar" id="admin-chat-sidebar">
+                <div style="padding:20px; text-align:center; color:var(--text-sec); font-size:13px;">
+                    Оновлення списку чатів...
+                </div>
+            </div>
 
+            <div class="chat-main">
+                <div id="admin-chat-messages" class="chat-messages">
+                    <div style="margin:auto; color:var(--text-sec); text-align:center;">
+                        <span style="font-size:40px;">👈</span><br><br>
+                        Оберіть квартиру зліва,<br>щоб переглянути повідомлення або відповісти
+                    </div>
+                </div>
+                
+                <div class="chat-input-area" id="admin-chat-input-area" style="display:none;">
+                    <input type="text" id="admin-msg-text" placeholder="Напишіть повідомлення мешканцю..." style="margin:0; flex:1; padding:10px; border-radius:8px; border:1px solid var(--border); background:var(--bg-main); color:var(--text);">
+                    <button class="btn btn-primary" style="width:auto; padding:0 20px;" onclick="alert('Функція відправки підключається!')">➤</button>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+    
 <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
@@ -3497,6 +3530,7 @@ window.addEventListener('load', () => {
     </script>
 </body>
 </html>
+
 
 
 
