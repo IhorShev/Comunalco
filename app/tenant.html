@@ -540,38 +540,75 @@
         }
         
         // ==========================================
-        // 3. ВІДПРАВКА ПОВІДОМЛЕНЬ
+        // 💬 ЛОГІКА ЧАТУ МЕШКАНЦЯ
         // ==========================================
-        function toggleAptInput() {
-            const recipient = document.getElementById('msg-recipient').value;
-            const aptInput = document.getElementById('msg-apt-number');
-            if (aptInput) aptInput.style.display = (recipient === 'apt') ? 'block' : 'none';
-        }
+        async function loadTenantChat() {
+            if (!currentTenant) return;
+            const historyBox = document.getElementById('tenant-chat-history');
+            if (!historyBox) return;
 
-        async function sendMessage() {
-            const text = document.getElementById('msg-text').value.trim();
-            const to = document.getElementById('msg-recipient').value;
-            const apt = document.getElementById('msg-apt-number').value;
-            
-            if (!text) return alert("Будь ласка, введіть текст повідомлення!");
-            
             try {
-                const { error } = await _supabase.from('messages').insert([{
-                    sender_id: currentTenant.id,
-                    recipient_type: to === 'apt' ? 'apt_' + apt : to,
-                    message_text: text
-                }]);
+                // Шукаємо переписку між цим мешканцем і керуючим
+                const { data: msgs, error } = await _supabase
+                    .from('messages')
+                    .select('*')
+                    .or(`and(sender_id.eq.${currentTenant.id},recipient_type.eq.manager),and(sender_id.eq.manager,recipient_type.eq.${currentTenant.id})`)
+                    .order('created_at', { ascending: true });
 
                 if (error) throw error;
-
-                let targetName = (to === 'manager') ? 'Керуючому' : (to === 'all' ? 'Всім мешканцям' : 'Кв. ' + apt);
-                alert("✅ Повідомлення відправлено!\\nОтримувач: " + targetName);
+                historyBox.innerHTML = '';
                 
-                document.getElementById('msg-text').value = '';
-                if(document.getElementById('msg-apt-number')) document.getElementById('msg-apt-number').value = '';
+                if (msgs.length === 0) {
+                    historyBox.innerHTML = '<div style="text-align:center; color:var(--text-sec); font-size:12px; margin-top:20px;">Немає повідомлень. Напишіть щось керуючому!</div>';
+                    return;
+                }
+
+                msgs.forEach(m => {
+                    const isMe = m.sender_id === String(currentTenant.id);
+                    const align = isMe ? 'flex-end' : 'flex-start';
+                    const bg = isMe ? 'var(--primary)' : 'var(--bg-card)';
+                    const color = isMe ? '#fff' : 'var(--text)';
+                    const timeString = new Date(m.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    
+                    historyBox.insertAdjacentHTML('beforeend', `
+                        <div style="align-self:${align}; background:${bg}; color:${color}; padding:10px 14px; border-radius:15px; max-width:85%; font-size:13px; border:1px solid var(--border); box-shadow:0 2px 5px rgba(0,0,0,0.1);">
+                            ${m.message_text}
+                            <div style="font-size:9px; opacity:0.7; text-align:right; margin-top:5px;">${timeString}</div>
+                        </div>
+                    `);
+                });
+                // Прокручуємо в самий низ до нових повідомлень
+                historyBox.scrollTop = historyBox.scrollHeight;
+
             } catch (err) {
-                console.error("Помилка повідомлення:", err);
-                alert("Помилка відправки: " + err.message);
+                console.error("Помилка чату:", err);
+                historyBox.innerHTML = '<div style="color:var(--danger); text-align:center; font-size:12px;">Помилка підключення</div>';
+            }
+        }
+
+        async function sendTenantMessage() {
+            if (!currentTenant) return;
+            const input = document.getElementById('tenant-msg-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            input.value = ''; // Очищаємо поле одразу для зручності
+            
+            try {
+                const { error } = await _supabase
+                    .from('messages')
+                    .insert([{ 
+                        sender_id: String(currentTenant.id), 
+                        recipient_type: 'manager', 
+                        message_text: text,
+                        is_read: false
+                    }]);
+                
+                if (error) throw error;
+                loadTenantChat(); // Оновлюємо чат, щоб побачити своє повідомлення
+            } catch (err) {
+                console.error(err);
+                alert('Не вдалося відправити повідомлення');
             }
         }
 
