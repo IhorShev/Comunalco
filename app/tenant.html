@@ -49,6 +49,37 @@
         .meter-label { font-size: 11px; color: var(--text-sec); margin-bottom: 5px; }
         .meter-val { font-size: 18px; font-weight: 700; font-family: 'Montserrat', sans-serif; }
         .meter-val.blue { color: #3b82f6; } .meter-val.green { color: var(--success); } .meter-val.orange { color: var(--warning); }
+        /* Виправлення для модального вікна Доступу */
+#apt-action-row {
+    display: flex;
+    flex-direction: column; /* На мобілці: Квартира зверху, Кнопка знизу */
+    gap: 15px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+@media (min-width: 992px) {
+    #apt-action-row {
+        flex-direction: row; /* На ноуті: в один рядок */
+        align-items: flex-end;
+    }
+    #apt-selector-block {
+        flex: 2; /* Поле вибору квартири у 2 рази більше */
+    }
+    #btn-grant-access {
+        flex: 1; /* Кнопка у 2 рази менша за поле поруч */
+        height: 44px; /* Вирівнюємо висоту з інпутом */
+        margin: 0 !important;
+    }
+}
+
+/* Прибираємо гуляння праворуч-ліворуч на мобільних */
+.modal-content {
+    box-sizing: border-box;
+    width: 95% !important;
+    max-width: 500px;
+    margin: 0 auto;
+}
     </style>
 </head>
 <body>
