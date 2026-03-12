@@ -141,30 +141,11 @@
 </div>
 
             <div class="card" style="margin-bottom: 0; flex-grow: 1; display: flex; flex-direction: column;">
-                <h3 class="card-title">🗳 Активне голосування</h3>
-                <div id="voting-area" style="flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between;">
-                    <div id="vote-info">
-                        <div style="font-size:15px; font-weight:bold; margin-bottom:8px;">Ремонт даху (Збір по 500 грн)</div>
-                        <div style="font-size:12px; color:var(--text-sec); margin-bottom:15px;">
-                            Проголосувало: <b>45</b> з <b>60</b> (75%)
-                        </div>
-                        <div style="display: flex; width: 100%; height: 12px; border-radius: 6px; overflow: hidden; margin-bottom: 5px; background: #333;">
-                            <div id="vote-bar-yes" style="width: 70%; background: var(--success); transition: width 0.5s;"></div>
-                            <div id="vote-bar-no" style="width: 30%; background: var(--danger); transition: width 0.5s;"></div>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--text-sec); margin-bottom: 20px;">
-                            <span>ЗА: 32 (70%)</span>
-                            <span>ПРОТИ: 13 (30%)</span>
-                        </div>
-                    </div>
-                    <div id="vote-actions" style="display:flex; gap:10px; margin-bottom:15px;">
-                        <button class="btn btn-success" style="flex:1;" onclick="submitVote('yes')">👍 ЗА</button>
-                        <button class="btn btn-danger" style="flex:1;" onclick="submitVote('no')">👎 ПРОТИ</button>
-                    </div>
-                    <button class="btn btn-outline" style="font-size:11px; padding:8px;" onclick="downloadVotePdf()">📄 Завантажити протокол PDF</button>
-                </div>
-            </div>
-        </div>
+    <h3 class="card-title" style="margin-top:0;">🔥 Активне голосування</h3>
+    <div id="voting-area" style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center;">
+        <div style="text-align:center; color:var(--text-sec); padding:20px;">Завантаження...</div>
+    </div>
+</div>
 
     </div> 
 
