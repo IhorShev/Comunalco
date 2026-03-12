@@ -3523,6 +3523,35 @@ window.addEventListener('load', () => {
         </div>
     </div>
 </div>
+
+    <div id="poll-modal" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2005; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
+    <div style="background: var(--bg-card); width: 95%; max-width: 800px; height: 85vh; border-radius: 15px; display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+        
+        <div style="padding: 15px 20px; background: rgba(255,255,255,0.05); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="margin:0; font-size:18px;">📊 Управління голосуваннями</h3>
+            <button class="btn btn-outline" style="padding:5px 15px;" onclick="document.getElementById('poll-modal').style.display='none'">✕ Назад до чату</button>
+        </div>
+        
+        <div style="display:flex; flex:1; overflow:hidden;">
+            
+            <div style="width: 35%; border-right: 1px solid var(--border); background: rgba(0,0,0,0.2); display:flex; flex-direction:column;">
+                <div style="padding:15px; border-bottom:1px solid var(--border);">
+                    <button class="btn btn-primary" style="width:100%; font-size:13px;" onclick="alert('Тут будемо створювати опитування!')">+ Створити нове</button>
+                </div>
+                <div id="admin-polls-list" style="flex:1; overflow-y:auto; padding:10px; display:flex; flex-direction:column; gap:10px;">
+                    <div style="text-align:center; color:var(--text-sec); font-size:12px; margin-top:20px;">Завантаження...</div>
+                </div>
+            </div>
+
+            <div id="admin-poll-details" style="width: 65%; background: var(--bg-main); padding:20px; overflow-y:auto;">
+                <div style="text-align:center; color:var(--text-sec); margin-top:50px; line-height:1.5;">
+                    <span style="font-size:40px;">👈</span><br><br>Оберіть голосування зліва,<br>щоб побачити результати та завантажити PDF,<br>або створіть нове.
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
     
 <script>
         if ('serviceWorker' in navigator) {
@@ -3671,6 +3700,7 @@ async function sendAdminMessage() {
     </script>
 </body>
 </html>
+
 
 
 
