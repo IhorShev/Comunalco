@@ -3697,43 +3697,30 @@ async function sendAdminMessage() {
         alert('Помилка відправки');
     }
 }
-     // ==========================================
+// ==========================================
 // 📊 ЛОГІКА ГОЛОСУВАНЬ (КЕРУЮЧИЙ)
 // ==========================================
 
 // 1. Показуємо форму створення опитування
 function showCreatePollForm() {
     const detailsArea = document.getElementById('admin-poll-details');
-    
-    // Вставляємо HTML-код форми прямо в праву панель
     detailsArea.innerHTML = `
         <h3 style="margin-top:0; color:var(--text); border-bottom:1px solid var(--border); padding-bottom:10px;">📝 Нове голосування</h3>
-        
         <div style="display:flex; flex-direction:column; gap:15px; margin-top:20px;">
             <div>
                 <label style="font-size:12px; color:var(--text-sec); margin-bottom:5px; display:block;">Тема голосування</label>
-                <input type="text" id="new-poll-title" style="width:100%; padding:12px; border-radius:8px; border:1px solid var(--border); background:var(--bg-main); color:var(--text); box-sizing:border-box; font-family:inherit;" placeholder="Наприклад: Збір коштів на ремонт даху">
+                <input type="text" id="new-poll-title" style="width:100%; padding:12px; border-radius:8px; border:1px solid var(--border); background:var(--bg-main); color:var(--text); box-sizing:border-box;" placeholder="Наприклад: Збір коштів на ремонт даху">
             </div>
-            
             <div>
                 <label style="font-size:12px; color:var(--text-sec); margin-bottom:5px; display:block;">Деталі (сума, причини, терміни)</label>
-                <textarea id="new-poll-desc" rows="4" style="width:100%; padding:12px; border-radius:8px; border:1px solid var(--border); background:var(--bg-main); color:var(--text); box-sizing:border-box; font-family:inherit; resize:none;" placeholder="Опишіть суть питання детальніше..."></textarea>
+                <textarea id="new-poll-desc" rows="4" style="width:100%; padding:12px; border-radius:8px; border:1px solid var(--border); background:var(--bg-main); color:var(--text); box-sizing:border-box; resize:none;" placeholder="Опишіть суть питання детальніше..."></textarea>
             </div>
-            
-            <div style="padding:15px; background:rgba(255,255,255,0.05); border-radius:8px; border:1px solid var(--border);">
-                <div style="font-size:12px; color:var(--text-sec); margin-bottom:10px;">Варіанти відповідей (стандартні):</div>
-                <div style="display:flex; gap:10px;">
-                    <div style="flex:1; text-align:center; padding:10px; background:var(--success); border-radius:6px; font-weight:bold; color:white;">👍 ЗА</div>
-                    <div style="flex:1; text-align:center; padding:10px; background:var(--danger); border-radius:6px; font-weight:bold; color:white;">👎 ПРОТИ</div>
-                </div>
-            </div>
-            
             <button class="btn btn-primary" style="padding:15px; font-size:16px; font-weight:bold; margin-top:10px;" onclick="createPollToDB()">🚀 Запустити голосування</button>
         </div>
     `;
 }
 
-// 2. Збереження в базу
+// 2. Збереження в базу Supabase
 async function createPollToDB() {
     const title = document.getElementById('new-poll-title').value.trim();
     const desc = document.getElementById('new-poll-desc').value.trim();
@@ -3749,16 +3736,16 @@ async function createPollToDB() {
         if (error) throw error;
 
         alert('✅ Голосування успішно запущено!');
-        loadAdminPolls(); // Оновлюємо список
-        if(data && data.length > 0) openAdminPollDetails(data[0].id); // Відкриваємо його результати
+        loadAdminPolls(); // Оновлюємо список зліва
+        if(data && data.length > 0) openAdminPollDetails(data[0].id); // Відкриваємо результати створеного
 
     } catch (err) {
         console.error(err);
-        alert('Помилка створення. Перевірте, чи створена таблиця polls у Supabase.');
+        alert('Помилка створення. Перевірте консоль.');
     }
 }
 
-// 3. Завантаження списку опитувань (зліва)
+// 3. Завантаження списку опитувань (ліва панель)
 async function loadAdminPolls() {
     const listArea = document.getElementById('admin-polls-list');
     listArea.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-sec);">Завантаження...</div>';
@@ -3782,7 +3769,7 @@ async function loadAdminPolls() {
             const statusText = poll.status === 'active' ? 'Активне' : 'Завершено';
 
             listArea.insertAdjacentHTML('beforeend', `
-                <div onclick="openAdminPollDetails('${poll.id}')" style="padding: 15px; border-bottom: 1px solid var(--border); cursor: pointer; transition: 0.2s; background: rgba(255,255,255,0.02); border-radius: 8px;">
+                <div onclick="openAdminPollDetails('${poll.id}')" style="padding: 15px; border-bottom: 1px solid var(--border); cursor: pointer; transition: 0.2s; background: rgba(255,255,255,0.02); border-radius: 8px; margin-bottom:5px;">
                     <div style="font-weight:bold; margin-bottom:5px; font-size: 14px;">${poll.title}</div>
                     <div style="display: flex; justify-content: space-between; font-size: 11px;">
                         <span style="color:var(--text-sec);">${new Date(poll.created_at).toLocaleDateString()}</span>
@@ -3797,21 +3784,18 @@ async function loadAdminPolls() {
     }
 }
 
-// 4. Відображення результатів (справа)
+// 4. Відображення результатів (права панель)
 async function openAdminPollDetails(pollId) {
     const detailsArea = document.getElementById('admin-poll-details');
     detailsArea.innerHTML = '<div style="text-align:center; padding:50px; color:var(--text-sec);">Завантаження результатів...</div>';
 
     try {
-        // Беремо дані опитування
         const { data: poll, error: pollError } = await _supabase.from('polls').select('*').eq('id', pollId).single();
         if (pollError) throw pollError;
 
-        // Беремо голоси мешканців
         const { data: votes, error: votesError } = await _supabase.from('votes').select('*').eq('poll_id', pollId);
         if (votesError) throw votesError;
 
-        // Рахуємо статистику
         let yesCount = 0, noCount = 0;
         votes.forEach(v => { if (v.choice === 'yes') yesCount++; else if (v.choice === 'no') noCount++; });
         
@@ -3819,7 +3803,6 @@ async function openAdminPollDetails(pollId) {
         const yesPercent = totalVotes === 0 ? 0 : Math.round((yesCount / totalVotes) * 100);
         const noPercent = totalVotes === 0 ? 0 : Math.round((noCount / totalVotes) * 100);
 
-        // Малюємо інтерфейс результатів
         detailsArea.innerHTML = `
             <h3 style="margin-top:0; color:var(--text); border-bottom:1px solid var(--border); padding-bottom:10px;">📊 ${poll.title}</h3>
             <p style="font-size:13px; color:var(--text-sec); line-height:1.5; margin-bottom:20px; white-space: pre-wrap;">${poll.description || 'Без додаткового опису'}</p>
@@ -3840,10 +3823,7 @@ async function openAdminPollDetails(pollId) {
                 </div>
             </div>
             
-            <div style="display:flex; gap:10px;">
-                <button class="btn btn-outline" style="flex:1;" onclick="alert('Генеруємо офіційний PDF протокол...')">📄 Завантажити протокол</button>
-                <button class="btn btn-primary" style="background:var(--danger); border:none; flex:1;" onclick="alert('Закриваємо голосування...')">🛑 Зупинити збір голосів</button>
-            </div>
+            <button class="btn btn-outline" style="width:100%;" onclick="alert('Генеруємо офіційний PDF протокол...')">📄 Завантажити протокол</button>
         `;
     } catch (err) {
         console.error(err);
@@ -3854,6 +3834,7 @@ async function openAdminPollDetails(pollId) {
     </script>
 </body>
 </html>
+
 
 
 
