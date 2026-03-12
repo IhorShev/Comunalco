@@ -3733,23 +3733,128 @@ function showCreatePollForm() {
     `;
 }
 
-// 2. Функція, яка забере дані з форми
+// 2. Збереження в базу
 async function createPollToDB() {
     const title = document.getElementById('new-poll-title').value.trim();
     const desc = document.getElementById('new-poll-desc').value.trim();
     
-    if (!title) {
-        alert('❌ Будь ласка, введіть тему голосування!');
-        return;
-    }
+    if (!title) return alert('❌ Будь ласка, введіть тему голосування!');
 
-    // Тимчасова заглушка для перевірки
-    alert('Успіх! Готуємо до відправки в базу: ' + title);
+    try {
+        const { data, error } = await _supabase
+            .from('polls')
+            .insert([{ title: title, description: desc, status: 'active' }])
+            .select();
+
+        if (error) throw error;
+
+        alert('✅ Голосування успішно запущено!');
+        loadAdminPolls(); // Оновлюємо список
+        if(data && data.length > 0) openAdminPollDetails(data[0].id); // Відкриваємо його результати
+
+    } catch (err) {
+        console.error(err);
+        alert('Помилка створення. Перевірте, чи створена таблиця polls у Supabase.');
+    }
+}
+
+// 3. Завантаження списку опитувань (зліва)
+async function loadAdminPolls() {
+    const listArea = document.getElementById('admin-polls-list');
+    listArea.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-sec);">Завантаження...</div>';
+
+    try {
+        const { data: polls, error } = await _supabase
+            .from('polls')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        listArea.innerHTML = '';
+
+        if (polls.length === 0) {
+            listArea.innerHTML = '<div style="text-align:center; color:var(--text-sec); font-size:12px; margin-top:20px;">Немає опитувань</div>';
+            return;
+        }
+
+        polls.forEach(poll => {
+            const statusColor = poll.status === 'active' ? 'var(--success)' : 'var(--text-sec)';
+            const statusText = poll.status === 'active' ? 'Активне' : 'Завершено';
+
+            listArea.insertAdjacentHTML('beforeend', `
+                <div onclick="openAdminPollDetails('${poll.id}')" style="padding: 15px; border-bottom: 1px solid var(--border); cursor: pointer; transition: 0.2s; background: rgba(255,255,255,0.02); border-radius: 8px;">
+                    <div style="font-weight:bold; margin-bottom:5px; font-size: 14px;">${poll.title}</div>
+                    <div style="display: flex; justify-content: space-between; font-size: 11px;">
+                        <span style="color:var(--text-sec);">${new Date(poll.created_at).toLocaleDateString()}</span>
+                        <span style="color:${statusColor}; font-weight:bold;">${statusText}</span>
+                    </div>
+                </div>
+            `);
+        });
+    } catch (err) {
+        console.error(err);
+        listArea.innerHTML = '<div style="color:red; text-align:center;">Помилка бази</div>';
+    }
+}
+
+// 4. Відображення результатів (справа)
+async function openAdminPollDetails(pollId) {
+    const detailsArea = document.getElementById('admin-poll-details');
+    detailsArea.innerHTML = '<div style="text-align:center; padding:50px; color:var(--text-sec);">Завантаження результатів...</div>';
+
+    try {
+        // Беремо дані опитування
+        const { data: poll, error: pollError } = await _supabase.from('polls').select('*').eq('id', pollId).single();
+        if (pollError) throw pollError;
+
+        // Беремо голоси мешканців
+        const { data: votes, error: votesError } = await _supabase.from('votes').select('*').eq('poll_id', pollId);
+        if (votesError) throw votesError;
+
+        // Рахуємо статистику
+        let yesCount = 0, noCount = 0;
+        votes.forEach(v => { if (v.choice === 'yes') yesCount++; else if (v.choice === 'no') noCount++; });
+        
+        const totalVotes = yesCount + noCount;
+        const yesPercent = totalVotes === 0 ? 0 : Math.round((yesCount / totalVotes) * 100);
+        const noPercent = totalVotes === 0 ? 0 : Math.round((noCount / totalVotes) * 100);
+
+        // Малюємо інтерфейс результатів
+        detailsArea.innerHTML = `
+            <h3 style="margin-top:0; color:var(--text); border-bottom:1px solid var(--border); padding-bottom:10px;">📊 ${poll.title}</h3>
+            <p style="font-size:13px; color:var(--text-sec); line-height:1.5; margin-bottom:20px; white-space: pre-wrap;">${poll.description || 'Без додаткового опису'}</p>
+            
+            <div style="background:rgba(255,255,255,0.05); padding:20px; border-radius:10px; border:1px solid var(--border); margin-bottom:20px;">
+                <h4 style="margin-top:0; margin-bottom:15px; font-size:14px; display:flex; justify-content:space-between;">
+                    <span>Поточні результати</span>
+                    <span style="color:var(--text-sec); font-weight:normal;">Всього голосів: ${totalVotes}</span>
+                </h4>
+                
+                <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:5px; font-weight:bold;">
+                    <span style="color:var(--success);">👍 ЗА: ${yesCount} (${yesPercent}%)</span>
+                    <span style="color:var(--danger);">👎 ПРОТИ: ${noCount} (${noPercent}%)</span>
+                </div>
+                <div style="display:flex; width:100%; height:12px; border-radius:6px; overflow:hidden; background:#333;">
+                    <div style="width:${yesPercent}%; background:var(--success); transition:1s;"></div>
+                    <div style="width:${noPercent}%; background:var(--danger); transition:1s;"></div>
+                </div>
+            </div>
+            
+            <div style="display:flex; gap:10px;">
+                <button class="btn btn-outline" style="flex:1;" onclick="alert('Генеруємо офіційний PDF протокол...')">📄 Завантажити протокол</button>
+                <button class="btn btn-primary" style="background:var(--danger); border:none; flex:1;" onclick="alert('Закриваємо голосування...')">🛑 Зупинити збір голосів</button>
+            </div>
+        `;
+    } catch (err) {
+        console.error(err);
+        detailsArea.innerHTML = '<div style="color:red; text-align:center;">Помилка завантаження</div>';
+    }
 }
     
     </script>
 </body>
 </html>
+
 
 
 
