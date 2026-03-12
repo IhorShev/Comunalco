@@ -541,78 +541,153 @@
         }
         
         // ==========================================
-        // 💬 ЛОГІКА ЧАТУ МЕШКАНЦЯ
-        // ==========================================
-        async function loadTenantChat() {
-            if (!currentTenant) return;
-            const historyBox = document.getElementById('tenant-chat-history');
-            if (!historyBox) return;
+// 💬 ЛОГІКА ЧАТУ МЕШКАНЦЯ (ПОВНОЦІННА)
+// ==========================================
+let currentTenantChatTarget = null; // З ким зараз говоримо ('manager' або номер квартири)
 
-            try {
-                // Шукаємо переписку між цим мешканцем і керуючим
-                const { data: msgs, error } = await _supabase
-                    .from('messages')
-                    .select('*')
-                    .or(`and(sender_id.eq.${currentTenant.id},recipient_type.eq.manager),and(sender_id.eq.manager,recipient_type.eq.${currentTenant.id})`)
-                    .order('created_at', { ascending: true });
+async function loadTenantChatsList() {
+    if (!currentTenant) return;
+    const sidebar = document.getElementById('tenant-chat-sidebar');
+    
+    try {
+        // Завантажуємо всі повідомлення, де мешканець відправник АБО отримувач
+        const { data: msgs, error } = await _supabase
+            .from('messages')
+            .select('*')
+            .or(`sender_id.eq.${currentTenant.id},recipient_type.eq.${currentTenant.id}`)
+            .order('created_at', { ascending: false });
 
-                if (error) throw error;
-                historyBox.innerHTML = '';
-                
-                if (msgs.length === 0) {
-                    historyBox.innerHTML = '<div style="text-align:center; color:var(--text-sec); font-size:12px; margin-top:20px;">Немає повідомлень. Напишіть щось керуючому!</div>';
-                    return;
-                }
+        if (error) throw error;
 
-                msgs.forEach(m => {
-                    const isMe = m.sender_id === String(currentTenant.id);
-                    const align = isMe ? 'flex-end' : 'flex-start';
-                    const bg = isMe ? 'var(--primary)' : 'var(--bg-card)';
-                    const color = isMe ? '#fff' : 'var(--text)';
-                    const timeString = new Date(m.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                    
-                    historyBox.insertAdjacentHTML('beforeend', `
-                        <div style="align-self:${align}; background:${bg}; color:${color}; padding:10px 14px; border-radius:15px; max-width:85%; font-size:13px; border:1px solid var(--border); box-shadow:0 2px 5px rgba(0,0,0,0.1);">
-                            ${m.message_text}
-                            <div style="font-size:9px; opacity:0.7; text-align:right; margin-top:5px;">${timeString}</div>
-                        </div>
-                    `);
-                });
-                // Прокручуємо в самий низ до нових повідомлень
-                historyBox.scrollTop = historyBox.scrollHeight;
+        const chats = new Map();
+        // Керуючий ЗАВЖДИ закріплений першим
+        chats.set('manager', { targetId: 'manager', unread: 0, lastMsg: 'Натисніть, щоб написати...', name: '👑 Керуючий' });
 
-            } catch (err) {
-                console.error("Помилка чату:", err);
-                historyBox.innerHTML = '<div style="color:var(--danger); text-align:center; font-size:12px;">Помилка підключення</div>';
-            }
-        }
-
-        async function sendTenantMessage() {
-            if (!currentTenant) return;
-            const input = document.getElementById('tenant-msg-input');
-            const text = input.value.trim();
-            if (!text) return;
-
-            input.value = ''; // Очищаємо поле одразу для зручності
+        msgs.forEach(m => {
+            const isMe = m.sender_id === String(currentTenant.id);
+            const targetId = isMe ? m.recipient_type : m.sender_id; // Визначаємо співрозмовника
             
-            try {
-                const { error } = await _supabase
-                    .from('messages')
-                    .insert([{ 
-                        sender_id: String(currentTenant.id), 
-                        recipient_type: 'manager', 
-                        message_text: text,
-                        is_read: false
-                    }]);
-                
-                if (error) throw error;
-                loadTenantChat(); // Оновлюємо чат, щоб побачити своє повідомлення
-            } catch (err) {
-                console.error(err);
-                alert('Не вдалося відправити повідомлення');
+            if (!chats.has(targetId)) {
+                const targetName = targetId === 'manager' ? '👑 Керуючий' : `🚪 Квартира ${targetId}`;
+                chats.set(targetId, { targetId: targetId, unread: 0, lastMsg: m.message_text, name: targetName });
+            } else if (chats.get(targetId).lastMsg === 'Натисніть, щоб написати...') {
+                chats.get(targetId).lastMsg = m.message_text; // Оновлюємо текст, якщо це керуючий і вже є історія
             }
+            
+            // Рахуємо непрочитані (якщо написали нам)
+            if (!isMe && !m.is_read) {
+                chats.get(targetId).unread += 1;
+            }
+        });
+
+        sidebar.innerHTML = '';
+        chats.forEach(chat => {
+            const unreadBadge = chat.unread > 0 ? `<div style="width:10px; height:10px; background:var(--danger); border-radius:50%;"></div>` : '';
+            sidebar.insertAdjacentHTML('beforeend', `
+                <div onclick="openTenantChat('${chat.targetId}')" id="t-chat-item-${chat.targetId}" style="padding: 15px; border-bottom: 1px solid var(--border); cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: 0.2s;">
+                    <div style="overflow: hidden;">
+                        <div style="font-weight:bold; margin-bottom:5px; color: ${chat.targetId === 'manager' ? 'var(--primary)' : 'inherit'};">${chat.name}</div>
+                        <div style="font-size:11px; color:var(--text-sec); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${chat.lastMsg}</div>
+                    </div>
+                    ${unreadBadge}
+                </div>
+            `);
+        });
+    } catch (err) {
+        console.error(err);
+        sidebar.innerHTML = '<div style="color:red; text-align:center;">Помилка</div>';
+    }
+}
+
+async function openTenantChat(targetId) {
+    currentTenantChatTarget = targetId;
+    
+    // Підсвітка активного чату зліва
+    document.querySelectorAll('[id^="t-chat-item-"]').forEach(el => el.style.background = 'transparent');
+    const activeItem = document.getElementById('t-chat-item-' + targetId);
+    if (activeItem) activeItem.style.background = 'rgba(255,255,255,0.05)';
+
+    document.getElementById('tenant-chat-input-area').style.display = 'flex';
+    const msgArea = document.getElementById('tenant-chat-messages');
+    msgArea.innerHTML = '<div style="text-align:center; color:var(--text-sec); padding:20px;">Завантаження...</div>';
+
+    try {
+        const { data: msgs, error } = await _supabase
+            .from('messages')
+            .select('*')
+            .or(`and(sender_id.eq.${currentTenant.id},recipient_type.eq.${targetId}),and(sender_id.eq.${targetId},recipient_type.eq.${currentTenant.id})`)
+            .order('created_at', { ascending: true });
+
+        if (error) throw error;
+        msgArea.innerHTML = '';
+        
+        if (msgs.length === 0) {
+            msgArea.innerHTML = `<div style="text-align:center; color:var(--text-sec); margin-top:20px;">Тут поки порожньо. Напишіть першим!</div>`;
         }
 
+        msgs.forEach(m => {
+            const isMe = m.sender_id === String(currentTenant.id);
+            const align = isMe ? 'flex-end' : 'flex-start';
+            const bg = isMe ? 'var(--primary)' : 'var(--bg-card)';
+            const color = isMe ? '#fff' : 'var(--text)';
+            const timeString = new Date(m.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            msgArea.insertAdjacentHTML('beforeend', `
+                <div style="align-self:${align}; background:${bg}; color:${color}; padding:10px 14px; border-radius:15px; max-width:85%; font-size:13px; border:1px solid var(--border); box-shadow:0 2px 5px rgba(0,0,0,0.1);">
+                    ${m.message_text}
+                    <div style="font-size:9px; opacity:0.7; text-align:right; margin-top:5px; color: ${isMe ? 'rgba(255,255,255,0.7)' : 'var(--text-sec)'};">${timeString}</div>
+                </div>
+            `);
+        });
+        msgArea.scrollTop = msgArea.scrollHeight;
+
+        // Позначаємо прочитаними
+        await _supabase.from('messages').update({ is_read: true }).eq('sender_id', targetId).eq('recipient_type', String(currentTenant.id));
+        loadTenantChatsList(); // Оновлюємо бейджі
+        
+    } catch (err) {
+        console.error(err);
+        msgArea.innerHTML = '<div style="color:red;">Помилка</div>';
+    }
+}
+
+async function sendTenantMessage() {
+    if (!currentTenant || !currentTenantChatTarget) return;
+    const input = document.getElementById('tenant-msg-text');
+    const text = input.value.trim();
+    if (!text) return;
+
+    input.value = '';
+    
+    try {
+        const { error } = await _supabase
+            .from('messages')
+            .insert([{ 
+                sender_id: String(currentTenant.id), 
+                recipient_type: String(currentTenantChatTarget), 
+                message_text: text,
+                is_read: false
+            }]);
+        
+        if (error) throw error;
+        openTenantChat(currentTenantChatTarget); 
+    } catch (err) {
+        console.error(err);
+        alert('Не вдалося відправити');
+    }
+}
+
+// Функція для кнопки "+ Написати"
+function startNewTenantChat() {
+    const input = document.getElementById('new-chat-apt');
+    const aptNum = input.value.trim();
+    if (!aptNum || aptNum === String(currentTenant.id)) {
+        alert('Введіть коректний номер квартири сусіда (не свій).');
+        return;
+    }
+    openTenantChat(aptNum);
+    input.value = ''; // Очищаємо поле пошуку
+}
         // ==========================================
         // 4. СИСТЕМА ГОЛОСУВАННЯ
         // ==========================================
