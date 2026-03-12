@@ -644,6 +644,39 @@
             alert("Генерується офіційний протокол голосування з підписами... (PDF)");
         }
     </script>
+     <div id="tenant-chat-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
+    <div style="background: var(--bg-card); width: 95%; max-width: 900px; height: 85vh; border-radius: 15px; display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+        
+        <div style="padding: 15px 20px; background: rgba(255,255,255,0.05); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="margin:0; font-size:18px;">💬 Чат будинку</h3>
+            <button class="btn btn-outline" style="padding:5px 15px;" onclick="document.getElementById('tenant-chat-modal').style.display='none'">✕ Закрити</button>
+        </div>
+        
+        <div style="display: flex; flex: 1; overflow: hidden;">
+            
+            <div style="width: 35%; border-right: 1px solid var(--border); display: flex; flex-direction: column; background: rgba(0,0,0,0.2);">
+                <div style="padding: 10px; border-bottom: 1px solid var(--border); display: flex; gap: 5px;">
+                    <input type="number" id="new-chat-apt" placeholder="№ кв..." style="width: 60px; padding: 5px 10px; border-radius: 5px; border: 1px solid var(--border); background: var(--bg-main); color: var(--text);">
+                    <button class="btn btn-primary" style="padding: 5px 10px; flex: 1; font-size: 12px;" onclick="startNewTenantChat()">+ Написати</button>
+                </div>
+                <div id="tenant-chat-sidebar" style="overflow-y: auto; flex: 1;">
+                    <div style="padding:20px; text-align:center; color:var(--text-sec); font-size:12px;">Завантаження...</div>
+                </div>
+            </div>
+
+            <div style="width: 65%; display: flex; flex-direction: column; background: var(--bg-main);">
+                <div id="tenant-chat-messages" style="flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px;">
+                    <div style="margin:auto; color:var(--text-sec); text-align:center;">👈 Оберіть співрозмовника зліва<br>або введіть номер квартири</div>
+                </div>
+                <div id="tenant-chat-input-area" style="display:none; padding: 15px; border-top: 1px solid var(--border); gap: 10px; background: var(--bg-card);">
+                    <input type="text" id="tenant-msg-text" placeholder="Напишіть повідомлення..." style="flex:1; padding:10px; border-radius:8px; border:1px solid var(--border); background:var(--bg-main); color:var(--text);">
+                    <button class="btn btn-primary" style="width:auto; padding:0 20px;" onclick="sendTenantMessage()">➤</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>   
     <div id="payment-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,15,30,0.8); z-index:1000; align-items:center; justify-content:center; padding:20px; box-sizing:border-box; backdrop-filter: blur(5px);">
         <div class="card" style="width:100%; max-width:400px; text-align:center; position:relative;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
