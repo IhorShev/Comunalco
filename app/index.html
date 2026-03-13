@@ -2367,12 +2367,11 @@ class App {
         }
     } 
 
-   // 1. ФУНКЦІЯ ВІДПРАВКИ ЧЕРЕЗ SUPABASE (Оновлена назва)
-    // --- 1. ВІДПРАВКА ОДНІЄЇ КВИТАНЦІЇ (Оновлена) ---
+   // --- 1. ВІДПРАВКА ОДНІЄЇ КВИТАНЦІЇ (Оновлена + Архів) ---
     async sendToBot(i, isSilentMode = false) {
-        const FUNCTION_URL = "https://aougdxtsmzjgoykaslbt.supabase.co/functions/v1/telegram-bot";
+        const FUNCTION_URL = "https://aougdxsmzjgoykaslbt.supabase.co/functions/v1/telegram-bot";
         const a = this.currentData.apartments[i];
-        
+
         const chatId = a.telegram_chat_id || a.tg_id || a.chat_id;
         if (!chatId) {
             if (!isSilentMode) alert(`⚠️ ${a.name}: Немає Telegram ID. Натисніть "Підключити Телеграм-Бот".`);
@@ -2383,6 +2382,7 @@ class App {
         if (btn && !isSilentMode) { btn.disabled = true; btn.innerText = "⏳..."; }
 
         try {
+            // 1. Відправляємо в Телеграм
             const response = await fetch(FUNCTION_URL, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -2394,24 +2394,21 @@ class App {
             });
 
             if (!response.ok) throw new Error("Server Error");
-            // =========================================================
-            // 🚀 ДОДАНО: Автоматичне збереження в Архів (таблиця bills)
-            // =========================================================
+
+            // 2. 🚀 АВТОМАТИЧНЕ ЗБЕРЕЖЕННЯ В АРХІВ (для темного чека)
             try {
-                if (typeof sbClient !== 'undefined') {
-                    const a = this.currentData.apartments[i];
-                    
-                    // Формуємо красиву назву місяця (напр. "Березень 2026")
+                // Знаходимо підключення до бази (захист від помилок)
+                const db = (typeof sbClient !== 'undefined') ? sbClient : (window._supabase || null);
+                
+                if (db) {
                     const dateStr = new Date().toLocaleString('uk-UA', { month: 'long', year: 'numeric' });
                     const periodName = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
                     
-                    // Рахуємо фінальну суму до сплати
                     const debt = parseFloat(a.debt) || 0;
                     const bill = parseFloat(a.bill) || 0;
                     const paid = parseFloat(a.paid) || 0;
                     const totalToPay = debt + bill - paid;
                     
-                    // Пакуємо всі показники для нашого темного чека
                     const billData = {
                         user_id: String(a.id),
                         period_name: periodName,
@@ -2422,31 +2419,30 @@ class App {
                         services: a.services || []
                     };
 
-                    // Перевіряємо, чи вже є квитанція за цей місяць, щоб не дублювати
-                    const { data: existing } = await sbClient.from('bills')
+                    const { data: existing } = await db.from('bills')
                         .select('id')
                         .eq('user_id', String(a.id))
                         .eq('period_name', periodName)
                         .maybeSingle();
 
                     if (existing) {
-                        // Якщо вже відправляли в цьому місяці - просто оновлюємо дані
-                        await sbClient.from('bills').update(billData).eq('id', existing.id);
+                        await db.from('bills').update(billData).eq('id', existing.id);
                     } else {
-                        // Якщо це перша відправка за місяць - створюємо нову
-                        await sbClient.from('bills').insert([billData]);
+                        await db.from('bills').insert([billData]);
                     }
+                    console.log(`✅ Архів для кв.${a.id} успішно оновлено!`);
                 }
-            } catch (err) {
-                console.error("Помилка збереження в архів мешканця:", err);
+            } catch (dbErr) {
+                console.error("❌ Помилка збереження архіву:", dbErr);
             }
-            // =========================================================            
 
+            // 3. Завершення
             if (btn && !isSilentMode) {
                 btn.innerText = "✅ OK";
                 setTimeout(() => { btn.innerText = "Надіслати"; btn.disabled = false; }, 2000);
             }
             return true;
+
         } catch (e) {
             console.error(e);
             if (btn && !isSilentMode) { btn.innerText = "❌ Помилка"; btn.disabled = false; }
