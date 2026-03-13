@@ -3874,10 +3874,18 @@ async function loadAdminChats() {
 
         chats.forEach(chat => {
             const unreadBadge = chat.unread > 0 ? `<div class="unread-dot"></div>` : '';
+            
+            // 🚀 МАГІЯ: Шукаємо нормальне ім'я квартири у списку об'єктів
+            let aptName = "Квартира " + chat.aptId; // Запасний варіант (якщо раптом не знайде)
+            if (window.app && window.app.currentData && window.app.currentData.apartments) {
+                const found = window.app.currentData.apartments.find(a => String(a.id) === String(chat.aptId));
+                if (found && found.name) aptName = found.name;
+            }
+
             sidebar.insertAdjacentHTML('beforeend', `
                 <div class="chat-list-item" onclick="openAdminChat('${chat.aptId}')" id="chat-item-${chat.aptId}">
                     <div>
-                        <div style="font-weight:bold; margin-bottom:5px;">Квартира ${chat.aptId}</div>
+                        <div style="font-weight:bold; margin-bottom:5px;">${aptName}</div>
                         <div style="font-size:11px; color:var(--text-sec); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:150px;">
                             ${chat.lastMsg}
                         </div>
