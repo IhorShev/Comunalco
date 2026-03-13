@@ -915,11 +915,16 @@ async function submitVote(choice) {
         const prev = item.prev || {};
             const curr = item.curr || {};
             const services = item.services || [];
-            const tariffs = item.tariffs || {}; // 🚀 ДІСТАЄМО ТАРИФИ З БАЗИ
+            const tariffs = item.tariffs || {}; 
+            
+            // 🚀 Дістаємо фінанси з нашої хитрої кишені
+            const debt = tariffs._debt || 0;
+            const bill = tariffs._bill || 0;
+            const paid = tariffs._paid || 0;
 
             let rowsHtml = '';
             
-            // 🚀 Оновлена функція: тепер вона приймає тариф (price)
+            // 🚀 1. МАКЕТ ЛІЧИЛЬНИКІВ (Як у PDF + відступ 15px від скролу)
             const addRow = (icon, name, p, c, unit, price) => {
                 const pv = parseFloat(p) || 0;
                 const cv = parseFloat(c) || 0;
@@ -927,46 +932,75 @@ async function submitVote(choice) {
                 
                 if (cv > 0 || pv > 0) {
                     const diff = Math.max(0, (cv * 10 - pv * 10) / 10);
+                    let prHtml = '';
+                    let sumHtml = '<strong style="color:#fff; min-width:65px; text-align:right;">-</strong>';
                     
-                    // Формуємо красивий рядок з множенням, якщо тариф відомий
-                    let calcHtml = '';
-                    if (pr > 0) {
+                    if (pr > 0 && diff > 0) {
                         const sum = (diff * pr).toFixed(2);
-                        calcHtml = `<br><span style="font-size:11px; font-weight:normal; color:rgba(255,255,255,0.4);">&times; ${pr} ₴ = <span style="color:#fff; font-weight:bold;">${sum} ₴</span></span>`;
+                        prHtml = `${pr} ₴ &times; ${diff}`;
+                        sumHtml = `<strong style="color:#fff; min-width:65px; text-align:right;">${sum} ₴</strong>`;
                     }
 
                     rowsHtml += `
-                        <div style="display:flex; justify-content:space-between; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size:13px; color:var(--text-sec);">
-                            <div style="flex:2;">
-                                <strong style="color:var(--text);">${icon} ${name}</strong><br>
-                                <span style="color:rgba(255,255,255,0.4); font-size:11px;">${pv} &rarr; ${cv}</span>
+                        <div style="padding: 12px 15px 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size:12px;">
+                            <div style="display:flex; justify-content:space-between; margin-bottom: 4px;">
+                                <strong style="color:var(--text); flex:1;">${icon} ${name}</strong>
+                                <span style="color:var(--text); text-align:center; flex:1;">${diff} ${unit}</span>
+                                ${sumHtml}
                             </div>
-                            <div style="flex:1; text-align:right; font-weight:bold; color:var(--text); padding-top:2px;">
-                                ${diff} ${unit}
-                                ${calcHtml}
+                            <div style="display:flex; justify-content:space-between; color:rgba(255,255,255,0.4); font-size:11px;">
+                                <span style="flex:1;">${pv} &rarr; ${cv}</span>
+                                <span style="text-align:right; flex:1;">${prHtml}</span>
                             </div>
                         </div>
                     `;
                 }
             };
 
-            // 🚀 Передаємо тарифи у кожен рядок
             addRow('⚡', 'Електрика (День)', prev.ed, curr.ed, 'кВт', tariffs.ed);
             addRow('🌙', 'Електрика (Ніч)', prev.en, curr.en, 'кВт', tariffs.en);
             addRow('💧', 'Водопостачання', prev.w, curr.w, 'м³', tariffs.w);
             addRow('🔥', 'Газопостачання', prev.g, curr.g, 'м³', tariffs.g);
 
-        // Додаємо додаткові послуги (якщо є)
-        services.forEach(s => {
-            if (s.name) {
-                rowsHtml += `
-                    <div style="display:flex; justify-content:space-between; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size:13px; color:var(--text-sec);">
-                        <div style="flex:2;"><strong style="color:var(--text);">🏢 ${s.name}</strong></div>
-                        <div style="flex:1; text-align:right; font-weight:bold; color:var(--text); padding-top:4px;">${s.val} ₴</div>
-                    </div>
-                `;
+            // 🚀 2. ДОДАТКОВІ ПОСЛУГИ (Інтернет тощо)
+            services.forEach(s => {
+                if (s.name && parseFloat(s.val) > 0) {
+                    const sVal = parseFloat(s.val).toFixed(2);
+                    rowsHtml += `
+                        <div style="display:flex; justify-content:space-between; align-items:center; padding: 12px 15px 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size:12px;">
+                            <strong style="color:var(--text);">🔹 ${s.name}</strong>
+                            <strong style="color:#fff;">${sVal} ₴</strong>
+                        </div>
+                    `;
+                }
+            });
+
+            // 🚀 3. БЛОК ПІДСУМКІВ (Точна копія PDF)
+            let debtText = "Борг (попередній)";
+            let debtColor = "var(--danger)";
+            let displayDebt = debt;
+            if (debt < 0) {
+                debtText = "Переплата (попередня)";
+                debtColor = "var(--success)";
+                displayDebt = Math.abs(debt);
             }
-        });
+
+            rowsHtml += `
+                <div style="margin: 15px 15px 15px 0; padding: 12px 15px; background: rgba(0,0,0,0.2); border-radius: 8px; font-size: 12px;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                        <span style="color:var(--text-sec);">Нараховано (поточний):</span>
+                        <strong style="color:#fff;">${bill.toFixed(2)} ₴</strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                        <span style="color:var(--text-sec);">${debtText}:</span>
+                        <strong style="color:${debtColor};">${displayDebt.toFixed(2)} ₴</strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span style="color:var(--text-sec);">Сплачено:</span>
+                        <strong style="color:var(--success);">${paid.toFixed(2)} ₴</strong>
+                    </div>
+                </div>
+            `;
 
         // Видаляємо старе вікно
         const oldModal = document.getElementById('receipt-modal');
