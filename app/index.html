@@ -4099,6 +4099,30 @@ async function openAdminPollDetails(pollId) {
         detailsArea.innerHTML = '<div style="color:red; text-align:center;">Помилка завантаження</div>';
     }
 }
+
+    // --- 🛑 ФУНКЦІЯ ЗАВЕРШЕННЯ ГОЛОСУВАННЯ ---
+async function closeAdminPoll(pollId) {
+    if (!confirm("Ви впевнені, що хочете завершити це голосування? Мешканці більше не зможуть віддавати голоси.")) return;
+
+    try {
+        // Оновлюємо статус у базі Supabase на 'closed'
+        const { error } = await _supabase
+            .from('polls')
+            .update({ status: 'closed' })
+            .eq('id', pollId);
+
+        if (error) throw error;
+
+        // Оновлюємо інтерфейс, щоб побачити зміни миттєво
+        alert("✅ Голосування успішно завершено!");
+        if (typeof loadAdminPolls === 'function') loadAdminPolls(); // Оновлюємо список зліва
+        if (typeof openAdminPollDetails === 'function') openAdminPollDetails(pollId); // Оновлюємо праву панель
+
+    } catch (err) {
+        console.error("Помилка закриття голосування:", err);
+        alert("❌ Сталася помилка при збереженні. Перевірте консоль (F12).");
+    }
+}
     
     </script>
 
