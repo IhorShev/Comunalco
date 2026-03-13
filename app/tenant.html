@@ -746,94 +746,105 @@ function startNewTenantChat() {
 let currentActivePollId = null;
 
 async function loadTenantPoll() {
-    if (!currentTenant) return;
-    const votingArea = document.getElementById('voting-area');
-    if (!votingArea) return;
+        if (!currentTenant) return;
+        const votingArea = document.getElementById('voting-area');
+        if (!votingArea) return;
 
-    try {
-        // 1. Шукаємо останнє АКТИВНЕ опитування
-        const { data: polls, error: pollError } = await _supabase
-            .from('polls')
-            .select('*')
-            .eq('status', 'active')
-            .order('created_at', { ascending: false })
-            .limit(1);
+        try {
+            // 1. Завантажуємо ВСІ опитування (і активні, і закриті)
+            const { data: allPolls, error: pollError } = await _supabase
+                .from('polls')
+                .select('*')
+                .order('created_at', { ascending: false });
 
-        if (pollError) throw pollError;
+            if (pollError) throw pollError;
 
-        if (!polls || polls.length === 0) {
-            votingArea.innerHTML = '<div style="text-align:center; color:var(--text-sec); font-size:13px;">Наразі немає активних голосувань 🎉</div>';
-            return;
+            const activePolls = allPolls ? allPolls.filter(p => p.status === 'active') : [];
+            const closedPolls = allPolls ? allPolls.filter(p => p.status === 'closed') : [];
+
+            let html = '';
+
+            // --- БЛОК 1: АКТИВНЕ ОПИТУВАННЯ ---
+            if (activePolls.length === 0) {
+                html += '<div style="text-align:center; color:var(--text-sec); font-size:13px; margin-bottom:20px;">🎉 Наразі немає активних голосувань</div>';
+            } else {
+                const poll = activePolls[0];
+                currentActivePollId = poll.id;
+
+                // Перевіряємо, чи голосувала ця квартира
+                const { data: myVote } = await _supabase
+                    .from('votes').select('*').eq('poll_id', poll.id).eq('user_id', String(currentTenant.id));
+
+                const hasVoted = myVote && myVote.length > 0;
+
+                if (hasVoted) {
+                    let yesCount = 0, noCount = 0;
+                    const { data: allVotes } = await _supabase.from('votes').select('*').eq('poll_id', poll.id);
+                    if (allVotes) {
+                        allVotes.forEach(v => { if (v.choice === 'yes') yesCount++; if (v.choice === 'no') noCount++; });
+                    }
+                    const totalVotes = yesCount + noCount;
+                    const yesPercent = totalVotes === 0 ? 0 : Math.round((yesCount / totalVotes) * 100);
+                    const noPercent = totalVotes === 0 ? 0 : Math.round((noCount / totalVotes) * 100);
+
+                    html += `
+                        <div style="flex-grow:1; margin-bottom:20px;">
+                            <div style="font-size:15px; font-weight:bold; margin-bottom:8px; color:var(--text);">${poll.title}</div>
+                            <div style="font-size:13px; color:var(--success); margin:15px 0; text-align:center; font-weight:bold; background:rgba(46,213,115,0.1); padding:10px; border-radius:6px;">✅ Ваш голос враховано</div>
+                            <div style="font-size:12px; color:var(--text-sec); margin-bottom:5px;">Всього голосів: <b>${totalVotes}</b></div>
+                            <div style="display:flex; width:100%; height:12px; border-radius:6px; overflow:hidden; margin-bottom:5px; background:#333;">
+                                <div style="width:${yesPercent}%; background:var(--success); transition:1s;"></div>
+                                <div style="width:${noPercent}%; background:var(--danger); transition:1s;"></div>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--text-sec); margin-bottom:20px;">
+                                <span>ЗА: ${yesCount} (${yesPercent}%)</span>
+                                <span>ПРОТИ: ${noCount} (${noPercent}%)</span>
+                            </div>
+                            <button class="btn btn-outline" style="width:100%; font-size:12px;" onclick="alert('Генеруємо PDF...')">📄 Завантажити PDF</button>
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div style="flex-grow:1; margin-bottom:20px;">
+                            <div style="font-size:15px; font-weight:bold; margin-bottom:8px; color:var(--text);">${poll.title}</div>
+                            <div style="font-size:13px; color:var(--text-sec); margin-bottom:15px; line-height:1.4;">${poll.description || ''}</div>
+                            <div style="display:flex; gap:10px;">
+                                <button class="btn btn-success" style="flex:1; padding:12px; font-weight:bold;" onclick="submitTenantVote('yes')">👍 ЗА</button>
+                                <button class="btn btn-danger" style="flex:1; padding:12px; font-weight:bold;" onclick="submitTenantVote('no')">👎 ПРОТИ</button>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+
+            // --- БЛОК 2: АРХІВ ЗАКРИТИХ ОПИТУВАНЬ ---
+            if (closedPolls.length > 0) {
+                html += `
+                    <div style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px; margin-top: 10px;">
+                        <div style="font-size:11px; font-weight:bold; color:var(--text-sec); text-transform:uppercase; margin-bottom:10px;">Архів опитувань</div>
+                `;
+                closedPolls.forEach(cp => {
+                    const dateStr = new Date(cp.created_at).toLocaleDateString('uk-UA');
+                    html += `
+                        <div style="background: rgba(0,0,0,0.2); border-radius: 8px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-size:13px; font-weight:bold; color:var(--text); margin-bottom:4px;">${cp.title}</div>
+                                <div style="font-size:11px; color:var(--text-sec);">Завершено: ${dateStr}</div>
+                            </div>
+                            <button class="btn btn-outline" style="padding: 6px 12px; font-size:11px;" onclick="alert('Генеруємо PDF архіву...')">PDF</button>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+            }
+
+            votingArea.innerHTML = html;
+
+        } catch (err) {
+            console.error("Помилка завантаження голосування:", err);
+            votingArea.innerHTML = '<div style="color:var(--danger); font-size:12px;">Помилка завантаження даних</div>';
         }
-
-        const poll = polls[0];
-        currentActivePollId = poll.id;
-
-        // 2. Перевіряємо, чи ця квартира вже голосувала
-        const { data: myVote, error: voteError } = await _supabase
-            .from('votes')
-            .select('*')
-            .eq('poll_id', poll.id)
-            .eq('user_id', String(currentTenant.id));
-
-        if (voteError) throw voteError;
-        const hasVoted = myVote && myVote.length > 0;
-
-        // 3. Якщо вже голосували, отримуємо загальну статистику
-        let yesCount = 0, noCount = 0;
-        const { data: allVotes } = await _supabase.from('votes').select('*').eq('poll_id', poll.id);
-        
-        if (allVotes) {
-            allVotes.forEach(v => {
-                if (v.choice === 'yes') yesCount++;
-                if (v.choice === 'no') noCount++;
-            });
-        }
-        const totalVotes = yesCount + noCount;
-        const yesPercent = totalVotes === 0 ? 0 : Math.round((yesCount / totalVotes) * 100);
-        const noPercent = totalVotes === 0 ? 0 : Math.round((noCount / totalVotes) * 100);
-
-        // 4. Відображення
-        if (hasVoted) {
-            // ВЖЕ ПРОГОЛОСУВАВ: Показуємо результати
-            votingArea.innerHTML = `
-                <div style="flex-grow:1;">
-                    <div style="font-size:15px; font-weight:bold; margin-bottom:8px; color:var(--text);">${poll.title}</div>
-                    
-                    <div style="font-size:13px; color:var(--success); margin:15px 0; text-align:center; font-weight:bold; background:rgba(46, 213, 115, 0.1); padding:10px; border-radius:8px; border:1px solid var(--success);">
-                        ✅ Ваш голос враховано
-                    </div>
-                    
-                    <div style="font-size:12px; color:var(--text-sec); margin-bottom:5px;">Всього голосів: <b>${totalVotes}</b></div>
-                    <div style="display:flex; width:100%; height:12px; border-radius:6px; overflow:hidden; margin-bottom:5px; background:#333;">
-                        <div style="width:${yesPercent}%; background:var(--success); transition:1s;"></div>
-                        <div style="width:${noPercent}%; background:var(--danger); transition:1s;"></div>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--text-sec); margin-bottom:20px;">
-                        <span>ЗА: ${yesCount} (${yesPercent}%)</span>
-                        <span>ПРОТИ: ${noCount} (${noPercent}%)</span>
-                    </div>
-                </div>
-                <button class="btn btn-outline" style="width:100%; font-size:12px;" onclick="downloadVotePdf()">📄 Завантажити PDF</button>
-            `;
-        } else {
-            // ЩЕ НЕ ПРОГОЛОСУВАВ: Показуємо кнопки
-            votingArea.innerHTML = `
-                <div style="flex-grow:1;">
-                    <div style="font-size:15px; font-weight:bold; margin-bottom:8px; color:var(--text);">${poll.title}</div>
-                    <div style="font-size:12px; color:var(--text-sec); margin-bottom:15px; white-space:pre-wrap; line-height:1.4;">${poll.description || ''}</div>
-                </div>
-                <div style="display:flex; gap:10px; margin-top:10px;">
-                    <button class="btn btn-primary" style="flex:1; background:var(--success); border:none; font-weight:bold;" onclick="submitVote('yes')">👍 ЗА</button>
-                    <button class="btn btn-primary" style="flex:1; background:var(--danger); border:none; font-weight:bold;" onclick="submitVote('no')">👎 ПРОТИ</button>
-                </div>
-            `;
-        }
-    } catch (err) {
-        console.error(err);
-        votingArea.innerHTML = '<div style="color:red; text-align:center;">Помилка бази даних</div>';
     }
-}
 
 async function submitVote(choice) {
     if (!currentTenant || !currentActivePollId) return;
