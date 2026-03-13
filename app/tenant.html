@@ -903,6 +903,8 @@ async function submitVote(choice) {
         const item = window.tenantArchiveData[index];
         if (!item) return;
 
+        console.log("ДАНІ ДЛЯ ЧЕКА:", item);
+
         const period = item.period_name || "Архів";
         const amount = item.amount || 0;
         const isPaid = item.is_paid || (item.paid && parseFloat(item.paid) > 0);
