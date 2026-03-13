@@ -1148,22 +1148,26 @@ async function submitVote(choice) {
             alert("❌ Сталася помилка при збереженні. Перевірте з'єднання.");
         }
     };
-    // --- 📄 СУПЕР-ФУНКЦІЯ ГЕНЕРАЦІЇ PDF ПРОТОКОЛУ ---
+    // --- 📄 СУПЕР-ФУНКЦІЯ ГЕНЕРАЦІЇ PDF (Відкриття в новій вкладці) ---
     window.downloadPollPDF = async function(pollId) {
-        try {
-            // Попереджаємо користувача, бо генерація займає 1-2 секунди
-            alert("⏳ Збираємо дані для протоколу. Будь ласка, зачекайте...");
+        // Одразу відкриваємо пусту вкладку (обхід блокувальника реклами)
+        const pdfWindow = window.open("", "_blank");
+        if (pdfWindow) {
+            pdfWindow.document.write("<div style='font-family:sans-serif; padding:50px; text-align:center;'>⏳ Генеруємо офіційний протокол, зачекайте...</div>");
+        } else {
+            alert("⚠️ Ваш браузер заблокував відкриття нової вкладки. Дозвольте спливаючі вікна для цього сайту.");
+            return;
+        }
 
+        try {
             const db = typeof _supabase !== 'undefined' ? _supabase : window._supabase;
 
-            // 1. Отримуємо дані опитування та голоси
             const { data: poll, error: pollErr } = await db.from('polls').select('*').eq('id', pollId).single();
             if (pollErr || !poll) throw new Error("Опитування не знайдено");
 
             const { data: votes, error: votesErr } = await db.from('votes').select('*').eq('poll_id', pollId);
             if (votesErr) throw votesErr;
 
-            // 2. Рахуємо статистику
             let yesCount = 0, noCount = 0;
             if (votes) votes.forEach(v => { if (v.choice === 'yes') yesCount++; else if (v.choice === 'no') noCount++; });
             
@@ -1171,7 +1175,6 @@ async function submitVote(choice) {
             const yesPercent = totalVotes === 0 ? 0 : Math.round((yesCount / totalVotes) * 100);
             const noPercent = totalVotes === 0 ? 0 : Math.round((noCount / totalVotes) * 100);
 
-            // 3. Формуємо красивий ОФІЦІЙНИЙ БЛАНК (світла тема для друку)
             const dateStr = new Date(poll.created_at).toLocaleDateString('uk-UA');
             const statusStr = poll.status === 'active' ? 'Активне' : 'Завершено';
 
@@ -1181,16 +1184,13 @@ async function submitVote(choice) {
                         <h1 style="margin: 0; font-size: 24px; text-transform: uppercase;">Офіційний Протокол Голосування</h1>
                         <p style="margin: 5px 0 0; color: #555; font-size: 12px;">Згенеровано автоматично системою Comunalco</p>
                     </div>
-
                     <div style="margin-bottom: 30px; font-size: 14px; line-height: 1.6;">
                         <p><strong>Тема опитування:</strong> ${poll.title}</p>
-                        <p><strong>Деталі/Опис:</strong> ${poll.description || 'Без додаткового опису'}</p>
+                        <p><strong>Деталі:</strong> ${poll.description || 'Без додаткового опису'}</p>
                         <p><strong>Дата створення:</strong> ${dateStr}</p>
                         <p><strong>Статус на момент генерації:</strong> ${statusStr}</p>
                     </div>
-
                     <h3 style="margin-bottom: 15px; font-size: 18px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">Підсумки голосування:</h3>
-
                     <table style="width: 100%; border-collapse: collapse; margin-bottom: 40px; font-size: 14px;">
                         <tbody>
                             <tr>
@@ -1207,7 +1207,6 @@ async function submitVote(choice) {
                             </tr>
                         </tbody>
                     </table>
-
                     <div style="margin-top: 50px; display: flex; justify-content: space-between; font-size: 14px;">
                         <div>
                             <p><strong>Підпис Адміністратора:</strong></p>
@@ -1221,11 +1220,9 @@ async function submitVote(choice) {
                 </div>
             `;
 
-            // 4. Створюємо прихований елемент для генерації
             const element = document.createElement('div');
             element.innerHTML = htmlContent;
             
-            // 5. Розумне завантаження бібліотеки html2pdf (якщо її немає)
             if (typeof window.html2pdf === 'undefined') {
                 await new Promise((resolve) => {
                     const script = document.createElement('script');
@@ -1235,7 +1232,6 @@ async function submitVote(choice) {
                 });
             }
 
-            // 6. Зберігаємо PDF
             const opt = {
                 margin:       10,
                 filename:     `Protokol_${pollId.substring(0,5)}.pdf`,
@@ -1244,10 +1240,14 @@ async function submitVote(choice) {
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
-            window.html2pdf().set(opt).from(element).save();
+            // 🚀 МАГІЯ: Відкриваємо згенерований PDF у вже створеній вкладці!
+            window.html2pdf().set(opt).from(element).outputPdf('bloburl').then(function(pdfUrl) {
+                pdfWindow.location.href = pdfUrl;
+            });
 
         } catch (err) {
             console.error("Помилка PDF:", err);
+            if (pdfWindow) pdfWindow.close(); // Закриваємо вкладку, якщо сталася помилка
             alert("❌ Сталася помилка при генерації PDF.");
         }
     };
