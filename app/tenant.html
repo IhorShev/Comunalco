@@ -1102,35 +1102,20 @@ async function submitVote(choice) {
     // --- 🔑 НАДІЙНА ЗМІНА PIN-КОДУ ---
     window.changeTenantPin = async function() {
         try {
-            // Дістаємо мешканця прямо з пам'яті браузера
             const tData = JSON.parse(localStorage.getItem('comunalco_tenant'));
-            if (!tData || !tData.id) {
-                alert("❌ Помилка: Не знайдено дані мешканця. Спробуйте перезайти в кабінет.");
-                return;
-            }
+            if (!tData || !tData.id) return alert("❌ Не знайдено дані мешканця.");
 
             const oldPin = prompt("Введіть ваш ПОТОЧНИЙ PIN-код для підтвердження:");
-            if (oldPin === null) return; // Натиснув Скасувати
+            if (oldPin === null) return; 
 
-            if (oldPin !== String(tData.pin)) {
-                alert("❌ Невірний поточний PIN-код!");
-                return;
-            }
+            if (oldPin !== String(tData.pin)) return alert("❌ Невірний поточний PIN-код!");
 
             const newPin = prompt("Введіть НОВИЙ PIN-код (мінімум 4 символи):");
             if (newPin === null) return;
-            
-            if (newPin.trim().length < 4) {
-                alert("❌ Помилка: PIN-код має містити хоча б 4 символи!");
-                return;
-            }
+            if (newPin.trim().length < 4) return alert("❌ Помилка: PIN-код має містити хоча б 4 символи!");
 
             // Зберігаємо в базу
-            const { error } = await window._supabase
-                .from('apartments')
-                .update({ pin: newPin.trim() })
-                .eq('id', tData.id);
-
+            const { error } = await window._supabase.from('apartments').update({ pin: newPin.trim() }).eq('id', tData.id);
             if (error) throw error;
 
             // Оновлюємо пам'ять
@@ -1139,10 +1124,8 @@ async function submitVote(choice) {
             window.currentTenant = tData;
 
             alert("✅ Ваш PIN-код успішно змінено!");
-            
         } catch (err) {
-            console.error("Помилка зміни PIN:", err);
-            alert("❌ Сталася помилка при збереженні. Перевірте консоль.");
+            console.error(err); alert("❌ Сталася помилка при збереженні.");
         }
     };
     </script>
