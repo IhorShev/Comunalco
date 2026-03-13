@@ -3522,6 +3522,31 @@ window.addEventListener('load', () => {
     setTimeout(checkUnreadAdminMessages, 2000);
     // ...і далі автоматично кожні 30 секунд
     setInterval(checkUnreadAdminMessages, 30000);
+    // ==========================================
+    // ⏰ СИСТЕМА АВТО-ПРОБУДЖЕННЯ (Анти-сон)
+    // ==========================================
+    let lastActivityTime = Date.now();
+
+    // Оновлюємо таймер, коли ви працюєте (рух, клік, клавіатура)
+    const resetTimer = () => { lastActivityTime = Date.now(); };
+    document.addEventListener('mousemove', resetTimer);
+    document.addEventListener('keydown', resetTimer);
+    document.addEventListener('click', resetTimer);
+
+    // Слухаємо подію "Користувач повернувся на вкладку"
+    document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") {
+            const timeAsleep = Date.now() - lastActivityTime;
+            
+            // Якщо додаток спав більше ніж 10 хвилин (600 000 мілісекунд)
+            if (timeAsleep > 10 * 60 * 1000) {
+                console.log("Додаток довго спав. Робимо свіже завантаження...");
+                
+                // Примусово і непомітно оновлюємо сторінку для 100% актуальних даних
+                window.location.reload(); 
+            }
+        }
+    });
 </script>
 
 <div id="resultModal" class="modal">
@@ -3960,6 +3985,7 @@ async function openAdminPollDetails(pollId) {
     
 </body>
 </html>
+
 
 
 
