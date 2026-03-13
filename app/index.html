@@ -2394,6 +2394,53 @@ class App {
             });
 
             if (!response.ok) throw new Error("Server Error");
+            // =========================================================
+            // 🚀 ДОДАНО: Автоматичне збереження в Архів (таблиця bills)
+            // =========================================================
+            try {
+                if (typeof sbClient !== 'undefined') {
+                    const a = this.currentData.apartments[i];
+                    
+                    // Формуємо красиву назву місяця (напр. "Березень 2026")
+                    const dateStr = new Date().toLocaleString('uk-UA', { month: 'long', year: 'numeric' });
+                    const periodName = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+                    
+                    // Рахуємо фінальну суму до сплати
+                    const debt = parseFloat(a.debt) || 0;
+                    const bill = parseFloat(a.bill) || 0;
+                    const paid = parseFloat(a.paid) || 0;
+                    const totalToPay = debt + bill - paid;
+                    
+                    // Пакуємо всі показники для нашого темного чека
+                    const billData = {
+                        user_id: String(a.id),
+                        period_name: periodName,
+                        amount: Math.max(0, totalToPay).toFixed(2),
+                        is_paid: totalToPay <= 0,
+                        prev: a.prev || {},
+                        curr: a.curr || {},
+                        services: a.services || []
+                    };
+
+                    // Перевіряємо, чи вже є квитанція за цей місяць, щоб не дублювати
+                    const { data: existing } = await sbClient.from('bills')
+                        .select('id')
+                        .eq('user_id', String(a.id))
+                        .eq('period_name', periodName)
+                        .maybeSingle();
+
+                    if (existing) {
+                        // Якщо вже відправляли в цьому місяці - просто оновлюємо дані
+                        await sbClient.from('bills').update(billData).eq('id', existing.id);
+                    } else {
+                        // Якщо це перша відправка за місяць - створюємо нову
+                        await sbClient.from('bills').insert([billData]);
+                    }
+                }
+            } catch (err) {
+                console.error("Помилка збереження в архів мешканця:", err);
+            }
+            // =========================================================            
 
             if (btn && !isSilentMode) {
                 btn.innerText = "✅ OK";
@@ -3985,6 +4032,7 @@ async function openAdminPollDetails(pollId) {
     
 </body>
 </html>
+
 
 
 
