@@ -579,7 +579,7 @@
                                 <div style="font-size:13px; font-weight:bold;">${item.period_name}</div>
                                 <div style="font-size:11px; color:${statusColor};">${statusText}: ${item.amount} ₴</div>
                             </div>
-                            <button class="btn btn-outline" style="width:auto; padding:6px 12px; font-size:11px;" onclick="alert('Завантаження PDF...')">PDF</button>
+                            <button class="btn btn-outline" style="width:auto; padding:6px 12px; font-size:11px;" onclick="printTenantReceipt('${item.period_name}', '${item.amount}', ${isPaid})">📄 PDF</button>
                         </div>
                     `);
                 });
