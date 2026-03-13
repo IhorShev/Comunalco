@@ -1152,10 +1152,25 @@ class App {
         document.getElementById('announcementModal').style.display = 'flex';
     }
 
+    // --- 🚀 ДОПОМІЖНА ФУНКЦІЯ: Збереження розсилки в історію чату ---
+    async saveToChatHistory(aptId, text) {
+        try {
+            if (typeof _supabase !== 'undefined') {
+                await _supabase.from('messages').insert([{
+                    sender_id: 'manager',
+                    recipient_type: String(aptId),
+                    message_text: text,
+                    is_read: false // Щоб світилося як непрочитане
+                }]);
+            }
+        } catch (e) { console.error("Помилка збереження в чат:", e); }
+    }
+    // ---------------------------------------------------------------
+
     async sendAnnouncement() {
         const textEl = document.getElementById('announcement-text');
         const text = textEl ? textEl.value.trim() : '';
-        
+
         if(!text) return alert("⚠️ Введіть текст повідомлення!");
 
         const indices = this.announcementTargets || [];
@@ -1179,7 +1194,11 @@ class App {
                         method: "POST", headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ action: "send_message", chat_id: chatId, text: text })
                     });
-                    if (response.ok) successCount++;
+                    if (response.ok) {
+                        successCount++;
+                        // 🚀 ДОДАНО: Копіюємо в Чат
+                        this.saveToChatHistory(a.id, `📢 Оголошення:\n${text}`);
+                    }
                 } catch (e) {}
             }
             // Пауза 300мс між відправками (захист від блокування Телеграмом)
@@ -1194,7 +1213,7 @@ class App {
         alert(`✅ Оголошення надіслано!\nУспішно доставлено: ${successCount} з ${indices.length}`);
     }
 
-    // --- В) НАГАДУВАННЯ ПРО БОРГ (Тільки боржникам з вибраних) ---
+    // --- В) НАГАДУВАННЯ ПРО БОРГ ---
     async remindDebtorsModal(indices) {
         const debtors = [];
         indices.forEach(i => {
@@ -1202,7 +1221,8 @@ class App {
             // Бронебійна перевірка: відправляємо ТІЛЬКИ якщо борг більше 100
             if (parseFloat(a.debt) > 100) {
                 const chatId = a.telegram_chat_id || a.tg_id || a.chat_id;
-                if (chatId) debtors.push({ chat_id: chatId, amount: a.debt });
+                // 🚀 ДОДАНО apt_id, щоб знати, в який чат це зберегти
+                if (chatId) debtors.push({ chat_id: chatId, amount: a.debt, apt_id: a.id });
             }
         });
 
@@ -1215,14 +1235,19 @@ class App {
 
         document.getElementById('tgActionModal').style.display = 'none';
         const FUNCTION_URL = "https://aougdxtsmzjgoykaslbt.supabase.co/functions/v1/telegram-bot";
-        
+
         try {
             const response = await fetch(FUNCTION_URL, {
                 method: "POST", headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ action: "remind_debtors", debtors: debtors })
             });
             if (!response.ok) throw new Error("Помилка сервера");
-            
+
+            // 🚀 ДОДАНО: Копіюємо в Чат кожному боржнику
+            debtors.forEach(d => {
+                this.saveToChatHistory(d.apt_id, `⚠️ Надіслано нагадування про борг: ${d.amount} грн.`);
+            });
+
             alert(`✅ Нагадування успішно відправлено ${debtors.length} боржникам!`);
         } catch (e) {
             alert("❌ Помилка: " + e.message);
@@ -3865,6 +3890,7 @@ async function openAdminPollDetails(pollId) {
     
 </body>
 </html>
+
 
 
 
