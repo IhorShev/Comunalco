@@ -3476,6 +3476,52 @@ window.addEventListener('load', () => {
             window.isSavingNow = false; 
         }
     };
+    // ==========================================
+    // 🔴 СИСТЕМА СПОВІЩЕНЬ ПРО НОВІ ПОВІДОМЛЕННЯ
+    // ==========================================
+    async function checkUnreadAdminMessages() {
+        try {
+            if (typeof _supabase === 'undefined') return;
+
+            // Шукаємо повідомлення від мешканців, які ще не прочитані
+            const { data, error } = await _supabase
+                .from('messages')
+                .select('id')
+                .neq('sender_id', 'manager')
+                .eq('is_read', false);
+
+            if (error) throw error;
+
+            const unreadCount = data ? data.length : 0;
+            const badge = document.getElementById('admin-chat-badge');
+
+            // 1. Оновлюємо крапку на кнопці
+            if (badge) {
+                if (unreadCount > 0) {
+                    badge.innerText = unreadCount;
+                    badge.style.display = 'block';
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+
+            // 2. Оновлюємо цифру на іконці додатка на робочому столі
+            if ('setAppBadge' in navigator) {
+                if (unreadCount > 0) {
+                    navigator.setAppBadge(unreadCount).catch(() => {});
+                } else {
+                    navigator.clearAppBadge().catch(() => {});
+                }
+            }
+        } catch (e) {
+            console.error("Помилка перевірки нових повідомлень:", e);
+        }
+    }
+
+    // Запускаємо перевірку відразу...
+    setTimeout(checkUnreadAdminMessages, 2000);
+    // ...і далі автоматично кожні 30 секунд
+    setInterval(checkUnreadAdminMessages, 30000);
 </script>
 
 <div id="resultModal" class="modal">
@@ -3914,6 +3960,7 @@ async function openAdminPollDetails(pollId) {
     
 </body>
 </html>
+
 
 
 
