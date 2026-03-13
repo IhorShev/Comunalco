@@ -2933,7 +2933,7 @@ class App {
                     };
 
                     // --- ЛОГІКА КНОПКИ "СКАЧАТИ" ---
-                    document.getElementById('btn-dl-img').onclick = () => {
+                    document.getElementById('btn-dl-img').onclick = async () => {
                         const link = document.createElement('a');
                         link.href = dataUri;
                         link.download = `Receipt_${apt.name}.png`;
