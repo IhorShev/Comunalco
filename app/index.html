@@ -2371,7 +2371,7 @@ class App {
 
    // --- 1. ВІДПРАВКА ОДНІЄЇ КВИТАНЦІЇ (Оновлена + Архів) ---
     async sendToBot(i, isSilentMode = false) {
-        const FUNCTION_URL = "https://aougdxsmzjgoykaslbt.supabase.co/functions/v1/telegram-bot";
+        const FUNCTION_URL = "https://aougdxtsmzjgoykaslbt.supabase.co/functions/v1/telegram-bot";
         const a = this.currentData.apartments[i];
 
         const chatId = a.telegram_chat_id || a.tg_id || a.chat_id;
@@ -2384,24 +2384,9 @@ class App {
         if (btn && !isSilentMode) { btn.disabled = true; btn.innerText = "⏳..."; }
 
         try {
-            // 1. Відправляємо в Телеграм
-            const response = await fetch(FUNCTION_URL, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    action: "send_message",
-                    chat_id: chatId,
-                    text: this.checks[i] // Текст квитанції
-                })
-            });
-
-            if (!response.ok) throw new Error("Server Error");
-
-            // 2. 🚀 АВТОМАТИЧНЕ ЗБЕРЕЖЕННЯ В АРХІВ (для темного чека)
+            // 🚀 1. СПОЧАТКУ ЗБЕРІГАЄМО В АРХІВ (Щоб PDF гарантовано згенерувався)
             try {
-                // Знаходимо підключення до бази (захист від помилок)
                 const db = (typeof sbClient !== 'undefined') ? sbClient : (window._supabase || null);
-                
                 if (db) {
                     const dateStr = new Date().toLocaleString('uk-UA', { month: 'long', year: 'numeric' });
                     const periodName = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
@@ -2421,24 +2406,32 @@ class App {
                         services: a.services || []
                     };
 
-                    const { data: existing } = await db.from('bills')
-                        .select('id')
-                        .eq('user_id', String(a.id))
-                        .eq('period_name', periodName)
-                        .maybeSingle();
+                    const { data: existing } = await db.from('bills').select('id').eq('user_id', String(a.id)).eq('period_name', periodName).maybeSingle();
 
                     if (existing) {
                         await db.from('bills').update(billData).eq('id', existing.id);
                     } else {
                         await db.from('bills').insert([billData]);
                     }
-                    console.log(`✅ Архів для кв.${a.id} успішно оновлено!`);
                 }
             } catch (dbErr) {
                 console.error("❌ Помилка збереження архіву:", dbErr);
             }
 
-            // 3. Завершення
+            // 📨 2. ВІДПРАВЛЯЄМО В ТЕЛЕГРАМ
+            const response = await fetch(FUNCTION_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    action: "send_message",
+                    chat_id: chatId,
+                    text: this.checks[i] || "Ваша квитанція сформована"
+                })
+            });
+
+            if (!response.ok) throw new Error("Помилка Telegram API");
+
+            // 3. УСПІШНЕ ЗАВЕРШЕННЯ
             if (btn && !isSilentMode) {
                 btn.innerText = "✅ OK";
                 setTimeout(() => { btn.innerText = "Надіслати"; btn.disabled = false; }, 2000);
@@ -2446,7 +2439,7 @@ class App {
             return true;
 
         } catch (e) {
-            console.error(e);
+            console.error("Помилка відправки:", e);
             if (btn && !isSilentMode) { btn.innerText = "❌ Помилка"; btn.disabled = false; }
             return false;
         }
