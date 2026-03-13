@@ -4088,7 +4088,11 @@ async function openAdminPollDetails(pollId) {
                 </div>
             </div>
             
-            <button class="btn btn-outline" style="width:100%;" onclick="alert('Генеруємо офіційний PDF протокол...')">📄 Завантажити протокол</button>
+            ${poll.status === 'active' 
+        ? `<button style="width:100%; margin-bottom: 10px; background: var(--danger); color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold;" onclick="closeAdminPoll('${poll.id}')">🛑 Завершити голосування</button>` 
+        : `<div style="text-align:center; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 6px; margin-bottom: 10px; color: var(--success); font-weight: bold;">✅ Голосування завершено</div>`
+    }
+    <button class="btn btn-outline" style="width:100%; padding: 10px; border-radius: 6px; cursor: pointer;" onclick="alert('Генеруємо офіційний PDF протокол...')">📄 Завантажити протокол</button>
         `;
     } catch (err) {
         console.error(err);
