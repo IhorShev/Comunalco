@@ -894,57 +894,119 @@ async function submitVote(choice) {
     setInterval(checkUnreadTenantMessages, 30000);
 
     // ==========================================
-    // 📄 ГЕНЕРАТОР КВИТАНЦІЙ (Красивий чек на екрані)
+    // 📄 ГЕНЕРАТОР КВИТАНЦІЙ (Детальний ТЕМНИЙ дизайн)
     // ==========================================
-    function printTenantReceipt(period, amount, isPaid) {
-        const status = isPaid ? "СПЛАЧЕНО" : "БОРГ / ДО СПЛАТИ";
-        const statusColor = isPaid ? "#10b981" : "#ef4444"; 
-        
+    function printTenantReceipt(index) {
+        // Дістаємо всі дані за обраний місяць
+        const item = window.tenantArchiveData[index];
+        if (!item) return;
+
+        const period = item.period_name || "Архів";
+        const amount = item.amount || 0;
+        const isPaid = item.is_paid || (item.paid && parseFloat(item.paid) > 0);
+        const status = isPaid ? "СПЛАЧЕНО" : "ДО СПЛАТИ";
+        // Використовуємо яскраві кольори для темного фону
+        const statusColor = isPaid ? "#00e676" : "#ff5252"; 
+
+        const prev = item.prev || {};
+        const curr = item.curr || {};
+        const services = item.services || [];
+
+        // Генеруємо рядки з показниками лічильників
+        let rowsHtml = '';
+        const addRow = (icon, name, p, c, unit) => {
+            const pv = parseFloat(p) || 0;
+            const cv = parseFloat(c) || 0;
+            if (cv > 0 || pv > 0) {
+                const diff = Math.max(0, (cv * 10 - pv * 10) / 10);
+                rowsHtml += `
+                    <div style="display:flex; justify-content:space-between; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size:13px; color:var(--text-sec);">
+                        <div style="flex:2;">
+                            <strong style="color:var(--text);">${icon} ${name}</strong><br>
+                            <span style="color:rgba(255,255,255,0.4); font-size:11px;">${pv} &rarr; ${cv}</span>
+                        </div>
+                        <div style="flex:1; text-align:right; font-weight:bold; color:var(--text); padding-top:4px;">${diff} ${unit}</div>
+                    </div>
+                `;
+            }
+        };
+
+        addRow('⚡', 'Електрика (День)', prev.ed, curr.ed, 'кВт');
+        addRow('🌙', 'Електрика (Ніч)', prev.en, curr.en, 'кВт');
+        addRow('💧', 'Водопостачання', prev.w, curr.w, 'м³');
+        addRow('🔥', 'Газопостачання', prev.g, curr.g, 'м³');
+
+        // Додаємо додаткові послуги (якщо є)
+        services.forEach(s => {
+            if (s.name) {
+                rowsHtml += `
+                    <div style="display:flex; justify-content:space-between; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size:13px; color:var(--text-sec);">
+                        <div style="flex:2;"><strong style="color:var(--text);">🏢 ${s.name}</strong></div>
+                        <div style="flex:1; text-align:right; font-weight:bold; color:var(--text); padding-top:4px;">${s.val} ₴</div>
+                    </div>
+                `;
+            }
+        });
+
+        // Видаляємо старе вікно
         const oldModal = document.getElementById('receipt-modal');
         if (oldModal) oldModal.remove();
 
+        // Створюємо темний фон-затемнення з блюром
         const overlay = document.createElement('div');
         overlay.id = "receipt-modal";
-        overlay.style.cssText = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; display:flex; justify-content:center; align-items:center; padding:20px; backdrop-filter: blur(5px);";
+        overlay.style.cssText = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999; display:flex; justify-content:center; align-items:center; padding:15px; backdrop-filter: blur(8px); overflow-y:auto;";
 
+        // Сам ЧЕК (Темний, глибокий, футуристичний)
         const printContent = `
-            <div style="font-family: 'Montserrat', sans-serif; background: var(--bg-card); padding: 30px; width: 100%; max-width: 350px; border-radius: 15px; border: 1px solid var(--border); box-shadow: 0 10px 25px rgba(0,0,0,0.5); position: relative;">
+            <div style="font-family: 'Montserrat', sans-serif; background: #1a1a1a; padding: 25px; width: 100%; max-width: 420px; border-radius: 15px; position: relative; margin: auto; box-shadow: 0 15px 40px rgba(0,0,0,0.8); border: 1px solid #333;">
                 
-                <span onclick="document.getElementById('receipt-modal').remove()" style="position:absolute; top:10px; right:15px; font-size:28px; cursor:pointer; color:var(--text-sec); line-height: 1;">&times;</span>
+                <span onclick="document.getElementById('receipt-modal').remove()" style="position:absolute; top:10px; right:15px; font-size:32px; cursor:pointer; color:#666; line-height: 1;">&times;</span>
                 
-                <h2 style="text-align: center; margin-top: 0; margin-bottom: 5px; color: var(--text);">MyComunalco</h2>
-                <div style="text-align: center; font-size: 13px; color: var(--text-sec); margin-bottom: 25px;">Електронна квитанція</div>
-                
-                <hr style="border: 0; border-top: 1px dashed var(--border); margin: 15px 0;">
-                
-                <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 15px; color: var(--text);">
-                    <span>Квартира:</span> <strong>№ ${currentTenant.id}</strong>
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 25px; border-bottom: 3px solid var(--primary); padding-bottom: 15px;">
+                    <div>
+                        <h2 style="margin: 0; color: var(--text); font-size:24px; font-weight: 800; letter-spacing: 0.5px;">COMUNALCO</h2>
+                        <div style="font-size: 12px; color: var(--text-sec);">Електронний чек</div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="font-weight:bold; color:var(--primary); font-size:14px; text-transform:uppercase;">${period}</div>
+                    </div>
                 </div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 15px; color: var(--text);">
-                    <span>Період:</span> <strong>${period}</strong>
+
+                <div style="background:rgba(255,255,255,0.03); border-radius:10px; padding:18px; margin-bottom:25px; border: 1px solid rgba(255,255,255,0.05);">
+                    <div style="font-size:11px; color:var(--text-sec); text-transform:uppercase; margin-bottom: 5px;">Платник</div>
+                    <div style="font-size:22px; font-weight:bold; color:var(--text);">Квартира ${currentTenant.id}</div>
                 </div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 15px;">
-                    <span style="color: var(--text);">Статус:</span> <strong style="color: ${statusColor};">${status}</strong>
+
+                <div style="font-size:11px; color:rgba(255,255,255,0.4); text-transform:uppercase; display:flex; border-bottom:2px solid #333; padding-bottom:8px; margin-bottom:8px; letter-spacing:1px;">
+                    <div style="flex:2; font-weight: 600;">Послуга / Показники</div>
+                    <div style="flex:1; text-align:right; font-weight: 600;">Спожито</div>
+                </div>
+
+                <div style="margin-bottom:25px; max-height: 300px; overflow-y:auto; padding-right:5px;">
+                    ${rowsHtml || '<div style="text-align:center; padding:20px; color:#666; font-size:12px;">Деталізація відсутня</div>'}
                 </div>
                 
-                <hr style="border: 0; border-top: 1px dashed var(--border); margin: 15px 0;">
+                <hr style="border: 0; border-top: 2px solid #444; margin: 15px 0;">
                 
-                <div style="display: flex; justify-content: space-between; font-size: 20px; color: var(--text);">
-                    <span>Всього:</span> <strong>${amount} ₴</strong>
+                <div style="display: flex; justify-content: space-between; align-items:center; font-size: 16px; margin-bottom: 8px;">
+                    <span style="color: var(--text-sec); font-weight: 600;">Статус:</span> 
+                    <strong style="color: ${statusColor}; font-size:16px; text-transform:uppercase; letter-spacing:1px;">${status}</strong>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items:center; font-size: 22px; color: var(--text);">
+                    <span style="font-weight:800; text-transform:uppercase;">До сплати:</span> 
+                    <strong style="font-size:32px; color:var(--text);">${amount} ₴</strong>
                 </div>
                 
-                <div style="text-align: center; margin-top: 40px; font-size: 11px; color: var(--text-sec);">
-                    Згенеровано автоматично <br>в системі керування будинком
+                <div style="text-align: center; margin-top: 40px; font-size: 10px; color: #555;">
+                    Згенеровано Comunalco &bull; id: ${item.id || 'N/A'}
                 </div>
             </div>
         `;
         
         overlay.innerHTML = printContent;
-        
-        overlay.addEventListener('click', function(e) {
-            if (e.target === overlay) overlay.remove();
-        });
-
+        overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
         document.body.appendChild(overlay);
     }
     // ==========================================
