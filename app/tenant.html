@@ -1087,6 +1087,48 @@ async function submitVote(choice) {
             }
         }
     });
+    // --- ЗМІНА PIN-КОДУ МЕШКАНЦЕМ ---
+    async function changeTenantPin() {
+        if (!window.currentTenant || !window.currentTenant.id) return;
+
+        // 1. Запитуємо старий PIN для безпеки
+        const oldPin = prompt("Введіть ваш ПОТОЧНИЙ PIN-код для підтвердження:");
+        if (oldPin === null) return; // Користувач натиснув "Скасувати"
+
+        if (oldPin !== String(window.currentTenant.pin)) {
+            alert("❌ Невірний поточний PIN-код!");
+            return;
+        }
+
+        // 2. Запитуємо новий PIN
+        const newPin = prompt("Введіть НОВИЙ PIN-код (мінімум 4 символи):");
+        if (newPin === null) return;
+        
+        if (newPin.trim().length < 4) {
+            alert("❌ Помилка: PIN-код має містити хоча б 4 символи!");
+            return;
+        }
+
+        // 3. Зберігаємо в базу Supabase
+        try {
+            const { error } = await _supabase
+                .from('apartments')
+                .update({ pin: newPin.trim() })
+                .eq('id', window.currentTenant.id);
+
+            if (error) throw error;
+
+            // 4. Оновлюємо дані локально, щоб не викинуло з кабінету
+            window.currentTenant.pin = newPin.trim();
+            localStorage.setItem('comunalco_tenant', JSON.stringify(window.currentTenant));
+
+            alert("✅ Ваш PIN-код успішно змінено!");
+            
+        } catch (err) {
+            console.error("Помилка зміни PIN:", err);
+            alert("❌ Сталася помилка при збереженні. Спробуйте пізніше.");
+        }
+    }
     </script>
      <div id="tenant-chat-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
     <div style="background: var(--bg-card); width: 95%; max-width: 900px; height: 85vh; border-radius: 15px; display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
