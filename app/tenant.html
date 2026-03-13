@@ -800,7 +800,7 @@ async function loadTenantPoll() {
                                 <span>ЗА: ${yesCount} (${yesPercent}%)</span>
                                 <span>ПРОТИ: ${noCount} (${noPercent}%)</span>
                             </div>
-                            <button class="btn btn-outline" style="width:100%; font-size:12px;" onclick="alert('Генеруємо PDF...')">📄 Завантажити PDF</button>
+                            <button class="btn btn-outline" style="width:100%; font-size:12px;" onclick="window.downloadPollPDF('${poll.id}')">📄 Завантажити PDF</button>
                         </div>
                     `;
                 } else {
@@ -831,7 +831,7 @@ async function loadTenantPoll() {
                                 <div style="font-size:13px; font-weight:bold; color:var(--text); margin-bottom:4px;">${cp.title}</div>
                                 <div style="font-size:11px; color:var(--text-sec);">Завершено: ${dateStr}</div>
                             </div>
-                            <button class="btn btn-outline" style="padding: 6px 12px; font-size:11px;" onclick="alert('Генеруємо PDF архіву...')">PDF</button>
+                            <button class="btn btn-outline" style="padding: 6px 12px; font-size:11px;" onclick="window.downloadPollPDF('${cp.id}')">PDF</button>
                         </div>
                     `;
                 });
