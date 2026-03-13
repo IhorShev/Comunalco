@@ -855,6 +855,98 @@ async function submitVote(choice) {
         alert("Помилка відправки.");
     }
 }
+    // ==========================================
+    // 🔴 СИСТЕМА СПОВІЩЕНЬ МЕШКАНЦЯ (Червона крапка)
+    // ==========================================
+    async function checkUnreadTenantMessages() {
+        try {
+            if (typeof _supabase === 'undefined' || typeof currentTenant === 'undefined' || !currentTenant) return;
+
+            const { data, error } = await _supabase
+                .from('messages')
+                .select('id')
+                .eq('recipient_type', String(currentTenant.id))
+                .eq('is_read', false);
+
+            if (error) throw error;
+
+            const unreadCount = data ? data.length : 0;
+            const badge = document.getElementById('tenant-chat-badge');
+
+            if (badge) {
+                if (unreadCount > 0) {
+                    badge.innerText = unreadCount;
+                    badge.style.display = 'block';
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+            
+            if ('setAppBadge' in navigator) {
+                if (unreadCount > 0) navigator.setAppBadge(unreadCount).catch(()=>{});
+                else navigator.clearAppBadge().catch(()=>{});
+            }
+        } catch (e) {
+            console.error("Помилка перевірки нових повідомлень мешканця:", e);
+        }
+    }
+    setTimeout(checkUnreadTenantMessages, 2000);
+    setInterval(checkUnreadTenantMessages, 30000);
+
+    // ==========================================
+    // 📄 ГЕНЕРАТОР КВИТАНЦІЙ (Красивий чек на екрані)
+    // ==========================================
+    function printTenantReceipt(period, amount, isPaid) {
+        const status = isPaid ? "СПЛАЧЕНО" : "БОРГ / ДО СПЛАТИ";
+        const statusColor = isPaid ? "#10b981" : "#ef4444"; 
+        
+        const oldModal = document.getElementById('receipt-modal');
+        if (oldModal) oldModal.remove();
+
+        const overlay = document.createElement('div');
+        overlay.id = "receipt-modal";
+        overlay.style.cssText = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; display:flex; justify-content:center; align-items:center; padding:20px; backdrop-filter: blur(5px);";
+
+        const printContent = `
+            <div style="font-family: 'Montserrat', sans-serif; background: var(--bg-card); padding: 30px; width: 100%; max-width: 350px; border-radius: 15px; border: 1px solid var(--border); box-shadow: 0 10px 25px rgba(0,0,0,0.5); position: relative;">
+                
+                <span onclick="document.getElementById('receipt-modal').remove()" style="position:absolute; top:10px; right:15px; font-size:28px; cursor:pointer; color:var(--text-sec); line-height: 1;">&times;</span>
+                
+                <h2 style="text-align: center; margin-top: 0; margin-bottom: 5px; color: var(--text);">MyComunalco</h2>
+                <div style="text-align: center; font-size: 13px; color: var(--text-sec); margin-bottom: 25px;">Електронна квитанція</div>
+                
+                <hr style="border: 0; border-top: 1px dashed var(--border); margin: 15px 0;">
+                
+                <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 15px; color: var(--text);">
+                    <span>Квартира:</span> <strong>№ ${currentTenant.id}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 15px; color: var(--text);">
+                    <span>Період:</span> <strong>${period}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 15px;">
+                    <span style="color: var(--text);">Статус:</span> <strong style="color: ${statusColor};">${status}</strong>
+                </div>
+                
+                <hr style="border: 0; border-top: 1px dashed var(--border); margin: 15px 0;">
+                
+                <div style="display: flex; justify-content: space-between; font-size: 20px; color: var(--text);">
+                    <span>Всього:</span> <strong>${amount} ₴</strong>
+                </div>
+                
+                <div style="text-align: center; margin-top: 40px; font-size: 11px; color: var(--text-sec);">
+                    Згенеровано автоматично <br>в системі керування будинком
+                </div>
+            </div>
+        `;
+        
+        overlay.innerHTML = printContent;
+        
+        overlay.addEventListener('click', function(e) {
+            if (e.target === overlay) overlay.remove();
+        });
+
+        document.body.appendChild(overlay);
+    }
     </script>
      <div id="tenant-chat-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
     <div style="background: var(--bg-card); width: 95%; max-width: 900px; height: 85vh; border-radius: 15px; display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
