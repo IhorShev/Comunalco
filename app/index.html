@@ -2483,10 +2483,16 @@ class App {
             
             // 🔥 ВИКЛИКАЄМО НОВУ ФУНКЦІЮ sendToBot
             // true означає "тихий режим" (без alert-ів на кожну квартиру)
-            const result = await this.sendToBot(index, true); 
-            
-            if (result) successCount++;
+            const result = await this.sendToBot(index, true);
 
+            if (result) {
+                successCount++;
+                // 🚀 ДОДАНО: Зберігаємо запис про квитанцію в Чат
+                const a = this.currentData.apartments[index];
+                if (a) {
+                    this.saveToChatHistory(a.id, "🧾 Надіслано квитанцію за поточний місяць.");
+                }
+            }
             // Пауза 0.3 сек, щоб Telegram не заблокував за спам
             await new Promise(r => setTimeout(r, 300));
         }
@@ -3890,6 +3896,7 @@ async function openAdminPollDetails(pollId) {
     
 </body>
 </html>
+
 
 
 
