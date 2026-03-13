@@ -1122,20 +1122,36 @@ class App {
         if (type === 'debt') this.remindDebtorsModal(indices);
     }
 
-    // --- А) ВІДПРАВКА КВИТАНЦІЙ ---
+    // --- А) ВІДПРАВКА КВИТАНЦІЙ (Виправлена) ---
     async sendBatchModal(indices) {
-        if(!confirm(`📨 Відправити квитанції обраним квартирам (${indices.length} шт.)?`)) return;
-        document.getElementById('tgActionModal').style.display = 'none';
+        if(!confirm(`🧾 Відправити квитанції обраним квартирам (${indices.length} шт.)?`)) return;
         
-        // Синхронізуємо ці галочки зі старим кодом, щоб ваша функція sendBatch відпрацювала правильно
-        this.currentData.apartments.forEach((a, i) => {
-            a.tg_selected = indices.includes(i);
-        });
-        
-        // Викликаємо вашу існуючу функцію масової розсилки
-        if(typeof this.sendBatch === 'function') {
-            this.sendBatch(); 
+        // Ховаємо модалку
+        const modal = document.getElementById('tgActionModal');
+        if (modal) modal.style.display = 'none';
+
+        let successCount = 0;
+
+        // Тепер ми перебираємо ТІЛЬКИ ті квартири, які ви обрали в модалці!
+        for (let index of indices) {
+            // Відправляємо через існуючу функцію (true = тихий режим без зайвих alert)
+            const result = await this.sendToBot(index, true);
+
+            if (result) {
+                successCount++;
+                // 🚀 Одразу зберігаємо повний текст квитанції в Чат
+                const a = this.currentData.apartments[index];
+                if (a) {
+                    const receiptText = this.checks[index] || "🧾 Надіслано квитанцію за поточний місяць.";
+                    this.saveToChatHistory(a.id, `🧾 Квитанція відправлена:\n\n${receiptText}`);
+                }
+            }
+            // Пауза 300мс, щоб Телеграм не подумав, що ми спамери
+            await new Promise(r => setTimeout(r, 300));
         }
+
+        // Показуємо фінальний звіт
+        alert(`✅ Звіт розсилки:\nВибрано квартир: ${indices.length}\nУспішно доставлено: ${successCount}`);
     }
 
     // --- Б) ВЕЛИКЕ ВІКНО ДЛЯ ПОВІДОМЛЕНЬ ---
@@ -3898,6 +3914,7 @@ async function openAdminPollDetails(pollId) {
     
 </body>
 </html>
+
 
 
 
