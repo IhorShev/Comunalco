@@ -2038,6 +2038,16 @@ class App {
         }
         this.save();
         this.calculate();
+        
+        // --- 🚀 ДОДАНО: Миттєве оновлення екрану без закриття картки ---
+        const detailsList = document.querySelectorAll('details');
+        const isOpen = detailsList[i] ? detailsList[i].open : false;
+        
+        this.renderApartments(); // Даємо команду перемалювати цифри
+        
+        const newDetailsList = document.querySelectorAll('details');
+        if (isOpen && newDetailsList[i]) newDetailsList[i].open = true;
+        // ----------------------------------------------------------------
     }
     updateAptMetric(i,t,k,v) {
         if (!this.currentData.apartments[i][t]) this.currentData.apartments[i][t] = {};
@@ -3855,6 +3865,7 @@ async function openAdminPollDetails(pollId) {
     
 </body>
 </html>
+
 
 
 
