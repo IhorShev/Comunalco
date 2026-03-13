@@ -1099,33 +1099,53 @@ async function submitVote(choice) {
         }
     });
     
-    // --- 🔑 НАДІЙНА ЗМІНА PIN-КОДУ ---
+    // --- 🔑 НАДІЙНА ЗМІНА PIN-КОДУ (Версія 3.0) ---
     window.changeTenantPin = async function() {
         try {
-            const tData = JSON.parse(localStorage.getItem('comunalco_tenant'));
-            if (!tData || !tData.id) return alert("❌ Не знайдено дані мешканця.");
+            // Беремо дані прямо з активної пам'яті сторінки
+            if (typeof currentTenant === 'undefined' || !currentTenant || !currentTenant.id) {
+                return alert("❌ Помилка: Дані мешканця не знайдені в пам'яті.");
+            }
 
             const oldPin = prompt("Введіть ваш ПОТОЧНИЙ PIN-код для підтвердження:");
             if (oldPin === null) return; 
 
-            if (oldPin !== String(tData.pin)) return alert("❌ Невірний поточний PIN-код!");
+            if (oldPin !== String(currentTenant.pin)) {
+                return alert("❌ Невірний поточний PIN-код!");
+            }
 
             const newPin = prompt("Введіть НОВИЙ PIN-код (мінімум 4 символи):");
             if (newPin === null) return;
-            if (newPin.trim().length < 4) return alert("❌ Помилка: PIN-код має містити хоча б 4 символи!");
+            
+            if (newPin.trim().length < 4) {
+                return alert("❌ Помилка: PIN-код має містити хоча б 4 символи!");
+            }
 
             // Зберігаємо в базу
-            const { error } = await window._supabase.from('apartments').update({ pin: newPin.trim() }).eq('id', tData.id);
+            const db = typeof _supabase !== 'undefined' ? _supabase : window._supabase;
+            const { error } = await db.from('apartments').update({ pin: newPin.trim() }).eq('id', currentTenant.id);
+            
             if (error) throw error;
 
-            // Оновлюємо пам'ять
-            tData.pin = newPin.trim();
-            localStorage.setItem('comunalco_tenant', JSON.stringify(tData));
-            window.currentTenant = tData;
+            // Оновлюємо активну змінну
+            currentTenant.pin = newPin.trim();
+            
+            // Магія: шукаємо ваш ключ у localStorage автоматично і оновлюємо його
+            for (let i = 0; i < localStorage.length; i++) {
+                let key = localStorage.key(i);
+                try {
+                    let val = JSON.parse(localStorage.getItem(key));
+                    if (val && val.id === currentTenant.id) {
+                        val.pin = newPin.trim();
+                        localStorage.setItem(key, JSON.stringify(val));
+                    }
+                } catch(e) {}
+            }
 
             alert("✅ Ваш PIN-код успішно змінено!");
         } catch (err) {
-            console.error(err); alert("❌ Сталася помилка при збереженні.");
+            console.error(err); 
+            alert("❌ Сталася помилка при збереженні. Перевірте з'єднання.");
         }
     };
     </script>
