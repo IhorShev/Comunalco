@@ -947,6 +947,29 @@ async function submitVote(choice) {
 
         document.body.appendChild(overlay);
     }
+    // ==========================================
+    // ⏰ СИСТЕМА АВТО-ПРОБУДЖЕННЯ (Анти-сон мешканця)
+    // ==========================================
+    let lastTenantActivityTime = Date.now();
+
+    const resetTenantTimer = () => { lastTenantActivityTime = Date.now(); };
+    document.addEventListener('mousemove', resetTenantTimer);
+    document.addEventListener('keydown', resetTenantTimer);
+    document.addEventListener('click', resetTenantTimer);
+    document.addEventListener('touchstart', resetTenantTimer); // Для телефонів
+
+    document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") {
+            const timeAsleep = Date.now() - lastTenantActivityTime;
+            
+            // Якщо спав більше 10 хвилин - оновлюємо
+            if (timeAsleep > 10 * 60 * 1000) {
+                console.log("Додаток спав. Оновлюємо...");
+                // Оскільки це кабінет мешканця, ми просто перезавантажуємо дані без рефрешу сторінки
+                if (typeof initTenantDashboard === 'function') initTenantDashboard();
+            }
+        }
+    });
     </script>
      <div id="tenant-chat-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
     <div style="background: var(--bg-card); width: 95%; max-width: 900px; height: 85vh; border-radius: 15px; display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
