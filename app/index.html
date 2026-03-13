@@ -2403,8 +2403,14 @@ class App {
                         is_paid: totalToPay <= 0,
                         prev: a.prev || {},
                         curr: a.curr || {},
-                        services: a.services || []
-                        tariffs: this.currentData.tariffs || {}
+                        services: a.services || [],
+                        // 🚀 Пакуємо тарифи та баланси в одну "кишеню", щоб не чіпати базу!
+                        tariffs: { 
+                            ...(this.currentData.tariffs || {}), 
+                            _debt: parseFloat(a.debt) || 0, 
+                            _bill: parseFloat(a.bill) || 0, 
+                            _paid: parseFloat(a.paid) || 0 
+                        }
                     };
 
                     // Перевіряємо, чи є вже такий рахунок
