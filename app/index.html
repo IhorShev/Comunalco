@@ -2490,7 +2490,9 @@ class App {
                 // 🚀 ДОДАНО: Зберігаємо запис про квитанцію в Чат
                 const a = this.currentData.apartments[index];
                 if (a) {
-                    this.saveToChatHistory(a.id, "🧾 Надіслано квитанцію за поточний місяць.");
+                    // 🚀 ДОДАНО: Зберігаємо реальну квитанцію в Чат
+                    const receiptText = this.checks[index] || "🧾 Надіслано квитанцію за поточний місяць.";
+                    this.saveToChatHistory(a.id, `🧾 Квитанція відправлена:\n\n${receiptText}`);
                 }
             }
             // Пауза 0.3 сек, щоб Telegram не заблокував за спам
@@ -3896,6 +3898,7 @@ async function openAdminPollDetails(pollId) {
     
 </body>
 </html>
+
 
 
 
