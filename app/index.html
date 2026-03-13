@@ -1493,6 +1493,8 @@ class App {
             if(el) el.value = this.currentData.tariffs[map[k]]; 
         });
         this.renderExtraTariffs(); this.renderRequisites(); this.renderGroups(); this.renderApartments();
+        // 🚀 Даємо браузеру 100 мілісекунд намалювати всі віконця, а потім запускаємо перерахунок!
+        setTimeout(() => { if (typeof this.calculate === 'function') this.calculate(); }, 100);
     }
 
     // --- ПОЧАТОК ГРАФІКІВ (Гібридна версія) ---
