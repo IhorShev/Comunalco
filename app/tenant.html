@@ -567,22 +567,24 @@
                     return;
                 }
 
-                // Малюємо кожен рахунок
-                data.forEach(item => {
-                    const isPaid = item.is_paid;
-                    const statusText = isPaid ? 'Сплачено' : 'Не сплачено';
-                    const statusColor = isPaid ? 'var(--success)' : 'var(--danger)';
-                    
-                    archiveContainer.insertAdjacentHTML('beforeend', `
-                        <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid var(--border);">
-                            <div>
-                                <div style="font-size:13px; font-weight:bold;">${item.period_name}</div>
-                                <div style="font-size:11px; color:${statusColor};">${statusText}: ${item.amount} ₴</div>
-                            </div>
-                            <button class="btn btn-outline" style="width:auto; padding:6px 12px; font-size:11px;" onclick="printTenantReceipt('${item.period_name}', '${item.amount}', ${isPaid})">📄 PDF</button>
-                        </div>
-                    `);
-                });
+               // 🚀 Зберігаємо архів глобально, щоб новий чек міг взяти з нього всі показники
+        window.tenantArchiveData = data;
+        
+        data.forEach((item, index) => {
+            const isPaid = item.is_paid || (item.paid && parseFloat(item.paid) > 0);
+            const statusText = isPaid ? 'Сплачено' : 'Не сплачено';
+            const statusColor = isPaid ? 'var(--success)' : 'var(--danger)';
+
+            archiveContainer.insertAdjacentHTML('beforeend', `
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid var(--border);">
+                <div>
+                    <div style="font-size:13px; font-weight:bold;">${item.period_name}</div>
+                    <div style="font-size:11px; color:${statusColor};">${statusText}: ${item.amount} ₴</div>
+                </div>
+                <button class="btn btn-outline" style="width:auto; padding:6px 12px; font-size:11px;" onclick="printTenantReceipt(${index})">📄 PDF</button>
+            </div>
+            `);
+        }); 
             } catch (err) {
                 console.error("Помилка завантаження архіву:", err);
                 archiveContainer.innerHTML = '<div style="padding:10px; font-size:12px; color:var(--danger); text-align:center;">Помилка підключення до бази</div>';
