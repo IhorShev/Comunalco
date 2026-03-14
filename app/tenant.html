@@ -1148,12 +1148,12 @@ async function submitVote(choice) {
             alert("❌ Сталася помилка при збереженні. Перевірте з'єднання.");
         }
     };
-    // --- 📄 ФІНАЛЬНА ФУНКЦІЯ ГЕНЕРАЦІЇ PDF (Нова вкладка + Ідеальний А4 на всіх пристроях) ---
+    // --- 📄 ІДЕАЛЬНА ФУНКЦІЯ ГЕНЕРАЦІЇ PDF (Рівні краї + Нова вкладка) ---
     window.downloadPollPDF = async function(pollId) {
-        // 1. Відкриваємо вкладку ОДРАЗУ, щоб браузер (особливо на мобільному) її не заблокував
+        // Одразу відкриваємо вкладку
         const pdfWindow = window.open("", "_blank");
         if (!pdfWindow) {
-            alert("⚠️ Ваш браузер заблокував нову вкладку. Будь ласка, дозвольте спливаючі вікна.");
+            alert("⚠️ Ваш браузер заблокував нову вкладку. Дозвольте спливаючі вікна.");
             return;
         }
         pdfWindow.document.write("<div style='font-family:sans-serif; padding:50px; text-align:center;'>⏳ Формуємо офіційний документ, зачекайте...</div>");
@@ -1177,11 +1177,11 @@ async function submitVote(choice) {
             const dateStr = new Date(poll.created_at).toLocaleDateString('uk-UA');
             const statusStr = poll.status === 'active' ? 'Активне' : 'Завершено';
 
-            // 🚀 ЖОРСТКА ШИРИНА 800px, щоб на мобільному текст не "з'їжджав" і не вилазив за краї
+            // 🚀 БЕЗПЕЧНИЙ ДИЗАЙН: Без жорсткої ширини 800px. Просто 100% ширини аркуша А4.
             const htmlContent = `
-                <div style="width: 800px; padding: 40px; font-family: 'Montserrat', Arial, sans-serif; color: #000; background: #fff; box-sizing: border-box; text-align: left;">
+                <div style="font-family: 'Montserrat', Arial, sans-serif; color: #000; background: #fff; text-align: left; padding: 10px;">
                     <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #000; padding-bottom: 15px;">
-                        <h1 style="margin: 0; font-size: 20px; text-transform: uppercase;">Офіційний Протокол Голосування</h1>
+                        <h1 style="margin: 0; font-size: 22px; text-transform: uppercase;">Офіційний Протокол Голосування</h1>
                         <p style="margin: 5px 0 0; color: #555; font-size: 11px;">Згенеровано автоматично системою Comunalco</p>
                     </div>
                     
@@ -1223,9 +1223,6 @@ async function submitVote(choice) {
                     </div>
                 </div>
             `;
-
-            const element = document.createElement('div');
-            element.innerHTML = htmlContent;
             
             if (typeof window.html2pdf === 'undefined') {
                 await new Promise((resolve) => {
@@ -1236,23 +1233,23 @@ async function submitVote(choice) {
                 });
             }
 
-            // 🚀 windowWidth: 800 - ця команда забороняє телефону стискати текст!
+            // 🚀 НАЛАШТУВАННЯ А4: Відступи 15 мм з усіх боків, ніяких глючних windowWidth
             const opt = {
-                margin:       [10, 0, 10, 0],
+                margin:       15, 
                 filename:     `Protokol_${pollId.substring(0,5)}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, windowWidth: 800 }, 
+                html2canvas:  { scale: 2 }, 
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
-            // Перетворюємо в PDF і показуємо у вже відкритій вкладці!
-            window.html2pdf().set(opt).from(element).outputPdf('bloburl').then(function(pdfUrl) {
+            // 🚀 МАГІЯ: Передаємо просто текст (htmlContent), а не DOM-елемент!
+            window.html2pdf().set(opt).from(htmlContent).outputPdf('bloburl').then(function(pdfUrl) {
                 pdfWindow.location.href = pdfUrl;
             });
 
         } catch (err) {
             console.error("Помилка PDF:", err);
-            if (pdfWindow) pdfWindow.close(); // Якщо помилка - закриваємо пусту вкладку
+            if (pdfWindow) pdfWindow.close(); 
             alert("❌ Сталася помилка при генерації PDF.");
         }
     };
