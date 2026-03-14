@@ -3664,15 +3664,23 @@ window.addEventListener('load', () => {
             }
         }
     });
-    // --- 📄 ІДЕАЛЬНА ФУНКЦІЯ ГЕНЕРАЦІЇ PDF (Рівні краї + Нова вкладка) ---
+   // --- 📄 ІДЕАЛЬНА ФУНКЦІЯ ГЕНЕРАЦІЇ PDF (Розумна: ПК - вкладка, Телефон - файл) ---
     window.downloadPollPDF = async function(pollId) {
-        // Одразу відкриваємо вкладку
-        const pdfWindow = window.open("", "_blank");
-        if (!pdfWindow) {
-            alert("⚠️ Ваш браузер заблокував нову вкладку. Дозвольте спливаючі вікна.");
-            return;
+        // 🚀 РОЗУМНА ПЕРЕВІРКА: Чи це мобільний телефон?
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        let pdfWindow = null;
+
+        if (!isMobile) {
+            // Якщо це ПК - відкриваємо нову вкладку для попереднього перегляду
+            pdfWindow = window.open("", "_blank");
+            if (!pdfWindow) {
+                return alert("⚠️ Ваш браузер заблокував нову вкладку. Дозвольте спливаючі вікна.");
+            }
+            pdfWindow.document.write("<div style='font-family:sans-serif; padding:50px; text-align:center;'>⏳ Формуємо офіційний документ, зачекайте...</div>");
+        } else {
+            // На мобільному просто попереджаємо
+            alert("⏳ Формуємо протокол... Файл зараз відкриється або завантажиться.");
         }
-        pdfWindow.document.write("<div style='font-family:sans-serif; padding:50px; text-align:center;'>⏳ Формуємо офіційний документ, зачекайте...</div>");
 
         try {
             const db = typeof _supabase !== 'undefined' ? _supabase : window._supabase;
@@ -3693,7 +3701,6 @@ window.addEventListener('load', () => {
             const dateStr = new Date(poll.created_at).toLocaleDateString('uk-UA');
             const statusStr = poll.status === 'active' ? 'Активне' : 'Завершено';
 
-            // 🚀 БЕЗПЕЧНИЙ ДИЗАЙН: Без жорсткої ширини 800px. Просто 100% ширини аркуша А4.
             const htmlContent = `
                 <div style="font-family: 'Montserrat', Arial, sans-serif; color: #000; background: #fff; text-align: left; padding: 10px;">
                     <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #000; padding-bottom: 15px;">
@@ -3749,7 +3756,6 @@ window.addEventListener('load', () => {
                 });
             }
 
-            // 🚀 НАЛАШТУВАННЯ А4: Відступи 15 мм з усіх боків, ніяких глючних windowWidth
             const opt = {
                 margin:       15, 
                 filename:     `Protokol_${pollId.substring(0,5)}.pdf`,
@@ -3758,17 +3764,23 @@ window.addEventListener('load', () => {
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
-            // 🚀 МАГІЯ: Передаємо просто текст (htmlContent), а не DOM-елемент!
-            window.html2pdf().set(opt).from(htmlContent).outputPdf('bloburl').then(function(pdfUrl) {
-                pdfWindow.location.href = pdfUrl;
-            });
+            // 🚀 МАГІЯ РОЗПОДІЛУ
+            if (isMobile) {
+                // ТЕЛЕФОН: Віддаємо як файл (завантаження/відкриття в рідері)
+                window.html2pdf().set(opt).from(htmlContent).save();
+            } else {
+                // НОУТБУК: Показуємо прев'ю у новій вкладці
+                window.html2pdf().set(opt).from(htmlContent).outputPdf('bloburl').then(function(pdfUrl) {
+                    if (pdfWindow) pdfWindow.location.href = pdfUrl;
+                });
+            }
 
         } catch (err) {
             console.error("Помилка PDF:", err);
             if (pdfWindow) pdfWindow.close(); 
             alert("❌ Сталася помилка при генерації PDF.");
         }
-    };
+    }; 
 </script>
 
 <div id="resultModal" class="modal">
