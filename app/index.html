@@ -696,7 +696,7 @@
     
 <script>
     // --- АВТО-ОНОВЛЕННЯ ВЕРСІЇ ---
-  const APP_VERSION = '6.8'; 
+  const APP_VERSION = '6.9'; 
   if (localStorage.getItem('app_version') !== APP_VERSION) {
       localStorage.setItem('app_version', APP_VERSION);
       if (navigator.serviceWorker) {
@@ -4328,6 +4328,13 @@ async function closeAdminPoll(pollId) {
         alert("❌ Сталася помилка при збереженні. Перевірте консоль (F12).");
     }
 }
+
+    // ⏱ ШВЕЙЦАРСЬКИЙ ГОДИННИК: Оновлюємо дані щоразу, коли користувач відкриває додаток
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && window.currentUser && typeof window.cloudLoad === 'function') {
+        window.cloudLoad(); // Автоматично тягнемо свіжі цифри з бази
+    }
+});
     
     </script>
 
