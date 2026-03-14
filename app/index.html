@@ -1475,13 +1475,15 @@ class App {
 
                 if (expireDisplay) {
                     expireDisplay.style.display = 'block';
-                    if (daysLeft <= 0) {
-                        expireDisplay.innerHTML = `⚠️ Тестовий період закінчився. <b style="cursor:pointer; color:var(--primary)" onclick="app.openMenu('premium')">Подовжити?</b>`;
-                    } else {
-                        const units = typeof totalUnits !== 'undefined' ? totalUnits : '∞';
-                        expireDisplay.innerHTML = `Залишилось <b>${daysLeft} дн.</b> | План: ${units} од.`;
-                    }
-                }
+                    if (daysLeft > 10000) {
+                expireDisplay.innerHTML = `<span style="color:var(--primary); font-weight:800;">💎 PRO АКТИВНО</span> | <span style="font-size:11px; opacity:0.8;">Безліміт</span>`;
+            } else if (daysLeft <= 0) {
+                expireDisplay.innerHTML = `⚠️ Тестовий період закінчився. <b style="cursor:pointer; color:var(--primary)" onclick="app.openMenu('premium')">Подовжити?</b>`;
+            } else {
+                const units = typeof totalUnits !== 'undefined' ? totalUnits : '∞';
+                expireDisplay.innerHTML = `Залишилось <b>${daysLeft} дн.</b> | План: ${units} од.`;
+            }
+         }                
                 
                 if (lim) {
                     const p6m = typeof price6m !== 'undefined' ? price6m : '---';
