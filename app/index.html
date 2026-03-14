@@ -696,7 +696,7 @@
     
 <script>
     // --- АВТО-ОНОВЛЕННЯ ВЕРСІЇ ---
-  const APP_VERSION = '6.6'; 
+  const APP_VERSION = '6.7'; 
   if (localStorage.getItem('app_version') !== APP_VERSION) {
       localStorage.setItem('app_version', APP_VERSION);
       if (navigator.serviceWorker) {
@@ -1480,7 +1480,8 @@ class App {
             }
         } catch (err) {
             console.error("Помилка відображення тарифу (проігноровано):", err);
-        }
+            }
+        }   
     // --- БЛОКУВАННЯ, ЯКЩО ТАРИФ ЗАКІНЧИВСЯ ---
     checkLimit() {
         this.updateStatus();
@@ -3414,7 +3415,7 @@ window.addEventListener('load', () => {
               const expDate = new Date(profile.expires_at);
               if (subExpireEl) {
                 // Якщо рік 2140 - це наш довічний безліміт, не пишемо дату!
-                if (profile.expires_at.includes('2140')) {
+                if (profile.expires_at && String(profile.expires_at).includes('2140')) {
                     subExpireEl.innerHTML = `<span style="color:var(--primary); font-weight:800;">💎 PRO АКТИВНО</span> | <span style="font-size:11px; opacity:0.8;">Безліміт</span>`;
                 } else {
                     subExpireEl.innerText = `PRO до ${expDate.toLocaleDateString()}`;
