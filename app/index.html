@@ -696,7 +696,7 @@
     
 <script>
     // --- АВТО-ОНОВЛЕННЯ ВЕРСІЇ ---
-  const APP_VERSION = '6.7'; 
+  const APP_VERSION = '6.8'; 
   if (localStorage.getItem('app_version') !== APP_VERSION) {
       localStorage.setItem('app_version', APP_VERSION);
       if (navigator.serviceWorker) {
@@ -3340,7 +3340,9 @@ window.addEventListener('load', () => {
   const SUPABASE_URL = 'https://aougdxtsmzjgoykaslbt.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFvdWdkeHRzbXpqZ295a2FzbGJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA5MTg0NzMsImV4cCI6MjA4NjQ5NDQ3M30.47XlL0ddVxtOi1b-7DYw7NmHioSzjnS4c7um9WO2VVI';
   
-  const sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  // 🚀 ЗАПОБІЖНИК ВІД ЗАВИСАНЬ (Створюємо підключення лише 1 раз)
+        const sbClient = window.__sbClient || supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        window.__sbClient = sbClient;
   window.currentUser = null;
 
   // 2. ВХІД
