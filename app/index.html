@@ -1439,26 +1439,30 @@ class App {
 
         if (isGlobalPro) {
             if (expireDisplay) {
-                expireDisplay.innerHTML = `<span style="color:var(--primary); font-weight:800;">💎 PRO АКТИВНО</span> | <span style="font-size:11px; opacity:0.8;">Безліміт до 2140 р.</span>`;
+                expireDisplay.style.display = 'block'; // 🚀 ЦЕ ПОВЕРНЕ ТЕКСТ НА НОУТБУК
+                expireDisplay.innerHTML = `<span style="color:var(--primary); font-weight:800;">💎 PRO АКТИВНО</span> | <span style="font-size:11px; opacity:0.8;">Безліміт</span>`;
             }
             if (badge) {
                 badge.innerText = "PRO";
                 badge.className = 'status-badge status-pro';
             }
             if (lim) {
-                lim.innerHTML = `🏢 Одиниці: <b>${totalUnits}</b> / ∞`;
+                lim.innerHTML = `📘 Одиниці: <b>${totalUnits}</b> / ∞`;
             }
         } else {
             const now = Date.now();
-        let expTime = this.state.sub_expire;
-        
-        // 🚀 МАГІЯ ДЛЯ ТЕЛЕФОНІВ (iPhone/Android): перетворюємо дату безпечно
-        if (typeof expTime === 'string') {
-            expTime = new Date(expTime.replace(/-/g, '/').replace('T', ' ')).getTime();
-        }
-        
-        // Якщо раптом сталася помилка з датою, ставимо 0, щоб не лякати NAN
-        const daysLeft = isNaN(expTime) ? 0 : Math.ceil((expTime - now) / (1000 * 60 * 60 * 24));
+            // 🚀 БЕРЕМО ДАТУ З УСІХ МОЖЛИВИХ МІСЦЬ, ЩОБ ТЕЛЕФОН НЕ ГУБИВСЯ
+            let expTime = this.state.sub_expire || (this.state.license ? this.state.license.exp : null);
+            let daysLeft = 0;
+
+            if (expTime) {
+                if (typeof expTime === 'string') {
+                    expTime = new Date(expTime.replace(/-/g, '/').replace('T', ' ')).getTime();
+                }
+                if (!isNaN(expTime)) {
+                    daysLeft = Math.ceil((expTime - now) / (1000 * 60 * 60 * 24));
+                }
+            }
 
             if (expireDisplay) {
                 expireDisplay.style.display = 'block';
@@ -1470,10 +1474,9 @@ class App {
             }
             
             if (lim) {
-                lim.innerHTML = `<span onclick="app.openMenu('premium')" style="cursor:pointer">💳 Тариф: <b>${price6m} грн</b> / 6 міс</span>`;
+                lim.innerHTML = `<span onclick="app.openMenu('premium')" style="cursor:pointer">💎 Тариф: <b>${price6m} грн</b> / 6 міс</span>`;
             }
         }
-    }
     // --- БЛОКУВАННЯ, ЯКЩО ТАРИФ ЗАКІНЧИВСЯ ---
     checkLimit() {
         this.updateStatus();
