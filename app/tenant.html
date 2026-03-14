@@ -1148,23 +1148,14 @@ async function submitVote(choice) {
             alert("❌ Сталася помилка при збереженні. Перевірте з'єднання.");
         }
     };
-    // --- 📄 ІДЕАЛЬНА ФУНКЦІЯ ГЕНЕРАЦІЇ PDF (Розумна: ПК - вкладка, Телефон - файл) ---
+    // --- 📄 СУПЕР-ФУНКЦІЯ: Нативний HTML-перегляд з функцією друку/PDF ---
     window.downloadPollPDF = async function(pollId) {
-        // 🚀 РОЗУМНА ПЕРЕВІРКА: Чи це мобільний телефон?
-        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-        let pdfWindow = null;
-
-        if (!isMobile) {
-            // Якщо це ПК - відкриваємо нову вкладку для попереднього перегляду
-            pdfWindow = window.open("", "_blank");
-            if (!pdfWindow) {
-                return alert("⚠️ Ваш браузер заблокував нову вкладку. Дозвольте спливаючі вікна.");
-            }
-            pdfWindow.document.write("<div style='font-family:sans-serif; padding:50px; text-align:center;'>⏳ Формуємо офіційний документ, зачекайте...</div>");
-        } else {
-            // На мобільному просто попереджаємо
-            alert("⏳ Формуємо протокол... Файл зараз відкриється або завантажиться.");
+        // Миттєво відкриваємо нову вкладку
+        const printWindow = window.open("", "_blank");
+        if (!printWindow) {
+            return alert("⚠️ Ваш браузер заблокував нову вкладку. Дозвольте спливаючі вікна.");
         }
+        printWindow.document.write("<div style='font-family:sans-serif; padding:50px; text-align:center;'>⏳ Відкриваємо офіційний документ...</div>");
 
         try {
             const db = typeof _supabase !== 'undefined' ? _supabase : window._supabase;
@@ -1185,8 +1176,69 @@ async function submitVote(choice) {
             const dateStr = new Date(poll.created_at).toLocaleDateString('uk-UA');
             const statusStr = poll.status === 'active' ? 'Активне' : 'Завершено';
 
+            // 🚀 СУПЕР-КОД: Формуємо ідеальну сторінку. 
+            // Вона має "сірий фон", а по центру лежить "білий аркуш".
+            // При друку сірий фон і кнопка зникають!
             const htmlContent = `
-                <div style="font-family: 'Montserrat', Arial, sans-serif; color: #000; background: #fff; text-align: left; padding: 10px;">
+            <!DOCTYPE html>
+            <html lang="uk">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Протокол_${pollId.substring(0,5)}</title>
+                <style>
+                    /* Стилі екрану (як це виглядає в браузері) */
+                    body {
+                        background-color: #555; /* Темний фон "столу" */
+                        margin: 0;
+                        padding: 20px 10px;
+                        font-family: 'Montserrat', Arial, sans-serif;
+                        color: #000;
+                    }
+                    .page {
+                        background: #fff;
+                        max-width: 800px;
+                        margin: 0 auto; /* По центру */
+                        padding: 40px;
+                        box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+                        border-radius: 4px;
+                        box-sizing: border-box;
+                    }
+                    .top-panel {
+                        text-align: center;
+                        margin-bottom: 20px;
+                    }
+                    .btn-print {
+                        background: #2ed573;
+                        color: #000;
+                        border: none;
+                        padding: 15px 30px;
+                        font-size: 16px;
+                        font-weight: bold;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        box-shadow: 0 4px 10px rgba(46, 213, 115, 0.4);
+                        transition: 0.2s;
+                    }
+                    .btn-print:active { transform: scale(0.95); }
+                    
+                    table { width: 100%; border-collapse: collapse; margin-bottom: 40px; font-size: 14px; text-align: left; }
+                    td { border: 1px solid #000; padding: 12px; }
+                    
+                    /* 🖨️ СТИЛІ ДЛЯ ДРУКУ ТА ЗБЕРЕЖЕННЯ В PDF */
+                    @media print {
+                        body { background: #fff; padding: 0; }
+                        .page { box-shadow: none; padding: 0; max-width: 100%; }
+                        .top-panel { display: none !important; } /* Ховаємо кнопку на папері */
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="top-panel">
+                    <button class="btn-print" onclick="window.print()">🖨️ Роздрукувати / Зберегти як PDF</button>
+                </div>
+                
+                <div class="page">
                     <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #000; padding-bottom: 15px;">
                         <h1 style="margin: 0; font-size: 22px; text-transform: uppercase;">Офіційний Протокол Голосування</h1>
                         <p style="margin: 5px 0 0; color: #555; font-size: 11px;">Згенеровано автоматично системою Comunalco</p>
@@ -1201,19 +1253,19 @@ async function submitVote(choice) {
 
                     <h3 style="margin-bottom: 15px; font-size: 16px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">Підсумки голосування:</h3>
                     
-                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 40px; font-size: 14px; text-align: left;">
+                    <table>
                         <tbody>
                             <tr>
-                                <td style="border: 1px solid #000; padding: 12px; width: 50%; font-weight: bold;">ЗА:</td>
-                                <td style="border: 1px solid #000; padding: 12px;">${yesCount} голос(ів) — ${yesPercent}%</td>
+                                <td style="width: 50%; font-weight: bold;">ЗА:</td>
+                                <td>${yesCount} голос(ів) — ${yesPercent}%</td>
                             </tr>
                             <tr>
-                                <td style="border: 1px solid #000; padding: 12px; font-weight: bold;">ПРОТИ:</td>
-                                <td style="border: 1px solid #000; padding: 12px;">${noCount} голос(ів) — ${noPercent}%</td>
+                                <td style="font-weight: bold;">ПРОТИ:</td>
+                                <td>${noCount} голос(ів) — ${noPercent}%</td>
                             </tr>
                             <tr style="background-color: #f0f0f0;">
-                                <td style="border: 1px solid #000; padding: 12px; font-weight: bold;">ВСЬОГО ПРОГОЛОСУВАЛО:</td>
-                                <td style="border: 1px solid #000; padding: 12px; font-weight: bold;">${totalVotes}</td>
+                                <td style="font-weight: bold;">ВСЬОГО ПРОГОЛОСУВАЛО:</td>
+                                <td style="font-weight: bold;">${totalVotes}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -1229,40 +1281,19 @@ async function submitVote(choice) {
                         </div>
                     </div>
                 </div>
+            </body>
+            </html>
             `;
-            
-            if (typeof window.html2pdf === 'undefined') {
-                await new Promise((resolve) => {
-                    const script = document.createElement('script');
-                    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
-                    script.onload = resolve;
-                    document.head.appendChild(script);
-                });
-            }
 
-            const opt = {
-                margin:       15, 
-                filename:     `Protokol_${pollId.substring(0,5)}.pdf`,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2 }, 
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-
-            // 🚀 МАГІЯ РОЗПОДІЛУ
-            if (isMobile) {
-                // ТЕЛЕФОН: Віддаємо як файл (завантаження/відкриття в рідері)
-                window.html2pdf().set(opt).from(htmlContent).save();
-            } else {
-                // НОУТБУК: Показуємо прев'ю у новій вкладці
-                window.html2pdf().set(opt).from(htmlContent).outputPdf('bloburl').then(function(pdfUrl) {
-                    if (pdfWindow) pdfWindow.location.href = pdfUrl;
-                });
-            }
+            // Миттєво малюємо документ у новій вкладці
+            printWindow.document.open();
+            printWindow.document.write(htmlContent);
+            printWindow.document.close();
 
         } catch (err) {
-            console.error("Помилка PDF:", err);
-            if (pdfWindow) pdfWindow.close(); 
-            alert("❌ Сталася помилка при генерації PDF.");
+            console.error("Помилка:", err);
+            if (printWindow) printWindow.close(); 
+            alert("❌ Сталася помилка при генерації документа.");
         }
     };
     </script>
