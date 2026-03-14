@@ -1437,52 +1437,39 @@ class App {
         const badge = document.getElementById('status-badge');
         const lim = document.getElementById('limit-counter');
 
-        // 🚀 БРОНЕЖИЛЕТ ДЛЯ ТАРИФІВ (Ніколи не зупиняє додаток)
-        try {
-            if (isGlobalPro) {
-                if (expireDisplay) {
-                    expireDisplay.style.display = 'block'; 
-                    expireDisplay.innerHTML = `<span style="color:var(--primary); font-weight:800;">💎 PRO АКТИВНО</span> | <span style="font-size:11px; opacity:0.8;">Безліміт</span>`;
-                }
-                if (badge) {
-                    badge.innerText = "PRO";
-                    badge.className = 'status-badge status-pro';
-                }
-                if (lim) {
-                    let units = typeof totalUnits !== 'undefined' ? totalUnits : '∞';
-                    lim.innerHTML = `📘 Одиниці: <b>${units}</b> / ∞`;
-                }
-            } else {
-                const now = Date.now();
-                let expTime = this.state.sub_expire || (this.state.license ? this.state.license.exp : null);
-                let daysLeft = 0;
+        if (isGlobalPro) {
+            if (expireDisplay) {
+                expireDisplay.style.display = 'block'; // Цей рядок повертає текст на ноут!
+                expireDisplay.innerHTML = `<span style="color:var(--primary); font-weight:800;">💎 PRO АКТИВНО</span> | <span style="font-size:11px; opacity:0.8;">Безліміт</span>`;
+            }
+            if (badge) {
+                badge.innerText = "PRO";
+                badge.className = 'status-badge status-pro';
+            }
+            if (lim) {
+                lim.innerHTML = `📘 Одиниці: <b>${totalUnits}</b> / ∞`;
+            }
+        } else {
+            const now = Date.now();
+            
+            // 🚀 СУПЕР-БЕЗПЕЧНА ДАТА ДЛЯ ТЕЛЕФОНУ
+            let safeExp = this.state.sub_expire;
+            if (typeof safeExp === 'string') safeExp = safeExp.replace(/-/g, '/').replace('T', ' ');
+            const parsedDate = new Date(safeExp).getTime();
+            const daysLeft = isNaN(parsedDate) ? 0 : Math.ceil((parsedDate - now) / (1000 * 60 * 60 * 24));
 
-                if (expTime) {
-                    if (typeof expTime === 'string') {
-                        expTime = new Date(expTime.replace(/-/g, '/').replace('T', ' ')).getTime();
-                    }
-                    if (!isNaN(expTime)) {
-                        daysLeft = Math.ceil((expTime - now) / (1000 * 60 * 60 * 24));
-                    }
-                }
-
-                if (expireDisplay) {
-                    expireDisplay.style.display = 'block';
-                    if (daysLeft <= 0) {
-                        expireDisplay.innerHTML = `⚠️ Тестовий період закінчився. <b style="cursor:pointer; color:var(--primary)" onclick="app.openMenu('premium')">Подовжити?</b>`;
-                    } else {
-                        let units = typeof totalUnits !== 'undefined' ? totalUnits : '∞';
-                        expireDisplay.innerHTML = `Залишилось <b>${daysLeft} дн.</b> | План: ${units} од.`;
-                    }
-                }
-                
-                if (lim) {
-                    let price = typeof price6m !== 'undefined' ? price6m : '---';
-                    lim.innerHTML = `<span onclick="app.openMenu('premium')" style="cursor:pointer">💎 Тариф: <b>${price} грн</b> / 6 міс</span>`;
+            if (expireDisplay) {
+                expireDisplay.style.display = 'block';
+                if (daysLeft <= 0) {
+                    expireDisplay.innerHTML = `⚠️ Тестовий період закінчився. <b style="cursor:pointer; color:var(--primary)" onclick="app.openMenu('premium')">Подовжити?</b>`;
+                } else {
+                    expireDisplay.innerHTML = `Залишилось <b>${daysLeft} дн.</b> | План: ${totalUnits} од.`;
                 }
             }
-        } catch (err) {
-            console.error("Помилка в блоці тарифів (проігноровано):", err);
+            
+            if (lim) {
+                lim.innerHTML = `<span onclick="app.openMenu('premium')" style="cursor:pointer">💎 Тариф: <b>${price6m} грн</b> / 6 міс</span>`;
+            }
         }
     // --- БЛОКУВАННЯ, ЯКЩО ТАРИФ ЗАКІНЧИВСЯ ---
     checkLimit() {
