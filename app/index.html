@@ -1356,9 +1356,19 @@ class App {
         }
 
         // 3. --- АНІМАЦІЯ ІНДИКАТОРА ---
-        const statusEl = document.getElementById('save-status');
+        let statusEl = document.getElementById('save-status');
+        
+        // 🚀 Якщо коробочка для статусу зникла - створюємо її заново під профілем!
+        if (!statusEl) {
+            statusEl = document.createElement('div');
+            statusEl.id = 'save-status';
+            statusEl.style = "font-size: 10px; font-weight: bold; margin-top: 5px; text-transform: uppercase; transition: opacity 0.3s;";
+            const authBtn = document.getElementById('auth-btn'); // Шукаємо блок профілю
+            if (authBtn) authBtn.appendChild(statusEl);
+        }
+
         if (statusEl) {
-            statusEl.innerText = "● СИНХРОНІЗАЦІЯ...";
+            statusEl.innerText = "• СИНХРОНІЗАЦІЯ...";
             statusEl.style.color = "var(--text-sec)";
             statusEl.style.opacity = "1";
         }
