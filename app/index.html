@@ -3380,7 +3380,15 @@ window.addEventListener('load', () => {
     if (user) {
       window.currentUser = user;
       if(btn && nameSpan) { 
-          nameSpan.innerText = user.email.split('@')[0];
+          let displayName = "";
+            if (user.user_metadata && user.user_metadata.full_name) {
+                displayName = user.user_metadata.full_name;
+            } else if (user.user_metadata && user.user_metadata.name) {
+                displayName = user.user_metadata.name;
+            } else {
+                displayName = user.email.split('@')[0];
+            }
+            nameSpan.innerText = displayName.toUpperCase();
           btn.style.color = 'var(--success)';
           btn.onclick = window.googleLogout; // ВИКЛИКАЄМО ЧИСТУ ФУНКЦІЮ ВИЩЕ
       }
