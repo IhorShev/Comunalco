@@ -696,7 +696,7 @@
     
 <script>
     // --- АВТО-ОНОВЛЕННЯ ВЕРСІЇ ---
-  const APP_VERSION = '6.4'; 
+  const APP_VERSION = '6.5'; 
   if (localStorage.getItem('app_version') !== APP_VERSION) {
       localStorage.setItem('app_version', APP_VERSION);
       if (navigator.serviceWorker) {
@@ -3402,10 +3402,15 @@ window.addEventListener('load', () => {
           const { data: profile } = await sbClient.from('profiles').select('*').eq('id', user.id).maybeSingle();
           if (profile && profile.expires_at) {
               const expDate = new Date(profile.expires_at);
-              if(subExpireEl) {
-                  subExpireEl.innerText = `PRO до ${expDate.toLocaleDateString()}`;
-                  subExpireEl.style.display = 'block';
-              }
+              if (subExpireEl) {
+                // Якщо рік 2140 - це наш довічний безліміт, не пишемо дату!
+                if (profile.expires_at.includes('2140')) {
+                    subExpireEl.innerHTML = `<span style="color:var(--primary); font-weight:800;">💎 PRO АКТИВНО</span> | <span style="font-size:11px; opacity:0.8;">Безліміт</span>`;
+                } else {
+                    subExpireEl.innerText = `PRO до ${expDate.toLocaleDateString()}`;
+                }
+                subExpireEl.style.display = 'block';
+            }
               if(window.app) window.app.state.license = { type: 'pro', exp: profile.expires_at };
           }
       } catch (e) { console.error(e); }
