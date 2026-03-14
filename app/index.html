@@ -1450,7 +1450,15 @@ class App {
             }
         } else {
             const now = Date.now();
-            const daysLeft = Math.ceil((this.state.sub_expire - now) / (1000 * 60 * 60 * 24));
+        let expTime = this.state.sub_expire;
+        
+        // 🚀 МАГІЯ ДЛЯ ТЕЛЕФОНІВ (iPhone/Android): перетворюємо дату безпечно
+        if (typeof expTime === 'string') {
+            expTime = new Date(expTime.replace(/-/g, '/').replace('T', ' ')).getTime();
+        }
+        
+        // Якщо раптом сталася помилка з датою, ставимо 0, щоб не лякати NAN
+        const daysLeft = isNaN(expTime) ? 0 : Math.ceil((expTime - now) / (1000 * 60 * 60 * 24));
 
             if (expireDisplay) {
                 expireDisplay.style.display = 'block';
