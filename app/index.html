@@ -696,7 +696,7 @@
     
 <script>
     // --- АВТО-ОНОВЛЕННЯ ВЕРСІЇ ---
-  const APP_VERSION = '6.3'; 
+  const APP_VERSION = '6.4'; 
   if (localStorage.getItem('app_version') !== APP_VERSION) {
       localStorage.setItem('app_version', APP_VERSION);
       if (navigator.serviceWorker) {
@@ -1437,45 +1437,52 @@ class App {
         const badge = document.getElementById('status-badge');
         const lim = document.getElementById('limit-counter');
 
-        if (isGlobalPro) {
-            if (expireDisplay) {
-                expireDisplay.style.display = 'block'; // 🚀 ЦЕ ПОВЕРНЕ ТЕКСТ НА НОУТБУК
-                expireDisplay.innerHTML = `<span style="color:var(--primary); font-weight:800;">💎 PRO АКТИВНО</span> | <span style="font-size:11px; opacity:0.8;">Безліміт</span>`;
-            }
-            if (badge) {
-                badge.innerText = "PRO";
-                badge.className = 'status-badge status-pro';
-            }
-            if (lim) {
-                lim.innerHTML = `📘 Одиниці: <b>${totalUnits}</b> / ∞`;
-            }
-        } else {
-            const now = Date.now();
-            // 🚀 БЕРЕМО ДАТУ З УСІХ МОЖЛИВИХ МІСЦЬ, ЩОБ ТЕЛЕФОН НЕ ГУБИВСЯ
-            let expTime = this.state.sub_expire || (this.state.license ? this.state.license.exp : null);
-            let daysLeft = 0;
+        // 🚀 БРОНЕЖИЛЕТ ДЛЯ ТАРИФІВ (Ніколи не зупиняє додаток)
+        try {
+            if (isGlobalPro) {
+                if (expireDisplay) {
+                    expireDisplay.style.display = 'block'; 
+                    expireDisplay.innerHTML = `<span style="color:var(--primary); font-weight:800;">💎 PRO АКТИВНО</span> | <span style="font-size:11px; opacity:0.8;">Безліміт</span>`;
+                }
+                if (badge) {
+                    badge.innerText = "PRO";
+                    badge.className = 'status-badge status-pro';
+                }
+                if (lim) {
+                    let units = typeof totalUnits !== 'undefined' ? totalUnits : '∞';
+                    lim.innerHTML = `📘 Одиниці: <b>${units}</b> / ∞`;
+                }
+            } else {
+                const now = Date.now();
+                let expTime = this.state.sub_expire || (this.state.license ? this.state.license.exp : null);
+                let daysLeft = 0;
 
-            if (expTime) {
-                if (typeof expTime === 'string') {
-                    expTime = new Date(expTime.replace(/-/g, '/').replace('T', ' ')).getTime();
+                if (expTime) {
+                    if (typeof expTime === 'string') {
+                        expTime = new Date(expTime.replace(/-/g, '/').replace('T', ' ')).getTime();
+                    }
+                    if (!isNaN(expTime)) {
+                        daysLeft = Math.ceil((expTime - now) / (1000 * 60 * 60 * 24));
+                    }
                 }
-                if (!isNaN(expTime)) {
-                    daysLeft = Math.ceil((expTime - now) / (1000 * 60 * 60 * 24));
-                }
-            }
 
-            if (expireDisplay) {
-                expireDisplay.style.display = 'block';
-                if (daysLeft <= 0) {
-                    expireDisplay.innerHTML = `⚠️ Тестовий період закінчився. <b style="cursor:pointer; color:var(--primary)" onclick="app.openMenu('premium')">Подовжити?</b>`;
-                } else {
-                    expireDisplay.innerHTML = `Залишилось <b>${daysLeft} дн.</b> | План: ${totalUnits} од.`;
+                if (expireDisplay) {
+                    expireDisplay.style.display = 'block';
+                    if (daysLeft <= 0) {
+                        expireDisplay.innerHTML = `⚠️ Тестовий період закінчився. <b style="cursor:pointer; color:var(--primary)" onclick="app.openMenu('premium')">Подовжити?</b>`;
+                    } else {
+                        let units = typeof totalUnits !== 'undefined' ? totalUnits : '∞';
+                        expireDisplay.innerHTML = `Залишилось <b>${daysLeft} дн.</b> | План: ${units} од.`;
+                    }
+                }
+                
+                if (lim) {
+                    let price = typeof price6m !== 'undefined' ? price6m : '---';
+                    lim.innerHTML = `<span onclick="app.openMenu('premium')" style="cursor:pointer">💎 Тариф: <b>${price} грн</b> / 6 міс</span>`;
                 }
             }
-            
-            if (lim) {
-                lim.innerHTML = `<span onclick="app.openMenu('premium')" style="cursor:pointer">💎 Тариф: <b>${price6m} грн</b> / 6 міс</span>`;
-            }
+        } catch (err) {
+            console.error("Помилка в блоці тарифів (проігноровано):", err);
         }
     // --- БЛОКУВАННЯ, ЯКЩО ТАРИФ ЗАКІНЧИВСЯ ---
     checkLimit() {
