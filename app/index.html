@@ -3664,16 +3664,15 @@ window.addEventListener('load', () => {
             }
         }
     });
-    // --- 📄 СУПЕР-ФУНКЦІЯ ГЕНЕРАЦІЇ PDF (Відкриття в новій вкладці) ---
+    // --- 📄 ФІНАЛЬНА ФУНКЦІЯ ГЕНЕРАЦІЇ PDF (Нова вкладка + Ідеальний А4 на всіх пристроях) ---
     window.downloadPollPDF = async function(pollId) {
-        // Одразу відкриваємо пусту вкладку (обхід блокувальника реклами)
+        // 1. Відкриваємо вкладку ОДРАЗУ, щоб браузер (особливо на мобільному) її не заблокував
         const pdfWindow = window.open("", "_blank");
-        if (pdfWindow) {
-            pdfWindow.document.write("<div style='font-family:sans-serif; padding:50px; text-align:center;'>⏳ Генеруємо офіційний протокол, зачекайте...</div>");
-        } else {
-            alert("⚠️ Ваш браузер заблокував відкриття нової вкладки. Дозвольте спливаючі вікна для цього сайту.");
+        if (!pdfWindow) {
+            alert("⚠️ Ваш браузер заблокував нову вкладку. Будь ласка, дозвольте спливаючі вікна.");
             return;
         }
+        pdfWindow.document.write("<div style='font-family:sans-serif; padding:50px; text-align:center;'>⏳ Формуємо офіційний документ, зачекайте...</div>");
 
         try {
             const db = typeof _supabase !== 'undefined' ? _supabase : window._supabase;
@@ -3694,20 +3693,24 @@ window.addEventListener('load', () => {
             const dateStr = new Date(poll.created_at).toLocaleDateString('uk-UA');
             const statusStr = poll.status === 'active' ? 'Активне' : 'Завершено';
 
+            // 🚀 ЖОРСТКА ШИРИНА 800px, щоб на мобільному текст не "з'їжджав" і не вилазив за краї
             const htmlContent = `
-                <div style="padding: 40px; font-family: 'Montserrat', Arial, sans-serif; color: #000; background: #fff; width: 800px; box-sizing: border-box;">
-                    <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #000; padding-bottom: 20px;">
-                        <h1 style="margin: 0; font-size: 24px; text-transform: uppercase;">Офіційний Протокол Голосування</h1>
-                        <p style="margin: 5px 0 0; color: #555; font-size: 12px;">Згенеровано автоматично системою Comunalco</p>
+                <div style="width: 800px; padding: 40px; font-family: 'Montserrat', Arial, sans-serif; color: #000; background: #fff; box-sizing: border-box; text-align: left;">
+                    <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #000; padding-bottom: 15px;">
+                        <h1 style="margin: 0; font-size: 20px; text-transform: uppercase;">Офіційний Протокол Голосування</h1>
+                        <p style="margin: 5px 0 0; color: #555; font-size: 11px;">Згенеровано автоматично системою Comunalco</p>
                     </div>
+                    
                     <div style="margin-bottom: 30px; font-size: 14px; line-height: 1.6;">
-                        <p><strong>Тема опитування:</strong> ${poll.title}</p>
-                        <p><strong>Деталі:</strong> ${poll.description || 'Без додаткового опису'}</p>
-                        <p><strong>Дата створення:</strong> ${dateStr}</p>
-                        <p><strong>Статус на момент генерації:</strong> ${statusStr}</p>
+                        <p style="margin: 5px 0;"><strong>Тема опитування:</strong> ${poll.title}</p>
+                        <p style="margin: 5px 0;"><strong>Деталі:</strong> ${poll.description || 'Без додаткового опису'}</p>
+                        <p style="margin: 5px 0;"><strong>Дата створення:</strong> ${dateStr}</p>
+                        <p style="margin: 5px 0;"><strong>Статус:</strong> ${statusStr}</p>
                     </div>
-                    <h3 style="margin-bottom: 15px; font-size: 18px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">Підсумки голосування:</h3>
-                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 40px; font-size: 14px;">
+
+                    <h3 style="margin-bottom: 15px; font-size: 16px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">Підсумки голосування:</h3>
+                    
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 40px; font-size: 14px; text-align: left;">
                         <tbody>
                             <tr>
                                 <td style="border: 1px solid #000; padding: 12px; width: 50%; font-weight: bold;">ЗА:</td>
@@ -3723,14 +3726,15 @@ window.addEventListener('load', () => {
                             </tr>
                         </tbody>
                     </table>
+
                     <div style="margin-top: 50px; display: flex; justify-content: space-between; font-size: 14px;">
                         <div>
-                            <p><strong>Підпис Адміністратора:</strong></p>
-                            <p>___________________________</p>
+                            <p style="margin: 2px 0;"><strong>Підпис Адміністратора:</strong></p>
+                            <p style="margin: 15px 0 0 0;">___________________________</p>
                         </div>
                         <div style="text-align: right;">
-                            <p><strong>Дата формування протоколу:</strong></p>
-                            <p>${new Date().toLocaleDateString('uk-UA')} ${new Date().toLocaleTimeString('uk-UA').slice(0,5)}</p>
+                            <p style="margin: 2px 0;"><strong>Дата формування:</strong></p>
+                            <p style="margin: 2px 0;">${new Date().toLocaleDateString('uk-UA')} ${new Date().toLocaleTimeString('uk-UA').slice(0,5)}</p>
                         </div>
                     </div>
                 </div>
@@ -3748,22 +3752,23 @@ window.addEventListener('load', () => {
                 });
             }
 
+            // 🚀 windowWidth: 800 - ця команда забороняє телефону стискати текст!
             const opt = {
-                margin:       10,
+                margin:       [10, 0, 10, 0],
                 filename:     `Protokol_${pollId.substring(0,5)}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2 },
+                html2canvas:  { scale: 2, windowWidth: 800 }, 
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
-            // 🚀 МАГІЯ: Відкриваємо згенерований PDF у вже створеній вкладці!
+            // Перетворюємо в PDF і показуємо у вже відкритій вкладці!
             window.html2pdf().set(opt).from(element).outputPdf('bloburl').then(function(pdfUrl) {
                 pdfWindow.location.href = pdfUrl;
             });
 
         } catch (err) {
             console.error("Помилка PDF:", err);
-            if (pdfWindow) pdfWindow.close(); // Закриваємо вкладку, якщо сталася помилка
+            if (pdfWindow) pdfWindow.close(); // Якщо помилка - закриваємо пусту вкладку
             alert("❌ Сталася помилка при генерації PDF.");
         }
     };
