@@ -1437,39 +1437,49 @@ class App {
         const badge = document.getElementById('status-badge');
         const lim = document.getElementById('limit-counter');
 
-        if (isGlobalPro) {
-            if (expireDisplay) {
-                expireDisplay.style.display = 'block'; // Цей рядок повертає текст на ноут!
-                expireDisplay.innerHTML = `<span style="color:var(--primary); font-weight:800;">💎 PRO АКТИВНО</span> | <span style="font-size:11px; opacity:0.8;">Безліміт</span>`;
-            }
-            if (badge) {
-                badge.innerText = "PRO";
-                badge.className = 'status-badge status-pro';
-            }
-            if (lim) {
-                lim.innerHTML = `📘 Одиниці: <b>${totalUnits}</b> / ∞`;
-            }
-        } else {
-            const now = Date.now();
-            
-            // 🚀 СУПЕР-БЕЗПЕЧНА ДАТА ДЛЯ ТЕЛЕФОНУ
-            let safeExp = this.state.sub_expire;
-            if (typeof safeExp === 'string') safeExp = safeExp.replace(/-/g, '/').replace('T', ' ');
-            const parsedDate = new Date(safeExp).getTime();
-            const daysLeft = isNaN(parsedDate) ? 0 : Math.ceil((parsedDate - now) / (1000 * 60 * 60 * 24));
+        // 🚀 АБСОЛЮТНИЙ ЗАХИСТ ВІД ЗБОЇВ (Гарантує завантаження квартир)
+        try {
+            if (isGlobalPro) {
+                if (expireDisplay) {
+                    expireDisplay.style.display = 'block';
+                    expireDisplay.innerHTML = `<span style="color:var(--primary); font-weight:800;">💎 PRO АКТИВНО</span> | <span style="font-size:11px; opacity:0.8;">Безліміт</span>`;
+                }
+                if (badge) {
+                    badge.innerText = "PRO";
+                    badge.className = 'status-badge status-pro';
+                }
+                if (lim) {
+                    const units = typeof totalUnits !== 'undefined' ? totalUnits : '∞';
+                    lim.innerHTML = `📘 Одиниці: <b>${units}</b> / ∞`;
+                }
+            } else {
+                const now = Date.now();
+                let daysLeft = 0;
+                let safeExp = this.state.sub_expire || (this.state.license ? this.state.license.exp : null);
+                
+                if (safeExp) {
+                    if (typeof safeExp === 'string') safeExp = safeExp.replace(/-/g, '/').replace('T', ' ');
+                    const parsedDate = new Date(safeExp).getTime();
+                    if (!isNaN(parsedDate)) daysLeft = Math.ceil((parsedDate - now) / 86400000);
+                }
 
-            if (expireDisplay) {
-                expireDisplay.style.display = 'block';
-                if (daysLeft <= 0) {
-                    expireDisplay.innerHTML = `⚠️ Тестовий період закінчився. <b style="cursor:pointer; color:var(--primary)" onclick="app.openMenu('premium')">Подовжити?</b>`;
-                } else {
-                    expireDisplay.innerHTML = `Залишилось <b>${daysLeft} дн.</b> | План: ${totalUnits} од.`;
+                if (expireDisplay) {
+                    expireDisplay.style.display = 'block';
+                    if (daysLeft <= 0) {
+                        expireDisplay.innerHTML = `⚠️ Тестовий період закінчився. <b style="cursor:pointer; color:var(--primary)" onclick="app.openMenu('premium')">Подовжити?</b>`;
+                    } else {
+                        const units = typeof totalUnits !== 'undefined' ? totalUnits : '∞';
+                        expireDisplay.innerHTML = `Залишилось <b>${daysLeft} дн.</b> | План: ${units} од.`;
+                    }
+                }
+                
+                if (lim) {
+                    const p6m = typeof price6m !== 'undefined' ? price6m : '---';
+                    lim.innerHTML = `<span onclick="app.openMenu('premium')" style="cursor:pointer">💎 Тариф: <b>${p6m} грн</b> / 6 міс</span>`;
                 }
             }
-            
-            if (lim) {
-                lim.innerHTML = `<span onclick="app.openMenu('premium')" style="cursor:pointer">💎 Тариф: <b>${price6m} грн</b> / 6 міс</span>`;
-            }
+        } catch (err) {
+            console.error("Помилка відображення тарифу (проігноровано):", err);
         }
     // --- БЛОКУВАННЯ, ЯКЩО ТАРИФ ЗАКІНЧИВСЯ ---
     checkLimit() {
