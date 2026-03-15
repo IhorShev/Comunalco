@@ -1351,12 +1351,11 @@ window.payWithBank = function(bankName) {
     });
 };
 
-// 📎 3. ВІДПРАВКА КВИТАНЦІЇ В ЧАТ (Supabase Storage + Messages)
+// 📎 3. ВІДПРАВКА КВИТАНЦІЇ В ЧАТ (Залізобетонна версія)
 window.uploadReceipt = async function(input) {
     if (!input.files || input.files.length === 0) return;
     const file = input.files[0];
     
-    // Візуально показуємо, що йде завантаження
     const btnLabel = input.parentElement;
     const originalText = btnLabel.innerHTML;
     btnLabel.innerHTML = "⏳ Відправка...";
@@ -1364,39 +1363,45 @@ window.uploadReceipt = async function(input) {
     btnLabel.style.pointerEvents = "none";
 
     try {
-        // 1. Формуємо унікальне ім'я файлу
+        // 🦸‍♂️ СТВОРЮЄМО АБО ЗНАХОДИМО КЛІЄНТ БАЗИ ДАНИХ
+        let activeClient;
+        if (typeof sbClient !== 'undefined') {
+            activeClient = sbClient;
+        } else if (typeof window.sbClient !== 'undefined') {
+            activeClient = window.sbClient;
+        } else {
+            // Створюємо на льоту, якщо змінні загубилися
+            activeClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        }
+
         const fileExt = file.name.split('.').pop();
         const fileName = `receipt_${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
 
-        // 2. Завантажуємо файл у наш новий бакет 'receipts'
-        const { data: uploadData, error: uploadError } = await sbClient.storage
+        // Завантажуємо файл
+        const { data: uploadData, error: uploadError } = await activeClient.storage
             .from('receipts')
             .upload(fileName, file);
 
         if (uploadError) throw uploadError;
 
-        // 3. Отримуємо публічне посилання на файл
-        const { data: urlData } = sbClient.storage.from('receipts').getPublicUrl(fileName);
+        // Отримуємо посилання
+        const { data: urlData } = activeClient.storage.from('receipts').getPublicUrl(fileName);
         const fileUrl = urlData.publicUrl;
 
-        // 4. Формуємо текст повідомлення
+        // Відправляємо в чат
         const amount = document.getElementById('payment-modal-amount').innerText;
         const msgText = `💳 Відправлено квитанцію про оплату на суму ${amount}.\nПосилання: ${fileUrl}`;
-
-        // 5. Записуємо в таблицю messages!
-        // ID мешканця беремо з поточної сесії
         const senderId = window.currentTenant ? String(window.currentTenant.id) : 'unknown_tenant';
 
-        const { error: dbError } = await sbClient.from('messages').insert({
+        const { error: dbError } = await activeClient.from('messages').insert({
             sender_id: senderId,
-            recipient_type: 'manager', // Відправляємо керуючому
+            recipient_type: 'manager',
             message_text: msgText,
             is_read: false
         });
 
         if (dbError) throw dbError;
 
-        // Успіх!
         alert("✅ Квитанцію успішно надіслано керуючому!");
         document.getElementById('payment-modal').style.display = 'none';
 
@@ -1404,11 +1409,10 @@ window.uploadReceipt = async function(input) {
         console.error("Помилка завантаження квитанції:", err);
         alert("❌ Сталася помилка при відправці. Перевірте підключення або спробуйте пізніше.");
     } finally {
-        // Повертаємо кнопку в нормальний стан
         btnLabel.innerHTML = originalText;
         btnLabel.style.opacity = "1";
         btnLabel.style.pointerEvents = "auto";
-        input.value = ""; // Очищаємо інпут
+        input.value = ""; 
     }
 };
     </script>
