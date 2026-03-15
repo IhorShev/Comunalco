@@ -3978,10 +3978,12 @@ window.addEventListener('load', () => {
                     </div>
                 </div>
                 
-                <div class="chat-input-area" id="admin-chat-input-area" style="display:none;">
-                    <input type="text" id="admin-msg-text" placeholder="Напишіть повідомлення мешканцю..." style="margin:0; flex:1; padding:10px; border-radius:8px; border:1px solid var(--border); background:var(--bg-main); color:var(--text);">
-                    <button class="btn btn-primary" style="width:auto; padding:0 20px;" onclick="sendAdminMessage()">➤</button>
-                </div>
+                <div class="chat-input-area" id="admin-chat-input-area" style="display:none; gap: 10px; align-items: flex-end; padding: 15px; border-top: 1px solid var(--border); background: var(--bg-card);">
+    <textarea id="admin-msg-text" placeholder="Напишіть повідомлення мешканцю..." style="margin:0; flex:1; padding: 12px 15px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg-main); color: var(--text); resize: none; height: 45px; min-height: 45px; max-height: 150px; font-family: inherit; line-height: 1.4; overflow-y: auto;" oninput="this.style.height = '45px'; this.style.height = Math.min(this.scrollHeight, 150) + 'px'"></textarea>
+    <button class="btn btn-primary" style="width:auto; height: 45px; padding: 0 20px; border-radius: 12px; display: flex; align-items: center; justify-content: center;" onclick="sendAdminMessage()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+    </button>
+</div>
             </div>
             
         </div>
