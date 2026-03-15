@@ -443,18 +443,16 @@
         }
         
         // --- ЛОГІКА ОПЛАТИ (QR ТА РЕКВІЗИТИ) ---
-        // 💳 1. ВІДКРИТТЯ НОВОГО ВІКНА ОПЛАТИ (Deep Links)
+        // 💳 1. ВІДКРИТТЯ НОВОГО ВІКНА ОПЛАТИ
 window.payOnline = function() {
-    // Беремо поточний борг прямо з великої цифри на екрані
     const debtElement = document.getElementById('dash-debt');
     let debt = "0.00";
     if (debtElement) debt = debtElement.innerText.replace('₴', '').trim();
     
-    // Вставляємо суму у наше НОВЕ вікно
     document.getElementById('payment-modal-amount').innerText = debt + ' ₴';
     
-    // Додаємо номер квартири в призначення
-    const aptName = window.currentTenant ? window.currentTenant.name : 'по квартирі';
+    // 🦸‍♂️ ВИПРАВЛЕНО: Правильно беремо ім'я квартири
+    const aptName = (typeof currentTenant !== 'undefined' && currentTenant) ? currentTenant.name : 'по квартирі';
     document.getElementById('payment-modal-desc').innerText = `Комунальні послуги, ${aptName}`;
     
     document.getElementById('payment-modal').style.display = 'flex';
