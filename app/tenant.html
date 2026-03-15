@@ -1296,6 +1296,65 @@ async function submitVote(choice) {
             alert("❌ Сталася помилка при генерації документа.");
         }
     };
+
+    // 💳 1. ВІДКРИТТЯ ВІКНА ОПЛАТИ
+window.payOnline = function() {
+    // Беремо поточний борг прямо з екрану
+    const debtElement = document.getElementById('dash-debt');
+    let debt = "0.00";
+    if (debtElement) debt = debtElement.innerText.replace('₴', '').trim();
+    
+    // Якщо боргу немає - можемо попередити, або все одно дати сплатити наперед
+    if (parseFloat(debt) <= 0) {
+        if(!confirm("У вас немає боргу. Бажаєте внести переплату?")) return;
+    }
+
+    // Вставляємо суму у вікно та показуємо його
+    document.getElementById('payment-modal-amount').innerText = debt + ' ₴';
+    // Додаємо номер квартири в призначення, якщо є (з window.currentTenant або подібного)
+    const aptName = window.currentTenant ? window.currentTenant.name : 'по квартирі';
+    document.getElementById('payment-modal-desc').innerText = `Комунальні послуги, ${aptName}`;
+    
+    document.getElementById('payment-modal').style.display = 'flex';
+};
+
+// 🏦 2. ОБРОБКА БАНКІВ (Копіюй та Відкрий)
+window.payWithBank = function(bankName) {
+    // ТУТ НАМ ПОТРІБНІ ВАШІ РЕКВІЗИТИ З БАЗИ (поки що ставлю заглушку)
+    // Зазвичай вони лежать десь у window.house.requisites
+    let reqs = "Номер картки або IBAN не знайдено"; 
+    
+    // Уявімо, що ми дістали реквізити:
+    // if (window.house && window.house.requisites) reqs = window.house.requisites.mono_card;
+
+    // Магія 1: Копіюємо в буфер обміну
+    navigator.clipboard.writeText(reqs).then(() => {
+        alert("✅ Реквізити скопійовано!\nВставте їх у додатку банку.");
+        
+        // Магія 2: Deep Links (Відкриваємо банк)
+        if (bankName === 'mono') {
+            window.location.href = "monobank://"; // Відкриває додаток Моно на телефоні
+            // Якщо є Банка: window.location.href = "https://send.monobank.ua/jar/XXXXX";
+        } else if (bankName === 'privat') {
+            window.location.href = "privat24://"; // Відкриває Приват24
+        }
+    }).catch(err => {
+        alert("Не вдалося скопіювати реквізити. Спробуйте інший спосіб.");
+    });
+};
+
+// 📎 3. ВІДПРАВКА КВИТАНЦІЇ
+window.uploadReceipt = async function(input) {
+    if (!input.files || input.files.length === 0) return;
+    const file = input.files[0];
+    
+    alert(`⏳ Завантажуємо квитанцію: ${file.name}...\n(Тут ми підключимо Supabase Storage)`);
+    
+    // Візуально закриваємо вікно після вибору файлу
+    document.getElementById('payment-modal').style.display = 'none';
+    
+    // TODO: Завантаження файлу в базу
+};
     </script>
      <div id="tenant-chat-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
     <div style="background: var(--bg-card); width: 95%; max-width: 900px; height: 85vh; border-radius: 15px; display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
