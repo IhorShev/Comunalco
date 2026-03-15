@@ -1318,42 +1318,100 @@ window.payOnline = function() {
     document.getElementById('payment-modal').style.display = 'flex';
 };
 
-// 🏦 2. ОБРОБКА БАНКІВ (Копіюй та Відкрий)
+// 🏦 2. ОБРОБКА БАНКІВ (Справжні дані з бази)
 window.payWithBank = function(bankName) {
-    // ТУТ НАМ ПОТРІБНІ ВАШІ РЕКВІЗИТИ З БАЗИ (поки що ставлю заглушку)
-    // Зазвичай вони лежать десь у window.house.requisites
-    let reqs = "Номер картки або IBAN не знайдено"; 
-    
-    // Уявімо, що ми дістали реквізити:
-    // if (window.house && window.house.requisites) reqs = window.house.requisites.mono_card;
+    // Шукаємо реквізити. Зазвичай вони прилітають разом з даними будинку
+    // Якщо у вас інша змінна - підправте (наприклад window.houseData)
+    const reqObj = (window.currentTenant && window.currentTenant.house_data && window.currentTenant.house_data.extra_data && window.currentTenant.house_data.extra_data.req) 
+                   || window.houseRequisites 
+                   || {};
 
-    // Магія 1: Копіюємо в буфер обміну
+    let reqs = "";
+    
+    if (bankName === 'mono') {
+        reqs = reqObj.mono || reqObj.monobank || "Номер Mono не знайдено";
+    } else if (bankName === 'privat') {
+        reqs = reqObj.privat || reqObj.privat24 || "Номер Приват не знайдено";
+    } else {
+        reqs = reqObj.iban || "Реквізити не знайдено";
+    }
+
+    if (reqs.includes("не знайдено")) {
+        alert("Керуючий ще не додав реквізити для цього банку.");
+        return;
+    }
+
+    // Магія 1: Копіюємо в буфер
     navigator.clipboard.writeText(reqs).then(() => {
-        alert("✅ Реквізити скопійовано!\nВставте їх у додатку банку.");
+        alert(`✅ Реквізити скопійовано!\nВставте їх у додатку банку.\n\nСкопійовано: ${reqs}`);
         
-        // Магія 2: Deep Links (Відкриваємо банк)
-        if (bankName === 'mono') {
-            window.location.href = "monobank://"; // Відкриває додаток Моно на телефоні
-            // Якщо є Банка: window.location.href = "https://send.monobank.ua/jar/XXXXX";
-        } else if (bankName === 'privat') {
-            window.location.href = "privat24://"; // Відкриває Приват24
-        }
+        // Магія 2: Відкриваємо банк
+        if (bankName === 'mono') window.location.href = "monobank://";
+        if (bankName === 'privat') window.location.href = "privat24://";
     }).catch(err => {
-        alert("Не вдалося скопіювати реквізити. Спробуйте інший спосіб.");
+        alert("Не вдалося автоматично скопіювати. Спробуйте вручну.");
     });
 };
 
-// 📎 3. ВІДПРАВКА КВИТАНЦІЇ
+// 📎 3. ВІДПРАВКА КВИТАНЦІЇ В ЧАТ (Supabase Storage + Messages)
 window.uploadReceipt = async function(input) {
     if (!input.files || input.files.length === 0) return;
     const file = input.files[0];
     
-    alert(`⏳ Завантажуємо квитанцію: ${file.name}...\n(Тут ми підключимо Supabase Storage)`);
-    
-    // Візуально закриваємо вікно після вибору файлу
-    document.getElementById('payment-modal').style.display = 'none';
-    
-    // TODO: Завантаження файлу в базу
+    // Візуально показуємо, що йде завантаження
+    const btnLabel = input.parentElement;
+    const originalText = btnLabel.innerHTML;
+    btnLabel.innerHTML = "⏳ Відправка...";
+    btnLabel.style.opacity = "0.7";
+    btnLabel.style.pointerEvents = "none";
+
+    try {
+        // 1. Формуємо унікальне ім'я файлу
+        const fileExt = file.name.split('.').pop();
+        const fileName = `receipt_${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+
+        // 2. Завантажуємо файл у наш новий бакет 'receipts'
+        const { data: uploadData, error: uploadError } = await sbClient.storage
+            .from('receipts')
+            .upload(fileName, file);
+
+        if (uploadError) throw uploadError;
+
+        // 3. Отримуємо публічне посилання на файл
+        const { data: urlData } = sbClient.storage.from('receipts').getPublicUrl(fileName);
+        const fileUrl = urlData.publicUrl;
+
+        // 4. Формуємо текст повідомлення
+        const amount = document.getElementById('payment-modal-amount').innerText;
+        const msgText = `💳 Відправлено квитанцію про оплату на суму ${amount}.\nПосилання: ${fileUrl}`;
+
+        // 5. Записуємо в таблицю messages!
+        // ID мешканця беремо з поточної сесії
+        const senderId = window.currentTenant ? String(window.currentTenant.id) : 'unknown_tenant';
+
+        const { error: dbError } = await sbClient.from('messages').insert({
+            sender_id: senderId,
+            recipient_type: 'manager', // Відправляємо керуючому
+            message_text: msgText,
+            is_read: false
+        });
+
+        if (dbError) throw dbError;
+
+        // Успіх!
+        alert("✅ Квитанцію успішно надіслано керуючому!");
+        document.getElementById('payment-modal').style.display = 'none';
+
+    } catch (err) {
+        console.error("Помилка завантаження квитанції:", err);
+        alert("❌ Сталася помилка при відправці. Перевірте підключення або спробуйте пізніше.");
+    } finally {
+        // Повертаємо кнопку в нормальний стан
+        btnLabel.innerHTML = originalText;
+        btnLabel.style.opacity = "1";
+        btnLabel.style.pointerEvents = "auto";
+        input.value = ""; // Очищаємо інпут
+    }
 };
     </script>
      <div id="tenant-chat-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
