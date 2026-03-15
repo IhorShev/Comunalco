@@ -1514,11 +1514,11 @@ window.uploadReceipt = async function(input) {
 
         <hr style="border-color: var(--border); margin: 20px 0;">
 
-        <div style="text-align: center;">
-            <p style="font-size: 13px; color: var(--text-sec); margin-bottom: 10px;">Вже сплатили?</p>
-            <label class="btn btn-primary" style="display: inline-block; cursor: pointer; padding: 10px 20px; font-size: 14px; border-radius: 8px;">
-                📎 Надіслати квитанцію в чат
-                <input type="file" id="receipt-upload" accept="image/*" style="display: none;" onchange="uploadReceipt(this)">
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-top: 20px; text-align: center;">
+            <p style="font-size: 13px; color: var(--text-sec); margin: 0 0 10px 0;">Вже сплатили?</p>
+            <label class="btn btn-primary" style="display: flex; justify-content: center; align-items: center; gap: 10px; cursor: pointer; padding: 12px 24px; font-size: 15px; border-radius: 10px; width: fit-content; margin: 0 auto;">
+                📎 Надіслати квитанцію
+                <input type="file" id="receipt-upload" accept="image/jpeg, image/png, image/jpg, application/pdf, .pdf" style="display: none;" onchange="uploadReceipt(this)">
             </label>
         </div>
     </div>
