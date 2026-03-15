@@ -1349,7 +1349,7 @@ window.payWithBank = function(bankName) {
     });
 };
 
-// 📎 3. ВІДПРАВКА КВИТАНЦІЇ В ЧАТ (Залізобетонна версія)
+// 📎 3. ВІДПРАВКА КВИТАНЦІЇ В ЧАТ (Клікабельне посилання + правильний ID)
 window.uploadReceipt = async function(input) {
     if (!input.files || input.files.length === 0) return;
     const file = input.files[0];
@@ -1361,14 +1361,12 @@ window.uploadReceipt = async function(input) {
     btnLabel.style.pointerEvents = "none";
 
     try {
-        // 🦸‍♂️ СТВОРЮЄМО АБО ЗНАХОДИМО КЛІЄНТ БАЗИ ДАНИХ
         let activeClient;
         if (typeof sbClient !== 'undefined') {
             activeClient = sbClient;
         } else if (typeof window.sbClient !== 'undefined') {
             activeClient = window.sbClient;
         } else {
-            // Створюємо на льоту, якщо змінні загубилися
             activeClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         }
 
@@ -1386,10 +1384,13 @@ window.uploadReceipt = async function(input) {
         const { data: urlData } = activeClient.storage.from('receipts').getPublicUrl(fileName);
         const fileUrl = urlData.publicUrl;
 
-        // Відправляємо в чат
         const amount = document.getElementById('payment-modal-amount').innerText;
-        const msgText = `💳 Відправлено квитанцію про оплату на суму ${amount}.\nПосилання: ${fileUrl}`;
-        const senderId = window.currentTenant ? String(window.currentTenant.id) : 'unknown_tenant';
+
+        // 🦸‍♂️ ВИПРАВЛЕНО: Робимо гарне клікабельне посилання, яке не вилазить за краї!
+        const msgText = `💳 Відправлено квитанцію про оплату на суму ${amount}.<br><br><a href="${fileUrl}" target="_blank" style="color: #4da3ff; text-decoration: underline; word-break: break-all; font-weight: bold;">📄 Відкрити квитанцію</a>`;
+
+        // 🦸‍♂️ ВИПРАВЛЕНО: Правильно беремо ID мешканця
+        const senderId = (typeof currentTenant !== 'undefined' && currentTenant) ? String(currentTenant.id) : 'unknown_tenant';
 
         const { error: dbError } = await activeClient.from('messages').insert({
             sender_id: senderId,
