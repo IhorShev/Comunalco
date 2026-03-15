@@ -1314,34 +1314,58 @@ window.payOnline = function() {
     document.getElementById('payment-modal').style.display = 'flex';
 };
 
-// 🏦 2. ОБРОБКА БАНКІВ (Справжні дані з бази)
+// 🏦 2. ОБРОБКА БАНКІВ (Розумний пошук реквізитів з бази)
 window.payWithBank = function(bankName) {
-    // Шукаємо реквізити. Зазвичай вони прилітають разом з даними будинку
-    // Якщо у вас інша змінна - підправте (наприклад window.houseData)
-    const reqObj = (window.currentTenant && window.currentTenant.house_data && window.currentTenant.house_data.extra_data && window.currentTenant.house_data.extra_data.req) 
-                   || window.houseRequisites 
-                   || {};
-
     let reqs = "";
     
-    if (bankName === 'mono') {
-        reqs = reqObj.mono || reqObj.monobank || "Номер Mono не знайдено";
-    } else if (bankName === 'privat') {
-        reqs = reqObj.privat || reqObj.privat24 || "Номер Приват не знайдено";
-    } else {
-        reqs = reqObj.iban || "Реквізити не знайдено";
+    try {
+        // Дістаємо дані будинку поточного мешканця
+        const houseData = (window.currentTenant && window.currentTenant.house_data) || {};
+        const extraData = houseData.extra_data || {};
+        
+        // В базі картки лежать як масив у extra_data.req
+        const reqArray = extraData.req || []; 
+        
+        if (Array.isArray(reqArray)) {
+            if (bankName === 'other') {
+                // Якщо кнопка "Інший банк", збираємо ВСІ номери карток в один список
+                let allReqs = [];
+                for (let item of reqArray) {
+                    if (item.val) allReqs.push(item.val);
+                }
+                reqs = allReqs.join('\n');
+            } else {
+                // Шукаємо конкретний банк (Моно або Приват)
+                for (let item of reqArray) {
+                    // Перетворюємо всі дані картки в нижній регістр для зручного пошуку
+                    const itemStr = JSON.stringify(item).toLowerCase();
+                    
+                    // Якщо шукаємо Моно і в назві є слово "моно" або "mono"
+                    if (bankName === 'mono' && (itemStr.includes('mono') || itemStr.includes('моно'))) {
+                        reqs = item.val || "";
+                    }
+                    // Якщо шукаємо Приват і в назві є слово "privat" або "приват"
+                    if (bankName === 'privat' && (itemStr.includes('privat') || itemStr.includes('приват'))) {
+                        reqs = item.val || "";
+                    }
+                }
+            }
+        }
+    } catch (e) {
+        console.error("Помилка читання реквізитів:", e);
     }
 
-    if (reqs.includes("не знайдено")) {
+    // Якщо код нічого не знайшов
+    if (!reqs || reqs.length < 5) {
         alert("Керуючий ще не додав реквізити для цього банку.");
         return;
     }
 
-    // Магія 1: Копіюємо в буфер
+    // Магія 1: Копіюємо в буфер обміну
     navigator.clipboard.writeText(reqs).then(() => {
-        alert(`✅ Реквізити скопійовано!\nВставте їх у додатку банку.\n\nСкопійовано: ${reqs}`);
+        alert(`✅ Реквізити скопійовано!\nВставте їх у додатку банку.\n\nСкопійовано:\n${reqs}`);
         
-        // Магія 2: Відкриваємо банк
+        // Магія 2: Відкриваємо додаток банку
         if (bankName === 'mono') window.location.href = "monobank://";
         if (bankName === 'privat') window.location.href = "privat24://";
     }).catch(err => {
