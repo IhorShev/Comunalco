@@ -428,39 +428,22 @@
         }
         
         // --- ЛОГІКА ОПЛАТИ (QR ТА РЕКВІЗИТИ) ---
-        function payOnline() {
-            if (!currentTenant) return;
-
-            const oldDebt = parseFloat(currentTenant.debt || 0);
-            const currentBill = parseFloat(currentTenant.total_bill || 0);
-            const paid = parseFloat(currentTenant.paid || 0);
-            const totalBalance = (oldDebt + currentBill) - paid;
-
-            if (totalBalance <= 0) {
-                alert("У вас немає заборгованості! Дякуємо за своєчасну оплату 😊");
-                return;
-            }
-
-            const amountStr = totalBalance.toFixed(2);
-            document.getElementById('pay-amount').innerText = amountStr;
-
-            // Демо-реквізити (Наступним кроком ми підтягнемо їх з адмінки Supabase!)
-            const receiver = "ОСББ 'Демо Будинок'";
-            const iban = "UA12345678901234567890123456789"; 
-            const purpose = `Оплата комунальних послуг, ${currentTenant.name}`;
-
-            document.getElementById('pay-receiver').innerText = receiver;
-            document.getElementById('pay-iban').innerText = iban;
-            document.getElementById('pay-purpose').innerText = purpose;
-
-            // Генеруємо Європейський платіжний QR-код (EPC)
-            const epcString = `BCD\n002\n1\nSCT\n\n${receiver}\n${iban}\nUAH${amountStr}\n\n\n${purpose}`;
-            // Використовуємо надійний генератор QuickChart (без підключення зайвих бібліотек)
-            const qrUrl = `https://quickchart.io/qr?text=${encodeURIComponent(epcString)}&size=200&margin=1`;
-            document.getElementById('pay-qr').src = qrUrl;
-
-            document.getElementById('payment-modal').style.display = 'flex';
-        }
+        // 💳 1. ВІДКРИТТЯ НОВОГО ВІКНА ОПЛАТИ (Deep Links)
+window.payOnline = function() {
+    // Беремо поточний борг прямо з великої цифри на екрані
+    const debtElement = document.getElementById('dash-debt');
+    let debt = "0.00";
+    if (debtElement) debt = debtElement.innerText.replace('₴', '').trim();
+    
+    // Вставляємо суму у наше НОВЕ вікно
+    document.getElementById('payment-modal-amount').innerText = debt + ' ₴';
+    
+    // Додаємо номер квартири в призначення
+    const aptName = window.currentTenant ? window.currentTenant.name : 'по квартирі';
+    document.getElementById('payment-modal-desc').innerText = `Комунальні послуги, ${aptName}`;
+    
+    document.getElementById('payment-modal').style.display = 'flex';
+};
 
         function copyIban() {
             const iban = document.getElementById('pay-iban').innerText;
