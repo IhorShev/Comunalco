@@ -1482,7 +1482,10 @@ window.uploadReceipt = async function(input) {
             <h3 style="margin:0; font-size:18px;">💬 Чат будинку</h3>
             <button class="btn btn-outline" style="padding:5px 15px;" onclick="document.getElementById('tenant-chat-modal').style.display='none'">✕ Закрити</button>
         </div>
-        
+        <div id="chat-tabs" style="display: flex; background: rgba(255,255,255,0.02); padding: 8px 15px; border-bottom: 1px solid var(--border); gap: 10px;">
+            <button id="tab-admin" onclick="window.switchChat('admin')" style="flex: 1; padding: 8px; border: none; border-radius: 8px; background: var(--primary); color: white; cursor: pointer; font-weight: bold; font-size: 14px; transition: 0.2s;">🏢 Керуючий</button>
+            <button id="tab-community" onclick="window.switchChat('community')" style="flex: 1; padding: 8px; border: none; border-radius: 8px; background: transparent; color: var(--text-sec); cursor: pointer; font-weight: bold; font-size: 14px; transition: 0.2s;">🤝 Сусіди</button>
+        </div>
         <div style="display: flex; flex: 1; overflow: hidden;">
             
             <div style="width: 35%; border-right: 1px solid var(--border); display: flex; flex-direction: column; background: rgba(0,0,0,0.2);">
@@ -1549,6 +1552,30 @@ window.uploadReceipt = async function(input) {
             });
         });
     }
+                // 🔄 ЛОГІКА ПЕРЕМИКАННЯ ЧАТІВ (МЕШКАНЕЦЬ)
+window.currentChatMode = 'admin'; // За замовчуванням пишемо Керуючому
+
+window.switchChat = function(mode) {
+    window.currentChatMode = mode;
+    
+    const btnAdmin = document.getElementById('tab-admin');
+    const btnComm = document.getElementById('tab-community');
+    
+    // Перемикаємо кольори кнопок
+    if (mode === 'admin') {
+        btnAdmin.style.background = 'var(--primary)';
+        btnAdmin.style.color = 'white';
+        btnComm.style.background = 'transparent';
+        btnComm.style.color = 'var(--text-sec)';
+        // Тут ми скажемо програмі завантажити чат з адміном (зробимо в наступному кроці)
+    } else {
+        btnComm.style.background = 'var(--primary)';
+        btnComm.style.color = 'white';
+        btnAdmin.style.background = 'transparent';
+        btnAdmin.style.color = 'var(--text-sec)';
+        // Тут ми скажемо програмі завантажити чат із сусідами
+    }
+};
 </script>
 
     <div id="payment-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
