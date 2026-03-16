@@ -734,7 +734,7 @@
     
 <script>
     // --- АВТО-ОНОВЛЕННЯ ВЕРСІЇ ---
-  const APP_VERSION = '7.7'; 
+  const APP_VERSION = '7.8'; 
   if (localStorage.getItem('app_version') !== APP_VERSION) {
       localStorage.setItem('app_version', APP_VERSION);
       if (navigator.serviceWorker) {
@@ -4545,7 +4545,9 @@ window.switchAdminChatMode = function(mode) {
         mainArea.style.setProperty('display', 'flex', 'important');
         mainArea.style.setProperty('width', '100%', 'important');
         
-        window.currentChatAptId = 'community'; 
+        window.currentChatAptId = 'community';
+        localStorage.setItem('comm_visit_admin', Date.now()); // Запам'ятовуємо час візиту
+        document.getElementById('comm-badge-admin').style.display = 'none'; // Ховаємо крапку
         document.getElementById('admin-chat-input-area').style.setProperty('display', 'flex', 'important');
         
         window.loadAdminCommunityMessages();
@@ -4600,6 +4602,22 @@ window.loadAdminCommunityMessages = async function() {
         console.error("Помилка:", err);
     }
 };
+    // 🔴 ФОНОВА ПЕРЕВІРКА ЗАГАЛЬНОГО ЧАТУ (КЕРУЮЧИЙ)
+async function checkAdminCommBadge() {
+    try {
+        const { data } = await _supabase.from('community_messages').select('created_at').order('created_at', { ascending: false }).limit(1);
+        if (data && data[0]) {
+            const lastMsg = new Date(data[0].created_at).getTime();
+            const lastVisit = localStorage.getItem('comm_visit_admin') || 0;
+            if (lastMsg > lastVisit && window.currentAdminChatMode !== 'community') {
+                const badge = document.getElementById('comm-badge-admin');
+                if (badge) badge.style.display = 'inline-block';
+            }
+        }
+    } catch(e) {}
+}
+setTimeout(checkAdminCommBadge, 2000); // Перевіряємо при запуску сторінки
+setInterval(checkAdminCommBadge, 15000); // І потім кожні 15 секунд
     
     </script>
 
