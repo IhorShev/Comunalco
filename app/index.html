@@ -734,7 +734,7 @@
     
 <script>
     // --- АВТО-ОНОВЛЕННЯ ВЕРСІЇ ---
-  const APP_VERSION = '7.3'; 
+  const APP_VERSION = '7.4'; 
   if (localStorage.getItem('app_version') !== APP_VERSION) {
       localStorage.setItem('app_version', APP_VERSION);
       if (navigator.serviceWorker) {
@@ -3992,7 +3992,7 @@ window.addEventListener('load', () => {
         <div id="chat-modal-header" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.05); gap: 10px; width: 100%; box-sizing: border-box;">
             <div style="display: flex; align-items: center; gap: 10px; overflow: hidden;">
                 <button id="mobile-chat-back" class="btn btn-outline" style="display: none; padding: 8px 12px; font-size: 16px; border-radius: 8px; align-items: center; justify-content: center;" onclick="showChatList()">⬅️</button>
-                <h3 style="margin: 0; font-size: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                <h3 style="margin: 0; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                     <span id="header-chat-icon">💬</span> Чат
                 </h3>
             </div>
