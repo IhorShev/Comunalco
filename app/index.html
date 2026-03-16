@@ -3991,7 +3991,7 @@ window.addEventListener('load', () => {
     <div class="chat-container">
         <div id="chat-modal-header" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.05); gap: 10px; width: 100%; box-sizing: border-box;">
             <div style="display: flex; align-items: center; gap: 10px; overflow: hidden;">
-                <button id="mobile-chat-back" class="btn btn-outline" style="display: none; padding: 8px 12px; font-size: 16px; border-radius: 8px; align-items: center; justify-content: center;" onclick="showChatList()">⬅️</button>
+                <button id="mobile-chat-back" class="btn btn-outline" style="display: none; padding: 8px 12px; font-size: 16px; border-radius: 8px; align-items: center; justify-content: center;" onclick="showChatList(); document.getElementById('admin-chat-tabs').style.display='flex';">⬅️</button>
                 <h3 style="margin: 0; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                     <span id="header-chat-icon">💬</span> Чат
                 </h3>
@@ -4001,7 +4001,7 @@ window.addEventListener('load', () => {
                     <span style="font-size: 16px; line-height: 1;">📊</span>
                     <span style="font-size: 10px; line-height: 1; font-weight: 500;">Опитування</span>
                 </button>
-                <button class="btn btn-outline" style="padding: 6px 10px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-width: 60px;" onclick="document.getElementById('chat-modal').style.display='none'; showChatList();">
+                <button class="btn btn-outline" style="padding: 6px 10px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-width: 60px;" onclick="document.getElementById('chat-modal').style.display='none'; showChatList(); document.getElementById('admin-chat-tabs').style.display='flex';">
                     <span style="font-size: 16px; line-height: 1;">✕</span>
                     <span style="font-size: 10px; line-height: 1; font-weight: 500;">Закрити</span>
                 </button>
