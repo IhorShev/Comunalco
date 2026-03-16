@@ -227,7 +227,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
     // 🚀 ЗАЛІЗОБЕТОННЕ ОНОВЛЕННЯ КЕШУ (Супер-режим)
-        const TENANT_VERSION = "3.9"; // ⚠️ Змінюйте цю цифру при кожній зміні коду!
+        const TENANT_VERSION = "4.0"; // ⚠️ Змінюйте цю цифру при кожній зміні коду!
         if (localStorage.getItem('tenant_app_version') !== TENANT_VERSION) {
             console.log("🔄 Оновлення версії! Чистимо кеш...");
             localStorage.setItem('tenant_app_version', TENANT_VERSION);
@@ -718,7 +718,7 @@ async function sendTenantMessage() {
                 .insert([{
                     house_id: currentTenant.house_id || 'default', // ID будинку
                     sender_id: String(currentTenant.id),           // ID мешканця
-                    sender_name: 'Кв. ' + currentTenant.flat,      // Підпис (Кв. 15)
+                    sender_name: 'Кв. ' + currentTenant.id,      // Підпис (Кв. 15)
                     message_text: text
                 }]);
 
