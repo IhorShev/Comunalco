@@ -711,7 +711,7 @@
     
 <script>
     // --- АВТО-ОНОВЛЕННЯ ВЕРСІЇ ---
-  const APP_VERSION = '7.0'; 
+  const APP_VERSION = '7.1'; 
   if (localStorage.getItem('app_version') !== APP_VERSION) {
       localStorage.setItem('app_version', APP_VERSION);
       if (navigator.serviceWorker) {
@@ -4354,6 +4354,66 @@ document.addEventListener('visibilitychange', () => {
         window.cloudLoad(); // Автоматично тягнемо свіжі цифри з бази
     }
 });
+
+    // 🔔 СИСТЕМА СПОВІЩЕНЬ: Радар непрочитаних повідомлень
+window.checkUnreadMessages = async function() {
+    try {
+        // Беремо існуюче підключення до бази (з рядка 4050 вашого коду)
+        if (typeof _supabase === 'undefined') return;
+
+        // Запитуємо всі повідомлення, де is_read = false і відправник НЕ Керуючий
+        const { data: unreadMsgs, error } = await _supabase
+            .from('messages')
+            .select('sender_id')
+            .eq('is_read', false)
+            .neq('sender_id', 'manager');
+
+        if (error) return;
+
+        const totalUnread = unreadMsgs ? unreadMsgs.length : 0;
+
+        // 1. Оновлюємо головний кружечок (рядок 337 вашого коду: id="admin-chat-badge")
+        const mainBadge = document.getElementById('admin-chat-badge');
+        if (mainBadge) {
+            mainBadge.textContent = totalUnread;
+            mainBadge.style.display = totalUnread > 0 ? 'inline-block' : 'none';
+        }
+
+        // 2. 📱 МАГІЯ: Вішаємо бейдж (цифру) на іконку додатку на телефоні/ПК!
+        if (navigator.setAppBadge) {
+            if (totalUnread > 0) navigator.setAppBadge(totalUnread).catch(e=>console.log(e));
+            else navigator.clearAppBadge().catch(e=>console.log(e));
+        }
+
+        // 3. Розподіляємо повідомлення по квартирах
+        const unreadByTenant = {};
+        if (unreadMsgs) {
+            unreadMsgs.forEach(msg => {
+                const sId = msg.sender_id;
+                unreadByTenant[sId] = (unreadByTenant[sId] || 0) + 1;
+            });
+        }
+
+        // 4. Оновлюємо кружечки у списку сусідів (якщо він відкритий)
+        document.querySelectorAll('.unread-badge[id^="badge-"]').forEach(badge => {
+            const aptId = badge.id.replace('badge-', '');
+            if (unreadByTenant[aptId]) {
+                badge.textContent = unreadByTenant[aptId];
+                badge.style.display = 'inline-block';
+            } else {
+                badge.style.display = 'none';
+            }
+        });
+
+    } catch (e) {
+        console.error("Помилка перевірки повідомлень:", e);
+    }
+};
+
+// Запускаємо "радар" кожні 10 секунд
+setInterval(window.checkUnreadMessages, 10000);
+// Перший запуск одразу при вході
+setTimeout(window.checkUnreadMessages, 2000);
     
     </script>
 
