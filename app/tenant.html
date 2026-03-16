@@ -1507,7 +1507,7 @@ window.uploadReceipt = async function(input) {
         </div>
         <div id="chat-tabs" style="display: flex; background: rgba(255,255,255,0.02); padding: 8px 15px; border-bottom: 1px solid var(--border); gap: 10px;">
             <button id="tab-admin" onclick="window.switchChat('admin')" style="flex: 1; padding: 8px; border: none; border-radius: 8px; background: var(--primary); color: white; cursor: pointer; font-weight: bold; font-size: 14px; transition: 0.2s;">🏢 Керуючий</button>
-            <button id="tab-community" onclick="window.switchChat('community')" style="flex: 1; padding: 8px; border: none; border-radius: 8px; background: transparent; color: var(--text-sec); cursor: pointer; font-weight: bold; font-size: 14px; transition: 0.2s;">🤝 Сусіди</button>
+            <button id="tab-community" onclick="switchChat('community')" style="flex: 1; padding: 10px; border: none; background: transparent; color: var(--text-sec); cursor: pointer; font-weight: bold; font-size: 14px; transition: 0.2s; border-radius: 8px;">🤝 Сусіди <span id="comm-badge-tenant" style="display:none; font-size:10px;">🔴</span></button>
         </div>
         <div style="display: flex; flex: 1; overflow: hidden;">
             
