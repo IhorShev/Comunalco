@@ -1314,55 +1314,36 @@ window.payOnline = function() {
     document.getElementById('payment-modal').style.display = 'flex';
 };
 
-// 🏦 2. ОБРОБКА БАНКІВ (Балакучий Детектив)
+// 🏦 2. ОБРОБКА БАНКІВ (Фінальна чиста версія)
 window.payWithBank = async function(bankName) {
-    // 1. АНТИ-КЕШ ПЕРЕВІРКА
-    alert("⏳ Крок 1: Запуск нової функції! Шукаємо реквізити для: " + bankName);
-
     let reqs = "";
+    
     try {
         const tenantInfo = (typeof currentTenant !== 'undefined' && currentTenant) ? currentTenant : window.currentTenant;
         
         if (!tenantInfo || !tenantInfo.house_id) {
-            alert("❌ Помилка: Немає house_id");
+            console.error("Помилка: Не знайдено ID будинку.");
             return;
         }
 
         let activeClient = (typeof sbClient !== 'undefined') ? sbClient : window.sbClient;
         if (!activeClient) activeClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // 2. ЗАПИТ У БАЗУ
         const { data: houseData, error } = await activeClient
             .from('houses')
             .select('extra_data')
             .eq('id', tenantInfo.house_id)
             .single();
 
-        if (error) {
-            alert("❌ Крок 2: База заблокувала доступ!\nПричина: " + error.message);
-            return;
-        }
+        if (error || !houseData || !houseData.extra_data) throw error || new Error("Немає даних");
 
-        if (!houseData || !houseData.extra_data) {
-            alert("❌ Крок 2: База повернула порожнечу.");
-            return;
-        }
-
-        // 3. РОЗБИРАЄМО ДАНІ
         let extraData = houseData.extra_data;
-        // Якщо база повернула текст замість об'єкта - перетворюємо
         if (typeof extraData === 'string') {
             try { extraData = JSON.parse(extraData); } catch(e) {}
         }
 
         const reqArray = extraData.req || []; 
         
-        if (reqArray.length === 0) {
-            alert("❌ Крок 3: Масив карток порожній!\nОсь що дала база:\n" + JSON.stringify(extraData));
-            return;
-        }
-
-        // 4. ПОШУК КАРТКИ
         if (bankName === 'other') {
             let allReqs = [];
             for (let item of reqArray) {
@@ -1374,32 +1355,28 @@ window.payWithBank = async function(bankName) {
                 if (!item.name || !item.val) continue;
                 const nameLower = item.name.toLowerCase();
                 
-                if (bankName === 'mono' && (nameLower.includes('моно') || nameLower.includes('mono'))) {
-                    reqs = item.val;
-                }
-                if (bankName === 'privat' && (nameLower.includes('приват') || nameLower.includes('privat'))) {
-                    reqs = item.val;
-                }
+                if (bankName === 'mono' && (nameLower.includes('моно') || nameLower.includes('mono'))) reqs = item.val;
+                if (bankName === 'privat' && (nameLower.includes('приват') || nameLower.includes('privat'))) reqs = item.val;
             }
         }
     } catch (e) {
-        alert("❌ Критична помилка коду: " + e.message);
-        return;
+        console.error("Помилка отримання реквізитів:", e);
     }
 
-    // ФІНАЛ
     if (!reqs || reqs.length < 5) {
-        alert("❌ Крок 4: Картку не знайдено серед списку!");
+        alert("Керуючий ще не додав реквізити для цього банку.");
         return;
     }
 
     try {
         await navigator.clipboard.writeText(reqs);
-        alert(`✅ УСПІХ!\nРеквізити скопійовано:\n${reqs}`);
+        alert(`✅ Реквізити скопійовано!\nВставте їх у додатку банку.\n\nСкопійовано:\n${reqs}`);
+        
+        // Магія: Відкриваємо додаток (працює на мобільних!)
         if (bankName === 'mono') window.location.href = "monobank://";
         if (bankName === 'privat') window.location.href = "privat24://";
     } catch (err) {
-        alert(`✅ Знайдено, але не скопіювалося автоматично:\n${reqs}`);
+        alert(`✅ Ваші реквізити:\n${reqs}\n(Скопіюйте вручну)`);
     }
 };
 
