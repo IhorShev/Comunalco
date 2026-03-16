@@ -227,7 +227,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
     // 🚀 ЗАЛІЗОБЕТОННЕ ОНОВЛЕННЯ КЕШУ (Супер-режим)
-        const TENANT_VERSION = "3.5"; // ⚠️ Змінюйте цю цифру при кожній зміні коду!
+        const TENANT_VERSION = "3.6"; // ⚠️ Змінюйте цю цифру при кожній зміні коду!
         if (localStorage.getItem('tenant_app_version') !== TENANT_VERSION) {
             console.log("🔄 Оновлення версії! Чистимо кеш...");
             localStorage.setItem('tenant_app_version', TENANT_VERSION);
@@ -1314,18 +1314,37 @@ window.payOnline = function() {
     document.getElementById('payment-modal').style.display = 'flex';
 };
 
-// 🏦 2. ОБРОБКА БАНКІВ (Чиста і масштабована версія)
-window.payWithBank = function(bankName) {
+// 🏦 2. ОБРОБКА БАНКІВ (Запит прямо в базу Supabase)
+window.payWithBank = async function(bankName) {
     let reqs = "";
     
     try {
+        // Беремо дані мешканця
         const tenantInfo = (typeof currentTenant !== 'undefined' && currentTenant) ? currentTenant : window.currentTenant;
-        const extraData = (tenantInfo && tenantInfo.house_data && tenantInfo.house_data.extra_data) || {};
+        
+        if (!tenantInfo || !tenantInfo.house_id) {
+            alert("Помилка: не знайдено ID будинку.");
+            return;
+        }
+
+        // 🦸‍♂️ МАГІЯ: Робимо швидкий запит у базу за реквізитами!
+        let activeClient = (typeof sbClient !== 'undefined') ? sbClient : window.sbClient;
+        if (!activeClient) activeClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const { data: houseData, error } = await activeClient
+            .from('houses')
+            .select('extra_data')
+            .eq('id', tenantInfo.house_id)
+            .single();
+
+        if (error || !houseData) throw error;
+
+        // Розбираємо отримані реквізити
+        const extraData = houseData.extra_data || {};
         const reqArray = extraData.req || []; 
         
         if (Array.isArray(reqArray)) {
             if (bankName === 'other') {
-                // Якщо обрали "Інший банк" - показуємо гарний список усіх карток з їхніми назвами
                 let allReqs = [];
                 for (let item of reqArray) {
                     if (item.val) {
@@ -1335,17 +1354,13 @@ window.payWithBank = function(bankName) {
                 }
                 reqs = allReqs.join('\n');
             } else {
-                // Шукаємо конкретний банк за полем "name"
                 for (let item of reqArray) {
                     if (!item.name || !item.val) continue;
-                    
                     const nameLower = item.name.toLowerCase();
                     
-                    // Якщо шукаємо Монобанк
                     if (bankName === 'mono' && (nameLower.includes('моно') || nameLower.includes('mono'))) {
                         reqs = item.val;
                     }
-                    // Якщо шукаємо Приватбанк
                     if (bankName === 'privat' && (nameLower.includes('приват') || nameLower.includes('privat'))) {
                         reqs = item.val;
                     }
@@ -1353,24 +1368,24 @@ window.payWithBank = function(bankName) {
             }
         }
     } catch (e) {
-        console.error("Помилка читання реквізитів:", e);
+        console.error("Помилка завантаження реквізитів з бази:", e);
     }
 
-    // Якщо нічого не знайшли
     if (!reqs || reqs.length < 5) {
         alert("Керуючий ще не додав реквізити для цього банку.");
         return;
     }
 
-    // Магія: Копіюємо і відкриваємо
-    navigator.clipboard.writeText(reqs).then(() => {
+    // Копіюємо і відкриваємо додаток
+    try {
+        await navigator.clipboard.writeText(reqs);
         alert(`✅ Реквізити скопійовано!\nВставте їх у додатку банку.\n\nСкопійовано:\n${reqs}`);
         
         if (bankName === 'mono') window.location.href = "monobank://";
         if (bankName === 'privat') window.location.href = "privat24://";
-    }).catch(err => {
+    } catch (err) {
         alert(`Не вдалося автоматично скопіювати. Ваші реквізити:\n${reqs}`);
-    });
+    }
 };
 
 // 📎 3. ВІДПРАВКА КВИТАНЦІЇ В ЧАТ (Клікабельне посилання + правильний ID)
