@@ -4203,6 +4203,8 @@ async function openAdminChat(aptId) {
         console.error(err);
         msgArea.innerHTML = '<div style="color:red;">Помилка</div>';
     }
+    // Ховаємо вкладки на мобільному, щоб звільнити місце
+if (window.innerWidth <= 768) document.getElementById('admin-chat-tabs').style.display = 'none';
 }
 
 // 3. Відправка повідомлення (Особисте або Загальне)
