@@ -227,7 +227,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
     // 🚀 ЗАЛІЗОБЕТОННЕ ОНОВЛЕННЯ КЕШУ (Супер-режим)
-        const TENANT_VERSION = "3.4"; // ⚠️ Змінюйте цю цифру при кожній зміні коду!
+        const TENANT_VERSION = "3.5"; // ⚠️ Змінюйте цю цифру при кожній зміні коду!
         if (localStorage.getItem('tenant_app_version') !== TENANT_VERSION) {
             console.log("🔄 Оновлення версії! Чистимо кеш...");
             localStorage.setItem('tenant_app_version', TENANT_VERSION);
@@ -1314,39 +1314,40 @@ window.payOnline = function() {
     document.getElementById('payment-modal').style.display = 'flex';
 };
 
-// 🏦 2. ОБРОБКА БАНКІВ (Розумний пошук реквізитів з бази)
+// 🏦 2. ОБРОБКА БАНКІВ (Чиста і масштабована версія)
 window.payWithBank = function(bankName) {
     let reqs = "";
     
     try {
-        // Дістаємо дані будинку поточного мешканця
-        const houseData = (window.currentTenant && window.currentTenant.house_data) || {};
-        const extraData = houseData.extra_data || {};
-        
-        // В базі картки лежать як масив у extra_data.req
+        const tenantInfo = (typeof currentTenant !== 'undefined' && currentTenant) ? currentTenant : window.currentTenant;
+        const extraData = (tenantInfo && tenantInfo.house_data && tenantInfo.house_data.extra_data) || {};
         const reqArray = extraData.req || []; 
         
         if (Array.isArray(reqArray)) {
             if (bankName === 'other') {
-                // Якщо кнопка "Інший банк", збираємо ВСІ номери карток в один список
+                // Якщо обрали "Інший банк" - показуємо гарний список усіх карток з їхніми назвами
                 let allReqs = [];
                 for (let item of reqArray) {
-                    if (item.val) allReqs.push(item.val);
+                    if (item.val) {
+                        let bankTitle = item.name ? (item.name + ": ") : "";
+                        allReqs.push(bankTitle + item.val);
+                    }
                 }
                 reqs = allReqs.join('\n');
             } else {
-                // Шукаємо конкретний банк (Моно або Приват)
+                // Шукаємо конкретний банк за полем "name"
                 for (let item of reqArray) {
-                    // Перетворюємо всі дані картки в нижній регістр для зручного пошуку
-                    const itemStr = JSON.stringify(item).toLowerCase();
+                    if (!item.name || !item.val) continue;
                     
-                    // Якщо шукаємо Моно і в назві є слово "моно" або "mono"
-                    if (bankName === 'mono' && (itemStr.includes('mono') || itemStr.includes('моно'))) {
-                        reqs = item.val || "";
+                    const nameLower = item.name.toLowerCase();
+                    
+                    // Якщо шукаємо Монобанк
+                    if (bankName === 'mono' && (nameLower.includes('моно') || nameLower.includes('mono'))) {
+                        reqs = item.val;
                     }
-                    // Якщо шукаємо Приват і в назві є слово "privat" або "приват"
-                    if (bankName === 'privat' && (itemStr.includes('privat') || itemStr.includes('приват'))) {
-                        reqs = item.val || "";
+                    // Якщо шукаємо Приватбанк
+                    if (bankName === 'privat' && (nameLower.includes('приват') || nameLower.includes('privat'))) {
+                        reqs = item.val;
                     }
                 }
             }
@@ -1355,21 +1356,20 @@ window.payWithBank = function(bankName) {
         console.error("Помилка читання реквізитів:", e);
     }
 
-    // Якщо код нічого не знайшов
+    // Якщо нічого не знайшли
     if (!reqs || reqs.length < 5) {
         alert("Керуючий ще не додав реквізити для цього банку.");
         return;
     }
 
-    // Магія 1: Копіюємо в буфер обміну
+    // Магія: Копіюємо і відкриваємо
     navigator.clipboard.writeText(reqs).then(() => {
         alert(`✅ Реквізити скопійовано!\nВставте їх у додатку банку.\n\nСкопійовано:\n${reqs}`);
         
-        // Магія 2: Відкриваємо додаток банку
         if (bankName === 'mono') window.location.href = "monobank://";
         if (bankName === 'privat') window.location.href = "privat24://";
     }).catch(err => {
-        alert("Не вдалося автоматично скопіювати. Спробуйте вручну.");
+        alert(`Не вдалося автоматично скопіювати. Ваші реквізити:\n${reqs}`);
     });
 };
 
