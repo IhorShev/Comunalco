@@ -734,7 +734,7 @@
     
 <script>
     // --- АВТО-ОНОВЛЕННЯ ВЕРСІЇ ---
-  const APP_VERSION = '7.4'; 
+  const APP_VERSION = '7.5'; 
   if (localStorage.getItem('app_version') !== APP_VERSION) {
       localStorage.setItem('app_version', APP_VERSION);
       if (navigator.serviceWorker) {
@@ -4205,26 +4205,50 @@ async function openAdminChat(aptId) {
     }
 }
 
-// 3. Відправка повідомлення мешканцю
+// 3. Відправка повідомлення (Особисте або Загальне)
 async function sendAdminMessage() {
     if (!currentChatAptId) return;
+
     const input = document.getElementById('admin-msg-text');
     const text = input.value.trim();
     if (!text) return;
 
-    try {
-        const { error } = await _supabase
-            .from('messages')
-            .insert([{ sender_id: 'manager', recipient_type: String(currentChatAptId), message_text: text, is_read: false }]);
+    // Одразу очищаємо і звужуємо поле
+    input.value = '';
+    input.style.height = '45px'; 
 
-        if (error) throw error;
-        
-        input.value = ''; // Очищаємо поле
-        input.style.height = '45px';
-        openAdminChat(currentChatAptId); // Оновлюємо цей діалог
-        loadAdminChats(); // Оновлюємо список зліва
+    try {
+        if (currentChatAptId === 'community') {
+            // 🌍 ВІДПРАВЛЯЄМО В ЗАГАЛЬНИЙ ЧАТ
+            const { error } = await _supabase
+                .from('community_messages')
+                .insert([{
+                    house_id: 'default',
+                    sender_id: 'manager',
+                    sender_name: '👑 Керуючий', // Гарний підпис для адміна
+                    message_text: text
+                }]);
+
+            if (error) throw error;
+            window.loadAdminCommunityMessages(); // Оновлюємо стрічку
+            
+        } else {
+            // 👤 ВІДПРАВЛЯЄМО ОСОБИСТО МЕШКАНЦЮ
+            const { error } = await _supabase
+                .from('messages')
+                .insert([{
+                    sender_id: 'manager',
+                    recipient_type: String(currentChatAptId),
+                    message_text: text,
+                    is_read: false
+                }]);
+
+            if (error) throw error;
+            openAdminChat(currentChatAptId); 
+            if (typeof loadAdminChats === 'function') loadAdminChats();
+        }
     } catch (err) {
-        console.error(err);
+        console.error("Помилка відправки:", err);
         alert('Помилка відправки');
     }
 }
@@ -4478,6 +4502,97 @@ if (adminInput) {
         this.style.height = this.scrollHeight + 'px'; // Розтягуємо рівно на висоту тексту
     });
 }
+    // 🔄 ЛОГІКА ПЕРЕМИКАННЯ ЧАТІВ (КЕРУЮЧИЙ)
+window.currentAdminChatMode = 'private';
+
+window.switchAdminChatMode = function(mode) {
+    window.currentAdminChatMode = mode;
+    const btnPriv = document.getElementById('admin-tab-private');
+    const btnComm = document.getElementById('admin-tab-community');
+    const sidebar = document.getElementById('admin-chat-sidebar');
+    const mainArea = document.querySelector('.chat-main');
+    
+    if (mode === 'private') {
+        // УВІМКНУЛИ ОСОБИСТІ ЧАТИ
+        btnPriv.style.background = 'var(--primary)';
+        btnPriv.style.color = 'white';
+        btnComm.style.background = 'transparent';
+        btnComm.style.color = 'var(--text-sec)';
+        
+        sidebar.style.display = ''; // Повертаємо колонку зі списком
+        mainArea.style.display = ''; 
+        
+        // Скидаємо вибір
+        window.currentChatAptId = null; 
+        document.getElementById('admin-chat-messages').innerHTML = '<div style="margin:auto; color:var(--text-sec); text-align:center;"><span style="font-size:40px;">💬</span><br>Оберіть квартиру зліва, щоб почати діалог</div>';
+        document.getElementById('admin-chat-input-area').style.display = 'none';
+        
+        if (typeof loadAdminChats === 'function') loadAdminChats();
+    } else {
+        // УВІМКНУЛИ ЗАГАЛЬНИЙ ЧАТ
+        btnComm.style.background = 'var(--primary)';
+        btnComm.style.color = 'white';
+        btnPriv.style.background = 'transparent';
+        btnPriv.style.color = 'var(--text-sec)';
+        
+        // Ховаємо список квартир, розтягуємо чат на весь екран
+        sidebar.style.display = 'none';
+        mainArea.style.display = 'flex';
+        document.getElementById('admin-chat-input-area').style.display = 'flex';
+        
+        window.currentChatAptId = 'community'; // Флаг для відправки
+        window.loadAdminCommunityMessages();
+    }
+};
+
+// 🌍 ЗАВАНТАЖЕННЯ ЗАГАЛЬНОГО ЧАТУ
+window.loadAdminCommunityMessages = async function() {
+    const msgArea = document.getElementById('admin-chat-messages');
+    if (!msgArea) return;
+    
+    try {
+        const { data: msgs, error } = await _supabase
+            .from('community_messages')
+            .select('*')
+            .order('created_at', { ascending: true });
+
+        if (error) throw error;
+
+        if (!msgs || msgs.length === 0) {
+            msgArea.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-sec);">Тут поки тихо.</div>';
+            return;
+        }
+
+        let html = '<div style="padding: 15px; display: flex; flex-direction: column; gap: 10px;">';
+        
+        msgs.forEach(m => {
+            const isManager = m.sender_id === 'manager';
+            const time = new Date(m.created_at).toLocaleTimeString('uk-UA', {hour: '2-digit', minute:'2-digit'});
+            
+            if (isManager) {
+                html += `
+                <div style="align-self: flex-end; background: var(--primary); color: white; padding: 10px 15px; border-radius: 15px 15px 0 15px; max-width: 80%;">
+                    <div style="font-size: 11px; color: rgba(255,255,255,0.8); font-weight: bold; margin-bottom: 4px;">👑 Ви (Керуючий)</div>
+                    <div style="font-size: 14px;">${m.message_text}</div>
+                    <div style="font-size: 10px; opacity: 0.7; text-align: right; margin-top: 4px;">${time}</div>
+                </div>`;
+            } else {
+                html += `
+                <div style="align-self: flex-start; background: rgba(255,255,255,0.1); border: 1px solid var(--border); padding: 10px 15px; border-radius: 15px 15px 15px 0; max-width: 80%;">
+                    <div style="font-size: 11px; color: var(--primary); font-weight: bold; margin-bottom: 4px;">🏠 ${m.sender_name}</div>
+                    <div style="font-size: 14px; color: var(--text);">${m.message_text}</div>
+                    <div style="font-size: 10px; color: var(--text-sec); text-align: right; margin-top: 4px;">${time}</div>
+                </div>`;
+            }
+        });
+        
+        html += '</div>';
+        msgArea.innerHTML = html;
+        msgArea.scrollTop = msgArea.scrollHeight;
+    } catch (err) {
+        console.error("Помилка:", err);
+    }
+};
     
     </script>
 
