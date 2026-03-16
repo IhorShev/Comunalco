@@ -819,7 +819,7 @@ class App {
         
         // Формуємо фінальне посилання з динамічною ціною та ID користувача
         // Ми явно кажемо: ціна для UAH дорівнює amount, і валюта кошика — теж UAH
-        const finalUrl = `${baseUrl}&products[1][price][UAH]=${amount}&currency=UAH&custom_field1=${encodeURIComponent(userId)}`;
+        const finalUrl = `${baseUrl}&products[1][price]=${amount}&currency=UAH&custom_field1=${encodeURIComponent(userId)}`;
 
         console.log("Відкриваємо оплату PayPro:", finalUrl);
         window.open(finalUrl, '_blank');
