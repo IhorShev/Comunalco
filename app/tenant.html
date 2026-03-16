@@ -227,7 +227,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
     // 🚀 ЗАЛІЗОБЕТОННЕ ОНОВЛЕННЯ КЕШУ (Супер-режим)
-        const TENANT_VERSION = "3.8"; // ⚠️ Змінюйте цю цифру при кожній зміні коду!
+        const TENANT_VERSION = "3.9"; // ⚠️ Змінюйте цю цифру при кожній зміні коду!
         if (localStorage.getItem('tenant_app_version') !== TENANT_VERSION) {
             console.log("🔄 Оновлення версії! Чистимо кеш...");
             localStorage.setItem('tenant_app_version', TENANT_VERSION);
@@ -1575,7 +1575,8 @@ window.uploadReceipt = async function(input) {
             });
         });
     }
-                // 🔄 ЛОГІКА ПЕРЕМИКАННЯ ЧАТІВ (МЕШКАНЕЦЬ)
+                
+// 🔄 ЛОГІКА ПЕРЕМИКАННЯ ЧАТІВ (МЕШКАНЕЦЬ)
 window.currentChatMode = 'admin'; // За замовчуванням пишемо Керуючому
 
 window.switchChat = function(mode) {
@@ -1584,19 +1585,28 @@ window.switchChat = function(mode) {
     const btnAdmin = document.getElementById('tab-admin');
     const btnComm = document.getElementById('tab-community');
     
-    // Перемикаємо кольори кнопок
     if (mode === 'admin') {
+        // 🏢 Натиснули "Керуючий"
         btnAdmin.style.background = 'var(--primary)';
         btnAdmin.style.color = 'white';
         btnComm.style.background = 'transparent';
         btnComm.style.color = 'var(--text-sec)';
-        // Тут ми скажемо програмі завантажити чат з адміном (зробимо в наступному кроці)
+        
+        // Відкриваємо історію повідомлень з Керуючим
+        if (typeof openTenantChat === 'function') {
+            openTenantChat('manager'); 
+        }
     } else {
+        // 🤝 Натиснули "Сусіди"
         btnComm.style.background = 'var(--primary)';
         btnComm.style.color = 'white';
         btnAdmin.style.background = 'transparent';
         btnAdmin.style.color = 'var(--text-sec)';
-        // Тут ми скажемо програмі завантажити чат із сусідами
+        
+        // Завантажуємо історію Загального чату
+        if (typeof window.loadCommunityMessages === 'function') {
+            window.loadCommunityMessages(); 
+        }
     }
 };
                 // 🌍 ЗАВАНТАЖЕННЯ ТА ВІДМАЛЬОВКА ЗАГАЛЬНОГО ЧАТУ
