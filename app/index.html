@@ -315,24 +315,25 @@
         }
         /* 📱 МОБІЛЬНИЙ ЧАТ (Стиль Telegram) */
         @media (max-width: 768px) {
-            /* Модальне вікно на весь екран */
             #chat-modal > div { width: 100% !important; height: 100vh !important; max-height: 100vh !important; border-radius: 0 !important; display: flex; flex-direction: column; }
             .chat-body { flex-direction: column !important; flex: 1; overflow: hidden; }
             
-            /* ЕКРАН 1: Список чатів (за замовчуванням) */
-            #admin-chat-sidebar { width: 100% !important; border-right: none !important; display: block; overflow-y: auto; }
-            #admin-chat-messages { display: none !important; }
-            #admin-chat-input-area { display: none !important; }
+            /* ЕКРАН 1: Список чатів */
+            #admin-chat-sidebar { width: 100% !important; border-right: none !important; display: block !important; overflow-y: auto; }
+            .chat-main { display: none !important; } /* Ховаємо праву панель повністю */
 
-            /* ЕКРАН 2: Активний діалог (коли додано клас .chat-active) */
+            /* ЕКРАН 2: Активний діалог */
             .chat-body.chat-active #admin-chat-sidebar { display: none !important; }
-            .chat-body.chat-active #admin-chat-messages { display: flex !important; width: 100% !important; flex: 1; }
-            .chat-body.chat-active #admin-chat-input-area { display: flex !important; width: 100% !important; }
+            .chat-body.chat-active .chat-main { display: flex !important; flex-direction: column; width: 100% !important; flex: 1; overflow: hidden; height: 100%; }
+            .chat-body.chat-active #admin-chat-messages { flex: 1 !important; overflow-y: auto !important; display: flex; flex-direction: column; }
+            .chat-body.chat-active #admin-chat-input-area { display: flex !important; flex-shrink: 0 !important; width: 100% !important; }
             
-            /* Керування кнопкою Назад у шапці */
+            /* Динамічна шапка (ховаємо зайве в діалозі) */
             #mobile-chat-back { display: none !important; }
             .chat-active-header #mobile-chat-back { display: flex !important; }
-            /* Трохи зменшуємо відступи в шапці на телефоні */
+            .chat-active-header #header-polls-btn { display: none !important; } /* Зникає кнопка Опитування */
+            .chat-active-header #header-chat-icon { display: none !important; } /* Зникає іконка 💬 */
+            
             #chat-modal-header { padding: 10px 15px !important; }
         }
     </style>
