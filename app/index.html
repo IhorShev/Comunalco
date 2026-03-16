@@ -734,7 +734,7 @@
     
 <script>
     // --- АВТО-ОНОВЛЕННЯ ВЕРСІЇ ---
-  const APP_VERSION = '7.8'; 
+  const APP_VERSION = '7.9'; 
   if (localStorage.getItem('app_version') !== APP_VERSION) {
       localStorage.setItem('app_version', APP_VERSION);
       if (navigator.serviceWorker) {
@@ -805,6 +805,23 @@ class App {
             const userId = window.currentUser ? window.currentUser.id.split('-')[0].toUpperCase() : 'ГІСТЬ';
             displayIdEl.innerText = userId;
         }
+    }
+    
+    payViaPayPro() {
+        const amount = this.lastCalcAmount;
+        if (!amount || amount <= 0) return alert("Помилка: сума не розрахована");
+
+        // Отримуємо ID користувача (використовуємо email або UID, щоб знати, кому подовжити)
+        const userId = (window.currentUser && window.currentUser.id) || 'unknown';
+        
+        // ВАШЕ ПОСИЛАННЯ З PAYPRO
+        const baseUrl = "https://store.payproglobal.com/checkout?products[1][id]=128709";
+        
+        // Формуємо фінальне посилання з динамічною ціною та ID користувача
+        const finalUrl = `${baseUrl}&products[1][price][UAH]=${amount}&custom_field1=${encodeURIComponent(userId)}`;
+
+        console.log("Відкриваємо оплату PayPro:", finalUrl);
+        window.open(finalUrl, '_blank');
     }
 
     setSubPeriod(p) {
