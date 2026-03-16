@@ -2245,6 +2245,11 @@ class App {
         try {
             const d = this.currentData;
             const t = d.tariffs;
+            // 🛡️ БРОНЯ: Якщо тарифи відсутні або дорівнюють нулю (ще не завантажилися) - зупиняємо розрахунок!
+            if (!t || (Number(t.el_d) === 0 && Number(t.w) === 0 && Number(t.g) === 0)) {
+                console.warn("🛡️ Броня спрацювала: Тарифи ще не завантажені. Чекаємо...");
+                return; 
+            }
             let totalIn={ed:0,en:0,w:0,g:0}, gServSum=0, totalApts={ed:0,en:0,w:0,g:0};
             
             // 1. Рахуємо суми по групах
