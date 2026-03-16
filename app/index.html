@@ -733,7 +733,7 @@
     
 <script>
     // --- АВТО-ОНОВЛЕННЯ ВЕРСІЇ ---
-  const APP_VERSION = '7.1'; 
+  const APP_VERSION = '7.2'; 
   if (localStorage.getItem('app_version') !== APP_VERSION) {
       localStorage.setItem('app_version', APP_VERSION);
       if (navigator.serviceWorker) {
@@ -4147,6 +4147,11 @@ async function loadAdminChats() {
 // 2. Відкриття конкретного діалогу (права панель)
 async function openAdminChat(aptId) {
     currentChatAptId = aptId;
+    // 📱 Активуємо мобільний екран діалогу
+    const chatBody = document.querySelector('#chat-modal .chat-body');
+    if(chatBody) chatBody.classList.add('chat-active');
+    const header = document.getElementById('chat-modal-header');
+    if(header) header.classList.add('chat-active-header');
     
     // Підсвічуємо активний чат
     document.querySelectorAll('.chat-list-item').forEach(el => el.classList.remove('active'));
@@ -4442,6 +4447,13 @@ window.checkUnreadMessages = async function() {
 setInterval(window.checkUnreadMessages, 10000);
 // Перший запуск одразу при вході
 setTimeout(window.checkUnreadMessages, 2000);
+    // 📱 Функція повернення до списку чатів (на мобільному)
+window.showChatList = function() {
+    const chatBody = document.querySelector('#chat-modal .chat-body');
+    if(chatBody) chatBody.classList.remove('chat-active');
+    const header = document.getElementById('chat-modal-header');
+    if(header) header.classList.remove('chat-active-header');
+};
     
     </script>
 
