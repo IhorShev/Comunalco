@@ -4007,6 +4007,11 @@ window.addEventListener('load', () => {
                 </button>
             </div>
         </div>
+
+        <div id="admin-chat-tabs" style="display: flex; background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--border);">
+            <button id="admin-tab-private" onclick="window.switchAdminChatMode('private')" style="flex: 1; padding: 12px; border: none; background: var(--primary); color: white; cursor: pointer; font-weight: bold; font-size: 14px; transition: 0.2s;">👤 Особисті чати</button>
+            <button id="admin-tab-community" onclick="window.switchAdminChatMode('community')" style="flex: 1; padding: 12px; border: none; background: transparent; color: var(--text-sec); cursor: pointer; font-weight: bold; font-size: 14px; transition: 0.2s;">🏘️ Загальний чат</button>
+        </div>
         
         <div class="chat-body">
             
