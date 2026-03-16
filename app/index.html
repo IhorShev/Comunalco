@@ -4089,7 +4089,7 @@ async function loadAdminChats() {
         }
 
         chats.forEach(chat => {
-            const unreadBadge = chat.unread > 0 ? `<div class="unread-dot"></div>` : '';
+            const unreadBadge = `<span id="badge-${chat.aptId}" class="unread-badge" style="display: ${chat.unread > 0 ? 'inline-block' : 'none'};">${chat.unread}</span>`;
             
             // 🚀 МАГІЯ: Шукаємо нормальне ім'я квартири у списку об'єктів
             let aptName = "Квартира " + chat.aptId; // Запасний варіант (якщо раптом не знайде)
