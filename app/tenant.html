@@ -700,28 +700,51 @@ async function openTenantChat(targetId) {
 }
 
 async function sendTenantMessage() {
-    if (!currentTenant || !currentTenantChatTarget) return;
+    if (!currentTenant) return;
+
     const input = document.getElementById('tenant-msg-text');
     const text = input.value.trim();
     if (!text) return;
 
+    // Одразу очищаємо і звужуємо поле (як ми робили для Керуючого)
     input.value = '';
-    
+    input.style.height = '45px'; 
+
     try {
-        const { error } = await _supabase
-            .from('messages')
-            .insert([{ 
-                sender_id: String(currentTenant.id), 
-                recipient_type: String(currentTenantChatTarget), 
-                message_text: text,
-                is_read: false
-            }]);
-        
-        if (error) throw error;
-        openTenantChat(currentTenantChatTarget); 
+        if (window.currentChatMode === 'community') {
+            // 🌍 ВІДПРАВЛЯЄМО В ЗАГАЛЬНИЙ ЧАТ СУСІДІВ
+            const { error } = await _supabase
+                .from('community_messages')
+                .insert([{
+                    house_id: currentTenant.house_id || 'default', // ID будинку
+                    sender_id: String(currentTenant.id),           // ID мешканця
+                    sender_name: 'Кв. ' + currentTenant.flat,      // Підпис (Кв. 15)
+                    message_text: text
+                }]);
+
+            if (error) throw error;
+            
+            // Завантажуємо оновлений список загального чату
+            if (typeof loadCommunityMessages === 'function') loadCommunityMessages();
+
+        } else {
+            // 🏢 ВІДПРАВЛЯЄМО ОСОБИСТО КЕРУЮЧОМУ (Ваша стара логіка)
+            const target = currentTenantChatTarget || 'manager';
+            const { error } = await _supabase
+                .from('messages')
+                .insert([{
+                    sender_id: String(currentTenant.id),
+                    recipient_type: String(target),
+                    message_text: text,
+                    is_read: false
+                }]);
+
+            if (error) throw error;
+            openTenantChat(target); 
+        }
     } catch (err) {
-        console.error(err);
-        alert('Не вдалося відправити');
+        console.error("Помилка відправки:", err);
+        alert('Не вдалося відправити повідомлення');
     }
 }
 
@@ -1574,6 +1597,64 @@ window.switchChat = function(mode) {
         btnAdmin.style.background = 'transparent';
         btnAdmin.style.color = 'var(--text-sec)';
         // Тут ми скажемо програмі завантажити чат із сусідами
+    }
+};
+                // 🌍 ЗАВАНТАЖЕННЯ ТА ВІДМАЛЬОВКА ЗАГАЛЬНОГО ЧАТУ
+window.loadCommunityMessages = async function() {
+    if (!currentTenant) return;
+    
+    // Шукаємо вікно, куди виводити повідомлення (зазвичай це тут)
+    // Якщо повідомлення не з'являться - ми просто перевіримо цей ID
+    const msgArea = document.querySelector('#tenant-chat-modal .chat-messages') || document.getElementById('chat-messages') || document.querySelector('[id*="chat-messages"]');
+    
+    if (!msgArea) return;
+
+    try {
+        const { data: msgs, error } = await _supabase
+            .from('community_messages')
+            .select('*')
+            .order('created_at', { ascending: true }); // Найстаріші зверху, нові знизу
+
+        if (error) throw error;
+
+        if (!msgs || msgs.length === 0) {
+            msgArea.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-sec);">Тут поки тихо. Напишіть першим! 👋</div>';
+            return;
+        }
+
+        let html = '<div style="padding: 15px; display: flex; flex-direction: column; gap: 10px;">';
+        
+        msgs.forEach(m => {
+            const isMe = m.sender_id === String(currentTenant.id);
+            const time = new Date(m.created_at).toLocaleTimeString('uk-UA', {hour: '2-digit', minute:'2-digit'});
+            
+            if (isMe) {
+                // Моє повідомлення (справа, синє)
+                html += `
+                <div style="align-self: flex-end; background: var(--primary); color: white; padding: 10px 15px; border-radius: 15px 15px 0 15px; max-width: 80%;">
+                    <div style="font-size: 14px;">${m.message_text}</div>
+                    <div style="font-size: 10px; opacity: 0.7; text-align: right; margin-top: 4px;">${time}</div>
+                </div>`;
+            } else {
+                // Повідомлення сусіда (зліва, сіре, з підписом квартири)
+                html += `
+                <div style="align-self: flex-start; background: rgba(255,255,255,0.1); border: 1px solid var(--border); padding: 10px 15px; border-radius: 15px 15px 15px 0; max-width: 80%;">
+                    <div style="font-size: 11px; color: var(--primary); font-weight: bold; margin-bottom: 4px;">🏠 ${m.sender_name}</div>
+                    <div style="font-size: 14px; color: var(--text);">${m.message_text}</div>
+                    <div style="font-size: 10px; color: var(--text-sec); text-align: right; margin-top: 4px;">${time}</div>
+                </div>`;
+            }
+        });
+        
+        html += '</div>';
+        msgArea.innerHTML = html;
+        
+        // Прокручуємо в самий низ до нових повідомлень
+        msgArea.scrollTop = msgArea.scrollHeight;
+
+    } catch (err) {
+        console.error("Помилка завантаження чату будинку:", err);
+        msgArea.innerHTML = '<div style="text-align:center; color:red;">Помилка завантаження чату</div>';
     }
 };
 </script>
