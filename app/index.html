@@ -734,7 +734,7 @@
     
 <script>
     // --- АВТО-ОНОВЛЕННЯ ВЕРСІЇ ---
-  const APP_VERSION = '7.2'; 
+  const APP_VERSION = '7.3'; 
   if (localStorage.getItem('app_version') !== APP_VERSION) {
       localStorage.setItem('app_version', APP_VERSION);
       if (navigator.serviceWorker) {
@@ -4215,6 +4215,7 @@ async function sendAdminMessage() {
         if (error) throw error;
         
         input.value = ''; // Очищаємо поле
+        input.style.height = '45px';
         openAdminChat(currentChatAptId); // Оновлюємо цей діалог
         loadAdminChats(); // Оновлюємо список зліва
     } catch (err) {
