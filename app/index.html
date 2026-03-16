@@ -818,7 +818,8 @@ class App {
         const baseUrl = "https://store.payproglobal.com/checkout?products[1][id]=128709";
         
         // Формуємо фінальне посилання з динамічною ціною та ID користувача
-        const finalUrl = `${baseUrl}&products[1][price][UAH]=${amount}&custom_field1=${encodeURIComponent(userId)}`;
+        // Ми явно кажемо: ціна для UAH дорівнює amount, і валюта кошика — теж UAH
+        const finalUrl = `${baseUrl}&products[1][price][UAH]=${amount}&currency=UAH&custom_field1=${encodeURIComponent(userId)}`;
 
         console.log("Відкриваємо оплату PayPro:", finalUrl);
         window.open(finalUrl, '_blank');
