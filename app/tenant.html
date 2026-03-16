@@ -227,7 +227,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
     // 🚀 ЗАЛІЗОБЕТОННЕ ОНОВЛЕННЯ КЕШУ (Супер-режим)
-        const TENANT_VERSION = "3.7"; // ⚠️ Змінюйте цю цифру при кожній зміні коду!
+        const TENANT_VERSION = "3.8"; // ⚠️ Змінюйте цю цифру при кожній зміні коду!
         if (localStorage.getItem('tenant_app_version') !== TENANT_VERSION) {
             console.log("🔄 Оновлення версії! Чистимо кеш...");
             localStorage.setItem('tenant_app_version', TENANT_VERSION);
@@ -1314,26 +1314,22 @@ window.payOnline = function() {
     document.getElementById('payment-modal').style.display = 'flex';
 };
 
-// 🏦 2. ОБРОБКА БАНКІВ (Фінальна чиста версія)
+// 🏦 2. ОБРОБКА БАНКІВ (Універсальна крос-платформенна версія)
 window.payWithBank = async function(bankName) {
     let reqs = "";
     
+    // 1. ОТРИМАННЯ ДАНИХ З БАЗИ
     try {
         const tenantInfo = (typeof currentTenant !== 'undefined' && currentTenant) ? currentTenant : window.currentTenant;
-        
         if (!tenantInfo || !tenantInfo.house_id) {
-            console.error("Помилка: Не знайдено ID будинку.");
-            return;
+            console.error("Помилка: Не знайдено ID будинку."); return;
         }
 
         let activeClient = (typeof sbClient !== 'undefined') ? sbClient : window.sbClient;
         if (!activeClient) activeClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         const { data: houseData, error } = await activeClient
-            .from('houses')
-            .select('extra_data')
-            .eq('id', tenantInfo.house_id)
-            .single();
+            .from('houses').select('extra_data').eq('id', tenantInfo.house_id).single();
 
         if (error || !houseData || !houseData.extra_data) throw error || new Error("Немає даних");
 
@@ -1343,7 +1339,6 @@ window.payWithBank = async function(bankName) {
         }
 
         const reqArray = extraData.req || []; 
-        
         if (bankName === 'other') {
             let allReqs = [];
             for (let item of reqArray) {
@@ -1354,7 +1349,6 @@ window.payWithBank = async function(bankName) {
             for (let item of reqArray) {
                 if (!item.name || !item.val) continue;
                 const nameLower = item.name.toLowerCase();
-                
                 if (bankName === 'mono' && (nameLower.includes('моно') || nameLower.includes('mono'))) reqs = item.val;
                 if (bankName === 'privat' && (nameLower.includes('приват') || nameLower.includes('privat'))) reqs = item.val;
             }
@@ -1364,19 +1358,54 @@ window.payWithBank = async function(bankName) {
     }
 
     if (!reqs || reqs.length < 5) {
-        alert("Керуючий ще не додав реквізити для цього банку.");
+        alert("Керуючий ще не додав реквізити для цього банку."); return;
+    }
+
+    // 2. УНІВЕРСАЛЬНЕ КОПІЮВАННЯ (Надійний метод)
+    let isCopied = false;
+    try {
+        await navigator.clipboard.writeText(reqs);
+        isCopied = true;
+    } catch (err) {
+        // Резервний метод копіювання для старих браузерів
+        try {
+            const textArea = document.createElement("textarea");
+            textArea.value = reqs;
+            document.body.appendChild(textArea);
+            textArea.select();
+            isCopied = document.execCommand('copy');
+            document.body.removeChild(textArea);
+        } catch (e) { isCopied = false; }
+    }
+
+    const copyStatus = isCopied ? `✅ Реквізити скопійовано!\n\n${reqs}` : `💳 Ваші реквізити:\n\n${reqs}\n\n(Скопіюйте їх вручну)`;
+
+    // 3. АНАЛІЗ ПРИСТРОЮ ТА ВІДКРИТТЯ ДОДАТКУ
+    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+    const isAndroid = /android/i.test(userAgent);
+    const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
+    const isMobile = isAndroid || isIOS;
+
+    if (!isMobile) {
+        // ЛОГІКА ДЛЯ КОМП'ЮТЕРІВ (Windows / Mac / Linux)
+        alert(`${copyStatus}\n\nВідкрийте веб-версію банку на комп'ютері або додаток на телефоні, щоб здійснити переказ.`);
         return;
     }
 
-    try {
-        await navigator.clipboard.writeText(reqs);
-        alert(`✅ Реквізити скопійовано!\nВставте їх у додатку банку.\n\nСкопійовано:\n${reqs}`);
+    // ЛОГІКА ДЛЯ СМАРТФОНІВ (Android / iPhone)
+    if (confirm(`${copyStatus}\n\nВідкрити додаток банку для оплати?`)) {
+        let appLink = "";
         
-        // Магія: Відкриваємо додаток (працює на мобільних!)
-        if (bankName === 'mono') window.location.href = "monobank://";
-        if (bankName === 'privat') window.location.href = "privat24://";
-    } catch (err) {
-        alert(`✅ Ваші реквізити:\n${reqs}\n(Скопіюйте вручну)`);
+        if (bankName === 'mono') {
+            appLink = isAndroid ? "intent://#Intent;scheme=monobank;package=com.ftband.mono;end;" : "monobank://";
+        } else if (bankName === 'privat') {
+            appLink = isAndroid ? "intent://#Intent;scheme=privat24;package=ua.privatbank.ap24;end;" : "privat24://";
+        }
+
+        if (appLink) {
+            // Відкриваємо додаток
+            window.location.href = appLink;
+        }
     }
 };
 
