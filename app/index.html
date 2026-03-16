@@ -3992,10 +3992,12 @@ window.addEventListener('load', () => {
         <div id="chat-modal-header" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.05); gap: 10px; width: 100%; box-sizing: border-box;">
             <div style="display: flex; align-items: center; gap: 10px; overflow: hidden;">
                 <button id="mobile-chat-back" class="btn btn-outline" style="display: none; padding: 8px 12px; font-size: 16px; border-radius: 8px; align-items: center; justify-content: center;" onclick="showChatList()">⬅️</button>
-                <h3 style="margin: 0; font-size: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">💬 Чат</h3>
+                <h3 style="margin: 0; font-size: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    <span id="header-chat-icon">💬</span> Чат
+                </h3>
             </div>
             <div style="display: flex; gap: 8px; flex-shrink: 0;">
-                <button class="btn btn-primary" style="padding: 6px 10px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-width: 70px;" onclick="document.getElementById('poll-modal').style.display='flex'; loadAdminPolls();">
+                <button id="header-polls-btn" class="btn btn-primary" style="padding: 6px 10px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-width: 70px;" onclick="document.getElementById('poll-modal').style.display='flex'; loadAdminPolls();">
                     <span style="font-size: 16px; line-height: 1;">📊</span>
                     <span style="font-size: 10px; line-height: 1; font-weight: 500;">Опитування</span>
                 </button>
@@ -4455,6 +4457,21 @@ window.showChatList = function() {
     const header = document.getElementById('chat-modal-header');
     if(header) header.classList.remove('chat-active-header');
 };
+    // 📱 РОЗУМНЕ ПОЛЕ ВВОДУ: Авторозширення як у Telegram
+const adminInput = document.getElementById('admin-msg-text');
+if (adminInput) {
+    // Базові налаштування (щоб не ламати ваші стилі)
+    adminInput.style.resize = 'none';      // Забираємо ручну тягачку
+    adminInput.style.maxHeight = '120px';  // Максимум ~5 рядків, далі з'явиться скрол
+    adminInput.style.overflowY = 'auto';
+    adminInput.style.minHeight = '45px';   // Стартова висота
+
+    // Слухаємо кожне натискання клавіші
+    adminInput.addEventListener('input', function() {
+        this.style.height = '45px'; // Спочатку скидаємо
+        this.style.height = this.scrollHeight + 'px'; // Розтягуємо рівно на висоту тексту
+    });
+}
     
     </script>
 
