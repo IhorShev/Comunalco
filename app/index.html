@@ -4502,7 +4502,7 @@ if (adminInput) {
         this.style.height = this.scrollHeight + 'px'; // Розтягуємо рівно на висоту тексту
     });
 }
-    // 🔄 ЛОГІКА ПЕРЕМИКАННЯ ЧАТІВ (КЕРУЮЧИЙ)
+    // 🔄 ЛОГІКА ПЕРЕМИКАННЯ ЧАТІВ (КЕРУЮЧИЙ - З ПАТЧЕМ ДЛЯ МОБІЛОК)
 window.currentAdminChatMode = 'private';
 
 window.switchAdminChatMode = function(mode) {
@@ -4513,34 +4513,34 @@ window.switchAdminChatMode = function(mode) {
     const mainArea = document.querySelector('.chat-main');
     
     if (mode === 'private') {
-        // УВІМКНУЛИ ОСОБИСТІ ЧАТИ
         btnPriv.style.background = 'var(--primary)';
         btnPriv.style.color = 'white';
         btnComm.style.background = 'transparent';
         btnComm.style.color = 'var(--text-sec)';
         
-        sidebar.style.display = ''; // Повертаємо колонку зі списком
-        mainArea.style.display = ''; 
+        // Знімаємо примусові стилі, щоб працював звичайний CSS мобільного меню
+        sidebar.style.removeProperty('display');
+        mainArea.style.removeProperty('display');
         
-        // Скидаємо вибір
         window.currentChatAptId = null; 
-        document.getElementById('admin-chat-messages').innerHTML = '<div style="margin:auto; color:var(--text-sec); text-align:center;"><span style="font-size:40px;">💬</span><br>Оберіть квартиру зліва, щоб почати діалог</div>';
+        document.getElementById('admin-chat-messages').innerHTML = '<div style="margin:auto; color:var(--text-sec); text-align:center;"><span style="font-size:40px;">💬</span><br>Оберіть квартиру зліва</div>';
         document.getElementById('admin-chat-input-area').style.display = 'none';
         
         if (typeof loadAdminChats === 'function') loadAdminChats();
     } else {
-        // УВІМКНУЛИ ЗАГАЛЬНИЙ ЧАТ
         btnComm.style.background = 'var(--primary)';
         btnComm.style.color = 'white';
         btnPriv.style.background = 'transparent';
         btnPriv.style.color = 'var(--text-sec)';
         
-        // Ховаємо список квартир, розтягуємо чат на весь екран
-        sidebar.style.display = 'none';
-        mainArea.style.display = 'flex';
-        document.getElementById('admin-chat-input-area').style.display = 'flex';
+        // ПРИМУСОВО показуємо праву панель (Загальний чат) для телефонів
+        sidebar.style.setProperty('display', 'none', 'important');
+        mainArea.style.setProperty('display', 'flex', 'important');
+        mainArea.style.setProperty('width', '100%', 'important');
         
-        window.currentChatAptId = 'community'; // Флаг для відправки
+        window.currentChatAptId = 'community'; 
+        document.getElementById('admin-chat-input-area').style.setProperty('display', 'flex', 'important');
+        
         window.loadAdminCommunityMessages();
     }
 };
