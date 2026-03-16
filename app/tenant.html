@@ -227,7 +227,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
     // 🚀 ЗАЛІЗОБЕТОННЕ ОНОВЛЕННЯ КЕШУ (Супер-режим)
-        const TENANT_VERSION = "4.0"; // ⚠️ Змінюйте цю цифру при кожній зміні коду!
+        const TENANT_VERSION = "4.1"; // ⚠️ Змінюйте цю цифру при кожній зміні коду!
         if (localStorage.getItem('tenant_app_version') !== TENANT_VERSION) {
             console.log("🔄 Оновлення версії! Чистимо кеш...");
             localStorage.setItem('tenant_app_version', TENANT_VERSION);
@@ -1602,7 +1602,9 @@ window.switchChat = function(mode) {
         btnComm.style.color = 'white';
         btnAdmin.style.background = 'transparent';
         btnAdmin.style.color = 'var(--text-sec)';
-        
+
+        localStorage.setItem('comm_visit_tenant', Date.now());
+        document.getElementById('comm-badge-tenant').style.display = 'none';
         // Завантажуємо історію Загального чату
         if (typeof window.loadCommunityMessages === 'function') {
             window.loadCommunityMessages(); 
@@ -1667,6 +1669,22 @@ window.loadCommunityMessages = async function() {
         msgArea.innerHTML = '<div style="text-align:center; color:red;">Помилка завантаження чату</div>';
     }
 };
+    // 🔴 ФОНОВА ПЕРЕВІРКА ЗАГАЛЬНОГО ЧАТУ (МЕШКАНЕЦЬ)
+async function checkTenantCommBadge() {
+    try {
+        const { data } = await _supabase.from('community_messages').select('created_at').order('created_at', { ascending: false }).limit(1);
+        if (data && data[0]) {
+            const lastMsg = new Date(data[0].created_at).getTime();
+            const lastVisit = localStorage.getItem('comm_visit_tenant') || 0;
+            if (lastMsg > lastVisit && window.currentChatMode !== 'community') {
+                const badge = document.getElementById('comm-badge-tenant');
+                if (badge) badge.style.display = 'inline-block';
+            }
+        }
+    } catch(e) {}
+}
+setTimeout(checkTenantCommBadge, 2000);
+setInterval(checkTenantCommBadge, 15000);
 </script>
 
     <div id="payment-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
