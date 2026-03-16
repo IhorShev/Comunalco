@@ -227,7 +227,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
     // 🚀 ЗАЛІЗОБЕТОННЕ ОНОВЛЕННЯ КЕШУ (Супер-режим)
-        const TENANT_VERSION = "4.1"; // ⚠️ Змінюйте цю цифру при кожній зміні коду!
+        const TENANT_VERSION = "4.2"; // ⚠️ Змінюйте цю цифру при кожній зміні коду!
         if (localStorage.getItem('tenant_app_version') !== TENANT_VERSION) {
             console.log("🔄 Оновлення версії! Чистимо кеш...");
             localStorage.setItem('tenant_app_version', TENANT_VERSION);
@@ -748,17 +748,6 @@ async function sendTenantMessage() {
     }
 }
 
-// Функція для кнопки "+ Написати"
-function startNewTenantChat() {
-    const input = document.getElementById('new-chat-apt');
-    const aptNum = input.value.trim();
-    if (!aptNum || aptNum === String(currentTenant.id)) {
-        alert('Введіть коректний номер квартири сусіда (не свій).');
-        return;
-    }
-    openTenantChat(aptNum);
-    input.value = ''; // Очищаємо поле пошуку
-}
         // ==========================================
 // 4. СИСТЕМА ГОЛОСУВАННЯ (МЕШКАНЕЦЬ)
 // ==========================================
@@ -1539,10 +1528,7 @@ window.uploadReceipt = async function(input) {
         }
     }
 </style>
-<div class="responsive-chat-header">
-    <input type="number" id="new-chat-apt" placeholder="№ кв..." style="padding: 8px 10px; border-radius: 5px; border: 1px solid var(--border); background: var(--bg-main); color: var(--text);">
-    <button class="btn btn-primary" style="padding: 8px 10px; font-size: 13px; font-weight: bold;" onclick="startNewTenantChat()">Написати ➔</button>
-</div>
+
                 <div id="tenant-chat-sidebar" style="overflow-y: auto; flex: 1;">
                     <div style="padding:20px; text-align:center; color:var(--text-sec); font-size:12px;">Завантаження...</div>
                 </div>
