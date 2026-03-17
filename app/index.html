@@ -769,7 +769,30 @@ class App {
         this.init();
     }
     
-    init() { this.load(); this.initTheme(); this.renderAll(); this.updateStatus(); }
+    init() { 
+    this.load(); 
+    this.initTheme(); 
+    this.renderAll(); 
+    this.updateStatus(); 
+
+    // --- Автоматичний запуск входу з лендінгу ---
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('action') === 'login') {
+        // Очищаємо посилання, щоб воно стало чистим
+        window.history.replaceState({}, document.title, window.location.pathname);
+        
+        // Запускаємо вхід з невеличкою затримкою, щоб інтерфейс встиг завантажитись
+        setTimeout(() => {
+            console.log("Сигнал з лендінгу отримано: запускаємо вхід");
+            
+            // ТУТ МАЄ БУТИ ВАША ФУНКЦІЯ ВХОДУ!
+            // Розкоментуйте правильний варіант або впишіть свій:
+            // this.login(); 
+            // signIn();
+            // authWithGoogle();
+        }, 500);
+    }
+}
     // 1. Розрахунок ціни (Ваша прогресивна шкала)
     updateSubscriptionCalc() {
         const aptsInput = document.getElementById('calc-apts');
