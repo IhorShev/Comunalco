@@ -1563,11 +1563,13 @@ class App {
             const units = typeof totalUnits !== 'undefined' ? totalUnits : '...';
             expireDisplay.innerHTML = `Залишилось <b>${daysLeft}</b> дн. | План: ${units} од.`;
 
-            if (lim) {
+           if (lim) {
                 const p6m = typeof price6m !== 'undefined' ? price6m : '...';
                 lim.innerHTML = `<span onclick="app.openMenu('premium')" style="cursor:pointer">💎 Тариф: <b>${p6m}</b> грн / 6 міс</span>`;
             }
-        }
+        } // <--- Це закриває умову else
+    } catch (err) { // <--- А ЦЕ закриває той самий try, що ховається вище!
+        console.error("Помилка завантаження тарифів:", err);
     }                  
     // --- БЛОКУВАННЯ, ЯКЩО ТАРИФ ЗАКІНЧИВСЯ ---
     checkLimit() {
