@@ -740,7 +740,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '8.3';
+    const APP_VERSION = '8.4';
     if (localStorage.getItem('app_version') !== APP_VERSION) {
         localStorage.setItem('app_version', APP_VERSION);
         if (navigator.serviceWorker) {
@@ -841,16 +841,32 @@ class App {
         const userId = user.id || 'unknown';
         const userEmail = user.email || ''; 
 
-        const baseUrl = "https://store.payproglobal.com/checkout?products[1][id]=128709";
+        // --- 1. АВТОЗАПОВНЕННЯ ІМЕНІ ТА ПРІЗВИЩА ---
+        let firstName = '';
+        let lastName = '';
+        if (user.user_metadata) {
+            // Беремо повне ім'я з Google і розбиваємо на два слова
+            const fullName = user.user_metadata.full_name || user.user_metadata.name || '';
+            const nameParts = fullName.trim().split(' ');
+            firstName = nameParts[0] || '';
+            lastName = nameParts.slice(1).join(' ') || ''; // Все інше йде в прізвище
+        }
 
+        const baseUrl = "https://store.payproglobal.com/checkout?products[1][id]=128709";
         let finalUrl = `${baseUrl}&products[1][price][UAH][amount]=${amount}&custom_field1=${encodeURIComponent(userId)}`;
 
-        if (userEmail) {
-            finalUrl += `&billing-email=${encodeURIComponent(userEmail)}`;
-        }
-        
-        // НОВІ ПАРАМЕТРИ ВІД PAYPRO (Дизайн 21413, Pop-up exfo=742 та Домен)
-        finalUrl += `&page-template=21413&exfo=742&parent-domain=comunalco.com`;
+        // Додаємо контакти в URL
+        if (userEmail) finalUrl += `&billing-email=${encodeURIComponent(userEmail)}`;
+        if (firstName) finalUrl += `&billing-first-name=${encodeURIComponent(firstName)}`;
+        if (lastName) finalUrl += `&billing-last-name=${encodeURIComponent(lastName)}`;
+
+        // --- 2. РОЗУМНИЙ ВИБІР GOOGLE PAY / APPLE PAY ---
+        // Якщо клієнт з пристрою Apple (iPhone, iPad, Mac) - показуємо Apple Pay (96), інакше Google Pay (97)
+        const isApple = /Mac|iPod|iPhone|iPad/i.test(navigator.userAgent);
+        const paymentMethodId = isApple ? 96 : 97; 
+
+        // Додаємо Дизайн (21413), Pop-up (742), Домен та Метод оплати
+        finalUrl += `&page-template=21413&exfo=742&parent-domain=comunalco.com&payment-method=${paymentMethodId}`;
 
         console.log("Відкриваємо оплату PayPro:", finalUrl);
 
@@ -861,8 +877,8 @@ class App {
         overlay.style.left = '0';
         overlay.style.width = '100vw';
         overlay.style.height = '100vh';
-        overlay.style.backgroundColor = 'rgba(0,0,0,0.7)'; // Темний напівпрозорий фон
-        overlay.style.backdropFilter = 'blur(5px)'; // Розмиття фону додатку
+        overlay.style.backgroundColor = 'rgba(0,0,0,0.7)'; 
+        overlay.style.backdropFilter = 'blur(5px)'; 
         overlay.style.zIndex = '99999';
         overlay.style.display = 'flex';
         overlay.style.justifyContent = 'center';
@@ -884,13 +900,13 @@ class App {
         const iframe = document.createElement('iframe');
         iframe.src = finalUrl;
         iframe.style.width = '100%';
-        iframe.style.maxWidth = '420px'; // Ідеальна ширина для каси
+        iframe.style.maxWidth = '420px'; 
         iframe.style.height = '90%';
         iframe.style.maxHeight = '680px';
         iframe.style.border = 'none';
         iframe.style.borderRadius = '16px';
         iframe.style.boxShadow = '0 25px 50px rgba(0,0,0,0.5)';
-        iframe.setAttribute('allow', 'payment'); // ⚠️ ОБОВ'ЯЗКОВО ДЛЯ APPLE PAY / GOOGLE PAY
+        iframe.setAttribute('allow', 'payment'); // ДОЗВІЛ НА GOOGLE/APPLE PAY
 
         overlay.appendChild(closeBtn);
         overlay.appendChild(iframe);
