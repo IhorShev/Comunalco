@@ -1567,7 +1567,8 @@ class App {
                 const p6m = typeof price6m !== 'undefined' ? price6m : '...';
                 lim.innerHTML = `<span onclick="app.openMenu('premium')" style="cursor:pointer">💎 Тариф: <b>${p6m}</b> грн / 6 міс</span>`;
             }
-        }   
+        }
+    }                  
     // --- БЛОКУВАННЯ, ЯКЩО ТАРИФ ЗАКІНЧИВСЯ ---
     checkLimit() {
         this.updateStatus();
