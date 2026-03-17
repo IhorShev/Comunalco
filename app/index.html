@@ -1549,27 +1549,17 @@ class App {
                 expireDisplay.innerHTML = `<span style="color:var(--primary); font-weight:800;">💎 PRO АКТИВНО</span> | <span style="font-size:11px; opacity:0.8;">Безліміт</span>`;
             } else if (daysLeft <= 0) {
     // ПЕРЕВІРЯЄМО: Це Гість чи авторизований користувач?
-    if (!window.currentUser || window.currentUser.id === 'guest' || window.currentUser.id === 'unknown') {
-        // СТАН ДЛЯ НОВОЇ ЛЮДИНИ (ГОСТЯ)
-        expireDisplay.innerHTML = '<span style="color:var(--success); font-weight:bold;">🎁 Отримайте 45 днів безкоштовно!</span>';
-    } else {
-        // СТАН ДЛЯ ЮЗЕРА, У ЯКОГО РЕАЛЬНО ЗАКІНЧИВСЯ ТЕСТ
-        expireDisplay.innerHTML = '⚠️ Тестовий період закінчився. <b style="cursor:pointer; color:var(--primary)" onclick="app.openMenu(\'premium\')">Подовжити?</b>';
-    }
-}
-            } else {
-                const units = typeof totalUnits !== 'undefined' ? totalUnits : '∞';
-                expireDisplay.innerHTML = `Залишилось <b>${daysLeft} дн.</b> | План: ${units} од.`;
-            }
-         }                
-                
-                if (lim) {
-                    const p6m = typeof price6m !== 'undefined' ? price6m : '---';
-                    lim.innerHTML = `<span onclick="app.openMenu('premium')" style="cursor:pointer">💎 Тариф: <b>${p6m} грн</b> / 6 міс</span>`;
-                }
-            }
-        } catch (err) {
-            console.error("Помилка відображення тарифу (проігноровано):", err);
+    if (!window.currentUser || window.currentUserId === 'guest' || window.currentUserId === 'unknown') {
+            // Стан для нової людини (Гість)
+            expireDisplay.innerHTML = '<span style="color:var(--success); font-weight:bold;">🎁 Отримайте 45 днів безкоштовно!</span>';
+        } else {
+            // Стан для зареєстрованого користувача
+            const units = typeof totalUnits !== 'undefined' ? totalUnits : '...';
+            expireDisplay.innerHTML = `Залишилось <b>${daysLeft}</b> дн. | План: ${units} од.`;
+
+            if (lim) {
+                const p6m = typeof price6m !== 'undefined' ? price6m : '...';
+                lim.innerHTML = `<span onclick="app.openMenu('premium')" style="cursor:pointer">💎 Тариф: <b>${p6m}</b> грн / 6 міс</span>`;
             }
         }   
     // --- БЛОКУВАННЯ, ЯКЩО ТАРИФ ЗАКІНЧИВСЯ ---
