@@ -299,5 +299,23 @@
         setLanguage(currentLang);
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+    const SUPABASE_URL = 'https://aougdxtsmzjgoykaslbt.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFvdWd4dHNtempnb3lrYXNsYnQiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTczMDM0ODYzMCwiZXhwIjoyMDQ1OTI0NjMwfQ.Lw9H6j8_G1j1Kq4Z7Yw0O7M6K1J1F1E7X0E6X9Q3M3w'; 
+    // ^ Я переписав початок і кінець з вашого скріна, але ПРОШУ, СКОПІЮЙТЕ ПОВНІСТЮ З ВАШОГО КОДУ, щоб я випадково не пропустив символ!
+
+    // Створюємо клієнт для лендінгу
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Функція швидкого входу
+    function loginDirectly() {
+        supabaseClient.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+                redirectTo: 'https://comunalco.com/app/index.html'
+            }
+        });
+    }
+</script>
 </body>
 </html>
