@@ -1550,30 +1550,33 @@ class App {
                 }
 
                 if (expireDisplay) {
-                    expireDisplay.style.display = 'block';
-                    if (daysLeft > 10000) {
-                expireDisplay.innerHTML = `<span style="color:var(--primary); font-weight:800;">💎 PRO АКТИВНО</span> | <span style="font-size:11px; opacity:0.8;">Безліміт</span>`;
-            } else if (daysLeft <= 0) {
-    // ПЕРЕВІРЯЄМО: Це Гість чи авторизований користувач?
-    if (!window.currentUser || window.currentUserId === 'guest' || window.currentUserId === 'unknown') {
-        // Стан для нової людини (Гість)
-        expireDisplay.innerHTML = '<span style="color:var(--success); font-weight:bold;">🎁 Отримайте 45 днів безкоштовно!</span>';
-    } else {
-        // Стан для зареєстрованого користувача
-        const units = typeof totalUnits !== 'undefined' ? totalUnits : '...';
-        expireDisplay.innerHTML = `Залишилось <b>${daysLeft}</b> дн. | План: ${units} од.`;
+        expireDisplay.style.display = 'block';
+        
+        if (daysLeft > 10000) {
+            expireDisplay.innerHTML = '<span style="color:var(--primary); font-weight:800;">💎 PRO АКТИВНО</span> | <span style="font-size:11px; opacity:0.8;">Безліміт</span>';
+        } else if (daysLeft <= 0) {
+            // Перевіряємо: Гість чи закінчився тариф
+            if (!window.currentUser || window.currentUser.id === 'guest' || window.currentUser.id === 'unknown') {
+                expireDisplay.innerHTML = '<span style="color:var(--success); font-weight:bold; cursor:pointer;" onclick="window.googleLogin()">🎁 Отримайте 45 днів безкоштовно!</span>';
+            } else {
+                expireDisplay.innerHTML = '⚠️ Тестовий період закінчився. <b style="cursor:pointer; color:var(--primary)" onclick="app.openMenu(\'premium\')">Подовжити?</b>';
+            }
+        } else {
+            // Стан для юзера, в якого є активні дні (> 0)
+            const units = typeof totalUnits !== 'undefined' ? totalUnits : '∞';
+            expireDisplay.innerHTML = `Залишилось <b>${daysLeft}</b> дн. | План: ${units} од.`;
+        }
 
+        // Блок тарифу під текстом
         if (lim) {
             const p6m = typeof price6m !== 'undefined' ? price6m : '...';
             lim.innerHTML = `<span onclick="app.openMenu('premium')" style="cursor:pointer">💎 Тариф: <b>${p6m}</b> грн / 6 міс</span>`;
         }
-    } 
-    } 
-    } 
-    } // Ця дужка закриває великий else з рядка 1541
-    catch (err) { // ЦЕЙ CATCH закриває try з рядка 1526!
-        console.error("Помилка завантаження статусів:", err);
     }
+
+} catch (err) { 
+    console.error("Помилка завантаження статусу:", err);
+}
 } // А ЦЯ ДУЖКА нарешті закриває саму функцію updateStatus() з рядка 1511!
 
 // --- БЛОКУВАННЯ, ЯКЩО ТАРИФ ЗАКІНЧИВСЯ ---
