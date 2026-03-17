@@ -1557,7 +1557,15 @@ class App {
                     if (daysLeft > 10000) {
                 expireDisplay.innerHTML = `<span style="color:var(--primary); font-weight:800;">💎 PRO АКТИВНО</span> | <span style="font-size:11px; opacity:0.8;">Безліміт</span>`;
             } else if (daysLeft <= 0) {
-                expireDisplay.innerHTML = `⚠️ Тестовий період закінчився. <b style="cursor:pointer; color:var(--primary)" onclick="app.openMenu('premium')">Подовжити?</b>`;
+    // ПЕРЕВІРЯЄМО: Це Гість чи авторизований користувач?
+    if (!window.currentUser || window.currentUser.id === 'guest' || window.currentUser.id === 'unknown') {
+        // СТАН ДЛЯ НОВОЇ ЛЮДИНИ (ГОСТЯ)
+        expireDisplay.innerHTML = '<span style="color:var(--success); font-weight:bold;">🎁 Отримайте 45 днів безкоштовно!</span>';
+    } else {
+        // СТАН ДЛЯ ЮЗЕРА, У ЯКОГО РЕАЛЬНО ЗАКІНЧИВСЯ ТЕСТ
+        expireDisplay.innerHTML = '⚠️ Тестовий період закінчився. <b style="cursor:pointer; color:var(--primary)" onclick="app.openMenu(\'premium\')">Подовжити?</b>';
+    }
+}
             } else {
                 const units = typeof totalUnits !== 'undefined' ? totalUnits : '∞';
                 expireDisplay.innerHTML = `Залишилось <b>${daysLeft} дн.</b> | План: ${units} од.`;
