@@ -734,7 +734,7 @@
     
 <script>
     // --- АВТО-ОНОВЛЕННЯ ВЕРСІЇ ---
-  const APP_VERSION = '8.0'; 
+  const APP_VERSION = '8.1'; 
   if (localStorage.getItem('app_version') !== APP_VERSION) {
       localStorage.setItem('app_version', APP_VERSION);
       if (navigator.serviceWorker) {
@@ -3513,7 +3513,35 @@ window.addEventListener('load', () => {
         }
 
       try {
-          const { data: profile } = await sbClient.from('profiles').select('*').eq('id', user.id).maybeSingle();
+          // Шукаємо користувача в базі
+let { data: profile } = await sbClient.from('profiles').select('*').eq('id', user.id).maybeSingle();
+
+// --- МАГІЯ: ЯКЩО ЦЕ НОВИЙ КОРИСТУВАЧ ---
+if (!profile) {
+    console.log("Новий користувач! Даруємо 45 днів PRO.");
+    
+    // Рахуємо дату: сьогодні + 45 днів
+    const trialEnd = new Date();
+    trialEnd.setDate(trialEnd.getDate() + 45);
+
+    // Створюємо йому профіль у базі
+    const { data: newProfile, error } = await sbClient.from('profiles')
+        .insert([{
+            id: user.id,
+            plan: 'pro',  // Ставимо тариф pro на тестовий період
+            expires_at: trialEnd.toISOString(),
+            apts_limit: 10 // Дефолтна кількість квартир (можете змінити, якщо треба)
+        }])
+        .select()
+        .single();
+
+    if (!error && newProfile) {
+        profile = newProfile; // Підставляємо новий профіль, щоб код нижче його побачив
+    } else {
+        console.error("Помилка створення профілю:", error);
+    }
+}
+// --- КІНЕЦЬ МАГІЇ ---
           if (profile && profile.expires_at) {
               const expDate = new Date(profile.expires_at);
               if (subExpireEl) {
