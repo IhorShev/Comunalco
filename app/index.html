@@ -1556,22 +1556,28 @@ class App {
             } else if (daysLeft <= 0) {
     // ПЕРЕВІРЯЄМО: Це Гість чи авторизований користувач?
     if (!window.currentUser || window.currentUserId === 'guest' || window.currentUserId === 'unknown') {
-            // Стан для нової людини (Гість)
-            expireDisplay.innerHTML = '<span style="color:var(--success); font-weight:bold;">🎁 Отримайте 45 днів безкоштовно!</span>';
-        } else {
-            // Стан для зареєстрованого користувача
-            const units = typeof totalUnits !== 'undefined' ? totalUnits : '...';
-            expireDisplay.innerHTML = `Залишилось <b>${daysLeft}</b> дн. | План: ${units} од.`;
+        // Стан для нової людини (Гість)
+        expireDisplay.innerHTML = '<span style="color:var(--success); font-weight:bold;">🎁 Отримайте 45 днів безкоштовно!</span>';
+    } else {
+        // Стан для зареєстрованого користувача
+        const units = typeof totalUnits !== 'undefined' ? totalUnits : '...';
+        expireDisplay.innerHTML = `Залишилось <b>${daysLeft}</b> дн. | План: ${units} од.`;
 
-           if (lim) {
-                const p6m = typeof price6m !== 'undefined' ? price6m : '...';
-                lim.innerHTML = `<span onclick="app.openMenu('premium')" style="cursor:pointer">💎 Тариф: <b>${p6m}</b> грн / 6 міс</span>`;
-            }
+        if (lim) {
+            const p6m = typeof price6m !== 'undefined' ? price6m : '...';
+            lim.innerHTML = `<span onclick="app.openMenu('premium')" style="cursor:pointer">💎 Тариф: <b>${p6m}</b> грн / 6 міс</span>`;
         }
+    } 
+    } 
+    } 
+    } // Ця дужка закриває великий else з рядка 1541
+    catch (err) { // ЦЕЙ CATCH закриває try з рядка 1526!
+        console.error("Помилка завантаження статусів:", err);
     }
-}
-    // --- БЛОКУВАННЯ, ЯКЩО ТАРИФ ЗАКІНЧИВСЯ ---
-    checkLimit() {
+} // А ЦЯ ДУЖКА нарешті закриває саму функцію updateStatus() з рядка 1511!
+
+// --- БЛОКУВАННЯ, ЯКЩО ТАРИФ ЗАКІНЧИВСЯ ---
+checkLimit() {
         this.updateStatus();
         // Якщо ви PRO — жодних обмежень на створення!
         if (this.state.licenseDate === '2140-03-28') return true;
