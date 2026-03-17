@@ -733,17 +733,24 @@
 </div>
     
 <script>
-    // --- АВТО-ОНОВЛЕННЯ ВЕРСІЇ ---
-  const APP_VERSION = '8.2'; 
-  if (localStorage.getItem('app_version') !== APP_VERSION) {
-      localStorage.setItem('app_version', APP_VERSION);
-      if (navigator.serviceWorker) {
-          navigator.serviceWorker.getRegistrations().then(registrations => {
-              for (let registration of registrations) registration.unregister();
-          });
-      }
-      setTimeout(() => { window.location.href = window.location.pathname + '?v=' + Date.now(); }, 500);
-  }
+    <script>
+    // 1. МИТТЄВЕ ВСТАНОВЛЕННЯ ТЕМИ (Пам'ять теми)
+    (function() {
+        const savedTheme = localStorage.getItem('comunalco-theme') || 'dark';
+        document.body.setAttribute('data-theme', savedTheme);
+    })();
+
+    // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
+    const APP_VERSION = '8.3';
+    if (localStorage.getItem('app_version') !== APP_VERSION) {
+        localStorage.setItem('app_version', APP_VERSION);
+        if (navigator.serviceWorker) {
+            navigator.serviceWorker.getRegistrations().then(registrations => {
+                for (let registration of registrations) registration.unregister();
+            });
+        }
+        setTimeout(() => { window.location.href = window.location.pathname + '?v=' + Date.now(); }, 500);
+    }
 class App {
     constructor() {
         this.LIMITS = { free: 2, standard: 10, pro: 9999, vip: 9999 };
