@@ -734,7 +734,7 @@
     
 <script>
     // --- АВТО-ОНОВЛЕННЯ ВЕРСІЇ ---
-  const APP_VERSION = '8.1'; 
+  const APP_VERSION = '8.2'; 
   if (localStorage.getItem('app_version') !== APP_VERSION) {
       localStorage.setItem('app_version', APP_VERSION);
       if (navigator.serviceWorker) {
@@ -828,22 +828,29 @@ class App {
     }
     
     payViaPayPro() {
-        const amount = this.lastCalcAmount;
-        if (!amount || amount <= 0) return alert("Помилка: сума не розрахована");
+    const amount = this.lastCalcAmount;
+    if (!amount || amount <= 0) return alert("Помилка: сума не розрахована");
 
-        // Отримуємо ID користувача (використовуємо email або UID, щоб знати, кому подовжити)
-        const userId = (window.currentUser && window.currentUser.id) || 'unknown';
-        
-        // ВАШЕ ПОСИЛАННЯ З PAYPRO
-        const baseUrl = "https://store.payproglobal.com/checkout?products[1][id]=128709";
-        
-        // Формуємо фінальне посилання з динамічною ціною та ID користувача
-        // Ми явно кажемо: ціна для UAH дорівнює amount, і валюта кошика — теж UAH
-       const finalUrl = `${baseUrl}&products[1][price][UAH][amount]=${amount}&custom_field1=${encodeURIComponent(userId)}`;
+    const user = window.currentUser || {};
+    const userId = user.id || 'unknown';
+    const userEmail = user.email || ''; 
 
-        console.log("Відкриваємо оплату PayPro:", finalUrl);
-        window.open(finalUrl, '_blank');
+    const baseUrl = "https://store.payproglobal.com/checkout?products[1][id]=128709";
+
+    // УВАГА: використовуємо let, щоб можна було додавати параметри
+    let finalUrl = `${baseUrl}&products[1][price][UAH][amount]=${amount}&custom_field1=${encodeURIComponent(userId)}`;
+
+    // 1. Автозаповнення Email (щоб клієнт не вводив руками)
+    if (userEmail) {
+        finalUrl += `&billing-email=${encodeURIComponent(userEmail)}`;
     }
+    
+    // 2. Додаємо батьківський домен для Apple Pay (вимога PayPro)
+    finalUrl += `&parent-domain=comunalco.com`;
+
+    console.log("Відкриваємо оплату PayPro:", finalUrl);
+    window.open(finalUrl, '_blank');
+}
 
     setSubPeriod(p) {
         this.subPeriod = p;
@@ -860,20 +867,7 @@ class App {
         this.updateSubscriptionCalc();
     }
 
-        // 1. Оплата карткою через Destream
-    payViaDestream() {
-        if (!window.currentUser) return alert("Будь ласка, увійдіть в акаунт!");
-        const amount = this.lastCalcAmount;
-        const userId = window.currentUser.id;
-        const apts = document.getElementById('calc-apts').value;
-        const msg = `SUB:${userId}:${apts}:${this.subPeriod}`;
-        
-        // ЗАМІНІТЬ 'your_destream_username' на ваш реальний нік у Destream
-        const url = `https://destream.net/live/your_destream_username/donate?amount=${amount}&message=${encodeURIComponent(msg)}`;
-        window.open(url, '_blank');
-    }
-
-    // 2. Оплата Crypto (Вибір методу)
+           // 2. Оплата Crypto (Вибір методу)
     async payViaCrypto(method) {
         if (!window.currentUser) return alert("Будь ласка, увійдіть в акаунт!");
         
