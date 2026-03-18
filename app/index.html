@@ -802,27 +802,53 @@ class App {
         const apts = aptsInput ? (parseInt(aptsInput.value) || 1) : 1;
         const period = this.subPeriod;
         
-        // Тарифікація за квартиру в місяць (чим більше квартир, тим дешевше)
-        let pricePerMonth = 7; 
-        if (apts >= 3) pricePerMonth = 6;
-        if (apts >= 10) pricePerMonth = 5;
-        if (apts >= 30) pricePerMonth = 3.5; // -50% знижка для великих об'єктів
+        // Отримуємо поточну мову системи (як на лендінгу)
+        const appLang = localStorage.getItem('lang') || 'uk';
+        
+        // Базові змінні
+        let pricePerMonth = 25;
+        let currencyLabel = "грн";
+        let perAptLabel = "грн/кв в міс";
+
+        // МУЛЬТИВАЛЮТНА СІТКА ТАРИФІВ
+        if (appLang === 'uk') {
+            pricePerMonth = 25; currencyLabel = "грн"; perAptLabel = "грн/кв в міс";
+            if (apts >= 6) pricePerMonth = 20;
+            if (apts >= 21) pricePerMonth = 15;
+            if (apts >= 51) pricePerMonth = 10;
+        } else if (appLang === 'pl') {
+            pricePerMonth = 4; currencyLabel = "PLN"; perAptLabel = "PLN/lokal/mc";
+            if (apts >= 6) pricePerMonth = 3;
+            if (apts >= 21) pricePerMonth = 2.5;
+            if (apts >= 51) pricePerMonth = 2;
+        } else {
+            pricePerMonth = 1.50; currencyLabel = "$"; perAptLabel = "$/unit/mo";
+            if (apts >= 6) pricePerMonth = 1.20;
+            if (apts >= 21) pricePerMonth = 0.90;
+            if (apts >= 51) pricePerMonth = 0.60;
+        }
 
         let total = apts * pricePerMonth * period;
-        
-        // Додаткова знижка -20% якщо передплата на рік
+
+        // Додаткова знижка -20% якщо передплата на рік (залишаємо вашу логіку)
         if (period === 12) total = total * 0.8;
 
-        this.lastCalcAmount = Math.ceil(total);
-        
+        // Для гривні та злотих округлюємо до цілого, для доларів - залишаємо центи
+        this.lastCalcAmount = (appLang === 'uk' || appLang === 'pl') ? Math.ceil(total) : parseFloat(total.toFixed(2));
+
         // Оновлюємо цифри на екрані
         const totalSumEl = document.getElementById('calc-total-sum');
         const pricePerAptEl = document.getElementById('calc-price-per-apt');
+
+        if (totalSumEl) {
+            totalSumEl.innerText = (appLang === 'uk' || appLang === 'pl') 
+                ? `${this.lastCalcAmount} ${currencyLabel}` 
+                : `${currencyLabel}${this.lastCalcAmount.toFixed(2)}`;
+        }
         
-        if (totalSumEl) totalSumEl.innerText = `${this.lastCalcAmount} грн`;
         if (pricePerAptEl) {
             const effectivePrice = (this.lastCalcAmount / period / apts).toFixed(2);
-            pricePerAptEl.innerText = `(${effectivePrice} грн/кв в міс)`;
+            pricePerAptEl.innerText = `(${effectivePrice} ${perAptLabel})`;
         }
         
         // Показуємо ID користувача (короткий варіант для коментаря)
