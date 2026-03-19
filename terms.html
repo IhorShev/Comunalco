@@ -3,88 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Terms of Service - Comunalco</title>
+    <title>Умови використання та Політика конфіденційності — Comunalco</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Montserrat', sans-serif; background-color: #050a14; color: #e0e6ed; line-height: 1.7; padding: 40px 20px; }
-        .container { max-width: 900px; margin: 0 auto; background: #0f172a; padding: 50px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 10px 40px rgba(0,0,0,0.4); }
-        h1, h2, h3 { color: #fff; margin-top: 35px; }
-        h1 { text-align: center; border-bottom: 2px solid #00f0ff; padding-bottom: 25px; margin-bottom: 40px; text-transform: uppercase; letter-spacing: 2px; font-weight: 900;}
-        h2 { font-size: 1.4rem; border-left: 4px solid #00f0ff; padding-left: 15px; }
-        a { color: #00f0ff; text-decoration: none; font-weight: bold; border-bottom: 1px solid transparent; transition: 0.3s; }
-        a:hover { border-bottom: 1px solid #00f0ff; }
-        .lang-section { margin-bottom: 80px; }
-        .back-btn { display: inline-block; margin-bottom: 30px; padding: 12px 25px; border: 1px solid #00f0ff; border-radius: 10px; color: #00f0ff; font-weight: 600; text-transform: uppercase; font-size: 12px; letter-spacing: 1px; }
-        hr { border: 0; border-top: 1px dashed rgba(255,255,255,0.1); margin: 60px 0; }
-        strong { color: #fff; }
-        .disclaimer-box { background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; padding: 20px; border-radius: 12px; margin: 25px 0; }
+        :root { --bg-dark: #050a14; --bg-card: #0f172a; --text-main: #e0e6ed; --text-sec: #94a3b8; --accent: #00f0ff; --border-color: rgba(255,255,255,0.05); }
+        body { margin: 0; padding: 0; background-color: var(--bg-dark); color: var(--text-main); font-family: 'Montserrat', sans-serif; line-height: 1.7; }
+        .header-simple { padding: 20px 0; border-bottom: 1px solid var(--border-color); background: rgba(5, 10, 20, 0.95); position: fixed; top: 0; width: 100%; z-index: 100; backdrop-filter: blur(10px); }
+        .container { max-width: 900px; margin: 0 auto; padding: 0 20px; }
+        .back-link { color: var(--accent); text-decoration: none; font-weight: 700; font-size: 1rem; display: inline-flex; align-items: center; gap: 8px; }
+        .back-link:hover { text-shadow: 0 0 10px rgba(0,240,255,0.5); }
+        .legal-content { padding: 120px 0 80px 0; }
+        .legal-title { font-size: 2.5rem; font-weight: 900; margin-bottom: 10px; text-transform: uppercase; }
+        .legal-date { color: var(--text-sec); font-size: 0.95rem; margin-bottom: 40px; }
+        .legal-section { background: var(--bg-card); padding: 40px; border-radius: 16px; border: 1px solid var(--border-color); margin-bottom: 30px; }
+        .legal-section h2 { font-size: 1.5rem; color: #fff; margin-top: 0; margin-bottom: 20px; font-weight: 800; display: flex; align-items: center; gap: 10px; }
+        .legal-section h2::before { content: ''; display: block; width: 4px; height: 24px; background: var(--accent); border-radius: 2px; }
+        .legal-section p, .legal-section li { margin-bottom: 15px; color: #b0bec5; font-size: 1.05rem; }
+        .legal-section ul { padding-left: 20px; }
+        .legal-section strong { color: #fff; }
+        @media (max-width: 768px) { .legal-title { font-size: 1.8rem; } .legal-section { padding: 25px; } }
     </style>
 </head>
 <body>
-    <div class="container">
-        <a href="index.html" class="back-btn">⬅ На головну / Back to Home</a>
 
-        <div class="lang-section">
-            <h1>Terms of Service</h1>
-            <p><strong>Effective Date: March 4, 2026</strong></p>
-            
-            <h2>1. Agreement to Terms</h2>
-            <p>By using the Comunalco web application ("Service"), you agree to be bound by these Terms of Service. If you disagree with any part of these terms, you may not access the Service.</p>
-            
-            <h2>2. Nature of Service and Disclaimer</h2>
-            <div class="disclaimer-box">
-                <strong>IMPORTANT:</strong> Comunalco is provided strictly as a <strong>calculation and management tool</strong> for utility accounting. 
-                <ul>
-                    <li>The Service does not submit data to utility providers, government bodies, or any third-party organizations.</li>
-                    <li>The User is solely and exclusively responsible for the accuracy, legality, and validity of all data entered (meter readings, tariffs, personal info).</li>
-                    <li>Comunalco does not guarantee the financial accuracy of your official bills. Always verify calculations before making payments to official providers.</li>
-                </ul>
-            </div>
-            
-            <h2>3. Payments and Merchant of Record</h2>
-            <p>Our order process is conducted by our online reseller <strong>PayPro Global</strong> (PayProGlobal.com). PayPro Global is the <strong>Merchant of Record</strong> for all our orders. They handle all payment-related inquiries, compliance, taxes, and technical transaction support. By purchasing a PRO subscription, you agree to their Terms and Conditions.</p>
-            
-            <h2>4. Subscription and Refund Policy</h2>
-            <p>We offer a <strong>14-day money-back guarantee</strong>. If you are unsatisfied, you may request a refund within 14 days of your initial purchase by contacting <a href="mailto:support@comunalco.com">support@comunalco.com</a> or PayPro Global support. After 14 days, all sales are final.</p>
+    <header class="header-simple">
+        <div class="container">
+            <a href="index.html" class="back-link">← Повернутися на головну</a>
+        </div>
+    </header>
 
-            <h2>5. Limitation of Liability</h2>
-            <p>To the maximum extent permitted by law, Comunalco shall not be liable for any indirect, incidental, or consequential damages, including but not limited to utility disconnections, fines from providers, or financial losses resulting from incorrect data entry or Service unavailability.</p>
+    <main class="legal-content container">
+        <h1 class="legal-title">Умови використання та Політика конфіденційності</h1>
+        <div class="legal-date">Остання редакція: 18 березня 2026 р.</div>
 
-            <h2>6. Governing Law</h2>
-            <p>These Terms shall be governed by the laws of Ukraine. Any disputes shall be resolved in the competent courts of Ukraine.</p>
+        <div class="legal-section">
+            <h2>1. Вступ та Згода</h2>
+            <p>Використовуючи екосистему <strong>Comunalco</strong>, ви (Користувач, Керуючий або Мешканець) погоджуєтеся з цими Умовами використання та Політикою конфіденційності. Якщо ви не згодні з цими умовами, ви повинні припинити використання Сервісу.</p>
         </div>
 
-        <hr>
-
-        <div class="lang-section">
-            <h1>Умови використання</h1>
-            <p><strong>Дата набрання чинності: 4 березня 2026 р.</strong></p>
-            
-            <h2>1. Прийняття умов</h2>
-            <p>Використовуючи веб-додаток Comunalco («Сервіс»), ви погоджуєтеся з цими Умовами. Якщо ви не згодні з будь-якою частиною цих умов, ви не можете використовувати Сервіс.</p>
-            
-            <h2>2. Суть Сервісу та Відмова від відповідальності</h2>
-            <div class="disclaimer-box">
-                <strong>ВАЖЛИВО:</strong> Comunalco надається виключно як <strong>допоміжний інструмент для обчислень</strong> та управління обліком комунальних послуг. 
-                <ul>
-                    <li>Сервіс НЕ передає дані постачальникам послуг, державним органам чи будь-яким іншим організаціям.</li>
-                    <li>Користувач несе повну та одноосібну відповідальність за точність та законність усіх введених даних (показники, тарифи, ПІБ).</li>
-                    <li>Comunalco не гарантує фінансову точність ваших офіційних рахунків. Завжди перевіряйте розрахунки перед здійсненням оплати офіційним постачальникам.</li>
-                </ul>
-            </div>
-            
-            <h2>3. Платежі та Офіційний продавець (MoR)</h2>
-            <p>Процес оформлення замовлення здійснюється нашим партнером <strong>PayPro Global</strong>. PayPro Global є <strong>Merchant of Record</strong> (Офіційним продавцем) для всіх замовлень. Вони обробляють платежі, податки та запити щодо транзакцій. Оплачуючи PRO-версію, ви також погоджуєтеся з Умовами PayPro Global.</p>
-            
-            <h2>4. Підписка та Політика повернення</h2>
-            <p>Ми надаємо <strong>14-денну гарантію повернення коштів</strong>. Якщо ви незадоволені Сервісом, ви можете запросити повернення протягом 14 днів після першої оплати, написавши на <a href="mailto:support@comunalco.com">support@comunalco.com</a>. Після закінчення 14 днів кошти не повертаються.</p>
-
-            <h2>5. Обмеження відповідальності</h2>
-            <p>У межах, дозволених законом, Comunalco не несе відповідальності за будь-які непрямі або випадкові збитки, включаючи відключення послуг, штрафи від постачальників або фінансові втрати, спричинені некоректним введенням даних або технічними збоями Сервісу.</p>
-
-            <h2>6. Застосовне право</h2>
-            <p>Ці Умови регулюються законодавством України. Усі суперечки вирішуються у відповідних судах України.</p>
+        <div class="legal-section">
+            <h2>2. Збір та використання даних</h2>
+            <p>Для забезпечення роботи Сервісу (виставлення рахунків, проведення голосувань, ідентифікація в чаті) ми збираємо наступні дані:</p>
+            <ul>
+                <li><strong>Для Керуючих:</strong> ПІБ, контактний номер телефону, email, реквізити юридичної особи або ФОП.</li>
+                <li><strong>Для Мешканців:</strong> ПІБ, номер квартири/приміщення, email, номер телефону (для авторизації та сповіщень).</li>
+            </ul>
+            <p>Ці дані використовуються виключно для функціонування вашого ОСББ чи керуючої компанії всередині закритої системи.</p>
         </div>
-    </div>
+
+        <div class="legal-section">
+            <h2>3. Передача даних третім особам</h2>
+            <p><strong>Comunalco ніколи не продає персональні дані Користувачів третім особам.</strong></p>
+            <p>Дані можуть бути передані лише нашим інфраструктурним партнерам (таким як Supabase для безпечного зберігання бази даних та PayPro Global для обробки платежів) на умовах суворої конфіденційності (Data Processing Agreement).</p>
+        </div>
+
+        <div class="legal-section">
+            <h2>4. Правила поведінки (Community Hub)</h2>
+            <p>Користувачі зобов'язуються використовувати вбудований чат будинку та систему онлайн-голосувань з повагою до інших мешканців. Забороняється:</p>
+            <ul>
+                <li>Публікація спаму, реклами, образливого контенту або матеріалів, що порушують законодавство.</li>
+                <li>Маніпуляція результатами голосувань шляхом передачі свого акаунта третім особам.</li>
+            </ul>
+            <p>Керуючий будинком має право модерації чату та блокування порушників.</p>
+        </div>
+
+        <div class="legal-section">
+            <h2>5. Ваші права (Право на забуття)</h2>
+            <p>Відповідно до європейських та українських норм, ви маєте право в будь-який момент запитати експорт усіх ваших персональних даних або повне видалення вашого акаунту (Right to be Forgotten). Для цього зверніться на нашу пошту: <strong>support@comunalco.com</strong>.</p>
+        </div>
+    </main>
+
 </body>
 </html>

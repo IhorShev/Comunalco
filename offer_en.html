@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Public SaaS Agreement — Comunalco</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-dark: #050a14; --bg-card: #0f172a; --text-main: #e0e6ed; --text-sec: #94a3b8; --accent: #00f0ff; --border-color: rgba(255,255,255,0.05); }
+        body { margin: 0; padding: 0; background-color: var(--bg-dark); color: var(--text-main); font-family: 'Montserrat', sans-serif; line-height: 1.7; }
+        .header-simple { padding: 20px 0; border-bottom: 1px solid var(--border-color); background: rgba(5, 10, 20, 0.95); position: fixed; top: 0; width: 100%; z-index: 100; backdrop-filter: blur(10px); }
+        .container { max-width: 900px; margin: 0 auto; padding: 0 20px; }
+        .back-link { color: var(--accent); text-decoration: none; font-weight: 700; font-size: 1rem; display: inline-flex; align-items: center; gap: 8px; }
+        .back-link:hover { text-shadow: 0 0 10px rgba(0,240,255,0.5); }
+        .legal-content { padding: 120px 0 80px 0; }
+        .legal-title { font-size: 2.5rem; font-weight: 900; margin-bottom: 10px; text-transform: uppercase; }
+        .legal-date { color: var(--text-sec); font-size: 0.95rem; margin-bottom: 40px; }
+        .legal-section { background: var(--bg-card); padding: 40px; border-radius: 16px; border: 1px solid var(--border-color); margin-bottom: 30px; }
+        .legal-section h2 { font-size: 1.5rem; color: #fff; margin-top: 0; margin-bottom: 20px; font-weight: 800; display: flex; align-items: center; gap: 10px; }
+        .legal-section h2::before { content: ''; display: block; width: 4px; height: 24px; background: var(--accent); border-radius: 2px; }
+        .legal-section p, .legal-section li { margin-bottom: 15px; color: #b0bec5; font-size: 1.05rem; }
+        .legal-section strong { color: #fff; }
+        @media (max-width: 768px) { .legal-title { font-size: 1.8rem; } .legal-section { padding: 25px; } }
+    </style>
+</head>
+<body>
+
+    <header class="header-simple">
+        <div class="container">
+            <a href="index.html" class="back-link">← Back to Homepage</a>
+        </div>
+    </header>
+
+    <main class="legal-content container">
+        <h1 class="legal-title">Public SaaS Agreement (Offer)</h1>
+        <div class="legal-date">Last Updated: March 18, 2026</div>
+
+        <div class="legal-section">
+            <h2>1. General Provisions</h2>
+            <p>This document constitutes an official proposal (public offer) by <strong>Comunalco</strong> (hereinafter referred to as the "Provider") to enter into a Software as a Service (SaaS) Agreement. By registering an account or paying for the subscription, the User (hereinafter referred to as the "Client") accepts this offer fully and unconditionally.</p>
+        </div>
+
+        <div class="legal-section">
+            <h2>2. Subject of the Agreement</h2>
+            <p>The Provider grants the Client a non-exclusive, non-transferable right to access the Comunalco cloud ecosystem (hereinafter "Service") for property management, utility billing, online voting, and resident communication. The Service is provided on a subscription basis and "AS IS".</p>
+        </div>
+
+        <div class="legal-section">
+            <h2>3. Payment and Billing (PayPro Global)</h2>
+            <p><strong>3.1. Merchant of Record.</strong> All financial transactions, payment processing, refunds, and subscription management are conducted through our official reseller and payment partner, <strong>PayPro Global, Inc.</strong> (Canada/USA).</p>
+            <p><strong>3.2. Payment Security.</strong> The Provider does not collect or store full credit card data. All payment details are processed exclusively on PayPro Global's secure, PCI DSS-compliant servers.</p>
+            <p><strong>3.3. Recurring Charges.</strong> Subscription fees are billed automatically at the beginning of each billing cycle. The Client may cancel auto-renewal at any time via their Dashboard.</p>
+        </div>
+
+        <div class="legal-section">
+            <h2>4. Data Storage (Supabase) and Privacy (GDPR)</h2>
+            <p><strong>4.1. Infrastructure.</strong> Database management, user authentication, and file storage are powered by <strong>Supabase</strong> (AWS-based cloud infrastructure) with servers located in privacy-compliant jurisdictions.</p>
+            <p><strong>4.2. Compliance.</strong> Processing of residents' personal data (names, addresses, contacts) strictly complies with the <strong>GDPR</strong> (General Data Protection Regulation).</p>
+            <p><strong>4.3. Roles.</strong> The Client acts as the Data Controller, while Comunalco acts as the Data Processor.</p>
+        </div>
+
+        <div class="legal-section">
+            <h2>5. Rights and Liabilities</h2>
+            <p><strong>5.1.</strong> The Provider commits to maintaining a Service Level Agreement (SLA) uptime of 99.5%, excluding scheduled maintenance.</p>
+            <p><strong>5.2.</strong> The Client bears full responsibility for the accuracy of the data entered into the system and the legal validity of online voting conducted via the Service.</p>
+            <p><strong>5.3.</strong> The Provider shall not be liable for any indirect damages or lost profits caused by internet outages, third-party actions, or force majeure events.</p>
+        </div>
+
+        <div class="legal-section">
+            <h2>6. Termination</h2>
+            <p>The Client has the right to terminate the use of the Service at any time. Prepaid fees are non-refundable, but access to the Service will remain active until the end of the current billing cycle. Upon expiration, the Client's data is retained for 60 days for potential recovery, after which it is permanently deleted.</p>
+        </div>
+    </main>
+
+</body>
+</html>

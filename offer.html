@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Договір публічної оферти — Comunalco</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #050a14; --bg-card: #0f172a; --text-main: #e0e6ed; --text-sec: #94a3b8;
+            --accent: #00f0ff; --border-color: rgba(255,255,255,0.05);
+        }
+        body { 
+            margin: 0; padding: 0; background-color: var(--bg-dark); color: var(--text-main); 
+            font-family: 'Montserrat', sans-serif; line-height: 1.7;
+        }
+        .header-simple {
+            padding: 20px 0; border-bottom: 1px solid var(--border-color); background: rgba(5, 10, 20, 0.95);
+            position: fixed; top: 0; width: 100%; z-index: 100; backdrop-filter: blur(10px);
+        }
+        .container { max-width: 900px; margin: 0 auto; padding: 0 20px; }
+        .back-link { color: var(--accent); text-decoration: none; font-weight: 700; font-size: 1rem; display: inline-flex; align-items: center; gap: 8px; }
+        .back-link:hover { text-shadow: 0 0 10px rgba(0,240,255,0.5); }
+        
+        .legal-content { padding: 120px 0 80px 0; }
+        .legal-title { font-size: 2.5rem; font-weight: 900; margin-bottom: 10px; text-transform: uppercase; }
+        .legal-date { color: var(--text-sec); font-size: 0.95rem; margin-bottom: 40px; }
+        
+        .legal-section { background: var(--bg-card); padding: 40px; border-radius: 16px; border: 1px solid var(--border-color); margin-bottom: 30px; }
+        .legal-section h2 { font-size: 1.5rem; color: #fff; margin-top: 0; margin-bottom: 20px; font-weight: 800; display: flex; align-items: center; gap: 10px; }
+        .legal-section h2::before { content: ''; display: block; width: 4px; height: 24px; background: var(--accent); border-radius: 2px; }
+        .legal-section p, .legal-section li { margin-bottom: 15px; color: #b0bec5; font-size: 1.05rem; }
+        .legal-section ul { padding-left: 20px; }
+        .legal-section strong { color: #fff; }
+
+        @media (max-width: 768px) {
+            .legal-title { font-size: 1.8rem; }
+            .legal-section { padding: 25px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header-simple">
+        <div class="container">
+            <a href="index.html" class="back-link">← Повернутися на головну</a>
+        </div>
+    </header>
+
+    <main class="legal-content container">
+        <h1 class="legal-title">Договір публічної оферти (SaaS)</h1>
+        <div class="legal-date">Остання редакція: 18 березня 2026 р.</div>
+
+        <div class="legal-section">
+            <h2>1. Загальні положення</h2>
+            <p>Цей документ є офіційною пропозицією (публічною офертою) платформи <strong>Comunalco</strong> (далі — «Виконавець») укласти договір про надання права користування програмним забезпеченням (SaaS) на умовах, викладених нижче. Реєстрація в системі та/або оплата послуг означає повне і беззастережне прийняття (акцепт) умов цієї оферти Користувачем (далі — «Клієнт»).</p>
+        </div>
+
+        <div class="legal-section">
+            <h2>2. Предмет договору</h2>
+            <p>Виконавець надає Клієнту неексклюзивне, непередаване право доступу до хмарної екосистеми Comunalco (далі — «Сервіс») для автоматизації процесів управління нерухомістю, обліку МЗК, проведення онлайн-голосувань та комунікації мешканців. Сервіс надається на умовах підписки (щомісячної або щорічної) за принципом «як є» (AS IS).</p>
+        </div>
+
+        <div class="legal-section">
+            <h2>3. Оплата та розрахунки (PayPro Global)</h2>
+            <p><strong>3.1. Merchant of Record.</strong> Всі фінансові транзакції, обробка платежів, повернення коштів та управління підписками здійснюються через нашого офіційного реселлера та платіжного партнера — <strong>PayPro Global, Inc.</strong> (Канада/США).</p>
+            <p><strong>3.2. Безпека платежів.</strong> Виконавець (Comunalco) не збирає, не обробляє і не зберігає повні дані банківських карток Клієнтів. Усі платіжні дані обробляються виключно на захищених серверах PayPro Global згідно зі стандартом PCI DSS.</p>
+            <p><strong>3.3. Списання.</strong> Оплата підписки знімається автоматично на початку кожного розрахункового періоду. Клієнт може скасувати автоподовження підписки в будь-який момент у своєму Кабінеті.</p>
+        </div>
+
+        <div class="legal-section">
+            <h2>4. Зберігання даних (Supabase) та Конфіденційність (GDPR)</h2>
+            <p><strong>4.1. Інфраструктура.</strong> Бази даних, аутентифікація користувачів та зберігання файлів забезпечуються хмарною інфраструктурою <strong>Supabase</strong> (на базі AWS). Сервери фізично розташовані в юрисдикціях, що відповідають вимогам захисту даних.</p>
+            <p><strong>4.2. Відповідність стандартам.</strong> Зберігання та обробка персональних даних мешканців (ПІБ, адреси, контакти) здійснюється у суворій відповідності до <strong>GDPR</strong> (Загального регламенту захисту даних ЄС) та Закону України «Про захист персональних даних».</p>
+            <p><strong>4.3. Роль сторін.</strong> Клієнт (ОСББ/Керуюча компанія) виступає Володільцем даних (Data Controller), а Comunalco — Обробником даних (Data Processor).</p>
+        </div>
+
+        <div class="legal-section">
+            <h2>5. Права та Відповідальність сторін</h2>
+            <p><strong>5.1.</strong> Виконавець зобов'язується забезпечувати доступність Сервісу на рівні не менше 99.5% часу (SLA), за винятком планових технічних робіт.</p>
+            <p><strong>5.2.</strong> Клієнт несе повну відповідальність за достовірність даних, внесених до системи, та за легітимність проведення онлайн-голосувань за допомогою Сервісу відповідно до місцевого законодавства.</p>
+            <p><strong>5.3.</strong> Виконавець не несе відповідальності за непрямі збитки або упущену вигоду Клієнта, спричинені перебоями в роботі інтернету, діями третіх осіб або форс-мажорними обставинами.</p>
+        </div>
+
+        <div class="legal-section">
+            <h2>6. Розірвання договору</h2>
+            <p>Клієнт має право в будь-який момент відмовитися від використання Сервісу. У разі дострокового розірвання договору кошти за вже оплачений період не повертаються, але доступ до Сервісу зберігається до кінця оплаченого циклу. Після закінчення підписки дані Клієнта зберігаються в системі протягом 60 днів для можливості відновлення, після чого видаляються незворотно.</p>
+        </div>
+    </main>
+
+</body>
+</html>

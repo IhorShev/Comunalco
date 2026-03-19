@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Service & Privacy Policy — Comunalco</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-dark: #050a14; --bg-card: #0f172a; --text-main: #e0e6ed; --text-sec: #94a3b8; --accent: #00f0ff; --border-color: rgba(255,255,255,0.05); }
+        body { margin: 0; padding: 0; background-color: var(--bg-dark); color: var(--text-main); font-family: 'Montserrat', sans-serif; line-height: 1.7; }
+        .header-simple { padding: 20px 0; border-bottom: 1px solid var(--border-color); background: rgba(5, 10, 20, 0.95); position: fixed; top: 0; width: 100%; z-index: 100; backdrop-filter: blur(10px); }
+        .container { max-width: 900px; margin: 0 auto; padding: 0 20px; }
+        .back-link { color: var(--accent); text-decoration: none; font-weight: 700; font-size: 1rem; display: inline-flex; align-items: center; gap: 8px; }
+        .back-link:hover { text-shadow: 0 0 10px rgba(0,240,255,0.5); }
+        .legal-content { padding: 120px 0 80px 0; }
+        .legal-title { font-size: 2.5rem; font-weight: 900; margin-bottom: 10px; text-transform: uppercase; }
+        .legal-date { color: var(--text-sec); font-size: 0.95rem; margin-bottom: 40px; }
+        .legal-section { background: var(--bg-card); padding: 40px; border-radius: 16px; border: 1px solid var(--border-color); margin-bottom: 30px; }
+        .legal-section h2 { font-size: 1.5rem; color: #fff; margin-top: 0; margin-bottom: 20px; font-weight: 800; display: flex; align-items: center; gap: 10px; }
+        .legal-section h2::before { content: ''; display: block; width: 4px; height: 24px; background: var(--accent); border-radius: 2px; }
+        .legal-section p, .legal-section li { margin-bottom: 15px; color: #b0bec5; font-size: 1.05rem; }
+        .legal-section ul { padding-left: 20px; }
+        .legal-section strong { color: #fff; }
+        @media (max-width: 768px) { .legal-title { font-size: 1.8rem; } .legal-section { padding: 25px; } }
+    </style>
+</head>
+<body>
+
+    <header class="header-simple">
+        <div class="container">
+            <a href="index.html" class="back-link">← Back to Homepage</a>
+        </div>
+    </header>
+
+    <main class="legal-content container">
+        <h1 class="legal-title">Terms of Service & Privacy Policy</h1>
+        <div class="legal-date">Last Updated: March 18, 2026</div>
+
+        <div class="legal-section">
+            <h2>1. Introduction & Consent</h2>
+            <p>By accessing and using the <strong>Comunalco</strong> ecosystem, you (the User, Property Manager, or Resident) agree to be bound by these Terms of Service and Privacy Policy. If you do not agree, you must discontinue your use of the Service immediately.</p>
+        </div>
+
+        <div class="legal-section">
+            <h2>2. Data Collection & Usage</h2>
+            <p>To provide essential Service functionalities (such as billing, online voting, and chat identification), we collect the following data:</p>
+            <ul>
+                <li><strong>For Managers:</strong> Full name, contact phone number, email, and legal entity/sole proprietorship details.</li>
+                <li><strong>For Residents:</strong> Full name, apartment/unit number, email, and phone number (for authentication and notifications).</li>
+            </ul>
+            <p>This data is used exclusively to operate your Homeowners Association (HOA) or property management environment within a closed system.</p>
+        </div>
+
+        <div class="legal-section">
+            <h2>3. Data Sharing with Third Parties</h2>
+            <p><strong>Comunalco never sells Users' personal data to third parties.</strong></p>
+            <p>Data may only be securely transmitted to our infrastructure partners (e.g., Supabase for database hosting and PayPro Global for payment processing) under strict confidentiality agreements (Data Processing Agreement).</p>
+        </div>
+
+        <div class="legal-section">
+            <h2>4. Community Rules of Conduct</h2>
+            <p>Users must use the built-in community chat and online voting systems with respect for neighbors. The following is strictly prohibited:</p>
+            <ul>
+                <li>Posting spam, advertising, offensive content, or materials that violate applicable laws.</li>
+                <li>Manipulating voting results by sharing account access credentials with third parties.</li>
+            </ul>
+            <p>The Property Manager reserves the right to moderate the chat and suspend rule-violating accounts.</p>
+        </div>
+
+        <div class="legal-section">
+            <h2>5. Your Rights (Right to Erasure)</h2>
+            <p>In compliance with European (GDPR) and Ukrainian regulations, you have the right to request an export of all your personal data or the complete deletion of your account (Right to be Forgotten) at any time. To exercise this right, please contact us at: <strong>support@comunalco.com</strong>.</p>
+        </div>
+    </main>
+
+</body>
+</html>

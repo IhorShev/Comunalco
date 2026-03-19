@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Comunalco — Smart Utility Billing & Management</title>
+    <title>Comunalco — Ecosystem for Smart Property Management</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="logo.png">
 
     <style>
-        /* --- ЗМІННІ КОЛЬОРІВ --- */
+        /* --- ЗМІННІ КОЛЬОРІВ (Ваші оригінальні) --- */
         :root {
             --bg-dark: #050a14; --bg-card: #0f172a; --text-main: #e0e6ed; --text-sec: #94a3b8;
             --accent: #00f0ff; --accent-glow: rgba(0, 240, 255, 0.6);
@@ -25,24 +25,23 @@
         }
 
         *, *::before, *::after { box-sizing: border-box; }
-        html, body { 
-            margin: 0; padding: 0; width: 100%; max-width: 100vw; overflow-x: hidden; 
+        html {
+            scroll-behavior: smooth;
+        }
+        body { 
+            margin: 0; padding: 0; width: 100%; overflow-x: hidden; 
             font-family: 'Montserrat', sans-serif; background-color: var(--bg-dark); color: var(--text-main); 
-            scroll-behavior: smooth; 
-            padding-top: 90px; /* Зменшив відступ на ПК, щоб підняти контент */
-            transition: 0.4s; 
+            padding-top: 70px; transition: background-color 0.4s ease;
         }
         .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 20px; }
         
-        /* --- ШАПКА ТА ЛОГОТИП --- */
+        /* --- ШАПКА --- */
         header { padding: 8px 0; border-bottom: 1px solid var(--border-color); background: var(--header-bg); position: fixed; top: 0; width: 100%; z-index: 1000; backdrop-filter: blur(15px); }
         .nav-wrapper { display: flex; justify-content: space-between; align-items: center; }
-        
         .logo-brand { display: flex; align-items: center; gap: 15px; text-decoration: none; }
         .logo-icon-img { width: 55px; height: 55px; object-fit: cover; border-radius: 50%; mix-blend-mode: screen; filter: contrast(1.5) brightness(0.9) drop-shadow(0 0 5px var(--accent-glow)); flex-shrink: 0; }
         [data-theme="light"] .logo-icon-img { mix-blend-mode: multiply; filter: invert(1) hue-rotate(180deg) contrast(1.2); }
         .logo-text-wrapper { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.1; }
-        
         .brand-top { font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em; font-size: 1.4rem; }
         .brand-bottom { font-weight: 700; font-size: 0.9rem; margin-top: -2px; display: block; }
         .outline-neon, .outline-neon-sub { color: transparent; -webkit-text-stroke: 1px var(--neon-outline); text-shadow: 0 0 10px rgba(103, 232, 249, 0.4); }
@@ -57,78 +56,330 @@
         .btn-login { padding: 10px 25px; border: 2px solid var(--accent); color: var(--accent); border-radius: 8px; font-weight: 800; font-size: 0.9rem; text-transform: uppercase; background: rgba(0, 240, 255, 0.05); white-space: nowrap; transition: 0.3s; text-decoration: none; text-align: center; }
         .btn-login:hover { background: var(--accent); color: #fff; box-shadow: 0 0 20px var(--accent-glow); }
 
-        /* --- ОСНОВНИЙ КОНТЕНТ (ГОЛОВНИЙ ЕКРАН) --- */
-        .hero { padding: 30px 0 60px 0; } /* Зменшив верхній padding */
-        .hero-inner { display: flex; align-items: center; gap: 60px; justify-content: center; }
-        .hero-content { flex: 1; max-width: 600px; }
-        h1 { font-size: 3.2rem; font-weight: 900; margin-bottom: 20px; line-height: 1.1; word-wrap: break-word; }
-        h1 span { color: var(--accent); background: var(--gradient-btn); -webkit-background-clip: text; color: transparent; }
-        .hero p { font-size: 1.2rem; color: var(--text-sec); margin-bottom: 35px; line-height: 1.6; }
+        /* --- НОВИЙ ГОЛОВНИЙ ЕКРАН (HERO) --- */
+        .hero { padding: 10px 0 80px 0; position: relative; }
+        /* Легке фонове світіння для атмосфери екосистеми */
+        .hero::before { content: ''; position: absolute; top: -100px; left: -100px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(0, 240, 255, 0.08) 0%, transparent 70%); z-index: -1; pointer-events: none; }
         
-        .btn-main { display: inline-block; background: var(--gradient-btn); padding: 18px 45px; border-radius: 50px; font-weight: 800; color: #fff; text-decoration: none; box-shadow: 0 10px 30px var(--accent-glow); text-transform: uppercase; transition: 0.3s; border: none; cursor: pointer; text-align: center; }
+        .hero-inner { display: flex; align-items: center; gap: 60px; justify-content: center; }
+        .hero-content { flex: 1; max-width: 650px; }
+        
+        /* Оновлена типографіка для крутого заголовку */
+        .hero-badge { display: inline-block; padding: 6px 14px; background: rgba(0, 240, 255, 0.1); border: 1px solid rgba(0, 240, 255, 0.3); border-radius: 50px; color: var(--accent); font-size: 0.85rem; font-weight: 700; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; }
+        h1 { font-size: 3.5rem; font-weight: 900; margin-bottom: 25px; line-height: 1.15; word-wrap: break-word; }
+        h1 span { color: var(--accent); background: var(--gradient-btn); -webkit-background-clip: text; color: transparent; }
+        .hero p { font-size: 1.25rem; color: var(--text-sec); margin-bottom: 40px; line-height: 1.6; }
+        
+        .btn-main { display: inline-block; background: var(--gradient-btn); padding: 18px 45px; border-radius: 50px; font-weight: 800; color: #fff; text-decoration: none; box-shadow: 0 10px 30px var(--accent-glow); text-transform: uppercase; transition: 0.3s; border: none; cursor: pointer; text-align: center; font-size: 1rem; }
         .btn-main:hover { transform: translateY(-3px); box-shadow: 0 15px 40px var(--accent-glow); }
 
-        .hero-media { flex: 1; max-width: 550px; width: 100%; }
-        .hero-video { width: 100%; border-radius: 24px; border: 1px solid var(--border-color); box-shadow: 0 20px 50px rgba(0,0,0,0.3); display: block; }
+        .hero-media { flex: 1; max-width: 550px; width: 100%; position: relative; }
+        .hero-video { width: 100%; border-radius: 24px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 25px 60px rgba(0,0,0,0.5); display: block; position: relative; z-index: 2; }
+        /* Декоративна рамка позаду відео */
+        .hero-media::after { content: ''; position: absolute; top: 20px; right: -20px; width: 100%; height: 100%; border: 2px solid var(--accent); border-radius: 24px; z-index: 1; opacity: 0.3; transition: 0.3s; }
+        .hero-media:hover::after { top: 10px; right: -10px; opacity: 0.6; }
 
-        .section-title { text-align: center; font-size: 2.5rem; margin-bottom: 60px; font-weight: 900; text-transform: uppercase; word-wrap: break-word; }
-        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
-        
-        .card { background: var(--bg-card); padding: 35px; border-radius: 20px; border: 1px solid var(--border-color); transition: 0.3s; }
-        .card:hover { border-color: var(--accent); transform: translateY(-5px); }
-        .card-icon { font-size: 2.5rem; margin-bottom: 20px; display: block; }
-        .card h3 { font-size: 1.3rem; margin-bottom: 15px; color: var(--text-main); }
-        .card p { font-size: 0.95rem; color: var(--text-sec); line-height: 1.6; }
-
-        .price-card { background: var(--bg-card); padding: 50px 30px; border-radius: 24px; text-align: center; border: 1px solid var(--border-color); position: relative; display: flex; flex-direction: column; }
-        .price-card.popular { border-color: var(--accent); box-shadow: 0 0 40px rgba(0, 240, 255, 0.15); transform: scale(1.03); }
-        .price { font-size: 3rem; font-weight: 900; margin: 20px 0; color: var(--accent); }
-        
-        .calc-box { background: var(--bg-dark); padding: 25px; border-radius: 16px; margin: 25px 0; border: 1px dashed var(--border-color); }
-        input[type="range"] { width: 100%; accent-color: var(--accent); cursor: pointer; }
-
-        footer { padding: 60px 0; text-align: center; border-top: 1px solid var(--border-color); font-size: 0.9rem; color: var(--text-sec); }
-        .footer-links { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px; font-weight: 600; }
-        
-        .fade-out { opacity: 0; transition: 0.3s; }
-
-        /* --- ІДЕАЛЬНА МОБІЛЬНА АДАПТАЦІЯ --- */
+        /* --- МОБІЛЬНА АДАПТАЦІЯ --- */
         @media (max-width: 900px) { 
             body { padding-top: 130px; } 
             .nav-wrapper { flex-direction: column; gap: 12px; padding: 5px 0; }
             .logo-brand { justify-content: center; width: 100%; margin-bottom: 0; }
             .nav-right-group { width: 100%; justify-content: center; flex-wrap: wrap; gap: 15px; }
-            
-            /* Робимо відео зверху! */
-            .hero { padding-top: 10px; padding-bottom: 40px; }
-            .hero-inner { flex-direction: column-reverse; gap: 30px; } /* column-reverse ставить медіа над контентом */
+            .hero { padding-top: 20px; padding-bottom: 40px; }
+            .hero-inner { flex-direction: column-reverse; gap: 40px; } 
             .hero-content { text-align: center; max-width: 100%; }
-            h1 { font-size: 2.4rem; }
+            h1 { font-size: 2.5rem; }
             .hero-media { max-width: 90%; }
+            .hero-media::after { display: none; } /* Ховаємо декоративну рамку на мобільному */
         }
-        
         @media (max-width: 450px) {
             body { padding-top: 140px; }
             .logo-icon-img { width: 40px; height: 40px; }
             .brand-top { font-size: 1.2rem; }
             .brand-bottom { font-size: 0.75rem; }
-            .lang-switch { gap: 8px; font-size: 0.8rem; }
-            .btn-login { padding: 8px 20px; font-size: 0.8rem; }
-            
-            h1 { font-size: 1.9rem; margin-bottom: 15px; }
+            h1 { font-size: 2rem; margin-bottom: 15px; }
             .hero p { font-size: 1.05rem; margin-bottom: 25px; }
-            .hero-inner { gap: 20px; }
-            .hero-media { max-width: 100%; } /* Відео на всю ширину на телефоні */
-            
+            .hero-media { max-width: 100%; } 
             .btn-main { width: 100%; padding: 15px 10px; font-size: 0.85rem; }
-            .price-card .btn-login { width: 100%; }
-            
-            .price { font-size: 2.5rem; }
-            .grid-3 { gap: 20px; }
-            .card { padding: 25px 20px; }
-            .price-card { padding: 35px 20px; transform: scale(1) !important; }
         }
-    </style>
+		
+		/* --- БЛОК "ДВА СВІТИ" (ПОВНІ СТИЛІ З КАРТИНКАМИ) --- */
+        .two-worlds { padding: 100px 0; background: var(--bg-card); position: relative; }
+        .two-worlds .section-title { margin-bottom: 20px; }
+        .two-worlds .section-subtitle { text-align: center; color: var(--text-sec); font-size: 1.2rem; margin-bottom: 60px; max-width: 700px; margin-left: auto; margin-right: auto; }
+        
+        .worlds-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+        
+        .world-card { background: var(--bg-dark); padding: 50px 40px; border-radius: 24px; border: 1px solid var(--border-color); position: relative; overflow: hidden; transition: 0.4s; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .world-card:hover { transform: translateY(-5px); }
+        
+        .world-card.admin { border-top: 4px solid var(--accent); }
+        .world-card.resident { border-top: 4px solid var(--neon-solid); }
+        .world-card.admin::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100px; background: linear-gradient(180deg, rgba(0, 240, 255, 0.05) 0%, transparent 100%); pointer-events: none; }
+        .world-card.resident::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100px; background: linear-gradient(180deg, rgba(45, 212, 191, 0.05) 0%, transparent 100%); pointer-events: none; }
+
+        /* Стилі для заголовка картки */
+        .world-header { display: flex; align-items: center; gap: 15px; margin-bottom: 25px; }
+        .world-header .world-icon { font-size: 2.2rem; margin: 0; }
+        .world-header .world-title { font-size: 1.6rem; font-weight: 900; color: var(--text-main); margin: 0; }
+        
+        /* Стилі для подвійних скріншотів (Ефект шарів) */
+        .world-image-wrapper { position: relative; width: 100%; height: 250px; margin-bottom: 30px; perspective: 1000px; }
+        .world-image-wrapper img { position: absolute; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 15px 30px rgba(0,0,0,0.5); object-fit: cover; object-position: top; transition: all 0.5s ease; }
+        
+        .img-back { top: 0; left: 0; width: 65%; height: 80%; opacity: 0.6; filter: blur(1px); z-index: 1; }
+        .img-front { bottom: 0; right: 0; width: 75%; height: 90%; z-index: 2; }
+        
+        .world-card:hover .img-back { opacity: 1; filter: blur(0); transform: translate(30%, 20%); z-index: 3; }
+        .world-card:hover .img-front { opacity: 0.4; filter: blur(2px); transform: translate(-20%, -10%); z-index: 1; }
+
+        /* Стилі для списку фіч */
+        .world-features { list-style: none; padding: 0; margin: 0; }
+        .world-features li { display: flex; align-items: flex-start; gap: 15px; margin-bottom: 20px; font-size: 1.05rem; color: var(--text-sec); line-height: 1.5; }
+        .world-features i { font-style: normal; font-size: 1.3rem; flex-shrink: 0; }
+        .admin .world-features i { color: var(--accent); }
+        .resident .world-features i { color: var(--neon-solid); }
+        .world-features b { color: var(--text-main); font-weight: 700; }
+
+        @media (max-width: 900px) {
+            .worlds-grid { grid-template-columns: 1fr; gap: 30px; }
+            .world-card { padding: 35px 25px; }
+            .world-title { font-size: 1.5rem; }
+            .two-worlds { padding: 60px 0; }
+        }
+		
+		/* --- СТИЛІ ДЛЯ ЗБІЛЬШЕННЯ КАРТИНОК (LIGHTBOX) --- */
+        .world-image-wrapper img { cursor: zoom-in; } /* Додаємо лупу при наведенні */
+        
+        .img-lightbox {
+            display: none; position: fixed; z-index: 999999;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: rgba(0, 0, 0, 0.85); backdrop-filter: blur(5px);
+            justify-content: center; align-items: center; cursor: zoom-out;
+            opacity: 0; transition: opacity 0.3s ease;
+        }
+        .img-lightbox.show { display: flex; opacity: 1; }
+        .img-lightbox img {
+            max-width: 90%; max-height: 90vh; border-radius: 12px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            transform: scale(0.8); transition: transform 0.3s ease;
+        }
+        .img-lightbox.show img { transform: scale(1); }
+		
+		/* --- БАНЕР ДОВІРИ --- */
+        .trust-banner-section { 
+            padding: 40px 0 80px 0; 
+            background: var(--bg-dark); 
+        }
+        .trust-banner-wrapper { 
+            width: 100%; 
+            border-radius: 20px; 
+            overflow: hidden; 
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4); 
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
+        .trust-banner-wrapper:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 60px rgba(0, 240, 255, 0.35); /* Неонове світіння при наведенні */
+        }
+        .trust-banner-wrapper img { 
+            width: 100%; 
+            height: auto; 
+            display: block; 
+        }
+		
+		/* --- ЦИФРОВА ДЕМОКРАТІЯ --- */
+        .democracy-section { padding: 100px 0; background: var(--bg-card); border-top: 1px solid var(--border-color); }
+        .democracy-inner { display: flex; align-items: center; gap: 60px; }
+        .democracy-content { flex: 1; max-width: 600px; }
+        
+        .democracy-content h2 { font-size: 2.5rem; font-weight: 900; margin-bottom: 25px; line-height: 1.2; text-transform: uppercase; }
+        .democracy-content h2 span { color: var(--accent); }
+        .democracy-content p { font-size: 1.15rem; color: var(--text-sec); margin-bottom: 35px; line-height: 1.6; }
+        
+        .democracy-list { list-style: none; padding: 0; margin: 0; }
+        .democracy-list li { position: relative; padding-left: 45px; margin-bottom: 25px; font-size: 1.1rem; color: var(--text-main); line-height: 1.5; }
+        .democracy-list li::before { content: '⚖️'; position: absolute; left: 0; top: -2px; font-size: 1.5rem; background: rgba(0, 240, 255, 0.1); width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 8px; }
+        .democracy-list li:nth-child(2)::before { content: '📊'; }
+        .democracy-list li:nth-child(3)::before { content: '🖨️'; }
+        .democracy-list strong { color: var(--accent); font-weight: 800; display: block; margin-bottom: 5px; }
+        
+        .democracy-media { flex: 1; position: relative; }
+        .democracy-media img { width: 100%; border-radius: 16px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); transition: transform 0.4s ease; cursor: zoom-in; }
+        .democracy-media img:hover { transform: scale(1.03); border-color: var(--accent); }
+
+        @media (max-width: 900px) {
+            .democracy-inner { flex-direction: column; }
+            .democracy-content { text-align: center; }
+            .democracy-list li { text-align: left; }
+            .democracy-content h2 { font-size: 2rem; }
+            .democracy-section { padding: 60px 0; }
+        }
+		/* Магія шарів для секції Демократії */
+        .democracy-media:hover .img-back { opacity: 1; filter: blur(0); transform: translate(25%, 15%); z-index: 3; }
+        .democracy-media:hover .img-front { opacity: 0.4; filter: blur(2px); transform: translate(-15%, -10%); z-index: 1; }
+		
+		/* --- ФІНАНСОВА МАГІЯ (МЗК ТА БОРГИ) --- */
+        .finance-section { padding: 100px 0; background: var(--bg-dark); } 
+        .finance-inner { display: flex; align-items: center; gap: 60px; flex-direction: row-reverse; } /* row-reverse ставить текст справа, а медіа зліва */
+        
+        .finance-content { flex: 1; max-width: 600px; }
+        .finance-content h2 { font-size: 2.5rem; font-weight: 900; margin-bottom: 25px; line-height: 1.2; text-transform: uppercase; }
+        .finance-content h2 span { color: var(--neon-solid); } /* Бірюзовий акцент для різноманітності */
+        .finance-content p { font-size: 1.15rem; color: var(--text-sec); margin-bottom: 35px; line-height: 1.6; }
+        
+        .finance-list { list-style: none; padding: 0; margin: 0; }
+        .finance-list li { position: relative; padding-left: 45px; margin-bottom: 25px; font-size: 1.1rem; color: var(--text-main); line-height: 1.5; }
+        .finance-list li::before { content: '🧮'; position: absolute; left: 0; top: -2px; font-size: 1.5rem; background: rgba(45, 212, 191, 0.1); width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 8px; }
+        .finance-list li:nth-child(2)::before { content: '📉'; }
+        .finance-list li:nth-child(3)::before { content: '⚡'; }
+        .finance-list strong { color: var(--neon-solid); font-weight: 800; display: block; margin-bottom: 5px; }
+        
+        .finance-media { flex: 1; position: relative; }
+
+        @media (max-width: 900px) {
+            .finance-inner { flex-direction: column; }
+            .finance-content { text-align: center; }
+            .finance-list li { text-align: left; }
+            .finance-content h2 { font-size: 2rem; }
+            .finance-section { padding: 60px 0; }
+        }
+		
+		/* --- COMMUNITY HUB (ЧАТ БУДИНКУ) --- */
+        .community-section { padding: 100px 0; background: var(--bg-card); border-top: 1px solid var(--border-color); }
+        .community-inner { display: flex; align-items: center; gap: 60px; } /* Текст зліва, медіа справа */
+        
+        .community-content { flex: 1; max-width: 600px; }
+        .community-content h2 { font-size: 2.5rem; font-weight: 900; margin-bottom: 25px; line-height: 1.2; text-transform: uppercase; }
+        .community-content h2 span { color: var(--accent); }
+        .community-content p { font-size: 1.15rem; color: var(--text-sec); margin-bottom: 35px; line-height: 1.6; }
+        
+        .community-list { list-style: none; padding: 0; margin: 0; }
+        .community-list li { position: relative; padding-left: 45px; margin-bottom: 25px; font-size: 1.1rem; color: var(--text-main); line-height: 1.5; }
+        .community-list li::before { content: '💬'; position: absolute; left: 0; top: -2px; font-size: 1.5rem; background: rgba(0, 240, 255, 0.1); width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 8px; }
+        .community-list li:nth-child(2)::before { content: '📢'; }
+        .community-list li:nth-child(3)::before { content: '🛡️'; }
+        .community-list strong { color: var(--accent); font-weight: 800; display: block; margin-bottom: 5px; }
+        
+        .community-media { flex: 1; position: relative; }
+
+        @media (max-width: 900px) {
+            .community-inner { flex-direction: column; }
+            .community-content { text-align: center; }
+            .community-list li { text-align: left; }
+            .community-content h2 { font-size: 2rem; }
+            .community-section { padding: 60px 0; }
+        }
+		
+		/* --- Стилі для одинарних скріншотів (МЗК та Чат) --- */
+        .single-image-wrapper {
+            width: 100%;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+            transition: transform 0.4s ease;
+        }
+        .single-image-wrapper img {
+            width: 100%;
+            height: auto;
+            display: block;
+            cursor: zoom-in; /* Лупа при наведенні */
+            transition: transform 0.4s ease;
+        }
+        .single-image-wrapper:hover img {
+            transform: scale(1.03); /* Легке наближення */
+        }
+		
+		/* --- ЯК ЦЕ ПРАЦЮЄ (3 КРОКИ) --- */
+        .steps-section { padding: 100px 0; background: var(--bg-dark); text-align: center; }
+        .steps-section .section-title { margin-bottom: 60px; font-size: 2.5rem; font-weight: 900; text-transform: uppercase; }
+        .steps-section .section-title span { color: var(--accent); }
+        
+        .steps-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; position: relative; }
+        
+        /* Лінія, що з'єднує кроки на ПК */
+        .steps-grid::before { 
+            content: ''; position: absolute; top: 40px; left: 15%; right: 15%; 
+            height: 2px; background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.3), transparent); z-index: 1; 
+        }
+        
+        .step-card { background: var(--bg-card); padding: 40px 30px; border-radius: 20px; border: 1px solid var(--border-color); position: relative; z-index: 2; transition: transform 0.3s; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .step-card:hover { transform: translateY(-5px); border-color: var(--accent); }
+        
+        .step-number { 
+            width: 70px; height: 70px; background: var(--bg-dark); border: 2px solid var(--accent); 
+            color: var(--accent); border-radius: 50%; display: flex; justify-content: center; align-items: center; 
+            font-size: 1.8rem; font-weight: 900; margin: 0 auto 25px auto; box-shadow: 0 0 20px rgba(0,240,255,0.15); 
+        }
+        
+        .step-title { font-size: 1.4rem; font-weight: 800; margin-bottom: 15px; color: var(--text-main); }
+        .step-desc { font-size: 1.05rem; color: var(--text-sec); line-height: 1.6; }
+
+        @media (max-width: 900px) {
+            .steps-grid { grid-template-columns: 1fr; gap: 20px; }
+            .steps-grid::before { display: none; } /* Ховаємо лінію на мобільному */
+            .steps-section { padding: 60px 0; }
+        }
+		
+		/* --- ТАРИФИ --- */
+        .pricing-section { padding: 100px 0; background: var(--bg-card); text-align: center; border-top: 1px solid var(--border-color); }
+        .pricing-section .section-title { font-size: 2.5rem; font-weight: 900; margin-bottom: 20px; text-transform: uppercase; }
+        .pricing-section .section-title span { color: var(--accent); }
+        .pricing-subtitle { color: var(--text-sec); font-size: 1.2rem; margin-bottom: 60px; }
+        
+        .pricing-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 40px; max-width: 900px; margin: 0 auto; }
+        
+        .price-card { display: flex; flex-direction: column; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 24px; padding: 40px 30px; transition: transform 0.4s, box-shadow 0.4s; position: relative; overflow: hidden; }
+        .price-card:hover { transform: translateY(-10px); border-color: var(--accent); }
+        .price-card.popular { border-color: var(--accent); box-shadow: 0 10px 40px rgba(0, 240, 255, 0.15); }
+        .price-card.popular::before { content: 'Найпопулярніший'; position: absolute; top: 25px; right: -45px; background: var(--accent); color: #000; font-weight: 800; font-size: 0.85rem; padding: 8px 50px; transform: rotate(45deg); text-transform: uppercase; letter-spacing: 1px; }
+        
+        .price-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 15px; color: var(--text-main); text-transform: uppercase; }
+        .price-value { font-size: 3rem; font-weight: 900; color: var(--text-main); margin-bottom: 25px; line-height: 1; }
+        .price-value span { font-size: 1rem; color: var(--text-sec); font-weight: 500; display: block; margin-top: 10px; text-transform: lowercase; }
+        
+        .price-features { list-style: none; padding: 0; margin: 0 0 30px 0; text-align: left; flex: 1; }
+        .price-features li { margin-bottom: 15px; font-size: 1.05rem; color: var(--text-sec); display: flex; align-items: flex-start; gap: 12px; line-height: 1.4; }
+        .price-features li::before { content: '✔'; color: var(--accent); font-weight: bold; font-size: 1.2rem; }
+        
+        .btn-price { display: block; width: 100%; padding: 15px; border-radius: 12px; background: var(--accent); color: #000; font-size: 1rem; font-weight: 800; text-decoration: none; transition: 0.3s; cursor: pointer; text-transform: uppercase; text-align: center; margin-top: auto; }
+        .btn-price:hover { box-shadow: 0 0 25px rgba(0, 240, 255, 0.4); transform: scale(1.02); }
+        .btn-outline { background: transparent; border: 2px solid var(--accent); color: #fff; }
+        .btn-outline:hover { background: var(--accent); color: #000; }
+
+        /* Стилі для калькулятора */
+        .calc-box { background: rgba(0,0,0,0.3); padding: 25px 15px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 25px; }
+        #obj-range { -webkit-appearance: none; width: 100%; background: transparent; margin: 15px 0; }
+        #obj-range::-webkit-slider-runnable-track { width: 100%; height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 4px; cursor: pointer; }
+        #obj-range::-webkit-slider-thumb { -webkit-appearance: none; height: 24px; width: 24px; border-radius: 50%; background: var(--accent); cursor: pointer; margin-top: -9px; box-shadow: 0 0 15px rgba(0, 240, 255, 0.8); }
+
+        @media (max-width: 900px) {
+            .pricing-cards { grid-template-columns: 1fr; max-width: 450px; margin: 0 auto; }
+        }
+
+        /* --- ФУТЕР (ПІДВАЛ) --- */
+        .footer { background: #070b14; padding: 70px 0 30px; border-top: 1px solid rgba(255,255,255,0.05); }
+        .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 50px; margin-bottom: 50px; }
+        .footer-logo { font-size: 1.8rem; font-weight: 900; color: #fff; text-decoration: none; display: flex; align-items: center; gap: 15px; margin-bottom: 25px; letter-spacing: 1px; }
+        .footer-logo img { height: 45px; }
+        .footer-desc { color: var(--text-sec); line-height: 1.7; max-width: 400px; font-size: 1.05rem; }
+        
+        .footer-title { color: #fff; font-size: 1.2rem; font-weight: 800; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 1px; }
+        .footer-links { list-style: none; padding: 0; margin: 0; }
+        .footer-links li { margin-bottom: 15px; }
+        .footer-links a { color: var(--text-sec); text-decoration: none; transition: 0.3s; font-size: 1.05rem; }
+        .footer-links a:hover { color: var(--accent); padding-left: 8px; }
+        
+        .footer-bottom { text-align: center; padding-top: 30px; border-top: 1px solid rgba(255,255,255,0.05); color: rgba(255,255,255,0.4); font-size: 0.95rem; }
+
+        @media (max-width: 900px) {
+            .footer-grid { grid-template-columns: 1fr; text-align: center; }
+            .footer-desc { margin: 0 auto; }
+            .footer-logo { justify-content: center; }
+        }
+    </style>	
 </head>
 <body>
 
@@ -144,26 +395,27 @@
                 </div>
             </a>
             <div class="nav-right-group">
-                <div class="lang-switch">
-                    <span class="lang-link active" onclick="setLanguage('uk')">UA</span>
-                    <span class="lang-link" onclick="setLanguage('en')">EN</span>
-                    <span class="lang-link" onclick="setLanguage('pl')">PL</span>
-                    <span class="lang-link" onclick="setLanguage('de')">DE</span>
-                    <span class="lang-link" onclick="setLanguage('es')">ES</span>
-                    <span class="lang-link" onclick="setLanguage('fr')">FR</span>
-                </div>
-                <div id="theme-toggle" style="cursor:pointer; font-size:1.3rem;">🌙</div>
-                <a href="#" onclick="loginDirectly(); return false;" class="btn-login" data-i18n="btnLogin">Увійти</a>
+            <div class="lang-switch">
+                <span class="lang-link active" onclick="setLanguage('uk')">UA</span>
+                <span class="lang-link" onclick="setLanguage('en')">EN</span>
+                <span class="lang-link" onclick="setLanguage('pl')">PL</span>
+                <span class="lang-link" onclick="setLanguage('de')">DE</span>
+                <span class="lang-link" onclick="setLanguage('es')">ES</span>
+                <span class="lang-link" onclick="setLanguage('fr')">FR</span>
             </div>
+            <div id="theme-toggle" style="cursor:pointer; font-size:1.3rem;">🌙</div>
+            <a href="#" onclick="loginDirectly(); return false;" class="btn-login">УВІЙТИ</a>
+        </div> 
         </div>
     </header>
 
     <section class="hero">
         <div class="container hero-inner">
             <div class="hero-content">
-                <h1 data-i18n="heroTitle">Цифровий облік <br><span>без паперів та нервів</span></h1>
-                <p data-i18n="heroDesc">Професійна система для ОСББ та орендодавців. Точність у кожній цифрі.</p>
-                <a href="#" onclick="loginDirectly(); return false;" class="btn-main" data-i18n="heroBtn">Спробувати 45 днів безкоштовно</a>
+                <div class="hero-badge">Property Management 2.0</div>
+                <h1 data-i18n="heroTitle">Оцифруйте своє ОСББ чи оренду <br><span>за 1 день</span></h1>
+                <p data-i18n="heroDesc">Повноцінна екосистема: від автоматичного розрахунку МЗК до легітимних онлайн-голосувань та прозорих оплат. Все в одному кабінеті.</p>
+                <a href="#" onclick="loginDirectly(); return false;" class="btn-main">Спробувати 45 днів безкоштовно</a>
             </div>
             <div class="hero-media">
                 <video class="hero-video" autoplay muted loop playsinline>
@@ -172,150 +424,479 @@
             </div>
         </div>
     </section>
+	
+	<section class="two-worlds">
+        <div class="container">
+            <h2 class="section-title" style="text-align: center; font-size: 2.5rem; font-weight: 900; text-transform: uppercase;">Єдина екосистема.<br><span>Два зручних кабінети.</span></h2>
+            <p class="section-subtitle">Ми створили ідеальні інструменти як для тих, хто керує нерухомістю, так і для тих, хто в ній проживає.</p>
 
-    <section id="features" class="container" style="padding: 60px 0 100px 0;">
-        <h2 class="section-title" data-i18n="featuresTitle">Ваш персональний <span>цифровий помічник</span></h2>
-        <div class="grid-3">
-            <div class="card"><span class="card-icon">✈️</span><h3 data-i18n="f1Title">Telegram Розсилка</h3><p data-i18n="f1Desc">Квитанції та нагадування прямо в месенджер мешканцям.</p></div>
-            <div class="card"><span class="card-icon">📂</span><h3 data-i18n="f2Title">Розумний Архів</h3><p data-i18n="f2Desc">Повна історія платежів та показників за будь-який місяць.</p></div>
-            <div class="card"><span class="card-icon">🧮</span><h3 data-i18n="f3Title">Авто-розрахунок МЗК</h3><p data-i18n="f3Desc">Справедливий розподіл загальнобудинкових витрат.</p></div>
-            <div class="card"><span class="card-icon">📊</span><h3 data-i18n="f4Title">Звіти в Excel/PDF</h3><p data-i18n="f4Desc">Детальні відомості для бухгалтера та мешканців.</p></div>
-            <div class="card"><span class="card-icon">🔌</span><h3 data-i18n="f5Title">100% Автономність</h3><p data-i18n="f5Desc">Працює в браузері навіть без стабільного інтернету.</p></div>
-            <div class="card"><span class="card-icon">📉</span><h3 data-i18n="f6Title">Контроль Боргів</h3><p data-i18n="f6Desc">Автоматичне додавання боргів та переплат до нових чеків.</p></div>
-            <div class="card"><span class="card-icon">⚡</span><h3 data-i18n="f7Title">Багатотарифний Облік</h3><p data-i18n="f7Desc">День/Ніч для електрики та будь-які кастомні послуги.</p></div>
-            <div class="card"><span class="card-icon">🛡️</span><h3 data-i18n="f8Title">Приватність Даних</h3><p data-i18n="f8Desc">Тільки ви контролюєте свою базу та бекапи.</p></div>
-            <div class="card"><span class="card-icon">🗓️</span><h3 data-i18n="f9Title">Закриття Місяця</h3><p data-i18n="f9Desc">В один клік перенос показників на новий період.</p></div>
+            <div class="worlds-grid">
+                
+                <div class="world-card admin">
+                    <div class="world-header">
+                        <div class="world-icon">🏢</div>
+                        <h3 class="world-title">Кабінет Керуючого</h3>
+                    </div>
+                    <div class="world-image-wrapper">
+                        <img src="screen-admin-1.png" alt="Дашборд" class="img-back">
+                        <img src="screen-admin-2.png" alt="Аналітика" class="img-front">
+                    </div>
+                    <ul class="world-features">
+                        <li><i>✔</i> <div><b>Глибока аналітика:</b> Візуалізація доходів, витрат та моніторинг заборгованостей у реальному часі.</div></li>
+                        <li><i>✔</i> <div><b>Делегування доступу:</b> Дайте бухгалтеру права на фінанси, а консьєржу — тільки на перегляд бази.</div></li>
+                        <li><i>✔</i> <div><b>Авто-розподіл МЗК:</b> Інтелектуальний алгоритм сам розкидає витрати на загальне освітлення та опалення.</div></li>
+                        <li><i>✔</i> <div><b>Розсилка в 1 клік:</b> Миттєва відправка рахунків через Telegram. Більше ніяких роздрукованих папірців.</div></li>
+                    </ul>
+                </div>
+
+                <div class="world-card resident">
+                    <div class="world-header">
+                        <div class="world-icon">📱</div>
+                        <h3 class="world-title">Кабінет Мешканця</h3>
+                    </div>
+                    <div class="world-image-wrapper">
+                        <img src="screen-resident-1.png" alt="Показники" class="img-back">
+                        <img src="screen-resident-2.png" alt="Квитанція" class="img-front">
+                    </div>
+                    <ul class="world-features">
+                        <li><i>✔</i> <div><b>Подача показників без помилок:</b> Система валідує дані (не дозволить ввести менше попереднього).</div></li>
+                        <li><i>✔</i> <div><b>Персональна статистика:</b> Графіки споживання та анонімне порівняння з «середнім чеком» по будинку.</div></li>
+                        <li><i>✔</i> <div><b>Розумний архів:</b> Всі квитанції та оплати зберігаються в хмарі. Знайдіть будь-який чек за 2 секунди.</div></li>
+                        <li><i>✔</i> <div><b>Оплата в один клік:</b> Інтеграція Apple Pay та Google Pay для миттєвих розрахунків прямо з телефону.</div></li>
+                    </ul>
+                </div>
+
+            </div>
         </div>
     </section>
-
-    <section id="pricing" style="background: var(--bg-card); padding: 80px 0;">
+	
+	<section class="trust-banner-section">
         <div class="container">
-            <h2 class="section-title" data-i18n="pricingTitle">Прозорі <span>Тарифи</span></h2>
-            <div class="grid-3">
+            <div class="trust-banner-wrapper">
+                <img src="banner.png" alt="Цифровий облік чесних розрахунків">
+            </div>
+        </div>
+    </section>
+	
+	<section class="democracy-section">
+        <div class="container democracy-inner">
+            <div class="democracy-content">
+                <div class="hero-badge" style="margin-bottom: 15px;">Smart ОСББ</div>
+                <h2>Цифрова Демократія <br><span>Без зборів у дворі</span></h2>
+                <p>Проводьте легітимні голосування прямо в системі. Забудьте про ходіння по квартирах, зіпсовані бланки та крики на зборах.</p>
+                
+                <ul class="democracy-list">
+                    <li>
+                        <strong>Юридична точність</strong>
+                        Голоси рахуються автоматично пропорційно площі нерухомості або кількості власників згідно з законом.
+                    </li>
+                    <li>
+                        <strong>Прозорі результати</strong>
+                        Мешканці бачать хід голосування в реальному часі. Жодних маніпуляцій чи загублених голосів.
+                    </li>
+                    <li>
+                        <strong>Автоматичний протокол</strong>
+                        Після завершення опитування система сама генерує готовий до підпису протокол. Економія тижнів роботи!
+                    </li>
+                </ul>
+            </div>
+            <div class="democracy-media">
+                    <div class="world-image-wrapper" style="margin: 0; height: 350px;">
+                        <img src="screen-vote-1.png" alt="Модуль голосування" class="img-back">
+                        <img src="screen-vote-2.png" alt="Готовий протокол" class="img-front">
+                    </div>
+                </div>
+        </div>
+    </section>
+	
+	<section class="finance-section">
+        <div class="container finance-inner">
+            <div class="finance-content">
+                <div class="hero-badge" style="margin-bottom: 15px; color: var(--neon-solid); border-color: rgba(45, 212, 191, 0.3); background: rgba(45, 212, 191, 0.1);">Smart Фінанси</div>
+                <h2>Фінансова магія <br><span>МЗК та Борги</span></h2>
+                <p>Більше ніяких складних таблиць в Excel. Система автоматично зводить баланс будинку і формує ідеальні квитанції.</p>
+                
+                <ul class="finance-list">
+                    <li>
+                        <strong>Авто-розподіл МЗК</strong>
+                        Справедливий розподіл витрат на освітлення під’їздів, ліфти та опалення холів за заданими вами правилами.
+                    </li>
+                    <li>
+                        <strong>Контроль боргів та переплат</strong>
+                        Алгоритм автоматично враховує залишки з минулого місяця та переносить їх у нові рахунки.
+                    </li>
+                    <li>
+                        <strong>Багатотарифний облік</strong>
+                        Підтримка тарифів "День/Ніч" для електрики та налаштування будь-яких кастомних послуг (наприклад, охорона чи паркінг).
+                    </li>
+                </ul>
+            </div>
+            <div class="finance-media">
+                    <div class="single-image-wrapper">
+                    <img src="screen-finance.png" alt="Фінансова аналітика та МЗК">
+                </div>
+            </div>
+        </div>
+    </section>
+	
+	<section class="community-section">
+        <div class="container community-inner">
+            <div class="community-content">
+                <div class="hero-badge" style="margin-bottom: 15px;">Smart Комунікація</div>
+                <h2>Офіційний чат <br><span>Без спаму у Viber</span></h2>
+                <p>Єдиний контрольований простір для спілкування сусідів. Ніякого флуду, листівок на свята та нескінченних суперечок.</p>
+                
+                <ul class="community-list">
+                    <li>
+                        <strong>Офіційний канал</strong>
+                        Прямий зв'язок «Керуючий — Мешканці». Публікуйте важливі оголошення про відключення води чи ремонтні роботи.
+                    </li>
+                    <li>
+                        <strong>Тематичні гілки</strong>
+                        Створюйте окремі обговорення для ініціативних груп (наприклад, «Озеленення двору» або «Відеоспостереження»).
+                    </li>
+                    <li>
+                        <strong>Повна модерація</strong>
+                        Керуючий повністю контролює простір. Можливість видаляти спам та керувати доступом зберігає нерви всім.
+                    </li>
+                </ul>
+            </div>
+            <div class="community-media">
+                <div class="single-image-wrapper">
+                    <img src="screen-chat.png" alt="Чат будинку">
+                </div>
+            </div>
+        </div>
+    </section>
+	
+	<section class="steps-section">
+        <div class="container">
+            <h2 class="section-title">Швидкий старт за <span>3 кроки</span></h2>
+            
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <h3 class="step-title">Реєстрація будинку</h3>
+                    <p class="step-desc">Створіть профіль вашого ОСББ, налаштуйте структуру будинку та завантажте базу квартир у пару кліків.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <h3 class="step-title">Запрошення мешканців</h3>
+                    <p class="step-desc">Згенеруйте посилання-запрошення. Мешканці самі реєструються і прив'язуються до своєї нерухомості.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <h3 class="step-title">Прозорий облік</h3>
+                    <p class="step-desc">Система автоматично розраховує тарифи, збирає показники та приймає оплати на ваш рахунок.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+	
+	<section class="pricing-section">
+        <div class="container">
+            <h2 class="section-title">Прозорі <span>Тарифи</span></h2>
+            <p class="pricing-subtitle">Гнучка система знижок: чим більше квартир, тим дешевше.</p>
+            
+            <div class="pricing-cards">
                 <div class="price-card">
-                    <h3 data-i18n="p1Name">TEST DRIVE</h3>
-                    <div class="price">0 <span data-i18n="currency">грн</span></div>
-                    <p style="color:var(--text-sec); flex:1;" data-i18n="p1_1">Спробуйте всі функції PRO безкоштовно протягом 45 днів.</p>
-                    <a href="#" onclick="loginDirectly(); return false;" class="btn-login" style="margin-top:20px; display:inline-block;" data-i18n="btnTry">Почати тест</a>
+                    <h3 class="price-title">Test Drive</h3>
+                    <div class="price-value">0 <span>грн</span></div>
+                    <ul class="price-features">
+                        <li>Спробуйте всі функції PRO</li>
+                        <li>Безкоштовно протягом 45 днів</li>
+                        <li>Без прив'язки банківської картки</li>
+                    </ul>
+                    <a href="#" onclick="loginDirectly(); return false;" class="btn-price btn-outline">Спробувати</a>
                 </div>
 
                 <div class="price-card popular">
-                    <div style="background:var(--accent); color:#000; font-size:11px; font-weight:900; padding:6px 12px; border-radius:6px; position:absolute; top:-15px; left:50%; transform:translateX(-50%);" data-i18n="badgeHit">НАЙКРАЩИЙ ВИБІР</div>
-                    <h3 data-i18n="p2Name">PRO ПЛАН</h3>
+                    <h3 class="price-title">PRO План</h3>
                     <div class="calc-box">
-                        <div id="obj-count" style="font-weight:900; font-size:1.2rem; margin-bottom:12px; color:var(--accent);">10 квартир</div>
+                        <div id="obj-count" style="font-weight: 900; font-size: 1.2rem; color: var(--accent); margin-bottom: 5px;">10 квартир</div>
                         <input type="range" id="obj-range" min="1" max="100" value="10">
-                        <div class="price" id="price-res">250</div>
-                        <div id="calc-curr-label" style="font-size:0.9rem; color:var(--text-sec); font-weight:600;">грн / місяць</div>
+                        <div style="display:flex; align-items: baseline; justify-content: center; gap: 8px; margin-top: 10px;">
+                            <div id="price-res" class="price-value" style="margin-bottom:0; font-size: 3.5rem;">250</div>
+                            <div style="color:var(--text-sec); font-weight:600;">грн / міс</div>
+                        </div>
                     </div>
-                    <a href="app/index.html" class="btn-main" data-i18n="btnPlan">Обрати план</a>
-                </div>
-
-                <div class="price-card">
-                    <h3 data-i18n="p3Name">VIP / LIFETIME</h3>
-                    <div class="price" id="vip-price">4900 грн</div>
-                    <p style="color:var(--text-sec); flex:1;" data-i18n="p3_3">Оплата один раз. Доступ назавжди без обмежень та підписок.</p>
-                    <a href="mailto:support@comunalco.com" class="btn-login" style="margin-top:20px; display:inline-block;" data-i18n="btnOrder">Замовити</a>
+                    <ul class="price-features">
+                        <li>Мобільний кабінет мешканця</li>
+                        <li>Авто-розподіл МЗК</li>
+                        <li>Легітимне онлайн-голосування</li>
+                        <li>Офіційний чат та Apple Pay</li>
+                    </ul>
+                    <a href="#" onclick="loginDirectly(); return false;" class="btn-price">Обрати план</a>
                 </div>
             </div>
         </div>
     </section>
 
-    <footer>
+    <footer class="footer">
         <div class="container">
-            <div class="footer-links">
-                <a href="terms.html" style="color:var(--accent); text-decoration:none;">Terms</a>
-                <a href="privacy.html" style="color:var(--accent); text-decoration:none;">Privacy</a>
-                <a href="mailto:support@comunalco.com" style="text-decoration:none; color:var(--text-sec);">support@comunalco.com</a>
+            <div class="footer-grid">
+                <div>
+                    <a href="#" class="footer-logo">
+                        <img src="logo.png" alt="Comunalco Logo"> 
+                        COMUNALCO
+                    </a>
+                    <p class="footer-desc">Property Management 2.0. Повноцінна екосистема для сучасного управління нерухомістю, що об'єднує керуючих та мешканців у єдиному зручному просторі.</p>
+                </div>
+                
+                <div>
+                    <h4 class="footer-title">Продукт</h4>
+                    <ul class="footer-links">
+                        <li><a href="#features">Можливості</a></li>
+                        <li><a href="#pricing">Тарифи</a></li>
+                        <li><a href="terms.html" id="link-terms" target="_blank">Умови використання</a></li>
+                        <li><a href="offer.html" id="link-offer" target="_blank">Договір оферти</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="footer-title">Контакти</h4>
+                    <ul class="footer-links">
+                        <li><a href="mailto:support@comunalco.com">support@comunalco.com</a></li>
+                        <li><a href="https://t.me/comunalco" target="_blank">Telegram Підтримка</a></li>
+                    </ul>
+                </div>
             </div>
-            <p>© 2026 Comunalco.com. <span data-i18n="footer">Всі права захищені.</span></p>
+            
+            <div class="footer-bottom">
+                &copy; 2026 Comunalco. Всі права захищені.
+            </div>
         </div>
     </footer>
 
-    <script>
-        const translations = {
-            uk: {
-                logoTop: "Комуналк", logoBot: "Облік", btnLogin: "Увійти", heroTitle: "Цифровий облік <br><span>без паперів та нервів</span>", heroDesc: "Найзручніша система для ОСББ та орендодавців. Точність у кожній цифрі.", heroBtn: "Спробувати 45 днів безкоштовно", featuresTitle: "Ваш персональний <span>цифровий помічник</span>", f1Title: "Telegram Розсилка", f1Desc: "Квитанції та нагадування прямо в месенджер мешканцям.", f2Title: "Розумний Архів", f2Desc: "Повна історія платежів та показників за будь-який місяць.", f3Title: "Авто-розрахунок МЗК", f3Desc: "Справедливий розподіл загальнобудинкових витрат.", f4Title: "Звіти в Excel/PDF", f4Desc: "Детальні відомості для бухгалтера та мешканців.", f5Title: "100% Автономність", f5Desc: "Працює в браузері навіть без стабільного інтернету.", f6Title: "Контроль Боргів", f6Desc: "Автоматичне додавання боргів та переплат до нових чеків.", f7Title: "Багатотарифний Облік", f7Desc: "День/Ніч для електрики та будь-які кастомні послуги.", f8Title: "Приватність Даних", f8Desc: "Тільки ви контролюєте свою базу та бекапи.", f9Title: "Закриття Місяця", f9Desc: "В один клік перенос показників на новий період.", pricingTitle: "Прозорі <span>Тарифи</span>", p1Name: "TEST DRIVE", p1_1: "Спробуйте всі функції PRO безкоштовно протягом 45 днів.", btnTry: "Почати тест", badgeHit: "НАЙКРАЩИЙ ВИБІР", p2Name: "PRO ПЛАН", btnPlan: "Обрати план", p3Name: "VIP / LIFETIME", p3_3: "Оплата один раз. Доступ назавжди без обмежень та підписок.", btnOrder: "Замовити", footer: "Всі права захищені.", calcDynText: "{val} квартир", currency: "грн"
-            },
-            en: {
-                logoTop: "Smart", logoBot: "Billing", btnLogin: "Login", heroTitle: "Smart Utility <br><span>Billing</span>", heroDesc: "The most convenient system for HOAs and landlords. Precision in every digit.", heroBtn: "Try 45 days for free", featuresTitle: "Your personal <span>digital assistant</span>", f1Title: "Telegram Broadcast", f1Desc: "Receipts and reminders directly to residents' messenger.", f2Title: "Smart Archive", f2Desc: "Full payment history for any month.", f3Title: "Auto-calc Common Areas", f3Desc: "Fair distribution of common area expenses.", f4Title: "Excel/PDF Reports", f4Desc: "Detailed reports for accountants and tenants.", f5Title: "100% Offline", f5Desc: "Works in browser without stable internet.", f6Title: "Debt Control", f6Desc: "Automatic debt and overpayment adjustment.", f7Title: "Multi-tariff Support", f7Desc: "Day/Night electricity and any custom services.", f8Title: "Data Privacy", f8Desc: "You control your database and backups.", f9Title: "Month Closing", f9Desc: "One-click transition to the next period.", pricingTitle: "Transparent <span>Pricing</span>", p1Name: "TEST DRIVE", p1_1: "Try all PRO features for free for 45 days.", btnTry: "Start Trial", badgeHit: "BEST CHOICE", p2Name: "PRO PLAN", btnPlan: "Choose Plan", p3Name: "VIP / LIFETIME", p3_3: "One-time payment. Lifetime access without limits.", btnOrder: "Order Now", footer: "All rights reserved.", calcDynText: "{val} units", currency: "$"
-            },
-            pl: {
-                logoTop: "Smart", logoBot: "Rozliczenia", btnLogin: "Zaloguj", heroTitle: "Cyfrowe Rozliczenia <br><span>Bez Stresu</span>", heroDesc: "Najwygodniejszy system dla wspólnot i wynajmujących.", heroBtn: "Wypróbuj 45 dni za darmo", featuresTitle: "Twój Osobisty <span>Asystent</span>", f1Title: "Wysyłka Telegram", f1Desc: "Rachunki i przypomnienia bezpośrednio do mieszkańców.", f2Title: "Inteligentne Archiwum", f2Desc: "Pełna historia płatności z każdego miesiąca.", f3Title: "Auto-rozliczenie MZA", f3Desc: "Sprawiedliwy podział kosztów ogólnobudynkowych.", f4Title: "Raporty Excel/PDF", f4Desc: "Szczegółowe zestawienia dla księgowości.", f5Title: "100% Offline", f5Desc: "Działa w przeglądarce nawet bez internetu.", f6Title: "Kontrola Długów", f6Desc: "Automatyczne doliczanie długów i nadpłat.", f7Title: "Wiele Taryf", f7Desc: "Prąd Dzień/Noc i dowolne usługi niestandardowe.", f8Title: "Prywatność", f8Desc: "Ty kontrolujesz swoją bazę danych.", f9Title: "Zamknięcie Miesiąca", f9Desc: "Jedno kliknięcie przenosi dane na nowy okres.", pricingTitle: "Jasne <span>Ceny</span>", p1Name: "TEST DRIVE", p1_1: "Wypróbuj wszystkie funkcje PRO za darmo przez 45 dni.", btnTry: "Rozpocznij test", badgeHit: "NAJLEPSZY WYBÓR", p2Name: "PLAN PRO", btnPlan: "Wybierz plan", p3Name: "VIP / NA ZAWSZE", p3_3: "Płatność jednorazowa. Dożywotni dostęp bez limitów.", btnOrder: "Zamów", footer: "Wszelkie prawa zastrzeżone.", calcDynText: "{val} lokali", currency: "$"
-            },
-            de: {
-                logoTop: "Smart", logoBot: "Abrechnung", btnLogin: "Login", heroTitle: "Digitale Abrechnung <br><span>Stressfrei</span>", heroDesc: "Das bequemste System für Vermieter und Hausverwaltungen.", heroBtn: "45 Tage kostenlos testen", featuresTitle: "Ihr digitaler <span>Assistent</span>", f1Title: "Telegram-Versand", f1Desc: "Rechnungen und Mahnungen direkt an die Bewohner.", f2Title: "Intelligentes Archiv", f2Desc: "Vollständige Zahlungshistorie für jeden Monat.", f3Title: "Nebenkosten-Verteilung", f3Desc: "Gerechte Verteilung der Gemeinschaftskosten.", f4Title: "Excel/PDF Berichte", f4Desc: "Detaillierte Berichte für Buchhaltung und Mieter.", f5Title: "100% Offline", f5Desc: "Funktioniert im Browser ohne stabiles Internet.", f6Title: "Schuldenkontrolle", f6Desc: "Automatische Verrechnung von Schulden.", f7Title: "Mehrtarif-Support", f7Desc: "Tag/Nacht-Strom und eigene Dienstleistungen.", f8Title: "Datenschutz", f8Desc: "Sie kontrollieren Ihre Datenbank und Backups.", f9Title: "Monatsabschluss", f9Desc: "Ein Klick für den Übergang zum nächsten Zeitraum.", pricingTitle: "Klare <span>Preise</span>", p1Name: "TEST DRIVE", p1_1: "Testen Sie alle PRO-Funktionen 45 Tage lang kostenlos.", btnTry: "Test starten", badgeHit: "BESTE WAHL", p2Name: "PRO PLAN", btnPlan: "Plan wählen", p3Name: "VIP / LIFETIME", p3_3: "Einmalzahlung. Lebenslanger Zugriff ohne Limits.", btnOrder: "Bestellen", footer: "Alle Rechte vorbehalten.", calcDynText: "{val} Einheiten", currency: "$"
-            },
-            es: {
-                logoTop: "Gestión", logoBot: "Digital", btnLogin: "Entrar", heroTitle: "Gestión Digital <br><span>Sin Estrés</span>", heroDesc: "El sistema más cómodo para propietarios y comunidades.", heroBtn: "Probar 45 días gratis", featuresTitle: "Tu Asistente <span>Digital</span>", f1Title: "Envío Telegram", f1Desc: "Recibos y recordatorios directamente a los vecinos.", f2Title: "Archivo Inteligente", f2Desc: "Historial completo de pagos de cualquier mes.", f3Title: "Reparto de Gastos", f3Desc: "Distribución justa de los gastos comunes.", f4Title: "Informes Excel/PDF", f4Desc: "Informes detallados para contabilidad.", f5Title: "100% Offline", f5Desc: "Funciona en el navegador sin internet estable.", f6Title: "Control de Deudas", f6Desc: "Ajuste automático de deudas y pagos.", f7Title: "Multitarifa", f7Desc: "Electricidad Día/Noche y servicios personalizados.", f8Title: "Privacidad", f8Desc: "Tú controlas tu base de datos y copias.", f9Title: "Cierre de Mes", f9Desc: "Un clic para pasar al siguiente periodo.", pricingTitle: "Precios <span>Transparentes</span>", p1Name: "TEST DRIVE", p1_1: "Prueba todas las funciones PRO gratis durante 45 días.", btnTry: "Iniciar test", badgeHit: "MEJOR OPCIÓN", p2Name: "PLAN PRO", btnPlan: "Elegir plan", p3Name: "VIP / POR VIDA", p3_3: "Pago único. Acceso de por vida sin límites.", btnOrder: "Pedir", footer: "Todos los derechos reservados.", calcDynText: "{val} unidades", currency: "$"
-            },
-            fr: {
-                logoTop: "Gest", logoBot: "Numérique", btnLogin: "Connexion", heroTitle: "Facturation Numérique <br><span>Sans Stress</span>", heroDesc: "Le système le plus pratique pour les bailleurs et copropriétés.", heroBtn: "Essai gratuit 45 jours", featuresTitle: "Votre Assistant <span>Digital</span>", f1Title: "Envoi Telegram", f1Desc: "Quittances et rappels directement aux résidents.", f2Title: "Archives Intelligentes", f2Desc: "Historique complet des paiements mensuels.", f3Title: "Répartition des Charges", f3Desc: "Distribution équitable des frais communs.", f4Title: "Rapports Excel/PDF", f4Desc: "Rapports détaillés pour la comptabilité.", f5Title: "100% Hors-ligne", f5Desc: "Fonctionne dans le navigateur sans internet.", f6Title: "Contrôle des Dettes", f6Desc: "Ajustement automatique des dettes.", f7Title: "Gestion Multitarif", f7Desc: "Électricité Jour/Nuit et services personnalisés.", f8Title: "Confidentialité", f8Desc: "Vous contrôlez vos données et sauvegardes.", f9Title: "Clôture du Mois", f9Desc: "Un clic pour passer au mois suivant.", pricingTitle: "Tarifs <span>Transparents</span>", p1Name: "TEST DRIVE", p1_1: "Essayez toutes les fonctions PRO gratuitement pendant 45 jours.", btnTry: "Démarrer l'essai", badgeHit: "MEILLEUR CHOIX", p2Name: "PLAN PRO", btnPlan: "Choisir un plan", p3Name: "VIP / À VIE", p3_3: "Paiement unique. Accès à vie sans limites.", btnOrder: "Commander", footer: "Tous droits réservés.", calcDynText: "{val} unités", currency: "$"
-            }
-        };
+   <script>
+        // ТЕМА
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        if(themeToggleBtn) {
+            themeToggleBtn.onclick = () => {
+                const isLight = document.body.getAttribute('data-theme') === 'light';
+                document.body.setAttribute('data-theme', isLight ? 'dark' : 'light');
+                themeToggleBtn.innerText = isLight ? '🌙' : '☀️';
+            };
+        }
 
+        // ЛАЙТБОКС
+        function openLightbox(src) {
+            document.getElementById('lightboxImg').src = src;
+            document.getElementById('imageLightbox').classList.add('show');
+        }
+        function closeLightbox() {
+            document.getElementById('imageLightbox').classList.remove('show');
+        }
+        document.querySelectorAll('.world-image-wrapper img, .single-image-wrapper img').forEach(img => {
+            img.onclick = function() { openLightbox(this.src); }
+        });
+
+        // КОПІЮВАННЯ ПОШТИ
+        document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const email = this.href.replace('mailto:', '');
+                navigator.clipboard.writeText(email).then(() => {
+                    const originalText = this.innerText;
+                    const msgs = { uk: "Скопійовано!", en: "Copied!", pl: "Skopiowano!", de: "Kopiert!", es: "¡Copiado!", fr: "Copié!" };
+                    this.innerText = msgs[currentLang] || msgs['en'];
+                    this.style.color = "var(--accent)";
+                    setTimeout(() => {
+                        this.innerText = originalText;
+                        this.style.color = "";
+                        window.location.href = "mailto:" + email;
+                    }, 1500);
+                });
+            });
+        });
+
+        // ТОТАЛЬНИЙ СЛОВНИК ПЕРЕКЛАДУ
         let currentLang = localStorage.getItem('lang') || 'uk';
+
+        const dict = [
+            // ШАПКА ТА ГОЛОВНИЙ ЕКРАН
+            { sel: ".btn-login", uk: "УВІЙТИ", en: "LOG IN", pl: "ZALOGUJ", de: "ANMELDEN", es: "ENTRAR", fr: "CONNEXION" },
+            { sel: ".hero-content h1", 
+              uk: "Оцифруйте своє ОСББ чи оренду <br><span>за 1 день</span>", en: "Digitize your HOA or rentals <br><span>in 1 day</span>", pl: "Zdigitalizuj swoją wspólnotę lub wynajem <br><span>w 1 dzień</span>", de: "Digitalisieren Sie Ihre WEG oder Vermietung <br><span>an 1 Tag</span>", es: "Digitaliza tu comunidad o alquileres <br><span>en 1 día</span>", fr: "Numérisez votre copropriété ou location <br><span>en 1 jour</span>" },
+            { sel: ".hero-content p", 
+              uk: "Повноцінна екосистема: від автоматичного розрахунку МЗК до легітимних онлайн-голосувань та прозорих оплат. Все в одному кабінеті.", en: "A complete ecosystem: from automated utility calculations to legitimate online voting and transparent payments. All in one dashboard.", pl: "Kompletny ekosystem: od automatycznych rozliczeń mediów po legalne głosowania online i przejrzyste płatności.", de: "Ein komplettes Ökosystem: von automatischen Nebenkostenabrechnungen bis hin zu rechtmäßigen Online-Abstimmungen und transparenten Zahlungen.", es: "Un ecosistema completo: desde cálculos automáticos de servicios hasta votaciones online legítimas y pagos transparentes.", fr: "Un écosystème complet : des calculs automatiques de charges aux votes en ligne légitimes et paiements transparents." },
+            { sel: ".hero-content .btn-main", 
+              uk: "Спробувати 45 днів безкоштовно", en: "Try 45 days for free", pl: "Wypróbuj 45 dni za darmo", de: "45 Tage kostenlos testen", es: "Probar 45 días gratis", fr: "Essai gratuit de 45 jours" },
+
+            // ДВА СВІТИ
+            { sel: ".two-worlds .section-title", 
+              uk: "Єдина екосистема. <br><span>Два зручних кабінети.</span>", en: "One ecosystem. <br><span>Two smart dashboards.</span>", pl: "Jeden ekosystem. <br><span>Dwa wygodne panele.</span>", de: "Ein Ökosystem. <br><span>Zwei smarte Dashboards.</span>", es: "Un ecosistema. <br><span>Dos paneles inteligentes.</span>", fr: "Un écosystème. <br><span>Deux tableaux de bord intelligents.</span>" },
+            { sel: ".two-worlds .section-subtitle", 
+              uk: "Ми створили ідеальні інструменти як для тих, хто керує нерухомістю, так і для тих, хто в ній проживає.", en: "We've built perfect tools for both property managers and residents.", pl: "Stworzyliśmy idealne narzędzia zarówno dla zarządców nieruchomości, jak i mieszkańców.", de: "Wir haben perfekte Tools für Hausverwalter und Bewohner entwickelt.", es: "Hemos creado herramientas perfectas tanto para administradores como para residentes.", fr: "Nous avons conçu des outils parfaits pour les gestionnaires et les résidents." },
+            
+            // КАБІНЕТ КЕРУЮЧОГО
+            { sel: ".world-card.admin .world-title", uk: "Кабінет Керуючого", en: "Manager's Dashboard", pl: "Panel Zarządcy", de: "Verwalter-Dashboard", es: "Panel del Administrador", fr: "Tableau de bord du Gestionnaire" },
+            { sel: ".world-card.admin .world-features li:nth-child(1)", uk: "<b>Глибока аналітика:</b> Візуалізація доходів, витрат та моніторинг заборгованостей у реальному часі.", en: "<b>Deep Analytics:</b> Real-time visualization of income, expenses, and debt monitoring.", pl: "<b>Głęboka analityka:</b> Wizualizacja dochodów, wydatków i monitorowanie zadłużenia w czasie rzeczywistym.", de: "<b>Tiefenanalyse:</b> Echtzeit-Visualisierung von Einnahmen, Ausgaben und Schulden.", es: "<b>Análisis Profundo:</b> Visualización en tiempo real de ingresos, gastos y deudas.", fr: "<b>Analytique approfondie :</b> Visualisation en temps réel des revenus, dépenses et dettes." },
+            { sel: ".world-card.admin .world-features li:nth-child(2)", uk: "<b>Делегування доступу:</b> Дайте бухгалтеру права на фінанси, а консьєржу — тільки на перегляд бази.", en: "<b>Access Delegation:</b> Grant finance rights to the accountant, and view-only access to the concierge.", pl: "<b>Delegowanie dostępu:</b> Nadaj księgowemu prawa do finansów, a portierowi — tylko podgląd bazy.", de: "<b>Zugriffsdelegation:</b> Finanzrechte für den Buchhalter, Nur-Lese-Zugriff für den Concierge.", es: "<b>Delegación de Acceso:</b> Derechos financieros para el contable, acceso de solo lectura para el conserje.", fr: "<b>Délégation d'accès :</b> Droits financiers pour le comptable, accès en lecture seule pour le concierge." },
+            { sel: ".world-card.admin .world-features li:nth-child(3)", uk: "<b>Авто-розподіл МЗК:</b> Інтелектуальний алгоритм сам розкидає витрати на загальне освітлення та опалення.", en: "<b>Auto-calc Common Areas:</b> Smart algorithm distributes expenses for common lighting and heating.", pl: "<b>Auto-rozliczenie MZA:</b> Inteligentny algorytm rozdziela koszty oświetlenia i ogrzewania.", de: "<b>Auto-Verteilung:</b> Intelligenter Algorithmus verteilt Kosten für Allgemeinstrom und Heizung.", es: "<b>Cálculo Automático:</b> Algoritmo inteligente que distribuye gastos de iluminación y calefacción común.", fr: "<b>Répartition Auto :</b> Algorithme intelligent répartissant les frais d'éclairage et de chauffage communs." },
+            { sel: ".world-card.admin .world-features li:nth-child(4)", uk: "<b>Розсилка в 1 клік:</b> Миттєва відправка рахунків через Telegram. Більше ніяких роздрукованих папірців.", en: "<b>1-Click Broadcast:</b> Instant invoice delivery via Telegram. No more printed papers.", pl: "<b>Wysyłka 1-kliknięciem:</b> Natychmiastowa wysyłka rachunków przez Telegram. Koniec z papierem.", de: "<b>1-Klick-Versand:</b> Sofortiger Rechnungsversand via Telegram. Keine Papierausdrucke mehr.", es: "<b>Envío en 1 clic:</b> Entrega instantánea de facturas vía Telegram. Adiós al papel.", fr: "<b>Envoi en 1 clic :</b> Livraison instantanée des factures via Telegram. Fini le papier." },
+
+            // КАБІНЕТ МЕШКАНЦЯ
+            { sel: ".world-card.resident .world-title", uk: "Кабінет Мешканця", en: "Resident's App", pl: "Aplikacja Mieszkańca", de: "Bewohner-App", es: "App del Residente", fr: "App du Résident" },
+            { sel: ".world-card.resident .world-features li:nth-child(1)", uk: "<b>Подача показників без помилок:</b> Система валідує дані (не дозволить ввести менше попереднього).", en: "<b>Error-free Meter Readings:</b> System validates data (prevents entering values lower than previous).", pl: "<b>Odczyty bez błędów:</b> System weryfikuje dane (zapobiega wpisaniu niższych wartości).", de: "<b>Fehlerfreie Zählerstände:</b> Das System validiert Daten (verhindert niedrigere Eingaben).", es: "<b>Lecturas sin errores:</b> El sistema valida los datos (evita ingresar valores menores).", fr: "<b>Relevés sans erreur :</b> Le système valide les données (empêche la saisie de valeurs inférieures)." },
+            { sel: ".world-card.resident .world-features li:nth-child(2)", uk: "<b>Персональна статистика:</b> Графіки споживання та порівняння з «середнім чеком» по будинку.", en: "<b>Personal Statistics:</b> Consumption charts and comparison with the building's average.", pl: "<b>Osobiste statystyki:</b> Wykresy zużycia i porównanie ze średnią budynku.", de: "<b>Persönliche Statistik:</b> Verbrauchsgrafiken und Vergleich mit dem Gebäudedurchschnitt.", es: "<b>Estadísticas Personales:</b> Gráficos de consumo y comparación con la media del edificio.", fr: "<b>Statistiques personnelles :</b> Graphiques de consommation et comparaison avec la moyenne du bâtiment." },
+            { sel: ".world-card.resident .world-features li:nth-child(3)", uk: "<b>Розумний архів:</b> Всі квитанції зберігаються в хмарі. Знайдіть будь-який чек за 2 секунди.", en: "<b>Smart Archive:</b> All receipts are stored in the cloud. Find any check in 2 seconds.", pl: "<b>Inteligentne archiwum:</b> Wszystkie rachunki w chmurze. Znajdź każdy paragon w 2 sekundy.", de: "<b>Smartes Archiv:</b> Alle Belege sicher in der Cloud. Finden Sie jede Rechnung in 2 Sekunden.", es: "<b>Archivo Inteligente:</b> Todos los recibos en la nube. Encuentra cualquier factura en 2 segundos.", fr: "<b>Archives intelligentes :</b> Tous les reçus dans le cloud. Trouvez n'importe quelle facture en 2 secondes." },
+            { sel: ".world-card.resident .world-features li:nth-child(4)", uk: "<b>Оплата в один клік:</b> Інтеграція Apple Pay та Google Pay для миттєвих розрахунків.", en: "<b>1-Click Payment:</b> Apple Pay & Google Pay integration for instant settlements.", pl: "<b>Płatność 1-kliknięciem:</b> Integracja Apple Pay i Google Pay dla natychmiastowych rozliczeń.", de: "<b>1-Klick-Zahlung:</b> Integration von Apple Pay & Google Pay für sofortige Abrechnungen.", es: "<b>Pago en 1 clic:</b> Integración de Apple Pay y Google Pay para pagos instantáneos.", fr: "<b>Paiement en 1 clic :</b> Intégration d'Apple Pay et Google Pay pour des règlements instantanés." },
+
+            // ДЕМОКРАТІЯ
+            { sel: ".democracy-content .hero-badge", uk: "Smart ОСББ", en: "Smart HOA", pl: "Smart Wspólnota", de: "Smart WEG", es: "Smart Comunidad", fr: "Smart Copropriété" },
+            { sel: ".democracy-content h2", uk: "Цифрова Демократія <br><span>Без зборів у дворі</span>", en: "Digital Democracy <br><span>No more yard meetings</span>", pl: "Cyfrowa Demokracja <br><span>Bez zebrań na podwórku</span>", de: "Digitale Demokratie <br><span>Ohne Hofversammlungen</span>", es: "Democracia Digital <br><span>Sin reuniones en el patio</span>", fr: "Démocratie Numérique <br><span>Fini les réunions dans la cour</span>" },
+            { sel: ".democracy-content p", uk: "Проводьте легітимні голосування прямо в системі. Забудьте про ходіння по квартирах, зіпсовані бланки та крики на зборах.", en: "Conduct legally binding votes directly in the system. Forget door-to-door visits, spoiled ballots, and shouting at meetings.", pl: "Przeprowadzaj legalne głosowania w systemie. Zapomnij o chodzeniu po mieszkaniach i krzykach na zebraniach.", de: "Führen Sie rechtmäßige Abstimmungen direkt im System durch. Vergessen Sie verdorbene Stimmzettel und Geschrei.", es: "Realiza votaciones legítimas directamente en el sistema. Olvida las papeletas arruinadas y los gritos.", fr: "Effectuez des votes légitimes directement dans le système. Oubliez les bulletins gâchés et les cris." },
+            { sel: ".democracy-content ul li:nth-child(1)", uk: "<strong>Юридична точність</strong> Голоси рахуються автоматично пропорційно площі нерухомості або кількості власників згідно з законом.", en: "<strong>Legal Accuracy</strong> Votes are calculated automatically proportional to property area or number of owners according to law.", pl: "<strong>Prawna Dokładność</strong> Głosy są liczone automatycznie proporcjonalnie do powierzchni nieruchomości zgodnie z prawem.", de: "<strong>Rechtliche Genauigkeit</strong> Stimmen werden automatisch proportional zur Fläche berechnet.", es: "<strong>Precisión Legal</strong> Los votos se calculan automáticamente de forma proporcional a la superficie.", fr: "<strong>Précision Légale</strong> Les votes sont calculés automatiquement proportionnellement à la surface." },
+            { sel: ".democracy-content ul li:nth-child(2)", uk: "<strong>Прозорі результати</strong> Мешканці бачать хід голосування в реальному часі. Жодних маніпуляцій чи загублених голосів.", en: "<strong>Transparent Results</strong> Residents track voting progress in real-time. No manipulation or lost votes.", pl: "<strong>Przejrzyste Wyniki</strong> Mieszkańcy widzą postęp głosowania w czasie rzeczywistym. Żadnych manipulacji.", de: "<strong>Transparente Ergebnisse</strong> Bewohner verfolgen den Abstimmungsverlauf in Echtzeit.", es: "<strong>Resultados Transparentes</strong> Los residentes siguen la votación en tiempo real. Cero manipulación.", fr: "<strong>Résultats Transparents</strong> Les résidents suivent le vote en temps réel. Aucune manipulation." },
+            { sel: ".democracy-content ul li:nth-child(3)", uk: "<strong>Автоматичний протокол</strong> Після завершення опитування система сама генерує готовий до підпису протокол. Економія тижнів роботи!", en: "<strong>Automated Protocol</strong> Upon completion, the system generates a ready-to-sign protocol. Saves weeks of work!", pl: "<strong>Automatyczny Protokół</strong> Po zakończeniu system sam generuje gotowy do podpisu protokół.", de: "<strong>Automatisches Protokoll</strong> Nach Abschluss generiert das System ein unterschriftsreifes Protokoll.", es: "<strong>Protocolo Automático</strong> Al finalizar, el sistema genera un protocolo listo para firmar.", fr: "<strong>Protocole Automatisé</strong> À la fin, le système génère un protocole prêt à être signé." },
+
+            // ФІНАНСИ
+            { sel: ".finance-content .hero-badge", uk: "Smart Фінанси", en: "Smart Finance", pl: "Smart Finanse", de: "Smart Finanzen", es: "Smart Finanzas", fr: "Smart Finances" },
+            { sel: ".finance-content h2", uk: "Фінансова магія <br><span>МЗК та Борги</span>", en: "Financial Magic <br><span>Common Areas & Debts</span>", pl: "Finansowa Magia <br><span>Części Wspólne i Długi</span>", de: "Finanzmagie <br><span>Allgemeinkosten & Schulden</span>", es: "Magia Financiera <br><span>Áreas Comunes y Deudas</span>", fr: "Magie Financière <br><span>Parties Communes & Dettes</span>" },
+            { sel: ".finance-content p", uk: "Більше ніяких складних таблиць в Excel. Система автоматично зводить баланс будинку і формує ідеальні квитанції.", en: "No more complex Excel spreadsheets. The system automatically balances the building's finances and generates perfect invoices.", pl: "Koniec ze skomplikowanymi tabelami w Excelu. System automatycznie bilansuje finanse i generuje rachunki.", de: "Keine komplizierten Excel-Tabellen mehr. Das System gleicht die Finanzen automatisch aus.", es: "Adiós a las complejas tablas de Excel. El sistema equilibra automáticamente las finanzas.", fr: "Fini les tableaux Excel complexes. Le système équilibre automatiquement les finances." },
+            { sel: ".finance-content ul li:nth-child(1)", uk: "<strong>Авто-розподіл МЗК</strong> Справедливий розподіл витрат на освітлення під’їздів, ліфти та опалення холів.", en: "<strong>Auto-calc Common Areas</strong> Fair distribution of lighting, elevators, and hall heating expenses.", pl: "<strong>Auto-rozliczenie MZA</strong> Sprawiedliwy podział kosztów oświetlenia i wind.", de: "<strong>Auto-Verteilung</strong> Gerechte Verteilung der Kosten für Beleuchtung und Aufzüge.", es: "<strong>Reparto Automático</strong> Distribución justa de gastos de iluminación y ascensores.", fr: "<strong>Répartition Auto</strong> Distribution équitable des frais d'éclairage et d'ascenseurs." },
+            { sel: ".finance-content ul li:nth-child(2)", uk: "<strong>Контроль боргів та переплат</strong> Алгоритм автоматично враховує залишки з минулого місяця та переносить їх у нові рахунки.", en: "<strong>Debt & Overpayment Control</strong> Algorithm automatically accounts for previous month's balances and transfers them.", pl: "<strong>Kontrola długów i nadpłat</strong> Algorytm automatycznie uwzględnia salda z poprzedniego miesiąca.", de: "<strong>Schuldenkontrolle</strong> Der Algorithmus berücksichtigt automatisch die Salden des Vormonats.", es: "<strong>Control de Deudas</strong> El algoritmo contabiliza automáticamente los saldos del mes anterior.", fr: "<strong>Contrôle des Dettes</strong> L'algorithme prend en compte automatiquement les soldes du mois précédent." },
+            { sel: ".finance-content ul li:nth-child(3)", uk: "<strong>Багатотарифний облік</strong> Підтримка тарифів «День/Ніч» для електрики та налаштування будь-яких кастомних послуг.", en: "<strong>Multi-tariff Support</strong> Support for Day/Night electricity tariffs and custom services.", pl: "<strong>Wiele Taryf</strong> Obsługa taryf Dzień/Noc dla prądu oraz dowolnych usług.", de: "<strong>Mehrtarif-Support</strong> Unterstützung für Tag/Nacht-Stromtarife und eigene Dienste.", es: "<strong>Soporte Multitarifa</strong> Soporte para tarifas eléctricas Día/Noche y servicios.", fr: "<strong>Support Multitarif</strong> Prise en charge des tarifs d'électricité Jour/Nuit et services." },
+
+            // ЧАТ
+            { sel: ".community-content .hero-badge", uk: "Smart Комунікація", en: "Smart Communication", pl: "Smart Komunikacja", de: "Smart Kommunikation", es: "Smart Comunicación", fr: "Smart Communication" },
+            { sel: ".community-content h2", uk: "Офіційний чат <br><span>Без спаму у Viber</span>", en: "Official Chat <br><span>No Viber spam</span>", pl: "Oficjalny Czat <br><span>Bez spamu na Viberze</span>", de: "Offizieller Chat <br><span>Kein Viber-Spam</span>", es: "Chat Oficial <br><span>Sin spam en Viber</span>", fr: "Chat Officiel <br><span>Pas de spam Viber</span>" },
+            { sel: ".community-content p", uk: "Єдиний контрольований простір для спілкування сусідів. Ніякого флуду, листівок на свята та нескінченних суперечок.", en: "A single controlled space for neighbors to communicate. No flood, holiday cards, or endless arguments.", pl: "Jedna kontrolowana przestrzeń do komunikacji sąsiadów. Żadnego spamu ani kłótni.", de: "Ein kontrollierter Raum für die Kommunikation der Nachbarn. Kein Spam oder endlose Streitigkeiten.", es: "Un único espacio controlado para la comunicación vecinal. Sin spam ni discusiones interminables.", fr: "Un espace contrôlé unique pour la communication entre voisins. Pas de spam ni de disputes." },
+            { sel: ".community-content ul li:nth-child(1)", uk: "<strong>Офіційний канал</strong> Прямий зв'язок «Керуючий — Мешканці». Публікуйте важливі оголошення.", en: "<strong>Official Channel</strong> Direct 'Manager — Residents' connection. Publish important announcements.", pl: "<strong>Oficjalny Kanał</strong> Bezpośrednia relacja 'Zarządca — Mieszkańcy'. Publikuj ogłoszenia.", de: "<strong>Offizieller Kanal</strong> Direkte Verbindung 'Verwalter — Bewohner'. Veröffentlichen Sie Ankündigungen.", es: "<strong>Canal Oficial</strong> Conexión directa 'Administrador — Residentes'. Publica anuncios.", fr: "<strong>Canal Officiel</strong> Connexion directe 'Gestionnaire — Résidents'. Publiez des annonces." },
+            { sel: ".community-content ul li:nth-child(2)", uk: "<strong>Тематичні гілки</strong> Створюйте окремі обговорення для ініціативних груп (наприклад, «Озеленення двору»).", en: "<strong>Thematic Threads</strong> Create separate discussions for initiative groups (e.g., 'Yard Greening').", pl: "<strong>Wątki Tematyczne</strong> Twórz osobne dyskusje dla grup inicjatywnych.", de: "<strong>Thematische Threads</strong> Erstellen Sie separate Diskussionen für Initiativgruppen.", es: "<strong>Hilos Temáticos</strong> Crea discusiones separadas para grupos de iniciativa.", fr: "<strong>Fils Thématiques</strong> Créez des discussions séparées pour les groupes d'initiative." },
+            { sel: ".community-content ul li:nth-child(3)", uk: "<strong>Повна модерація</strong> Керуючий повністю контролює простір. Можливість видаляти спам зберігає нерви всім.", en: "<strong>Full Moderation</strong> Manager has full control over the space. Ability to delete spam saves nerves.", pl: "<strong>Pełna Moderacja</strong> Zarządca ma pełną kontrolę nad przestrzenią. Usuwanie spamu oszczędza nerwy.", de: "<strong>Volle Moderation</strong> Der Verwalter hat die volle Kontrolle über den Raum.", es: "<strong>Moderación Total</strong> El administrador tiene control total sobre el espacio.", fr: "<strong>Modération Totale</strong> Le gestionnaire a le contrôle total sur l'espace." },
+
+            // КРОКИ (Як це працює)
+            { sel: ".steps-section .section-title", uk: "Швидкий старт за <span>3 кроки</span>", en: "Quick Start in <span>3 steps</span>", pl: "Szybki start w <span>3 krokach</span>", de: "Schnellstart in <span>3 Schritten</span>", es: "Inicio Rápido en <span>3 pasos</span>", fr: "Démarrage Rapide en <span>3 étapes</span>" },
+            { sel: ".steps-grid .step-card:nth-child(1) .step-title", uk: "Реєстрація будинку", en: "Property Registration", pl: "Rejestracja Nieruchomości", de: "Registrierung", es: "Registro", fr: "Inscription" },
+            { sel: ".steps-grid .step-card:nth-child(1) .step-desc", uk: "Створіть профіль вашого ОСББ, налаштуйте структуру будинку та завантажте базу квартир у пару кліків.", en: "Create your HOA profile, configure the building structure, and upload the apartment database.", pl: "Utwórz profil swojej wspólnoty, skonfiguruj strukturę budynku i wgraj bazę mieszkań.", de: "Erstellen Sie Ihr Profil, konfigurieren Sie das Gebäude und laden Sie die Datenbank hoch.", es: "Crea tu perfil, configura la estructura del edificio y sube la base de datos.", fr: "Créez votre profil, configurez la structure du bâtiment et téléchargez la base de données." },
+            { sel: ".steps-grid .step-card:nth-child(2) .step-title", uk: "Запрошення мешканців", en: "Inviting Residents", pl: "Zapraszanie Mieszkańców", de: "Bewohner einladen", es: "Invitar Residentes", fr: "Inviter les Résidents" },
+            { sel: ".steps-grid .step-card:nth-child(2) .step-desc", uk: "Згенеруйте посилання-запрошення. Мешканці самі реєструються і прив'язуються до своєї нерухомості.", en: "Generate an invitation link. Residents register themselves and link to their property.", pl: "Wygeneruj link. Mieszkańcy sami się rejestrują i przypisują do nieruchomości.", de: "Generieren Sie einen Link. Bewohner registrieren sich selbst.", es: "Genera un enlace. Los residentes se registran por sí mismos.", fr: "Générez un lien. Les résidents s'inscrivent eux-mêmes." },
+            { sel: ".steps-grid .step-card:nth-child(3) .step-title", uk: "Прозорий облік", en: "Transparent Billing", pl: "Przejrzyste Rozliczenia", de: "Transparente Abrechnung", es: "Facturación Transparente", fr: "Facturation Transparente" },
+            { sel: ".steps-grid .step-card:nth-child(3) .step-desc", uk: "Система автоматично розраховує тарифи, збирає показники та приймає оплати на ваш рахунок.", en: "The system automatically calculates tariffs, collects readings, and accepts payments.", pl: "System automatycznie oblicza taryfy, zbiera odczyty i przyjmuje płatności.", de: "Das System berechnet Tarife, sammelt Zählerstände und akzeptiert Zahlungen.", es: "El sistema calcula tarifas, recoge lecturas y acepta pagos.", fr: "Le système calcule les tarifs, collecte les relevés et accepte les paiements." },
+
+            // ТАРИФИ
+            { sel: ".pricing-section .section-title", uk: "Прозорі <span>Тарифи</span>", en: "Transparent <span>Pricing</span>", pl: "Przejrzyste <span>Cenniki</span>", de: "Transparente <span>Preise</span>", es: "Precios <span>Transparentes</span>", fr: "Tarifs <span>Transparents</span>" },
+            { sel: ".pricing-subtitle", uk: "Гнучка система знижок: чим більше квартир, тим дешевше.", en: "Flexible discount system: the more apartments, the cheaper.", pl: "Elastyczny system zniżek: im więcej mieszkań, tym taniej.", de: "Flexibles Rabattsystem: Je mehr Wohnungen, desto günstiger.", es: "Sistema flexible: cuantos más apartamentos, más barato.", fr: "Système flexible : plus il y a d'appartements, moins c'est cher." },
+            
+            { sel: ".pricing-cards .price-card:nth-child(1) .price-title", uk: "Test Drive", en: "Test Drive", pl: "Test Drive", de: "Test Drive", es: "Test Drive", fr: "Test Drive" },
+            { sel: ".pricing-cards .price-card:nth-child(1) .price-features li:nth-child(1)", uk: "Спробуйте всі функції PRO", en: "Try all PRO features", pl: "Wypróbuj wszystkie funkcje PRO", de: "Alle PRO-Funktionen testen", es: "Prueba todas las funciones PRO", fr: "Testez toutes les fonctions PRO" },
+            { sel: ".pricing-cards .price-card:nth-child(1) .price-features li:nth-child(2)", uk: "Безкоштовно протягом 45 днів", en: "Free for 45 days", pl: "Za darmo przez 45 dni", de: "Kostenlos für 45 Tage", es: "Gratis por 45 días", fr: "Gratuit pendant 45 jours" },
+            { sel: ".pricing-cards .price-card:nth-child(1) .price-features li:nth-child(3)", uk: "Без прив'язки банківської картки", en: "No credit card required", pl: "Bez podawania karty", de: "Keine Kreditkarte erforderlich", es: "Sin tarjeta de crédito", fr: "Sans carte de crédit" },
+            { sel: ".pricing-cards .price-card:nth-child(1) .btn-price", uk: "Спробувати", en: "Try Now", pl: "Wypróbuj", de: "Jetzt testen", es: "Pruébalo", fr: "Essayer" },
+
+            { sel: ".pricing-cards .price-card:nth-child(2) .price-title", uk: "PRO План", en: "PRO Plan", pl: "Plan PRO", de: "PRO Plan", es: "Plan PRO", fr: "Plan PRO" },
+            { sel: ".pricing-cards .price-card:nth-child(2) .price-features li:nth-child(1)", uk: "Мобільний кабінет мешканця", en: "Resident mobile app", pl: "Aplikacja mobilna mieszkańca", de: "Mobile Bewohner-App", es: "App móvil del residente", fr: "App mobile du résident" },
+            { sel: ".pricing-cards .price-card:nth-child(2) .price-features li:nth-child(2)", uk: "Авто-розподіл МЗК", en: "Auto-calc Common Areas", pl: "Auto-rozliczenie MZA", de: "Auto-Verteilung", es: "Reparto Automático", fr: "Répartition Auto" },
+            { sel: ".pricing-cards .price-card:nth-child(2) .price-features li:nth-child(3)", uk: "Легітимне онлайн-голосування", en: "Legitimate online voting", pl: "Legalne głosowania online", de: "Legitime Online-Abstimmung", es: "Votación online legítima", fr: "Vote en ligne légitime" },
+            { sel: ".pricing-cards .price-card:nth-child(2) .price-features li:nth-child(4)", uk: "Офіційний чат та Apple Pay", en: "Official chat & Apple Pay", pl: "Oficjalny czat i Apple Pay", de: "Offizieller Chat & Apple Pay", es: "Chat oficial y Apple Pay", fr: "Chat officiel et Apple Pay" },
+            { sel: ".pricing-cards .price-card:nth-child(2) .btn-price", uk: "Обрати план", en: "Choose Plan", pl: "Wybierz Plan", de: "Plan wählen", es: "Elegir Plan", fr: "Choisir le Plan" },
+
+            // ПІДВАЛ (ФУТЕР)
+            { sel: ".footer-desc", uk: "Property Management 2.0. Повноцінна екосистема для сучасного управління нерухомістю, що об'єднує керуючих та мешканців у єдиному зручному просторі.", en: "Property Management 2.0. A complete ecosystem for modern property management, uniting managers and residents in a single convenient space.", pl: "Property Management 2.0. Kompletny ekosystem do nowoczesnego zarządzania nieruchomościami, łączący zarządców i mieszkańców.", de: "Property Management 2.0. Ein komplettes Ökosystem für die moderne Immobilienverwaltung.", es: "Property Management 2.0. Un ecosistema completo para la gestión moderna de propiedades.", fr: "Property Management 2.0. Un écosystème complet pour la gestion immobilière moderne." },
+            { sel: ".footer-grid > div:nth-child(2) .footer-title", uk: "Продукт", en: "Product", pl: "Produkt", de: "Produkt", es: "Producto", fr: "Produit" },
+            { sel: ".footer-grid > div:nth-child(2) .footer-links li:nth-child(1) a", uk: "Можливості", en: "Features", pl: "Funkcje", de: "Funktionen", es: "Funciones", fr: "Fonctionnalités" },
+            { sel: ".footer-grid > div:nth-child(2) .footer-links li:nth-child(2) a", uk: "Тарифи", en: "Pricing", pl: "Cennik", de: "Preise", es: "Precios", fr: "Tarifs" },
+            { sel: ".footer-grid > div:nth-child(2) .footer-links li:nth-child(3) a", uk: "Умови використання", en: "Terms of Service", pl: "Warunki Korzystania", de: "Nutzungsbedingungen", es: "Términos de Servicio", fr: "Conditions d'utilisation" },
+            { sel: ".footer-grid > div:nth-child(2) .footer-links li:nth-child(4) a", uk: "Договір оферти", en: "Public Offer", pl: "Oferta Publiczna", de: "Öffentliches Angebot", es: "Oferta Pública", fr: "Offre Publique" },
+            { sel: ".footer-grid > div:nth-child(3) .footer-title", uk: "Контакти", en: "Contacts", pl: "Kontakty", de: "Kontakte", es: "Contactos", fr: "Contacts" },
+            { sel: ".footer-grid > div:nth-child(3) .footer-links li:nth-child(2) a", uk: "Telegram Підтримка", en: "Telegram Support", pl: "Wsparcie Telegram", de: "Telegram-Support", es: "Soporte en Telegram", fr: "Support Telegram" },
+            { sel: ".footer-bottom", uk: "&copy; 2026 Comunalco. Всі права захищені.", en: "&copy; 2026 Comunalco. All rights reserved.", pl: "&copy; 2026 Comunalco. Wszelkie prawa zastrzeżone.", de: "&copy; 2026 Comunalco. Alle Rechte vorbehalten.", es: "&copy; 2026 Comunalco. Todos los derechos reservados.", fr: "&copy; 2026 Comunalco. Tous droits réservés." }
+        ];
+
+        // ДОДАЄМО СТИЛІ ДЛЯ БЕДЖА "НАЙПОПУЛЯРНІШИЙ"
+        let dynamicStyle = document.createElement('style');
+        document.head.appendChild(dynamicStyle);
+        const badgeText = { uk: "'Найпопулярніший'", en: "'Most Popular'", pl: "'Najpopularniejszy'", de: "'Am Beliebtesten'", es: "'Más Popular'", fr: "'Plus Populaire'" };
 
         function setLanguage(lang) {
             currentLang = lang;
             localStorage.setItem('lang', lang);
-            document.querySelectorAll('.lang-link').forEach(el => el.classList.toggle('active', el.innerText.toLowerCase() === lang));
             
-            document.body.classList.add('fade-out');
-            setTimeout(() => {
-                document.querySelectorAll('[data-i18n]').forEach(el => {
-                    const key = el.getAttribute('data-i18n');
-                    if (translations[lang][key]) el.innerHTML = translations[lang][key];
+            // 1. Активна мова в шапці
+            document.querySelectorAll('.lang-link').forEach(el => {
+                el.classList.toggle('active', el.innerText.toLowerCase() === lang);
+            });
+            
+            // 2. Переклад тексту
+            dict.forEach(item => {
+                document.querySelectorAll(item.sel).forEach(el => {
+                    if (item[lang]) el.innerHTML = item[lang];
                 });
-                
-                document.getElementById('vip-price').innerText = (lang === 'uk') ? "4900 грн" : "$149.00";
-                updateCalcText();
-                document.body.classList.remove('fade-out');
-            }, 300);
-        }
+            });
 
-        function updateCalcText() {
-            const val = parseInt(document.getElementById('obj-range').value);
-            const isUA = (currentLang === 'uk');
-            const base = isUA ? 25 : 1.00;
-            
-            let rate = base;
-            if (val >= 6) rate = isUA ? 20 : 0.80;
-            if (val >= 21) rate = isUA ? 15 : 0.60;
-            if (val >= 51) rate = isUA ? 10 : 0.40;
+            // 3. Переклад бейджа через CSS
+            dynamicStyle.innerHTML = `.price-card.popular::before { content: ${badgeText[lang]} !important; }`;
 
-            const total = val * rate;
-            document.getElementById('price-res').innerText = isUA ? Math.ceil(total) : total.toFixed(2);
-            document.getElementById('calc-curr-label').innerText = isUA ? "грн / місяць" : "$ / month";
-            document.getElementById('obj-count').innerText = translations[currentLang].calcDynText.replace('{val}', val);
-        }
-
-        document.getElementById('obj-range').oninput = updateCalcText;
-        document.getElementById('theme-toggle').onclick = () => {
-            const isLight = document.body.getAttribute('data-theme') === 'light';
-            document.body.setAttribute('data-theme', isLight ? 'dark' : 'light');
-            document.getElementById('theme-toggle').innerText = isLight ? '🌙' : '☀️';
-        };
-        setLanguage(currentLang);
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
-    const SUPABASE_URL = 'https://aougdxtsmzjgoykaslbt.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFvdWd4dHNtempnb3lrYXNsYnQiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTczMDM0ODYzMCwiZXhwIjoyMDQ1OTI0NjMwfQ.Lw9H6j8_G1j1Kq4Z7Yw0O7M6K1J1F1E7X0E6X9Q3M3w'; 
-    // ^ Я переписав початок і кінець з вашого скріна, але ПРОШУ, СКОПІЮЙТЕ ПОВНІСТЮ З ВАШОГО КОДУ, щоб я випадково не пропустив символ!
-
-    // Створюємо клієнт для лендінгу
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    // Функція швидкого входу
-    function loginDirectly() {
-        supabaseClient.auth.signInWithOAuth({
-            provider: 'google',
-            options: {
-                redirectTo: 'https://comunalco.com/app/index.html'
+            // 4. Юридичні документи
+            const linkTerms = document.querySelector('.footer-grid > div:nth-child(2) .footer-links li:nth-child(3) a');
+            const linkOffer = document.querySelector('.footer-grid > div:nth-child(2) .footer-links li:nth-child(4) a');
+            if (linkTerms && linkOffer) {
+                linkTerms.href = (lang === 'uk') ? "terms.html" : "terms_en.html";
+                linkOffer.href = (lang === 'uk') ? "offer.html" : "offer_en.html";
             }
-        });
-    }
-</script>
+
+            // 5. Оновлення калькулятора
+            updateCalcText(); 
+        }
+
+        // МУЛЬТИВАЛЮТНИЙ КАЛЬКУЛЯТОР
+        function updateCalcText() {
+            const rangeInput = document.getElementById('obj-range');
+            if (!rangeInput) return;
+            
+            const val = parseInt(rangeInput.value);
+            let rate = 25; 
+            let currencyLabel = "грн / міс";
+            let countText = "квартир";
+            
+            if (currentLang === 'uk') {
+                rate = 25; currencyLabel = "грн / міс"; countText = "квартир";
+                if (val >= 6) rate = 20; if (val >= 21) rate = 15; if (val >= 51) rate = 10;
+            } else if (currentLang === 'pl') {
+                rate = 4; currencyLabel = "PLN / m-c"; countText = "mieszkań";
+                if (val >= 6) rate = 3; if (val >= 21) rate = 2.5; if (val >= 51) rate = 2;
+            } else {
+                rate = 1.50; currencyLabel = "$ / mo";
+                countText = currentLang === 'de' ? 'Einheiten' : (currentLang === 'es' ? 'unidades' : (currentLang === 'fr' ? 'unités' : 'units'));
+                if (val >= 6) rate = 1.20; if (val >= 21) rate = 0.90; if (val >= 51) rate = 0.60;
+            }
+            
+            const total = val * rate;
+            const priceRes = document.getElementById('price-res');
+            if (priceRes) {
+                priceRes.innerText = (currentLang === 'uk' || currentLang === 'pl') ? Math.ceil(total) : total.toFixed(2);
+                if (priceRes.nextElementSibling) priceRes.nextElementSibling.innerText = currencyLabel;
+            }
+            
+            const objCount = document.getElementById('obj-count');
+            if (objCount) objCount.innerText = val + (val === 100 ? "+ " : " ") + countText;
+        }
+
+        const rangeEl = document.getElementById('obj-range');
+        if (rangeEl) rangeEl.addEventListener('input', updateCalcText);
+
+        setLanguage(currentLang);
+    </script> 
+	
+	<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = 'https://aougdxtsmzjgoykaslbt.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFvdWd4dHNtempnb3lrYXNsYnQiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTczMDM0ODYzMCwiZXhwIjoyMDQ1OTI0NjMwfQ.Lw9H6j8_G1j1Kq4Z7Yw0O7M6K1J1F1E7X0E6X9Q3M3w'; 
+        
+        // Створюємо клієнт для лендінгу
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Функція швидкого входу через Google
+        function loginDirectly() {
+            supabaseClient.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: 'https://comunalco.com/app/index.html'
+                }
+            });
+        }
+    </script>
 </body>
 </html>
