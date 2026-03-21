@@ -2138,23 +2138,20 @@ checkLimit() {
     }
 
     selectRole(el, role) {
-        // Візуальне виділення картки
-        document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
-        el.classList.add('selected');
-        this.selectedRole = role;
+            document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+            el.classList.add('selected');
+            this.selectedRole = role;
 
-        // Якщо Орендар - показати вибір квартири
-        const aptBlock = document.getElementById('apt-selector-block');
-        const aptSelect = document.getElementById('access-apt-select');
-        
-        if (role === 'tenant') {
-            if(aptBlock) aptBlock.style.display = 'block';
-            // Наповнюємо список квартир
-            if(aptSelect) aptSelect.innerHTML = this.currentData.apartments.map(a => `<option value="${a.id}">${a.name}</option>`).join('');
-        } else {
-            if(aptBlock) aptBlock.style.display = 'none';
-        }
-    },
+            const aptBlock = document.getElementById('apt-selector-block');
+            const aptSelect = document.getElementById('access-apt-select');
+
+            if (role === 'tenant') {
+                if (aptBlock) aptBlock.style.display = 'block';
+                if (aptSelect) aptSelect.innerHTML = (this.currentData.apartments || []).map(a => `<option value="${a.id}">${a.name}</option>`).join('');
+            } else {
+                if (aptBlock) aptBlock.style.display = 'none';
+            }
+        },
 
         async grantUserAccess() {
             try {
@@ -2208,9 +2205,10 @@ checkLimit() {
             try {
                 if (!confirm("Забрати доступ?")) return;
                 this.currentData.users = this.currentData.users.filter(u => u.id !== id);
-                await sbClient.from('houses')
+                const { error } = await sbClient.from('houses')
                     .update({ allowed_emails: this.currentData.users })
                     .eq('id', this.currentData.id);
+                if (error) throw error;
                 this.renderUserList();
             } catch (e) {
                 console.error("Помилка видалення:", e);
