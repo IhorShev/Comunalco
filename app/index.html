@@ -2156,62 +2156,74 @@ checkLimit() {
         }
     }
 
-   grantUserAccess() {
-        const emailInput = document.getElementById('new-user-email');
-        // Приводимо до нижнього регістру
-        const email = emailInput.value.trim().toLowerCase();
-        
-        if(!email || !email.includes('@')) { alert("Введіть коректний Email (Gmail)!"); return; }
-        
-        // 1. Зберігаємо локально для відображення в списку
-        if(!this.currentData.users) this.currentData.users = [];
-        
-        let label = "Весь об'єкт";
-        let aptId = null; // ID квартири для мешканця
-        
-        // Якщо обрали роль "Мешканець", дізнаємось, яка квартира
-        if(this.selectedRole === 'tenant') {
-            const aptSelect = document.getElementById('access-apt-select');
-            if(aptSelect) {
-                aptId = aptSelect.value;
-                // Зберігаємо ID
-                const aptObj = this.currentData.apartments.find(a => a.id == aptId);
-                label = aptObj ? aptObj.name : 'Квартира';
+   async grantUserAccess() {
+            const emailInput = document.getElementById('new-user-email');
+            const email = emailInput.value.trim().toLowerCase();
+            if (!email || !email.includes('@')) { alert("Введіть коректний Email!"); return; }
+
+            let label = "Весь об'єкт";
+            let aptId = null;
+
+            if (this.selectedRole === 'tenant') {
+                const aptSelect = document.getElementById('access-apt-select');
+                if (aptSelect) {
+                    aptId = aptSelect.value;
+                    const aptObj = this.currentData.apartments.find(a => a.id == aptId);
+                    label = aptObj ? aptObj.name : 'Квартира';
+                }
             }
-        }
 
-        const newUser = {
-            id: Date.now(),
-            email: email,
-            role: this.selectedRole,
-            accessLabel: label,
-            aptId: aptId // Запам'ятовуємо ID квартири
-        };
-        
-        this.currentData.users.push(newUser);
-        
-        // Ця команда збереже дані локально і автоматично відправить їх у Supabase (завдяки нашій новій window.cloudSave)
-        this.save(); 
-        this.renderUserList();
+            const newUser = {
+                id: Date.now(),
+                email: email,
+                role: this.selectedRole,
+                accessLabel: label,
+                aptId: aptId
+            };
 
-        // Очищуємо поле введення
-        emailInput.value = '';
+            // 1. Зберігаємо локально для миттєвого відображення
+            if (!this.currentData.users) this.currentData.users = [];
+            this.currentData.users.push(newUser);
+            
+            // 2. ЗАПИСУЄМО В SUPABASE (в нашу нову колонку)
+            try {
+                const { error } = await sbClient.from('houses')
+                    .update({ allowed_emails: this.currentData.users })
+                    .eq('id', this.currentData.id);
+                
+                if (error) throw error;
 
-        // Формуємо повідомлення для месенджера
-        const roleNames = { 'manager': '🛠 Менеджер', 'tenant': '🏠 Мешканець' };
-        const roleName = roleNames[this.selectedRole];
-        const link = "https://comunalco.com"; // Твоє посилання
-        const msg = `👋 Вам надано доступ!\n\n🏢 Об'єкт: ${this.currentData.name}\n🔑 Роль: ${label} (${roleName})\n\n👇 Вхід:\n🌍 ${link}\n📧 Увійдіть через Google пошта: ${email}`;
-        
-        this.openShareModal(msg);
-    } 
+                this.renderUserList();
+                emailInput.value = '';
 
-    deleteUserAccess(id) {
-        if(!confirm("Забрати доступ у цього користувача?")) return;
-        this.currentData.users = this.currentData.users.filter(u => u.id !== id);
-        this.save();
-        this.renderUserList();
-    }
+                // Формуємо повідомлення
+                const roleNames = { 'manager': '⚒️ Менеджер', 'tenant': '🏠 Мешканець', 'operator': '📝 Обліковець' };
+                const msg = `👋 Вам надано доступ!\n🏠 Об'єкт: ${this.currentData.name}\n🎭 Роль: ${label} (${roleNames[this.selectedRole] || this.selectedRole})\n\nВхід: https://comunalco.com\n🌐 Увійдіть через Google пошту: ${email}`;
+                this.openShareModal(msg);
+
+            } catch (e) {
+                console.error("Помилка збереження доступу:", e);
+                alert("Не вдалося зберегти доступ у базі даних.");
+            }
+        },
+
+        async deleteUserAccess(id) {
+            if (!confirm("Забрати доступ у цього користувача?")) return;
+            
+            // Видаляємо локально
+            this.currentData.users = this.currentData.users.filter(u => u.id !== id);
+            
+            // Оновлюємо базу
+            try {
+                await sbClient.from('houses')
+                    .update({ allowed_emails: this.currentData.users })
+                    .eq('id', this.currentData.id);
+                
+                this.renderUserList();
+            } catch (e) {
+                console.error("Помилка видалення:", e);
+            }
+        },
 
     renderUserList() {
         const list = document.getElementById('users-list-container');
