@@ -4281,7 +4281,7 @@ window.addEventListener('load', () => {
       const { data: houses, error: errH } = await sbClient
           .from('houses')
           .select('*')
-          .eq('owner_id', userId);
+          .or(`owner_id.eq.${userId},allowed_emails.cs.[{"email":"${window.currentUser.email}"}]`)
 
       if (errH || !houses || houses.length === 0) {
           console.log("📭 Хмара пуста");
