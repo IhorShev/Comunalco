@@ -3567,56 +3567,100 @@ checkLimit() {
     }
 
            // --- 🛡 ФУНКЦІЯ ЗАХИСТУ ІНТЕРФЕЙСУ ---
-    applyRoleRestrictions() {
-        if (!window.currentRole || window.currentRole === 'owner' || window.currentRole === 'manager') return;
+    applyRoleRestrictions(role = null) {
+        const userRole = role || window.currentRole || 'admin';
+        
+        // Якщо це власник або керуючий - нічого не ховаємо
+        if (userRole === 'owner' || userRole === 'manager' || userRole === 'admin') return;
 
-        // 1. Приховуємо кнопки управління (Видалити, Додати)
+        // 1. Приховуємо кнопки управління об'єктом (Видалити, Додати)
         const deleteBtn = document.querySelector('span[title="Видалити об\'єкт"]');
         if(deleteBtn) deleteBtn.style.display = 'none';
         
         const addObjBtn = document.querySelector('div[title="Додати об\'єкт"]');
         if(addObjBtn) addObjBtn.style.display = 'none';
 
-        // 2. Приховуємо ТІЛЬКИ Тарифи та Доступ (Історію залишаємо!)
+        // 2. Приховуємо верхнє меню (Тарифи, Доступ, Аналітика, Локальні копії)
         const topMenu = document.querySelectorAll('.desktop-only span');
         topMenu.forEach(el => {
             const txt = el.innerText;
-            if(txt.includes('Тарифи') || txt.includes('Доступ')) {
+            if(txt.includes('Тарифи') || txt.includes('Доступ') || txt.includes('Аналітика') || txt.includes('Локальні копії')) {
                 el.style.display = 'none';
             }
         });
-        
+
         const mobMenu = document.getElementById('mobile-dropdown');
         if(mobMenu) {
-            if(mobMenu.children[0]) mobMenu.children[0].style.display = 'none'; // Тарифи
-            // Історію НЕ чіпаємо
-            if(mobMenu.children[3]) mobMenu.children[3].style.display = 'none'; // Доступ
+            Array.from(mobMenu.children).forEach(child => {
+                const txt = child.innerText;
+                if(txt.includes('Аналітика') || txt.includes('Доступ')) {
+                    child.style.display = 'none';
+                }
+            });
         }
 
-        // 3. Блокуємо інпути тарифів
-        const inputs = document.querySelectorAll('details input');
-        inputs.forEach(inp => inp.disabled = true);
-        
-        // 4. СПЕЦИФІКА ДЛЯ МЕШКАНЦЯ
-        if (window.currentRole === 'tenant' && window.currentAptId) {
+        // 3. Блокуємо загальні налаштування тарифів
+        const topTariffs = document.querySelectorAll('details input');
+        topTariffs.forEach(inp => inp.disabled = true);
+
+        // 4. СПЕЦИФІКА ДЛЯ ОБЛІКОВЦЯ (Тільки показники)
+        if (userRole === 'operator') {
+            // Ховаємо всі кнопки "+ Додати" та червоні хрестики (видалення)
+            document.querySelectorAll('.btn-add, .btn-add-counter, button[onclick="app.addGroup()"], button[onclick="app.addApartment()"]').forEach(btn => btn.style.display = 'none');
+            document.querySelectorAll('.del-icon').forEach(icon => icon.style.display = 'none');
+            
+            // Ховаємо блок "Банківські реквізити"
+            const reqTitle = document.querySelector('div.section-title[style*="margin-top:20px"]');
+            if(reqTitle && reqTitle.innerText.includes('реквізити')) reqTitle.style.display = 'none';
+            const reqCont = document.getElementById('requisites-container');
+            if(reqCont) reqCont.style.display = 'none';
+
+            // Блокуємо фінансові поля у квартирах (Борг, Сплачено, Телефон)
+            document.querySelectorAll('input[onchange*="debt"], input[onchange*="paid"], input[onchange*="phone"]').forEach(inp => {
+                inp.disabled = true;
+                inp.style.opacity = '0.5';
+            });
+            document.querySelectorAll('select[onchange*="messenger"]').forEach(sel => {
+                sel.disabled = true;
+                sel.style.opacity = '0.5';
+            });
+
+            // Ховаємо нижню панель "Закрити місяць" та "Надіслати"
+            const stickyFooter = document.querySelector('.sticky-footer');
+            if(stickyFooter) stickyFooter.style.display = 'none';
+
+            // Ховаємо розсилку Телеграм та налаштування бота
+            const batchControls = document.getElementById('batch-controls');
+            if(batchControls) batchControls.style.display = 'none';
+            document.querySelectorAll('.mass-send-chk, .switch, button[onclick^="app.copyBotLink"]').forEach(el => el.style.display = 'none');
+            
+            // Ховаємо кнопки відправки квитанцій та ПІН-кодів
+            document.querySelectorAll('button[onclick^="app.openSendFormatModal"], button[onclick^="app.sendAccessData"], div[onclick^="app.generateNewPin"]').forEach(btn => btn.style.display = 'none');
+            
+            // Підсвічуємо зверху, що це режим обліковця
+            const titleInput = document.getElementById('object-title');
+            if(titleInput && !titleInput.value.includes('ОБЛІКОВЦЯ')) {
+                titleInput.value = titleInput.value + ' (РЕЖИМ ОБЛІКОВЦЯ)';
+                titleInput.style.color = 'var(--gold)';
+            }
+        }
+
+        // 5. СПЕЦИФІКА ДЛЯ МЕШКАНЦЯ
+        if (userRole === 'tenant' && window.currentAptId) {
             const apartmentsDiv = document.getElementById('apartments-container');
             const allApts = apartmentsDiv.querySelectorAll('details');
             
             allApts.forEach((details, index) => {
                 const aptData = this.currentData.apartments[index];
-                
-                // Ховаємо чужі квартири
                 if (aptData.id != window.currentAptId) {
                     details.style.display = 'none'; 
                 } else {
                     details.open = true;
-                    // 👇 ТУТ МИ ПОВЕРТАЄМО ОРИГІНАЛЬНУ НАЗВУ КВАРТИРИ
                     const summary = details.querySelector('summary');
                     if(summary) summary.innerHTML = `<div>🏠 <b>${aptData.name}</b></div>`;
                 }
             });
 
-            // Ховаємо кнопки додавання квартир/груп
             const addAptBtn = document.querySelector('button[onclick="app.addApartment()"]');
             if(addAptBtn) addAptBtn.parentElement.style.display = 'none';
 
@@ -3625,12 +3669,12 @@ checkLimit() {
             
             const addGroupBtn = document.querySelector('button[onclick="app.addGroup()"]');
             if(addGroupBtn) addGroupBtn.parentElement.style.display = 'none';
-        }
 
-        // 5. Стиль перегляду
-        document.body.classList.add('archive-mode');
-        const saveBtn = document.querySelector('.sticky-footer button.btn-warning');
-        if(saveBtn) saveBtn.style.display = 'none';
+            // Стиль перегляду тільки для мешканця
+            document.body.classList.add('archive-mode');
+            const saveBtn = document.querySelector('.sticky-footer button.btn-warning');
+            if(saveBtn) saveBtn.style.display = 'none';
+        }
     }
    // --- ФУНКЦІЯ ІСТОРІЇ (Оновлено для Табів та різних Ролей) ---
     openHistory() {
