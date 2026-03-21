@@ -4162,103 +4162,79 @@ window.addEventListener('load', () => {
     const subExpireEl = document.getElementById('sub-expire-display');
 
     if (user) {
-      window.currentUser = user;
-      if(btn && nameSpan) {
+        window.currentUser = user;
+        if (btn && nameSpan) {
             try {
-                // 🚀 БЕЗПЕЧНИЙ ПОШУК ІМЕНІ
                 let displayName = "КОРИСТУВАЧ";
-                    let avatarUrl = "";
-                    
-                    if (user.user_metadata && user.user_metadata.full_name) {
-                        // Беремо тільки перше слово (Ім'я) без прізвища
-                        displayName = user.user_metadata.full_name.split(' ')[0];
-                    } else if (user.user_metadata && user.user_metadata.name) {
-                        displayName = user.user_metadata.name.split(' ')[0];
-                    } else if (user.email) {
-                        displayName = user.email.split('@')[0];
-                    } else if (user.phone) {
-                        displayName = user.phone;
-                    }
-                    
-                    // Витягуємо аватарку, якщо вона є
-                    if (user.user_metadata && user.user_metadata.avatar_url) {
-                        avatarUrl = user.user_metadata.avatar_url;
-                    }
+                let avatarUrl = "";
 
-                    nameSpan.innerText = displayName;
-                    
-                    // Показуємо аватарку, якщо вона знайдена
-                    const avatarImg = document.getElementById('user-avatar');
-                    if(avatarImg && avatarUrl) {
-                        avatarImg.src = avatarUrl;
-                        avatarImg.style.display = 'block';
-                    }
+                if (user.user_metadata && user.user_metadata.full_name) {
+                    displayName = user.user_metadata.full_name.split(' ')[0];
+                } else if (user.email) {
+                    displayName = user.email.split('@')[0];
+                }
 
-            btn.style.color = 'var(--success)';
-            
+                if (user.user_metadata && user.user_metadata.avatar_url) {
+                    avatarUrl = user.user_metadata.avatar_url;
+                }
+
+                nameSpan.innerText = displayName;
+                const avatarImg = document.getElementById('user-avatar');
+                if (avatarImg && avatarUrl) {
+                    avatarImg.src = avatarUrl;
+                    avatarImg.style.display = 'block';
+                }
+                btn.style.color = 'var(--success)';
+            } catch (e) { console.error("Помилка профілю:", e); }
         }
 
-      try {
-          // Шукаємо користувача в базі
-let { data: profile } = await sbClient.from('profiles').select('*').eq('id', user.id).maybeSingle();
+        try {
+            // Шукаємо або створюємо профіль у Supabase
+            let { data: profile } = await sbClient.from('profiles').select('*').eq('id', user.id).maybeSingle();
 
-// --- МАГІЯ: ЯКЩО ЦЕ НОВИЙ КОРИСТУВАЧ ---
-if (!profile) {
-    console.log("Новий користувач! Даруємо 45 днів PRO.");
-    
-    // Рахуємо дату: сьогодні + 45 днів
-    const trialEnd = new Date();
-    trialEnd.setDate(trialEnd.getDate() + 45);
-
-    // Створюємо йому профіль у базі
-    const { data: newProfile, error } = await sbClient.from('profiles')
-        .insert([{
-            id: user.id,
-            plan: 'pro',  // Ставимо тариф pro на тестовий період
-            expires_at: trialEnd.toISOString(),
-            apts_limit: 10 // Дефолтна кількість квартир (можете змінити, якщо треба)
-        }])
-        .select()
-        .single();
-
-    if (!error && newProfile) {
-        profile = newProfile; // Підставляємо новий профіль, щоб код нижче його побачив
-    } else {
-        console.error("Помилка створення профілю:", error);
-    }
-} catch (error) {
-        console.error("Помилка профілю:", error);
-    }
-// --- КІНЕЦЬ МАГІЇ ---
-          if (profile && profile.expires_at) {
-              const expDate = new Date(profile.expires_at);
-              if (subExpireEl) {
-                // Якщо рік 2140 - це наш довічний безліміт, не пишемо дату!
-                if (profile.expires_at && String(profile.expires_at).includes('2140')) {
-                            // Безліміт
-                            subExpireEl.innerText = profile.apts_limit + ' кв | Безліміт';
-                        } else {
-                            // Показуємо кількість квартир і дату (без слова PRO)
-                            subExpireEl.innerText = profile.apts_limit + ' кв | до ' + expDate.toLocaleDateString();
-                        }
-                subExpireEl.style.display = 'block';
+            if (!profile) {
+                const trialEnd = new Date();
+                trialEnd.setDate(trialEnd.getDate() + 45);
+                const { data: newProfile } = await sbClient.from('profiles').insert([{
+                    id: user.id,
+                    plan: 'pro',
+                    expires_at: trialEnd.toISOString(),
+                    apts_limit: 10
+                }]).select().single();
+                profile = newProfile;
             }
-              if(window.app) window.app.state.license = { type: 'pro', exp: profile.expires_at };
-          }
-      } catch (e) { console.error(e); }
 
-      if (window.app && window.app.state.objects.length <= 1) await window.cloudLoad();
+            if (profile && profile.expires_at) {
+                const expDate = new Date(profile.expires_at);
+                if (subExpireEl) {
+                    let text = profile.apts_limit + ' кв | до ' + expDate.toLocaleDateString();
+                    if (profile.expires_at.includes('2140')) text = profile.apts_limit + ' кв | Безліміт';
+                    subExpireEl.innerText = text;
+                    subExpireEl.style.display = 'block';
+                }
+                if (window.app) window.app.state.license = { type: 'pro', exp: profile.expires_at };
+            }
+            
+            // Завантаження даних
+            if (window.app && window.app.state.objects && window.app.state.objects.length <= 1) {
+                await window.cloudLoad();
+            }
+
+        } catch (error) {
+            console.error("Помилка бази даних:", error);
+        }
 
     } else {
-      window.currentUser = null;
-      if(btn && nameSpan) { 
-          nameSpan.innerText = "Вхід";
-          btn.style.color = 'var(--primary)';
-          btn.onclick = window.googleLogin;
-      }
-      if(subExpireEl) subExpireEl.style.display = 'none';
+        // --- ЯКЩО ЮЗЕР НЕ ЗАЛОГІНЕНИЙ ---
+        window.currentUser = null;
+        if (btn && nameSpan) {
+            nameSpan.innerText = "Вхід";
+            btn.style.color = 'var(--primary)';
+            btn.onclick = window.googleLogin;
+        }
+        if (subExpireEl) subExpireEl.style.display = 'none';
     }
-  });
+});
   // 5. ЗАВАНТАЖЕННЯ (DOWNLOAD) - "Розпаковка"
   window.cloudLoad = async () => {
       if (!window.currentUser) return;
