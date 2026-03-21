@@ -2119,88 +2119,88 @@ checkLimit() {
     }
     // --- КІНЕЦЬ ГРАФІКІВ ---
     // --- CRM СИСТЕМА (ДОСТУП) ---
-    openAccessMenu() {
-        // 1. Закриваємо інші меню
-        const ids = ['menuModal', 'mobile-dropdown', 'chartModal'];
-        ids.forEach(id => { 
-            const el = document.getElementById(id); 
-            if(el) el.style.display='none'; 
-        });
-        
-        // 2. Відкриваємо наше вікно
-        const modal = document.getElementById('accessModal');
-        if(modal) modal.style.display = 'flex';
-        
-        // 3. Скидаємо вибір на Менеджера
-        const firstRole = document.querySelector('.role-card');
-        if(firstRole) this.selectRole(firstRole, 'manager');
-        const emailInput = document.getElementById('new-user-email');
-        if(emailInput) emailInput.value = '';
-
-        // 4. Малюємо список
-        this.renderUserList();
-    },
-
-    selectRole(el, role) {
-        document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
-        el.classList.add('selected');
-        this.selectedRole = role;
-        const aptBlock = document.getElementById('apt-selector-block');
-        const aptSelect = document.getElementById('access-apt-select');
-        if (role === 'tenant') {
-            if (aptBlock) aptBlock.style.display = 'block';
-            if (aptSelect) aptSelect.innerHTML = (this.currentData.apartments || []).map(a => `<option value="${a.id}">${a.name}</option>`).join('');
-        } else {
-            if (aptBlock) aptBlock.style.display = 'none';
-        }
-    },
-
-    async grantUserAccess() {
-        try {
+        openAccessMenu() {
+            // 1. Закриваємо інші меню
+            const ids = ['menuModal', 'mobile-dropdown', 'chartModal'];
+            ids.forEach(id => { const el = document.getElementById(id); if(el) el.style.display='none'; });
+            
+            // 2. Відкриваємо наше вікно
+            document.getElementById('accessModal').style.display = 'flex';
+            
+            // 3. Скидаємо вибір на Менеджера
+            const firstRole = document.querySelector('.role-card');
+            if(firstRole) this.selectRole(firstRole, 'manager');
             const emailInput = document.getElementById('new-user-email');
-            if (!emailInput) return;
-            const email = emailInput.value.trim().toLowerCase();
-            if (!email || !email.includes('@')) { alert("Введіть email!"); return; }
-            
-            let label = "Весь об'єкт";
-            let aptId = null;
-            if (this.selectedRole === 'tenant') {
-                const aptSelect = document.getElementById('access-apt-select');
-                if (aptSelect) {
-                    aptId = aptSelect.value;
-                    const aptObj = this.currentData.apartments.find(a => a.id == aptId);
-                    label = aptObj ? aptObj.name : 'Квартира';
-                }
-            }
-            
-            const newUser = { id: Date.now(), email, role: this.selectedRole, accessLabel: label, aptId };
-            if (!this.currentData.users) this.currentData.users = [];
-            this.currentData.users.push(newUser);
-            
-            const { error } = await sbClient.from('houses').update({ allowed_emails: this.currentData.users }).eq('id', this.currentData.id);
-            if (error) throw error;
-            
-            this.renderUserList();
-            emailInput.value = '';
-            const roleNames = { 'manager': '⚒️ Менеджер', 'tenant': '🏠 Мешканець', 'operator': '📝 Обліковець' };
-            const msg = `👋 Вам надано доступ!\n🏠 Об'єкт: ${this.currentData.name}\n🎭 Роль: ${label} (${roleNames[this.selectedRole] || this.selectedRole})\n\nВхід: https://comunalco.com`;
-            this.openShareModal(msg);
-        } catch (e) {
-            console.error(e);
-            alert("Помилка збереження.");
-        }
-    },
+            if(emailInput) emailInput.value = '';
 
-    async deleteUserAccess(id) {
-        try {
-            if (!confirm("Забрати доступ?")) return;
-            this.currentData.users = this.currentData.users.filter(u => u.id !== id);
-            await sbClient.from('houses').update({ allowed_emails: this.currentData.users }).eq('id', this.currentData.id);
+            // 4. Малюємо список (поки що демо, згодом підтягнемо з бази)
             this.renderUserList();
-        } catch (e) {
-            console.error(e);
-        }
-    },
+        },
+
+        selectRole(el, role) {
+            document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+            el.classList.add('selected');
+            this.selectedRole = role;
+            const aptBlock = document.getElementById('apt-selector-block');
+            const aptSelect = document.getElementById('access-apt-select');
+            if (role === 'tenant') {
+                if (aptBlock) aptBlock.style.display = 'block';
+                if (aptSelect) aptSelect.innerHTML = (this.currentData.apartments || []).map(a => `<option value="${a.id}">${a.name}</option>`).join('');
+            } else {
+                if (aptBlock) aptBlock.style.display = 'none';
+            }
+        },
+
+        async grantUserAccess() {
+            try {
+                const emailInput = document.getElementById('new-user-email');
+                if (!emailInput) return;
+                const email = emailInput.value.trim().toLowerCase();
+                if (!email || !email.includes('@')) { alert("Введіть email!"); return; }
+                
+                let label = "Весь об'єкт";
+                let aptId = null;
+                
+                if (this.selectedRole === 'tenant') {
+                    const aptSelect = document.getElementById('access-apt-select');
+                    if (aptSelect) {
+                        aptId = aptSelect.value;
+                        const aptObj = this.currentData.apartments.find(a => a.id == aptId);
+                        label = aptObj ? aptObj.name : 'Квартира';
+                    }
+                }
+                
+                const newUser = { id: Date.now(), email, role: this.selectedRole, accessLabel: label, aptId };
+                
+                if (!this.currentData.users) this.currentData.users = [];
+                this.currentData.users.push(newUser);
+                
+                const { error } = await sbClient.from('houses').update({ allowed_emails: this.currentData.users }).eq('id', this.currentData.id);
+                if (error) throw error;
+                
+                this.renderUserList();
+                emailInput.value = '';
+                
+                const roleNames = { 'manager': '⚒️ Менеджер', 'tenant': '🏠 Мешканець', 'operator': '📝 Обліковець' };
+                const msg = `👋 Вам надано доступ!\n🏠 Об'єкт: ${this.currentData.name}\n🎭 Роль: ${label} (${roleNames[this.selectedRole] || this.selectedRole})\n\nВхід: https://comunalco.com`;
+                this.openShareModal(msg);
+                
+            } catch (e) {
+                console.error(e);
+                alert("Помилка збереження.");
+            }
+        },
+
+        async deleteUserAccess(id) {
+            try {
+                if (!confirm("Забрати доступ?")) return;
+                this.currentData.users = this.currentData.users.filter(u => u.id !== id);
+                await sbClient.from('houses').update({ allowed_emails: this.currentData.users }).eq('id', this.currentData.id);
+                this.renderUserList();
+            } catch (e) {
+                console.error(e);
+            }
+        },
 
     renderUserList() {
         const list = document.getElementById('users-list-container');
