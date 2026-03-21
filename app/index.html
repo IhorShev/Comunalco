@@ -2181,11 +2181,9 @@ checkLimit() {
                 aptId: aptId
             };
 
-            // 1. Зберігаємо локально для миттєвого відображення
             if (!this.currentData.users) this.currentData.users = [];
             this.currentData.users.push(newUser);
             
-            // 2. ЗАПИСУЄМО В SUPABASE (в нашу нову колонку)
             try {
                 const { error } = await sbClient.from('houses')
                     .update({ allowed_emails: this.currentData.users })
@@ -2196,29 +2194,23 @@ checkLimit() {
                 this.renderUserList();
                 emailInput.value = '';
 
-                // Формуємо повідомлення
                 const roleNames = { 'manager': '⚒️ Менеджер', 'tenant': '🏠 Мешканець', 'operator': '📝 Обліковець' };
                 const msg = `👋 Вам надано доступ!\n🏠 Об'єкт: ${this.currentData.name}\n🎭 Роль: ${label} (${roleNames[this.selectedRole] || this.selectedRole})\n\nВхід: https://comunalco.com\n🌐 Увійдіть через Google пошту: ${email}`;
                 this.openShareModal(msg);
 
             } catch (e) {
                 console.error("Помилка збереження доступу:", e);
-                alert("Не вдалося зберегти доступ у базі даних.");
+                alert("Не вдалося зберегти доступ.");
             }
         },
 
         async deleteUserAccess(id) {
             if (!confirm("Забрати доступ у цього користувача?")) return;
-            
-            // Видаляємо локально
             this.currentData.users = this.currentData.users.filter(u => u.id !== id);
-            
-            // Оновлюємо базу
             try {
                 await sbClient.from('houses')
                     .update({ allowed_emails: this.currentData.users })
                     .eq('id', this.currentData.id);
-                
                 this.renderUserList();
             } catch (e) {
                 console.error("Помилка видалення:", e);
