@@ -2135,9 +2135,9 @@ checkLimit() {
 
         // 4. Малюємо список (поки що демо, згодом підтягнемо з бази)
         this.renderUserList();
-    }
+   },
 
-    selectRole(el, role) {
+        selectRole(el, role) {
             document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
             el.classList.add('selected');
             this.selectedRole = role;
@@ -2194,7 +2194,7 @@ checkLimit() {
             }
         },
 
-    renderUserList() {
+        renderUserList() {
         const list = document.getElementById('users-list-container');
         if(!list) return;
         
