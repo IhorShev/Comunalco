@@ -3570,111 +3570,97 @@ checkLimit() {
     applyRoleRestrictions(role = null) {
         const userRole = role || window.currentRole || 'admin';
         
-        // Якщо це власник або керуючий - нічого не ховаємо
+        // 1. Очищаємо старий щит (якщо ви зайшли під іншим акаунтом)
+        let style = document.getElementById('role-css-shield');
+        if (style) style.remove();
+        
+        // Якщо це власник або менеджер - виходимо, все дозволено
         if (userRole === 'owner' || userRole === 'manager' || userRole === 'admin') return;
 
-        // 1. Приховуємо кнопки управління об'єктом (Видалити, Додати)
-        const deleteBtn = document.querySelector('span[title="Видалити об\'єкт"]');
-        if(deleteBtn) deleteBtn.style.display = 'none';
-        
-        const addObjBtn = document.querySelector('div[title="Додати об\'єкт"]');
-        if(addObjBtn) addObjBtn.style.display = 'none';
+        // 2. СТВОРЮЄМО НЕПРОБИВНИЙ CSS-ЩИТ
+        // Цей код неможливо "перемалювати", він працює на рівні браузера
+        style = document.createElement('style');
+        style.id = 'role-css-shield';
+        let css = '';
 
-        // 2. Приховуємо верхнє меню (Тарифи, Доступ, Аналітика, Локальні копії)
-        const topMenu = document.querySelectorAll('.desktop-only span');
-        topMenu.forEach(el => {
-            const txt = el.innerText;
-            if(txt.includes('Тарифи') || txt.includes('Доступ') || txt.includes('Аналітика') || txt.includes('Локальні копії')) {
-                el.style.display = 'none';
-            }
-        });
-
-        const mobMenu = document.getElementById('mobile-dropdown');
-        if(mobMenu) {
-            Array.from(mobMenu.children).forEach(child => {
-                const txt = child.innerText;
-                if(txt.includes('Аналітика') || txt.includes('Доступ')) {
-                    child.style.display = 'none';
-                }
-            });
-        }
-
-        // 3. Блокуємо загальні налаштування тарифів
-        const topTariffs = document.querySelectorAll('details input');
-        topTariffs.forEach(inp => inp.disabled = true);
-
-        // 4. СПЕЦИФІКА ДЛЯ ОБЛІКОВЦЯ (Тільки показники)
         if (userRole === 'operator') {
-            // Ховаємо всі кнопки "+ Додати" та червоні хрестики (видалення)
-            document.querySelectorAll('.btn-add, .btn-add-counter, button[onclick="app.addGroup()"], button[onclick="app.addApartment()"]').forEach(btn => btn.style.display = 'none');
-            document.querySelectorAll('.del-icon').forEach(icon => icon.style.display = 'none');
-            
-            // Ховаємо блок "Банківські реквізити"
-            const reqTitle = document.querySelector('div.section-title[style*="margin-top:20px"]');
-            if(reqTitle && reqTitle.innerText.includes('реквізити')) reqTitle.style.display = 'none';
-            const reqCont = document.getElementById('requisites-container');
-            if(reqCont) reqCont.style.display = 'none';
-
-            // Блокуємо фінансові поля у квартирах (Борг, Сплачено, Телефон)
-            document.querySelectorAll('input[onchange*="debt"], input[onchange*="paid"], input[onchange*="phone"]').forEach(inp => {
-                inp.disabled = true;
-                inp.style.opacity = '0.5';
-            });
-            document.querySelectorAll('select[onchange*="messenger"]').forEach(sel => {
-                sel.disabled = true;
-                sel.style.opacity = '0.5';
-            });
-
-            // Ховаємо нижню панель "Закрити місяць" та "Надіслати"
-            const stickyFooter = document.querySelector('.sticky-footer');
-            if(stickyFooter) stickyFooter.style.display = 'none';
-
-            // Ховаємо розсилку Телеграм та налаштування бота
-            const batchControls = document.getElementById('batch-controls');
-            if(batchControls) batchControls.style.display = 'none';
-            document.querySelectorAll('.mass-send-chk, .switch, button[onclick^="app.copyBotLink"]').forEach(el => el.style.display = 'none');
-            
-            // Ховаємо кнопки відправки квитанцій та ПІН-кодів
-            document.querySelectorAll('button[onclick^="app.openSendFormatModal"], button[onclick^="app.sendAccessData"], div[onclick^="app.generateNewPin"]').forEach(btn => btn.style.display = 'none');
-            
-            // Підсвічуємо зверху, що це режим обліковця
-            const titleInput = document.getElementById('object-title');
-            if(titleInput && !titleInput.value.includes('ОБЛІКОВЦЯ')) {
-                titleInput.value = titleInput.value + ' (РЕЖИМ ОБЛІКОВЦЯ)';
-                titleInput.style.color = 'var(--gold)';
-            }
-        }
-
-        // 5. СПЕЦИФІКА ДЛЯ МЕШКАНЦЯ
-        if (userRole === 'tenant' && window.currentAptId) {
-            const apartmentsDiv = document.getElementById('apartments-container');
-            const allApts = apartmentsDiv.querySelectorAll('details');
-            
-            allApts.forEach((details, index) => {
-                const aptData = this.currentData.apartments[index];
-                if (aptData.id != window.currentAptId) {
-                    details.style.display = 'none'; 
-                } else {
-                    details.open = true;
-                    const summary = details.querySelector('summary');
-                    if(summary) summary.innerHTML = `<div>🏠 <b>${aptData.name}</b></div>`;
+            css = `
+                /* Приховуємо кнопки додавання та видалення */
+                .btn-add, .btn-add-counter, .del-icon,
+                button[onclick*="addGroup"], button[onclick*="addApartment"],
+                span[title*="Видалити"], div[title*="Додати"] { display: none !important; }
+                
+                /* Приховуємо фінансові блоки та нижню панель */
+                #requisites-container, #extra-tariffs-container, .sticky-footer, #batch-controls { display: none !important; }
+                
+                /* Приховуємо розсилки і налаштування бота */
+                .mass-send-chk, .switch, 
+                button[onclick*="copyBotLink"], button[onclick*="openSendFormatModal"], 
+                button[onclick*="sendAccessData"], div[onclick*="generateNewPin"] { display: none !important; }
+                
+                /* Блокуємо поля вводу (Борг, Сплачено, Телефон, Тарифи) */
+                input[onchange*="debt"], input[onchange*="paid"], input[onchange*="phone"], 
+                select[onchange*="messenger"],
+                input[onchange*="updateTariff"], input[onchange*="updateExtraTariff"] { 
+                    pointer-events: none !important; 
+                    opacity: 0.5 !important; 
+                    background-color: transparent !important;
                 }
-            });
-
-            const addAptBtn = document.querySelector('button[onclick="app.addApartment()"]');
-            if(addAptBtn) addAptBtn.parentElement.style.display = 'none';
-
-            const groupsContainer = document.getElementById('groups-container');
-            if(groupsContainer) groupsContainer.style.display = 'none';
-            
-            const addGroupBtn = document.querySelector('button[onclick="app.addGroup()"]');
-            if(addGroupBtn) addGroupBtn.parentElement.style.display = 'none';
-
-            // Стиль перегляду тільки для мешканця
-            document.body.classList.add('archive-mode');
-            const saveBtn = document.querySelector('.sticky-footer button.btn-warning');
-            if(saveBtn) saveBtn.style.display = 'none';
+            `;
         }
+        
+        style.innerHTML = css;
+        document.head.appendChild(style);
+
+        // 3. ХОВАЄМО ТЕКСТОВІ МЕНЮ ТА ОБРОБЛЯЄМО МЕШКАНЦЯ (із затримкою)
+        setTimeout(() => {
+            if (userRole === 'operator') {
+                // Міняємо заголовок
+                const titleInput = document.getElementById('object-title');
+                if(titleInput && !titleInput.value.includes('ОБЛІКОВЦЯ')) {
+                    titleInput.value = titleInput.value + ' (РЕЖИМ ОБЛІКОВЦЯ)';
+                    titleInput.style.color = 'var(--gold)';
+                }
+                
+                // Ховаємо верхнє меню по назвах
+                const wordsToHide = ['Тарифи', 'Доступ', 'Аналітика', 'Локальні копії'];
+                document.querySelectorAll('span, div, a, button').forEach(el => {
+                    if (el.children.length === 0 && wordsToHide.some(w => el.innerText.includes(w))) {
+                        el.style.display = 'none';
+                    }
+                });
+            }
+            
+            // Логіка для мешканця (залишається як була)
+            if (userRole === 'tenant' && window.currentAptId) {
+                const apartmentsDiv = document.getElementById('apartments-container');
+                if (apartmentsDiv) {
+                    const allApts = apartmentsDiv.querySelectorAll('details');
+                    allApts.forEach((details, index) => {
+                        const aptData = this.currentData.apartments[index];
+                        if (aptData && aptData.id != window.currentAptId) {
+                            details.style.display = 'none'; 
+                        } else if (aptData) {
+                            details.open = true;
+                            const summary = details.querySelector('summary');
+                            if(summary) summary.innerHTML = `<div>🏠 <b>${aptData.name}</b></div>`;
+                        }
+                    });
+                }
+                const addAptBtn = document.querySelector('button[onclick="app.addApartment()"]');
+                if(addAptBtn) addAptBtn.parentElement.style.display = 'none';
+
+                const groupsContainer = document.getElementById('groups-container');
+                if(groupsContainer) groupsContainer.style.display = 'none';
+                
+                const addGroupBtn = document.querySelector('button[onclick="app.addGroup()"]');
+                if(addGroupBtn) addGroupBtn.parentElement.style.display = 'none';
+
+                document.body.classList.add('archive-mode');
+                const saveBtn = document.querySelector('.sticky-footer button.btn-warning');
+                if(saveBtn) saveBtn.style.display = 'none';
+            }
+        }, 150); // Затримка 150мс дає змогу браузеру намалювати весь HTML перед застосуванням
     }
    // --- ФУНКЦІЯ ІСТОРІЇ (Оновлено для Табів та різних Ролей) ---
     openHistory() {
