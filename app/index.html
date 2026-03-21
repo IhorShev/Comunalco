@@ -4249,27 +4249,28 @@ window.addEventListener('load', () => {
     }
 });
   // 5. ЗАВАНТАЖЕННЯ (DOWNLOAD) - "Розпаковка"
-  window.cloudLoad = async () => {
-      if (!window.currentUser) return;
-      
-      const btn = document.querySelector('.sticky-footer button.btn-warning');
-      const oldText = btn ? btn.innerText : '';
-      if(btn) btn.innerText = "📥 Синхронізація...";
+ window.cloudLoad = async () => {
+    if (!window.currentUser) return;
 
-      console.log("☁️ Отримуємо дані з Supabase...");
-      const userId = window.currentUser.id;
+    const btn = document.querySelector('.sticky-footer button.btn-warning');
+    const oldText = btn ? btn.innerText : '';
+    if (btn) btn.innerText = "⏳ Синхронізація...";
 
-      // 1. Тягнемо будинки з усіма "сейфами"
-      const { data: houses, error: errH } = await sbClient
-          .from('houses')
-          .select('*')
-          .or(`owner_id.eq.${userId},allowed_emails.cs.[{"email":"${window.currentUser.email}"}]`)
+    console.log("☁️ Отримуємо дані з Supabase...");
+    const userId = window.currentUser.id;
+    const userEmail = window.currentUser.email;
 
-      if (errH || !houses || houses.length === 0) {
-          console.log("📭 Хмара пуста");
-          if(btn) btn.innerText = oldText;
-          return;
-      }
+    // 1. Тягнемо будинки, де користувач є власником АБО має доступ по email
+    const { data: houses, error: errH } = await sbClient
+        .from('houses')
+        .select('*')
+        .or(`owner_id.eq.${userId},allowed_emails.cs.[{"email":"${userEmail}"}]`);
+
+    if (errH || !houses || houses.length === 0) {
+        console.log("☁️ Хмара пуста або помилка");
+        if (btn) btn.innerText = oldText;
+        return;
+    } 
 
       let newObjects = [];
 
