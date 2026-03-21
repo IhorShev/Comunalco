@@ -4317,7 +4317,6 @@ window.addEventListener('load', () => {
           
           if (dbApts) {
               cleanApts = dbApts.map(a => {
-                  // 🔥 МАГІЯ: Розпаковуємо current_data (лічильники, цифри)
                   const savedState = a.current_data || {};
                   
                   return {
@@ -4330,29 +4329,25 @@ window.addEventListener('load', () => {
                         debt: parseFloat(a.debt || 0),
                         paid: parseFloat(a.paid || 0),
                         
-                        // 🔥 ОСЬ ДВІ КОЛОНКИ, ЯКІ МИ ЗАБУЛИ ЗАВАНТАЖИТИ З ХМАРИ:
                         telegram_chat_id: a.telegram_chat_id, 
                         can_submit_readings: a.can_submit_readings,
                         
-                        // Відновлюємо точні цифри
                         prev: savedState.prev || {ed:0, en:0, w:0, g:0},
                         curr: savedState.curr || {ed:0, en:0, w:0, g:0},
                         custom_counters: savedState.custom || [],
                         services: savedState.serv || [],
                         
-                        // Для сумісності
                         group_id: 1 
                     };
                 });
 
-                // 🔥 ДОДАЄМО СОРТУВАННЯ, ЩОБ КВАРТИРИ ЙШЛИ ПО ПОРЯДКУ
                 cleanApts.sort((a, b) => a.id - b.id);
-              }
+          }
 
-          // 4. Розпаковуємо дані будинку (Групи, Реквізити, Історія)
+          // 4. Розпаковуємо дані будинку
           const groups = h.groups_data || [{ id: 1, name: "Загальнобудинкові (МЗК)", prev:{}, curr:{}, services:[], custom_counters:[] }];
           const extras = h.extra_data || { extra: [], req: [] };
-          const history = h.history_data || []; // Історія архівів
+          const history = h.history_data || [];
 
           newObjects.push({
               id: h.id,
@@ -4362,7 +4357,9 @@ window.addEventListener('load', () => {
               groups: groups,
               extra_tariffs: extras.extra || [],
               requisites: extras.req || [],
-              history: history
+              history: history,
+              users: h.allowed_emails || [], // 🔥 ФІКС 1: ЗАВАНТАЖУЄМО РОЛІ (Щоб розпізнати Обліковця)
+              owner_id: h.owner_id           // 🔥 ФІКС 2: ЗАПАМ'ЯТОВУЄМО СПРАВЖНЬОГО ВЛАСНИКА
           });
       }
 
@@ -4386,7 +4383,6 @@ window.addEventListener('load', () => {
     window.cloudSave = async (data) => {
         if(!window.currentUser) return;
 
-        // БРОНЯ ВІД ЗАВИСАНЬ: Якщо збереження вже йде - нове чекає своєї черги
         if (window.isSavingNow) {
             console.log("⏳ Пропускаємо, бо попереднє збереження ще йде...");
             return;
@@ -4410,11 +4406,12 @@ window.addEventListener('load', () => {
                 // 1. Зберігаємо БУДИНОК
                 const res1 = await sbClient.from('houses').upsert({
                     id: String(house.id),
-                    owner_id: userId,
+                    owner_id: house.owner_id || userId, // 🔥 ФІКС 3: ЗБЕРІГАЄМО СПРАВЖНЬОГО ВЛАСНИКА
                     name: house.name,
                     groups_data: house.groups,
                     extra_data: extraData,
-                    history_data: house.history
+                    history_data: house.history,
+                    allowed_emails: house.users || []   // 🔥 ФІКС 4: ЗБЕРІГАЄМО СПИСОК РОЛЕЙ
                 });
                 if (res1.error) console.error("⚠️ Помилка будинку:", res1.error);
 
@@ -4435,7 +4432,6 @@ window.addEventListener('load', () => {
                     const aptsToSave = house.apartments.map(a => ({
                         id: String(a.id),
                         house_id: String(house.id),
-                        // ❌ ВИДАЛИЛИ owner_id, бо цієї колонки немає в базі
                         name: a.name,
                         phone: a.phone || '',
                         pin: String(a.pin || ''),
@@ -4445,6 +4441,7 @@ window.addEventListener('load', () => {
                         paid: parseFloat(a.paid || 0),
                         total_bill: parseFloat(a.bill || 0),
                         telegram_chat_id: a.telegram_chat_id || null,
+                        can_submit_readings: a.can_submit_readings || false,
                         current_data: {
                             prev: a.prev,
                             curr: a.curr,
@@ -4466,7 +4463,6 @@ window.addEventListener('load', () => {
         } catch (err) {
             console.error("❌ Критична помилка в cloudSave:", err);
         } finally {
-            // Знімаємо блокування за БУДЬ-ЯКИХ умов, щоб програма не зависла назавжди!
             window.isSavingNow = false; 
         }
     };
