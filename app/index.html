@@ -2116,7 +2116,7 @@ checkLimit() {
                 }
             }
         });
-    },
+    }
     // --- КІНЕЦЬ ГРАФІКІВ ---
     // --- CRM СИСТЕМА (ДОСТУП) ---
     openAccessMenu() {
@@ -2131,7 +2131,7 @@ checkLimit() {
         if(emailInput) emailInput.value = '';
 
         this.renderUserList();
-    },
+    }
 
     selectRole(el, role) {
         document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
@@ -2145,7 +2145,7 @@ checkLimit() {
         } else {
             if (aptBlock) aptBlock.style.display = 'none';
         }
-    },
+    }
 
     async grantUserAccess() {
         try {
@@ -2185,7 +2185,7 @@ checkLimit() {
             console.error(e);
             alert("Помилка збереження.");
         }
-    },
+    }
 
     async deleteUserAccess(id) {
         try {
@@ -2196,7 +2196,7 @@ checkLimit() {
         } catch (e) {
             console.error(e);
         }
-    },
+    }
 
     renderUserList() {
         const list = document.getElementById('users-list-container');
@@ -2226,7 +2226,7 @@ checkLimit() {
                 </div>
             </div>
         `).join('');
-    }, // <-- КОМА ТУТ!
+    } // <-- КОМА ТУТ!
 
     renderExtraTariffs() { 
         const container = document.getElementById('extra-tariffs-container');
@@ -2234,7 +2234,7 @@ checkLimit() {
         container.innerHTML = (this.currentData.extra_tariffs || []).map((t, i) => 
             `<div class="custom-row"><input type="text" value="${t.name}" placeholder="Послуга" onchange="app.updateExtraTariff(${i}, 'name', this.value)"><input type="number" value="${t.val}" placeholder="Ціна" onchange="app.updateExtraTariff(${i}, 'val', this.value)"><span class="del-icon" onclick="app.delExtraTariff(${i})">&times;</span></div>`
         ).join('');
-    }, // <-- КОМА ТУТ!
+    } // <-- КОМА ТУТ!
 
     renderRequisites() { 
         const container = document.getElementById('requisites-container');
@@ -2242,7 +2242,7 @@ checkLimit() {
         container.innerHTML = (this.currentData.requisites || []).map((r, i) => 
             `<div class="custom-row"><input type="text" value="${r.name}" placeholder="Банк" onchange="app.updateReq(${i}, 'name', this.value)"><input type="text" value="${r.val}" placeholder="IBAN" onchange="app.updateReq(${i}, 'val', this.value)"><span class="del-icon" onclick="app.delReq(${i})">&times;</span></div>`
         ).join('');
-    }, // <-- КОМА ТУТ!
+    } // <-- КОМА ТУТ!
     
     renderGroups() { 
         document.getElementById('groups-container').innerHTML = this.currentData.groups.map((g, i) => `
@@ -2268,7 +2268,7 @@ checkLimit() {
                 </div>
             </div>
         </details>`).join(''); 
-    }, // <-- КОМА ТУТ!
+    } // <-- КОМА ТУТ!
 
     renderApartments() {
             document.getElementById('apartments-container').innerHTML = (this.currentData.apartments || []).map((a, i) => { 
