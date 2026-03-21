@@ -2157,35 +2157,35 @@ checkLimit() {
     }
 
    async grantUserAccess() {
-            const emailInput = document.getElementById('new-user-email');
-            if (!emailInput) return;
-            const email = emailInput.value.trim().toLowerCase();
-            if (!email || !email.includes('@')) { alert("Введіть коректний Email!"); return; }
-
-            let label = "Весь об'єкт";
-            let aptId = null;
-
-            if (this.selectedRole === 'tenant') {
-                const aptSelect = document.getElementById('access-apt-select');
-                if (aptSelect) {
-                    aptId = aptSelect.value;
-                    const aptObj = this.currentData.apartments.find(a => a.id == aptId);
-                    label = aptObj ? aptObj.name : 'Квартира';
-                }
-            }
-
-            const newUser = {
-                id: Date.now(),
-                email: email,
-                role: this.selectedRole,
-                accessLabel: label,
-                aptId: aptId
-            };
-
-            if (!this.currentData.users) this.currentData.users = [];
-            this.currentData.users.push(newUser);
-            
             try {
+                const emailInput = document.getElementById('new-user-email');
+                if (!emailInput) return;
+                const email = emailInput.value.trim().toLowerCase();
+                if (!email || !email.includes('@')) { alert("Введіть коректний Email!"); return; }
+
+                let label = "Весь об'єкт";
+                let aptId = null;
+
+                if (this.selectedRole === 'tenant') {
+                    const aptSelect = document.getElementById('access-apt-select');
+                    if (aptSelect) {
+                        aptId = aptSelect.value;
+                        const aptObj = this.currentData.apartments.find(a => a.id == aptId);
+                        label = aptObj ? aptObj.name : 'Квартира';
+                    }
+                }
+
+                const newUser = {
+                    id: Date.now(),
+                    email: email,
+                    role: this.selectedRole,
+                    accessLabel: label,
+                    aptId: aptId
+                };
+
+                if (!this.currentData.users) this.currentData.users = [];
+                this.currentData.users.push(newUser);
+                
                 const { error } = await sbClient.from('houses')
                     .update({ allowed_emails: this.currentData.users })
                     .eq('id', this.currentData.id);
@@ -2198,25 +2198,22 @@ checkLimit() {
                 const roleNames = { 'manager': '⚒️ Менеджер', 'tenant': '🏠 Мешканець', 'operator': '📝 Обліковець' };
                 const msg = `👋 Вам надано доступ!\n🏠 Об'єкт: ${this.currentData.name}\n🎭 Роль: ${label} (${roleNames[this.selectedRole] || this.selectedRole})\n\nВхід: https://comunalco.com\n🌐 Увійдіть через Google пошту: ${email}`;
                 this.openShareModal(msg);
-
             } catch (e) {
-                console.error("Помилка збереження доступу:", e);
+                console.error("Помилка доступу:", e);
                 alert("Не вдалося зберегти доступ.");
             }
         },
 
         async deleteUserAccess(id) {
-            if (!confirm("Забрати доступ у цього користувача?")) return;
-            this.currentData.users = this.currentData.users.filter(u => u.id !== id);
             try {
-                const { error } = await sbClient.from('houses')
+                if (!confirm("Забрати доступ?")) return;
+                this.currentData.users = this.currentData.users.filter(u => u.id !== id);
+                await sbClient.from('houses')
                     .update({ allowed_emails: this.currentData.users })
                     .eq('id', this.currentData.id);
-                if (error) throw error;
                 this.renderUserList();
             } catch (e) {
                 console.error("Помилка видалення:", e);
-                alert("Помилка при видаленні");
             }
         },
 
