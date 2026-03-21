@@ -393,8 +393,7 @@
 
     @media (max-width: 600px) {
         .top-menu-bar { gap: 6px !important; padding: 10px 8px !important; }
-        #auth-btn { min-width: 0 !important; max-width: 155px !important; padding: 5px 8px !important; }
-        
+                
         .chat-btn { width: auto !important; padding: 0 10px !important; }
         .menu-btn { width: auto !important; padding: 0 10px !important; }
         
@@ -410,14 +409,14 @@
 <div class="top-menu-bar" style="position: sticky; top: 0; background: var(--bg); z-index: 1000; padding: 10px 15px; border-bottom: 1px solid var(--border); margin: -10px -10px 10px -10px; box-shadow: 0 4px 10px rgba(0,0,0,0.35); display: flex; align-items: center; gap: 15px; justify-content: space-between;">
     
     <div style="position: relative; flex-shrink: 1; min-width: 0;" id="account-dropdown-wrapper">
-        <button onclick="toggleAccountMenu()" id="auth-btn" style="background: var(--bg-card); border: 1px solid var(--primary); padding: 5px 12px; border-radius: 20px; color: var(--primary); font-size: 13px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; max-width: 250px; height: 38px; transition: 0.2s; width: 100%;">
-            <img id="user-avatar" src="" alt="👤" style="width: 26px; height: 26px; border-radius: 50%; display: none; object-fit: cover; flex-shrink: 0;">
-            <div style="display: flex; flex-direction: column; align-items: flex-start; overflow: hidden; text-align: left; min-width: 0;">
-                <span id="user-name-display" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; font-size: 13px;">Гість</span>
-                <span id="sub-expire-display" style="font-size: 10px; opacity: 0.8; font-weight: normal; margin-top: -2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;"></span>
-            </div>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0; margin-left: auto;"><path d="M6 9l6 6 6-6"/></svg>
-        </button>
+        <button onclick="toggleAccountMenu()" id="auth-btn" style="background: var(--bg-card); border: 1px solid var(--border); padding: 5px 12px; border-radius: 12px; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: 0.3s;">
+    <img id="user-avatar" src="" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; display: none; border: 1px solid var(--border);">
+    <div style="display: flex; flex-direction: column; align-items: flex-start; text-align: left; line-height: 1.2;">
+        <span id="user-name-display" style="font-weight: bold; font-size: 14px; color: var(--text);">Вхід</span>
+        <span id="sub-expire-display" style="font-size: 11px; color: #9ca3af; display: none; margin-top: 2px;"></span>
+    </div>
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-left: 4px; opacity: 0.5;"><path d="m6 9 6 6 6-6"/></svg>
+</button>
         
         <div id="account-menu" style="display: none; position: absolute; top: 45px; left: 0; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 5px; box-shadow: 0 10px 25px rgba(0,0,0,0.8); z-index: 2000; min-width: 180px; backdrop-filter: blur(10px);">
             <div onclick="app.openMenu('premium'); toggleAccountMenu();" style="padding: 12px 15px; border-bottom: 1px solid var(--border); cursor: pointer; font-weight: bold; color: var(--primary); display: flex; align-items: center; gap: 10px; border-radius: 8px 8px 0 0; transition: 0.2s;" onmouseover="this.style.background='var(--border)'" onmouseout="this.style.background='transparent'">
