@@ -336,69 +336,150 @@
             
             #chat-modal-header { padding: 10px 15px !important; }
         }
+		
+		/* --- СТИЛІ ДЛЯ ПЛАШКИ ЗБЕРЕЖЕННЯ ЗВЕРХУ --- */
+.toast {
+    visibility: hidden;
+    min-width: 250px;
+    background-color: var(--success); /* Ваш зелений колір */
+    color: #fff;
+    text-align: center;
+    border-radius: 8px;
+    padding: 12px 20px;
+    position: fixed;
+    z-index: 99999; /* Поверх усього-усього */
+    left: 50%;
+    transform: translateX(-50%);
+    top: 20px; /* ЗВЕРХУ! */
+    font-size: 14px;
+    font-weight: bold;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+/* Анімація появи зверху вниз */
+.toast.show {
+    visibility: visible;
+    -webkit-animation: fadeinTop 0.5s, fadeoutTop 0.5s 2.5s;
+    animation: fadeinTop 0.5s, fadeoutTop 0.5s 2.5s;
+}
+
+@-webkit-keyframes fadeinTop {
+    from {top: -50px; opacity: 0;} 
+    to {top: 20px; opacity: 1;}
+}
+@keyframes fadeinTop {
+    from {top: -50px; opacity: 0;}
+    to {top: 20px; opacity: 1;}
+}
+@-webkit-keyframes fadeoutTop {
+    from {top: 20px; opacity: 1;} 
+    to {top: -50px; opacity: 0;}
+}
+@keyframes fadeoutTop {
+    from {top: 20px; opacity: 1;}
+    to {top: -50px; opacity: 0;}
+}
     </style>
 </head>
 <body>
 
-    <div class="top-menu-bar" style="position: sticky; top: 0; background: var(--bg); z-index: 1000; padding: 10px 15px; border-bottom: 1px solid var(--border); margin: -10px -10px 20px -10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
-        <div style="display:flex; align-items:center; gap:12px;">
-            <button onclick="app.toggleTheme()" style="background:none; border:none; cursor:pointer; padding:0; display:flex; align-items:center;" title="Змінити тему">
-                <svg class="theme-icon-svg" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-            </button>
-            <div style="display:flex; flex-direction:column; align-items:center;">
-                <span id="auth-btn" onclick="window.googleLogin()" style="border: 1px solid var(--primary); padding: 5px 12px; border-radius: 20px; color: var(--primary); font-size: 13px; font-weight:bold; cursor:pointer; display:flex; flex-direction:column; align-items:center; transition:0.2s; min-width: 90px; max-width: 150px; overflow: hidden; background: var(--card);">
-                    <div style="display:flex; align-items:center; gap:5px;">
-                         👤 <span id="user-name-display">Вхід</span>
-                    </div>
-                    <div id="sub-expire-display" style="font-size: 10px; color: inherit; display: none; opacity: 0.8; font-weight: normal; margin-top: 1px;"></div>
-                </span>
-                <span id="save-status" style="font-size:10px; font-weight:800; color:var(--text-sec); opacity:0; transition: opacity 0.3s ease; margin-top:2px;">✅ Збережено</span>
-            </div>
-          <div style="position: relative; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; width: auto; min-width: 50px; height: 50px; background: var(--bg-card); border: 1px solid var(--border); margin-left: 10px; padding: 0 5px; border-radius: 8px;" onclick="document.getElementById('chat-modal').style.display='flex'">
-    <span style="font-size: 20px; line-height: 1;">💬</span>
-    <span style="font-size: 10px; color: var(--text-sec); margin-top: 4px; text-align: center; font-weight: normal; font-family: sans-serif;">Чат будинку</span> 
-    <div id="admin-chat-badge" style="display: none; position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; font-size: 11px; font-weight: bold; padding: 2px 6px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.3); border: 2px solid var(--bg);">0</div>
-</div> 
-        </div>
+    <style>
+    /* Магія для мобільного фен-шую (з текстом) */
+    .mobile-text-chat { display: none !important; } /* ЗАВЖДИ ховаємо коротке слово на ПК */
+    
+    /* --- Спеціально для тосту в шапці --- */
+    .desktop-only-save { display: inline !important; } /* Показуємо на ПК */
+    .mobile-only-save { display: none !important; }  /* Ховаємо на ПК */
 
-        <div style="display:flex; align-items:center;">
-            <div class="desktop-only">
-                <span onclick="app.openMenu('premium')" style="color:var(--primary); font-weight:bold; cursor:pointer; font-size:14px;">💎 Тарифи</span>
-                <span onclick="app.openMenu('history')" style="cursor:pointer; font-weight:bold; font-size:14px; display:flex; align-items:center; gap:5px;" title="Архів">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/></svg> Історія
-                </span>
-                <span onclick="app.openCharts()" style="cursor:pointer; font-weight:bold; font-size:14px; display:flex; align-items:center; gap:5px;" title="Аналітика">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg> Графіки
-            </span>
-                <span onclick="app.openAccessMenu()" style="cursor:pointer; font-weight:bold; font-size:14px; display:flex; align-items:center; gap:5px;" title="Керування доступом">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg> Доступ
-</span>
-                <span onclick="app.openMenu('info')" style="cursor:pointer; font-size:14px;">ℹ️ Інфо</span>
-                <span onclick="app.openMenu('backups')" style="cursor:pointer; font-size:14px;">📦 Локальні копії</span>
-                <span onclick="app.openMenu('contacts')" style="cursor:pointer; font-size:14px;">📞 Контакти</span>
-            </div>
+    @media (max-width: 600px) {
+        .top-menu-bar { gap: 6px !important; padding: 10px 8px !important; }
+        #auth-btn { min-width: 0 !important; max-width: 155px !important; padding: 5px 8px !important; }
+        
+        .chat-btn { width: auto !important; padding: 0 10px !important; }
+        .menu-btn { width: auto !important; padding: 0 10px !important; }
+        
+        .desktop-text-chat { display: none !important; } /* Ховаємо довге слово на телефоні */
+        .mobile-text-chat { display: inline !important; } /* Показуємо коротке слово на телефоні */
+        
+        /* Спеціально для тосту в шапці (мобільний) */
+        .desktop-only-save { display: none !important; }  /* Ховаємо на телефоні */
+        .mobile-only-save { display: inline !important; } /* Показуємо на телефоні */
+    }
+</style>
 
-            <div class="mobile-only" style="align-items:center; gap:18px;">
-                <button onclick="document.getElementById('mobile-dropdown').style.display = document.getElementById('mobile-dropdown').style.display==='block'?'none':'block'" style="background:none; border:none; cursor:pointer; font-size:28px; color:var(--text); padding:0; display:flex; align-items:center;">☰</button>
+<div class="top-menu-bar" style="position: sticky; top: 0; background: var(--bg); z-index: 1000; padding: 10px 15px; border-bottom: 1px solid var(--border); margin: -10px -10px 10px -10px; box-shadow: 0 4px 10px rgba(0,0,0,0.35); display: flex; align-items: center; gap: 15px; justify-content: space-between;">
+    
+    <div style="position: relative; flex-shrink: 1; min-width: 0;" id="account-dropdown-wrapper">
+        <button onclick="toggleAccountMenu()" id="auth-btn" style="background: var(--bg-card); border: 1px solid var(--primary); padding: 5px 12px; border-radius: 20px; color: var(--primary); font-size: 13px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; max-width: 250px; height: 38px; transition: 0.2s; width: 100%;">
+            <img id="user-avatar" src="" alt="👤" style="width: 26px; height: 26px; border-radius: 50%; display: none; object-fit: cover; flex-shrink: 0;">
+            <div style="display: flex; flex-direction: column; align-items: flex-start; overflow: hidden; text-align: left; min-width: 0;">
+                <span id="user-name-display" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; font-size: 13px;">Гість</span>
+                <span id="sub-expire-display" style="font-size: 10px; opacity: 0.8; font-weight: normal; margin-top: -2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;"></span>
             </div>
-        </div>
-
-        <div id="mobile-dropdown" style="display:none; position:absolute; top:55px; right:0; background:var(--card); border:1px solid var(--border); border-radius:12px; padding:5px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index:2000; min-width:180px; text-align:left;">
-            <div onclick="app.openMenu('premium'); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; border-bottom:1px solid var(--border); cursor:pointer; font-weight:bold; color:var(--primary); display:flex; gap:10px;">💎 Тарифи</div>
-            <div onclick="app.openMenu('history'); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; border-bottom:1px solid var(--border); cursor:pointer; display:flex; align-items:center; gap:10px;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/></svg> Історія
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0; margin-left: auto;"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        
+        <div id="account-menu" style="display: none; position: absolute; top: 45px; left: 0; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 5px; box-shadow: 0 10px 25px rgba(0,0,0,0.8); z-index: 2000; min-width: 180px; backdrop-filter: blur(10px);">
+            <div onclick="app.openMenu('premium'); toggleAccountMenu();" style="padding: 12px 15px; border-bottom: 1px solid var(--border); cursor: pointer; font-weight: bold; color: var(--primary); display: flex; align-items: center; gap: 10px; border-radius: 8px 8px 0 0; transition: 0.2s;" onmouseover="this.style.background='var(--border)'" onmouseout="this.style.background='transparent'">
+                💎 Продовжити тариф
             </div>
-            <div onclick="app.openCharts(); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; border-bottom:1px solid var(--border); cursor:pointer; display:flex; align-items:center; gap:10px;">
-             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg> Графіки
-        </div>
-            <div onclick="app.openAccessMenu(); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; border-bottom:1px solid var(--border); cursor:pointer; display:flex; align-items:center; gap:10px;">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg> Доступ
-</div>
-            <div onclick="app.openMenu('info'); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; border-bottom:1px solid var(--border); cursor:pointer; display:flex; gap:10px;">ℹ️ Інфо</div>
-            <div onclick="app.openMenu('backups'); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; border-bottom:1px solid var(--border); cursor:pointer; display:flex; gap:10px;">📦 Локальні копії</div>
-            <div onclick="app.openMenu('contacts'); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; cursor:pointer; display:flex; gap:10px;">📞 Контакти</div>
+            <div onclick="window.googleLogout();" style="padding: 12px 15px; cursor: pointer; color: #ef4444; display: flex; align-items: center; gap: 10px; border-radius: 0 0 8px 8px; transition: 0.2s;" onmouseover="this.style.background='var(--border)'" onmouseout="this.style.background='transparent'">
+                🚪 Вийти
+            </div>
         </div>
     </div>
+
+    <div class="chat-btn" style="position: relative; cursor: pointer; display: flex; align-items: center; justify-content: center; height: 38px; padding: 0 15px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; color: var(--text); flex-shrink: 0;" onclick="document.getElementById('chat-modal').style.display='flex'">
+        <span style="font-size: 16px;">💬</span>
+        <span class="desktop-text-chat" style="font-size: 12px; font-weight: bold; margin-left: 5px;">ЧАТ БУДИНКУ</span>
+        <span class="mobile-text-chat" style="font-size: 12px; font-weight: bold; margin-left: 5px;">ЧАТ</span>
+        <div id="admin-chat-badge" style="display: none; position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; font-size: 10px; font-weight: bold; padding: 2px 5px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">Нові</div>
+    </div>
+    <div id="header-toast" style="display: none; opacity: 0; font-size: 11px; font-weight: bold; color: white; padding: 6px 12px; border-radius: 12px; white-space: nowrap; transition: opacity 0.4s ease; margin: 0 auto; box-shadow: 0 2px 8px rgba(0,0,0,0.2);"></div>
+	
+    <div class="desktop-only" style="display: flex; align-items: center; gap: 15px; margin-left: auto;">
+        <span onclick="app.openMenu('premium')" style="color:var(--primary); font-weight:bold; cursor:pointer; font-size:12px;">💎 Тарифи</span>
+        <span onclick="app.openMenu('history')" style="cursor:pointer; font-size:12px;">🕒 Архів</span>
+        <span onclick="app.openChartModal()" style="cursor: pointer; font-weight: bold; font-size: 12px;">📊 Аналітика</span>
+        <span onclick="app.openAccessMenu()" style="cursor:pointer; font-weight:bold; font-size:12px; display:flex; align-items:center; gap:2px;">👥 Доступ</span>
+        <span onclick="app.openMenu('info')" style="cursor:pointer; font-size:12px;">ℹ️ Інфо</span>
+        <span onclick="app.openMenu('backups')" style="cursor:pointer; font-size:12px;">📦 Локальні копії</span>
+        <span onclick="app.openMenu('contacts')" style="cursor:pointer; font-size:12px;">📞 Контакти</span>
+        
+        <button onclick="app.toggleTheme()" style="background:none; border:none; cursor:pointer; padding:0; display:flex; align-items:center; margin-left: 10px;" title="Змінити тему">
+            <svg id="theme-icon" viewBox="0 0 24 24" fill="none" stroke="var(--text-sec)" stroke-width="2" width="20" height="20"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+    </div>
+
+    <div class="mobile-only" style="position: relative; margin-left: auto; flex-shrink: 0;">
+        <button class="menu-btn" onclick="const m = document.getElementById('mobile-dropdown'); m.style.display = m.style.display === 'block' ? 'none' : 'block';" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; color: var(--text); padding: 0 10px; height: 38px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+            <span style="font-size: 18px;">≡</span>
+            <span style="font-size: 12px; font-weight: bold;">МЕНЮ</span>
+        </button>
+        
+        <div id="mobile-dropdown" style="display: none; position: absolute; top: 45px; right: 0; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 5px; box-shadow: 0 10px 25px rgba(0,0,0,0.8); z-index: 2000; min-width: 180px; text-align: left; backdrop-filter: blur(10px);">
+            <div onclick="app.openMenu('history'); document.getElementById('mobile-dropdown').style.display='none'" style="padding: 12px 15px; border-bottom: 1px solid var(--border); cursor: pointer; display: flex; align-items: center; gap: 10px;">🕒 Архів</div>
+            <div onclick="app.openChartModal(); document.getElementById('mobile-dropdown').style.display='none'" style="...">📊 Аналітика</div>
+            <div onclick="app.openAccessMenu(); document.getElementById('mobile-dropdown').style.display='none'" style="padding: 12px 15px; border-bottom: 1px solid var(--border); cursor: pointer; display: flex; align-items: center; gap: 10px;">👥 Доступ</div>
+            <div onclick="app.openMenu('info'); document.getElementById('mobile-dropdown').style.display='none'" style="padding: 12px 15px; cursor: pointer; display: flex; align-items: center; gap: 10px;">ℹ️ Інфо</div>
+            <div onclick="app.toggleTheme(); document.getElementById('mobile-dropdown').style.display='none'" style="padding: 12px 15px; cursor: pointer; display: flex; align-items: center; gap: 10px; border-top: 1px solid var(--border);">🌓 Змінити тему</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleAccountMenu() {
+        const menu = document.getElementById('account-menu');
+        menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    }
+    document.addEventListener('click', function(event) {
+        const wrapper = document.getElementById('account-dropdown-wrapper');
+        const menu = document.getElementById('account-menu');
+        if (wrapper && menu && !wrapper.contains(event.target)) {
+            menu.style.display = 'none';
+        }
+    });
+</script>
 
     <div class="brand-header">
         <div class="logo-text-wrapper">
@@ -485,26 +566,50 @@
             <h3 style="margin-top:0; text-align:center;" id="menu-title">Меню</h3>
             
             <div id="menu-content-info" style="display:none" class="info-block">
-    <p style="text-align:center;"><strong>📘 Comunalco 6.0: Керівництво Адміністратора</strong></p>
-    <hr style="border:0; border-top:1px solid var(--border)">
-    
-    <h4>1. Авторизація та Хмара</h4>
-    <p>Ваші дані тепер у безпеці. Завдяки <b>Google Login</b> система автоматично синхронізує всі зміни з хмарою Supabase кожні 5 секунд. Ви можете зайти в акаунт з будь-якого пристрою — дані підтягнуться миттєво.</p>
-    
-    <h4>2. Налаштування Тарифів та МЗК</h4>
-    <p>У розділі <b>💎 Тарифи</b> введіть ціни за одиницю ресурсу. Витрати на освітлення під'їздів, охорону чи прибирання (МЗК) додавайте у "Додаткові витрати" — система сама розділить їх порівну між усіма квартирами.</p>
-    
-    <h4>3. Телеграм-Бот та Показники</h4>
-    <p>Більше не потрібно вводити цифри вручну. Натисніть кнопку <b>🔗 Підключити Телеграм-Бот</b> у картці квартири та надішліть посилання мешканцю. Після підключення мешканець зможе сам подавати показники через бота, а ви контролюєте процес через перемикач "Дозвіл боту".</p>
-    
-    <h4>4. Аналітика та Тренди</h4>
-    <p>Кнопка <b>📊 Графіки</b> відкриває повну історію споживання. Система автоматично аналізує дані за минулі місяці: червоні стрілки показують перевитрати порівняно з минулим періодом, а зелені — економію.</p>
-    
-    <h4>5. Командний доступ</h4>
-    <p>Ви можете додати помічника (Менеджера) або надати доступ мешканцю до перегляду лише його квитанції через меню <b>👥 Доступ</b>. Користувач просто має увійти через свою пошту Google.</p>
-    
-    <h4>6. Закриття місяця</h4>
-    <p>Коли всі розрахунки завершено, натисніть <b>🗓 Закрити місяць</b>. Програма збереже копію всіх квитанцій в <b>📜 Архів</b>, перенесе поточні показники в "Було" та обнулить оплати для початку нового періоду.</p>
+    <h3 style="text-align: center; margin-bottom: 15px; color: var(--text);">📘 Comunalco: Керівництво</h3>
+<div style="text-align: left; font-size: 14px; line-height: 1.6; color: var(--text-sec); padding-right: 10px;">
+
+    <h4 style="color: #3b82f6; margin-bottom: 5px; margin-top: 0;">📱 1. Встановлення як Додаток (PWA)</h4>
+    <p style="margin-top: 0; margin-bottom: 15px;">
+        Для максимальної зручності встановіть систему на смартфон як звичайний додаток:<br>
+        <b>🍎 iOS (iPhone):</b> Відкрийте сайт у Safari, натисніть "Поділитися" (квадрат зі стрілочкою) та оберіть <b>"На початковий екран"</b>.<br>
+        <b>🤖 Android:</b> Відкрийте сайт у Chrome, натисніть меню (три крапки) та оберіть <b>"Додати на головний екран"</b>.
+    </p>
+
+    <h4 style="color: #3b82f6; margin-bottom: 5px;">🔐 2. Хмара та Ролі Доступу</h4>
+    <p style="margin-top: 0; margin-bottom: 15px;">
+        Ваші дані у безпеці і синхронізуються з хмарою <b>Supabase</b>. У меню <b>"Команда"</b> ви можете надати доступ помічникам:
+        <br>👑 <b>Керуючий:</b> Повний доступ до фінансів, налаштувань та аналітики.
+        <br>📝 <b>Обліковець:</b> Доступ ТІЛЬКИ для внесення показників лічильників (фінанси та архів приховані).
+    </p>
+
+    <h4 style="color: #3b82f6; margin-bottom: 5px;">💎 3. Тарифи та Втрати (МЗК)</h4>
+    <p style="margin-top: 0; margin-bottom: 15px;">
+        У розділі <b>"Тарифи"</b> налаштуйте актуальні ціни на ресурси. <br>
+        Для розрахунку загальнобудинкових витрат (освітлення, прибирання, втрати води), введіть суми у "Додаткові витрати" — система справедливо розділить їх між усіма квартирами як <b>МЗК</b>.
+    </p>
+
+    <h4 style="color: #3b82f6; margin-bottom: 5px;">🤖 4. Збір показників (Телеграм-Бот)</h4>
+    <p style="margin-top: 0; margin-bottom: 15px;">
+        Ви можете вносити показники вручну, або автоматизувати процес. Натисніть 🔗 <b>Підключити Телеграм-Бот</b> у картці квартири і надішліть посилання мешканцю. Ви контролюєте цей процес перемикачем "Дозвіл боту".
+    </p>
+
+    <h4 style="color: #3b82f6; margin-bottom: 5px;">📊 5. Аналітика об'єкта</h4>
+    <p style="margin-top: 0; margin-bottom: 15px;">
+        У меню <b>"Аналітика"</b> доступні графіки для контролю:<br>
+        • <b>Чистий МЗК:</b> Показує реальні втрати будинку (головний лічильник мінус усі квартири). Ідеально для пошуку крадіжок.<br>
+        • <b>Фінанси:</b> Порівняння виставлених рахунків із реально отриманими коштами.
+    </p>
+
+    <h4 style="color: #3b82f6; margin-bottom: 5px;">💾 6. Закриття місяця та Архів</h4>
+    <p style="margin-top: 0; margin-bottom: 15px;">
+        Коли всі розрахунки завершені, натисніть <b>"Закрити місяць"</b>. Система:<br>
+        1. Зробить безповоротний зліпок даних і відправить його в <b>Архів</b>.<br>
+        2. Перенесе поточні показники у графу "Попередні".<br>
+        У меню "Архів" ви завжди зможете відкрити детальний чек по кожній квартирі за будь-який період.
+    </p>
+
+</div>
                
 </div>
 
@@ -603,42 +708,86 @@
     </div>
 
     <div id="historyModal" class="modal" style="z-index: 3000;">
-        <div class="modal-content">
-            <span class="modal-close" onclick="document.getElementById('historyModal').style.display='none'">&times;</span>
-            <h3 style="margin-top:0; text-align:center; display:flex; align-items:center; justify-content:center; gap:10px;">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/></svg>
-                Архів
-            </h3>
-            <div id="history-list" style="margin-top:20px; display:flex; flex-direction:column; gap:10px;"></div>
-        </div>
-    </div>
-<div id="chartModal" class="modal" style="z-index: 3100;">
-    <div class="modal-content" style="width: 95%; max-width: 600px; background: var(--card);">
-        <span class="modal-close" onclick="document.getElementById('chartModal').style.display='none'">&times;</span>
-        <h3 style="margin-top:0; text-align:center;">📊 Аналітика</h3>
+    <div class="modal-content" style="max-width: 500px; padding: 0; overflow: hidden; background: var(--bg);">
         
-        <div style="display:flex; gap:10px; margin-bottom:15px;">
-            <div style="flex:1;">
-                <label style="font-size:11px; color:var(--text-sec); display:block; margin-bottom:4px;">Об'єкт</label>
-                <select id="chart-selector" onchange="app.updateChart()" style="width:100%; padding:8px; font-weight:bold; background:var(--input-bg); color:var(--text); border:1px solid var(--border); border-radius:8px;">
-                    <option value="group">🏢 Загальнобудинкові (МЗК)</option>
-                </select>
+        <div style="padding: 15px 20px; border-bottom: 1px solid var(--border); position: relative; background: var(--bg-card);">
+            <span class="modal-close" onclick="document.getElementById('historyModal').style.display='none'" style="position: absolute; right: 15px; top: 12px; cursor: pointer; color: var(--text-sec); font-size: 24px;">&times;</span>
+            <h3 style="margin: 0; text-align: center; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                🔄 Архів об'єкта
+            </h3>
+        </div>
+
+        <div style="display: flex; background: var(--bg-card); border-bottom: 2px solid var(--border);">
+            <button id="tab-btn-months" type="button" onclick="app.switchArchiveTab('months')" style="flex: 1; background: none; border: none; padding: 12px 5px; font-size: 11px; text-transform: uppercase; font-weight: bold; color: var(--primary); border-bottom: 3px solid var(--primary); cursor: pointer; transition: 0.3s; outline: none;">📊 Фінанси (Місяці)</button>
+            <button id="tab-btn-apts" type="button" onclick="app.switchArchiveTab('apts')" style="flex: 1; background: none; border: none; padding: 12px 5px; font-size: 11px; text-transform: uppercase; font-weight: bold; color: var(--text-sec); border-bottom: 3px solid transparent; cursor: pointer; transition: 0.3s; outline: none;">🧾 Квитанції (Квартири)</button>
+        </div>
+
+        <div id="history-tab-months" style="display: block; padding: 20px;">
+            <div id="history-list" style="display: flex; flex-direction: column; gap: 12px; max-height: 55vh; overflow-y: auto; padding-right: 5px;">
+                </div>
+        </div>
+
+        <div id="history-tab-apts" style="display: none; padding: 20px;">
+            <div style="margin-bottom: 15px;">
+                <label style="font-size: 12px; color: var(--text-sec); display: block; margin-bottom: 8px;">Оберіть платника:</label>
+                <select id="archive-apt-select" onchange="app.renderAptHistory(this.value)" style="width: 100%; padding: 12px; background: var(--bg-card); color: var(--text); border: 1px solid var(--border); border-radius: 8px; font-weight: bold; outline: none; cursor: pointer;"></select>
             </div>
-            <div style="flex:1;">
-                <label style="font-size:11px; color:var(--text-sec); display:block; margin-bottom:4px;">Вид графіка</label>
-                <select id="chart-type" onchange="app.updateChart()" style="width:100%; padding:8px; font-weight:bold; background:var(--input-bg); color:var(--text); border:1px solid var(--border); border-radius:8px;">
-                    <option value="bar">📊 Стовпчики</option>
-                    <option value="line">📈 Лінії (Тренди)</option>
-                </select>
+            
+            <div id="apt-history-list" style="display: flex; flex-direction: column; gap: 10px; max-height: 45vh; overflow-y: auto; padding-right: 5px;">
+                <div style="text-align: center; color: var(--text-sec); padding: 30px 10px;">
+                    <div style="font-size: 30px; margin-bottom: 10px;">👆</div>
+                    Оберіть квартиру зі списку вище, щоб побачити всі її квитанції
+                </div>
             </div>
         </div>
 
-        <div style="position: relative; height:40vh; min-height: 300px; width:100%;">
-            <canvas id="mainChart"></canvas>
+    </div>
+</div>
+
+<div id="archiveReceiptDetailModal" class="modal" style="z-index: 3200;">
+    <div class="modal-content" style="max-width: 400px; background: #111827; border: 1px solid #374151; box-shadow: 0 15px 35px rgba(0,0,0,0.8);">
+        <span class="modal-close" onclick="document.getElementById('archiveReceiptDetailModal').style.display='none'" style="color: #9ca3af;">&times;</span>
+        
+        <div style="text-align:center; border-bottom: 2px dashed #374151; padding-bottom:15px; margin-bottom:15px;">
+            <div style="font-size:12px; color:#3b82f6; font-weight:bold; letter-spacing:1px;" id="ard-date">АРХІВНА КВИТАНЦІЯ</div>
+            <div style="font-size:22px; font-weight:900; color:#f3f4f6; margin-top:5px;" id="ard-apt">Кв. 0</div>
         </div>
         
-        <div style="font-size:11px; color:var(--text-sec); text-align:center; margin-top:15px;">
-            * Сірий колір = Інтернет, Прибирання та інші послуги
+        <div id="archive-receipt-detail-content" style="font-size: 13px; line-height: 1.6; color:#e5e7eb;">
+            </div>
+        
+        <button class="btn" style="width:100%; margin-top:20px; padding:12px; font-size:14px; background:#3b82f6; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="document.getElementById('archiveReceiptDetailModal').style.display='none'">Закрити квитанцію</button>
+    </div>
+</div>
+
+<div id="chartModal" class="modal" style="z-index: 3100;">
+    <div class="modal-content" style="width: 95%; max-width: 700px; background: var(--bg-card);">
+        <span class="modal-close" onclick="document.getElementById('chartModal').style.display='none'">&times;</span>
+        <h3 style="margin-top:0; text-align:center;">📊 Аналітика об'єкта</h3>
+
+        <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap: wrap;">
+            <div style="flex:1; min-width: 200px;">
+                <label style="font-size:11px; color:var(--text-sec); display:block; margin-bottom:4px;">Об'єкт аналізу</label>
+                <select id="chart-selector" onchange="app.updateChart()" style="width:100%; padding:8px; font-weight:bold; background:var(--input-bg); color:var(--text); border:1px solid var(--border); border-radius:8px;">
+                    <option value="group">🏢 Чистий МЗК (Втрати будинку)</option>
+                    <option value="finance">💰 Фінанси (Нараховано / Сплачено)</option>
+                    </select>
+            </div>
+            
+            <div style="flex:1; min-width: 200px;">
+                <label style="font-size:11px; color:var(--text-sec); display:block; margin-bottom:4px;">Період порівняння</label>
+                <select id="chart-period" onchange="app.updateChart()" style="width:100%; padding:8px; font-weight:bold; background:var(--input-bg); color:var(--text); border:1px solid var(--border); border-radius:8px;">
+                    <option value="all">За весь час</option>
+                    <option value="1">Останній місяць (порівняння з попереднім)</option>
+                    <option value="3" selected>Останні 3 місяці</option>
+                    <option value="6">Останні півроку</option>
+                    <option value="12">Останній рік</option>
+                </select>
+            </div>
+        </div>
+        
+        <div style="position: relative; height: 350px; width: 100%;">
+            <canvas id="analyticsChart"></canvas>
         </div>
     </div>
 </div>
@@ -651,17 +800,17 @@
             <label style="color:var(--primary);">➕ Додати користувача</label>
             <input type="email" id="new-user-email" placeholder="email@gmail.com" style="margin-bottom:10px;">
             
-            <label>Оберіть роль:</label>
-<div class="role-selector">
-    <div class="role-card selected" onclick="app.selectRole(this, 'manager')">
-        <span class="role-icon">🛠</span>
-        <span class="role-name">Менеджер</span>
-        <span class="role-desc">Повний доступ (помічник)</span>
+           <label style="font-size:11px; color:var(--text-sec); display:block; margin-bottom:8px;">Оберіть рівень доступу:</label>
+<div class="role-selector" style="grid-template-columns: 1fr 1fr; margin-bottom: 20px;">
+    <div class="role-card selected" onclick="app.selectRole(this, 'admin')">
+        <span class="role-icon">👑</span>
+        <span class="role-name">КЕРУЮЧИЙ</span>
+        <span class="role-desc">Повний доступ (фінанси, налаштування)</span>
     </div>
-    <div class="role-card" onclick="app.selectRole(this, 'tenant')">
-        <span class="role-icon">🏠</span>
-        <span class="role-name">Мешканець</span>
-        <span class="role-desc">Тільки перегляд своєї кв.</span>
+    <div class="role-card" onclick="app.selectRole(this, 'operator')">
+        <span class="role-icon">📝</span>
+        <span class="role-name">ОБЛІКОВЕЦЬ</span>
+        <span class="role-desc">Тільки внесення показників квартир</span>
     </div>
 </div>
 
@@ -1504,66 +1653,69 @@ class App {
         }, 2000);
     }    
     async save() {
-        // 1. ЗАХИСТ: Ніколи не зберігаємо дані в режимі Архіву
+        // 1. ЗАХИСТ
         if (document.body.classList.contains('archive-mode')) return;
 
-        // 2. Миттєве локальне збереження
+        // 2. Локальне збереження
         if (this.STORAGE_KEY) {
             localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.state));
         }
 
-        // 3. --- АНІМАЦІЯ ІНДИКАТОРА ---
-        let statusEl = document.getElementById('save-status');
-        
-        // 🚀 Якщо коробочка для статусу зникла - створюємо її заново під профілем!
-        if (!statusEl) {
-            statusEl = document.createElement('div');
-            statusEl.id = 'save-status';
-            statusEl.style = "font-size: 10px; font-weight: bold; margin-top: 5px; text-transform: uppercase; transition: opacity 0.3s;";
-            const authBtn = document.getElementById('auth-btn'); // Шукаємо блок профілю
-            if (authBtn) authBtn.appendChild(statusEl);
-        }
+        // 3. АВТО-ЗБЕРЕЖЕННЯ
+        if (this.saveTimer) clearTimeout(this.saveTimer);
 
-        if (statusEl) {
-            statusEl.innerText = "• СИНХРОНІЗАЦІЯ...";
-            statusEl.style.color = "var(--text-sec)";
-            statusEl.style.opacity = "1";
-        }
+        this.saveTimer = setTimeout(async () => {
+            const toast = document.getElementById("header-toast");
+            if (!toast) return;
 
-        // 4. АВТО-ЗБЕРЕЖЕННЯ В ХМАРУ
-        if (window.currentUser && window.cloudSave) {
-            if (this.saveTimer) clearTimeout(this.saveTimer);
-
-            this.saveTimer = setTimeout(async () => {
+            // СЦЕНАРІЙ А: Зберігаємо в Хмару
+            if (window.currentUser && window.cloudSave) {
                 try {
-                    // ВАЖЛИВО: Чекаємо на відповідь від хмари
+                    toast.innerHTML = "⏳ Синхронізація...";
+                    toast.style.backgroundColor = "var(--primary)";
+                    toast.style.display = "block"; // ПОКАЗУЄМО І ВИДІЛЯЄМО МІСЦЕ
+                    setTimeout(() => { toast.style.opacity = "1"; }, 10);
+
                     await window.cloudSave(this.state);
-                    
-                    if (statusEl) {
-                        statusEl.innerText = "✅ Збережено";
-                        statusEl.style.color = "var(--success)";
-                        setTimeout(() => { 
-                            if(statusEl.innerText === "✅ Збережено") statusEl.style.opacity = "0"; 
-                        }, 2000);
-                    }
+
+                    toast.innerHTML = "✅ Збережено";
+                    toast.style.backgroundColor = "var(--success)";
+
+                    setTimeout(() => {
+                        if (toast.innerHTML === "✅ Збережено") {
+                            toast.style.opacity = "0";
+                            // Після завершення анімації (0.4с) повністю ПРИБИРАЄМО елемент
+                            setTimeout(() => { toast.style.display = "none"; }, 400);
+                        }
+                    }, 6000);
+
                 } catch (e) {
-                    console.error("Помилка синхронізації:", e);
-                    // Якщо сталася помилка — ми ПРИМУСОВО міняємо напис, щоб він не висів вічно
-                    if (statusEl) {
-                        statusEl.innerText = "⚠️ Помилка бази";
-                        statusEl.style.color = "var(--danger)";
-                        setTimeout(() => { statusEl.style.opacity = "0"; }, 5000);
-                    }
+                    console.error("Помилка:", e);
+                    toast.innerHTML = "❌ Помилка";
+                    toast.style.backgroundColor = "var(--danger)";
+                    setTimeout(() => {
+                        if (toast.innerHTML === "❌ Помилка") {
+                            toast.style.opacity = "0";
+                            setTimeout(() => { toast.style.display = "none"; }, 400);
+                        }
+                    }, 6000);
                 }
-            }, 1500); // Зменшив затримку, щоб швидше реагувало на "Сплачено"
-        } else {
-            // Тільки локальний режим
-            if (statusEl) {
-                statusEl.innerText = "✅ Локально";
-                statusEl.style.color = "var(--text-sec)";
-                setTimeout(() => { statusEl.style.opacity = "0"; }, 2000);
+            } 
+            // СЦЕНАРІЙ Б: Зберігаємо локально
+            else {
+                toast.innerHTML = `<span class="desktop-only-save">✅ Збережено локально</span><span class="mobile-only-save">✅ Локально</span>`;
+                toast.style.backgroundColor = "var(--text-sec)";
+                toast.style.display = "block"; // ПОКАЗУЄМО
+                setTimeout(() => { toast.style.opacity = "1"; }, 10);
+
+                setTimeout(() => {
+                    if (toast.innerHTML.includes("✅ Локально")) {
+                        toast.style.opacity = "0";
+                        setTimeout(() => { toast.style.display = "none"; }, 400); // ПРИБИРАЄМО
+                    }
+                }, 3000);
             }
-        }
+        }, 800);
     }
     
     get currentData() { return this.state.objects[this.state.currentObjIdx]; }
@@ -1688,164 +1840,280 @@ checkLimit() {
             if(el) el.value = this.currentData.tariffs[map[k]]; 
         });
         this.renderExtraTariffs(); this.renderRequisites(); this.renderGroups(); this.renderApartments();
-        // 🚀 Даємо браузеру 100 мілісекунд намалювати всі віконця, а потім запускаємо перерахунок!
+        
         setTimeout(() => { if (typeof this.calculate === 'function') this.calculate(); }, 100);
-    }
 
-    // --- ПОЧАТОК ГРАФІКІВ (Гібридна версія) ---
-    openCharts() {
-        const modal = document.getElementById('chartModal');
-        if (!this.currentData.history || this.currentData.history.length === 0) {
-            alert("Історія порожня! Закрийте хоча б один місяць.");
-            return;
+        // --- ПЕРЕВІРКА ДОСТУПУ ПІСЛЯ ЗАВАНТАЖЕННЯ ДАНИХ ---
+        if (window.currentUser && this.currentData && this.currentData.users) {
+            // Шукаємо профіль поточного юзера в базі даних (по email)
+            const myProfile = this.currentData.users.find(u => u.email === window.currentUser.email);
+            
+            // За замовчуванням всі мають роль 'admin' (щоб у вас як у власника нічого не зламалося)
+            let myRole = 'admin'; 
+            
+            // Але якщо в базі записано, що ця людина 'operator' (обліковець) - міняємо роль
+            if (myProfile && myProfile.role === 'operator') {
+                myRole = 'operator';
+            }
+            
+            // Вмикаємо "Снайпер", який сховає зайві кнопки, якщо це обліковець
+            this.applyRoleRestrictions(myRole);
         }
-
-        // Наповнюємо список об'єктів
-        const selector = document.getElementById('chart-selector');
-        let opts = `<option value="group">🏢 Загальнобудинкові (МЗК + Квартири)</option>`;
-        this.currentData.apartments.forEach((a) => {
-            opts += `<option value="${a.id}">🏠 ${a.name}</option>`;
-        });
-        selector.innerHTML = opts;
-        selector.value = 'group';
-        
-        // Скидаємо тип на "Стовпчики" при відкритті
-        document.getElementById('chart-type').value = 'bar';
-
-        const menuM = document.getElementById('menuModal'); if(menuM) menuM.style.display='none';
-        const mobM = document.getElementById('mobile-dropdown'); if(mobM) mobM.style.display='none';
-        modal.style.display = 'flex';
-        
-        setTimeout(() => this.updateChart(), 100);
+    }
     }
 
-    updateChart() {
-        // 1. Читаємо налаштування з екрану
+        // --- ВІДКРИТТЯ ВІКНА АНАЛІТИКИ (Підвантаження квартир) ---
+    openChartModal() {
         const selector = document.getElementById('chart-selector');
-        const targetId = selector ? selector.value : 'group';
-        const typeSelect = document.getElementById('chart-type');
-        const chartType = typeSelect ? typeSelect.value : 'bar';
+        if (selector) {
+            // Очищаємо старі квартири, залишаємо перші дві опції (МЗК та Фінанси)
+            while(selector.options.length > 2) { selector.remove(2); }
+            
+            // Збираємо актуальні квартири з архіву
+            const aptsMap = {};
+            if(this.currentData && this.currentData.history) {
+                this.currentData.history.forEach(h => {
+                    if (h.apartments) {
+                        let aptsList = Array.isArray(h.apartments) ? h.apartments : Object.values(h.apartments);
+                        aptsList.forEach((apt, idx) => {
+                            if (apt) {
+                                let id = (apt.id !== undefined && apt.id !== null) ? apt.id : idx;
+                                aptsMap[id] = apt.name || `Кв. ${id}`;
+                            }
+                        });
+                    }
+                });
+            }
+            // Додаємо їх у випадаючий список
+            Object.keys(aptsMap).sort((a,b) => a.localeCompare(b, undefined, {numeric: true})).forEach(id => {
+                selector.innerHTML += `<option value="${id}">🏠 ${aptsMap[id]}</option>`;
+            });
+        }
+        
+        document.getElementById('chartModal').style.display = 'flex';
+        this.updateChart();
+    }
 
-        const ctx = document.getElementById('mainChart').getContext('2d');
+    // --- МАЛЮВАННЯ ГРАФІКІВ (АНАЛІТИКА) ---
+    updateChart() {
+        const selector = document.getElementById('chart-selector');
+        const periodSelect = document.getElementById('chart-period');
+        if (!selector || !periodSelect) return;
+
+        const targetId = selector.value;
+        const period = periodSelect.value;
+
+        const ctx = document.getElementById('analyticsChart').getContext('2d');
         if (this.myChartInstance) this.myChartInstance.destroy();
 
-        // 2. Готуємо дані (12 місяців)
-        const historyData = (this.currentData.history || []).slice(0, 12).reverse();
-        const labels = historyData.map(h => h.monthName);
+        // 1. Фільтруємо історію по вибраному періоду
+        let history = this.currentData.history || [];
+        let limit = history.length;
+        if (period === '1') limit = 2; // для порівняння двох останніх
+        else if (period === '3') limit = 3;
+        else if (period === '6') limit = 6;
+        else if (period === '12') limit = 12;
+
+        // 🚀 Сортуємо жорстко від старого до нового і беремо тільки останні "limit" штук
+        let sortedHistory = [...history].sort((a, b) => a.id - b.id);
+        let historyData = sortedHistory.slice(-limit);
         
-        // Масиви для ГРОШЕЙ (d = data)
-        let dEl = [], dW = [], dG = [], dServ = [], dCust = [];
-        // Масиви для КІЛЬКОСТІ (q = quantity)
-        let qEl = [], qW = [], qG = [], qCust = [];
+        // Малюємо дати з часом, щоб не плутатися під час тестів в один день
+        const labels = historyData.map(h => {
+            let d = h.date ? new Date(h.date) : new Date(h.id);
+            if (!isNaN(d.getTime())) {
+                let dateStr = d.toLocaleDateString('uk-UA', { month: 'short', year: 'numeric' }).toUpperCase();
+                let timeStr = d.toLocaleTimeString('uk-UA', {hour: '2-digit', minute:'2-digit'});
+                return `${dateStr} (${timeStr})`;
+            }
+            return "Архів";
+        });
 
-        historyData.forEach(h => {
-            let cost = { el: 0, w: 0, g: 0, serv: 0, cust: 0 };
-            let quant = { el: 0, w: 0, g: 0, cust: 0 }; 
-            const t = h.tariffs;
+        // 2. Готуємо масиви для даних
+        let dEl = [], dW = [], dG = [], dServ = [];
+        let dBilled = [], dPaid = []; // Для фінансів
 
-            if (targetId === 'group') {
-                (h.groups || []).forEach(g => {
-                    let diff = { ed: (g.curr.ed||0)-(g.prev.ed||0), en: (g.curr.en||0)-(g.prev.en||0), w: (g.curr.w||0)-(g.prev.w||0), g: (g.curr.g||0)-(g.prev.g||0) };
-                    
-                    cost.el += (diff.ed * t.el_d) + (diff.en * t.el_n);
-                    cost.w += diff.w * t.w;
-                    cost.g += diff.g * t.g;
-                    
-                    quant.el += diff.ed + diff.en;
-                    quant.w += diff.w;
-                    quant.g += diff.g;
-
-                    (g.custom_counters||[]).forEach(c => {
-                        let q = (c.curr||0)-(c.prev||0);
-                        cost.cust += q * c.price;
-                        quant.cust += q;
-                    });
-                    (g.services||[]).forEach(s => cost.serv += (s.val||0));
-                });
-                (h.extra_tariffs||[]).forEach(e => cost.serv += (e.val||0));
-            } else {
-                const apt = h.apartments.find(a => a.id == targetId);
-                if (apt) {
-                    let diff = { ed: (apt.curr.ed||0)-(apt.prev.ed||0), en: (apt.curr.en||0)-(apt.prev.en||0), w: (apt.curr.w||0)-(apt.prev.w||0), g: (apt.curr.g||0)-(apt.prev.g||0) };
-                    
-                    cost.el += (diff.ed * t.el_d) + (diff.en * t.el_n);
-                    cost.w += diff.w * t.w;
-                    cost.g += diff.g * t.g;
-                    
-                    quant.el += diff.ed + diff.en;
-                    quant.w += diff.w;
-                    quant.g += diff.g;
-
-                    (apt.custom_counters||[]).forEach(c => {
-                        let q = (c.curr||0)-(c.prev||0);
-                        cost.cust += q * c.price;
-                        quant.cust += q;
-                    });
-                    (apt.services||[]).forEach(s => cost.serv += (s.val||0));
+        // Агресивний пошук тарифів
+        const getTariff = (obj1, obj2, ...keys) => {
+            for (let obj of [obj1, obj2]) {
+                if (!obj) continue;
+                if (Array.isArray(obj)) {
+                    for (let item of obj) {
+                        let name = String(item.service_name || item.name || item.id).toLowerCase();
+                        if (keys.some(k => name === k.toLowerCase())) {
+                            let val = parseFloat(String(item.price_per_unit || item.price || item.val || item.value).replace(',', '.'));
+                            if (!isNaN(val) && val > 0) return val;
+                        }
+                    }
+                } else {
+                    for (let k of keys) {
+                        if (obj[k] !== undefined && obj[k] !== null && obj[k] !== '') {
+                            let val = parseFloat(String(obj[k]).replace(',', '.'));
+                            if (!isNaN(val) && val > 0) return val;
+                        }
+                    }
+                    for (let fullKey of Object.keys(obj)) {
+                        let fk = fullKey.toLowerCase();
+                        if (keys.some(k => fk.includes(k.toLowerCase()))) {
+                             let val = parseFloat(String(obj[fullKey]).replace(',', '.'));
+                             if (!isNaN(val) && val > 0) return val;
+                        }
+                    }
                 }
             }
-            dEl.push(cost.el); dW.push(cost.w); dG.push(cost.g); dServ.push(cost.serv); dCust.push(cost.cust);
-            qEl.push(quant.el); qW.push(quant.w); qG.push(quant.g); qCust.push(quant.cust);
+            return 0;
+        };
+
+        historyData.forEach(h => {
+            const tArchive = h.tariffs || {};
+            const tLive = this.currentData.tariffs || {}; 
+            const t_ed = getTariff(tArchive, tLive, 'el_d', 'day', 'ed');
+            const t_en = getTariff(tArchive, tLive, 'el_n', 'night', 'en');
+            const t_w  = getTariff(tArchive, tLive, 'w', 'water');
+            const t_g  = getTariff(tArchive, tLive, 'g', 'gas');
+
+            let cost = { el: 0, w: 0, g: 0, serv: 0, billed: 0, paid: 0 };
+            let apts = Array.isArray(h.apartments) ? h.apartments : Object.values(h.apartments || {});
+
+            if (targetId === 'finance') {
+                // ФІНАНСИ БУДИНКУ
+                apts.forEach(apt => {
+                    if(!apt) return;
+                    let paid = parseFloat(String(apt.paid).replace(',', '.')) || 0;
+                    let bill = parseFloat(String(apt.bill || apt.total || apt.sum || 0).replace(',', '.')) || 0;
+                    
+                    // Якщо сума рахунку не збереглась, вираховуємо грубо по лічильниках
+                    if (bill === 0) {
+                        let c_ed = Math.max(0, (apt.curr?.ed||0) - (apt.prev?.ed||0));
+                        let c_en = Math.max(0, (apt.curr?.en||0) - (apt.prev?.en||0));
+                        let c_w = Math.max(0, (apt.curr?.w||0) - (apt.prev?.w||0));
+                        bill = (c_ed * t_ed) + (c_en * t_en) + (c_w * t_w);
+                    }
+                    cost.billed += bill;
+                    cost.paid += paid;
+                });
+            } 
+            else if (targetId === 'group') {
+                // ЧИСТИЙ МЗК (ВТРАТИ: Будинок мінус Квартири)
+                let houseEd = 0, houseEn = 0, houseW = 0, houseG = 0;
+                (h.groups || []).forEach(g => {
+                    houseEd += Math.max(0, (g.curr?.ed||0) - (g.prev?.ed||0));
+                    houseEn += Math.max(0, (g.curr?.en||0) - (g.prev?.en||0));
+                    houseW  += Math.max(0, (g.curr?.w||0) - (g.prev?.w||0));
+                    houseG  += Math.max(0, (g.curr?.g||0) - (g.prev?.g||0));
+                });
+
+                let aptsEd = 0, aptsEn = 0, aptsW = 0, aptsG = 0;
+                apts.forEach(apt => {
+                    if(!apt) return;
+                    aptsEd += Math.max(0, (apt.curr?.ed||0) - (apt.prev?.ed||0));
+                    aptsEn += Math.max(0, (apt.curr?.en||0) - (apt.prev?.en||0));
+                    aptsW  += Math.max(0, (apt.curr?.w||0) - (apt.prev?.w||0));
+                    aptsG  += Math.max(0, (apt.curr?.g||0) - (apt.prev?.g||0));
+                });
+
+                let netEd = Math.max(0, houseEd - aptsEd);
+                let netEn = Math.max(0, houseEn - aptsEn);
+                let netW  = Math.max(0, houseW - aptsW);
+                let netG  = Math.max(0, houseG - aptsG);
+
+                cost.el = (netEd * t_ed) + (netEn * t_en);
+                cost.w = netW * t_w;
+                cost.g = netG * t_g;
+            } 
+            else {
+                // КОНКРЕТНА КВАРТИРА
+                let apt = apts.find((a, idx) => a && (String(a.id) === String(targetId) || String(idx) === String(targetId)));
+                if (apt) {
+                    let c_ed = Math.max(0, (apt.curr?.ed||0) - (apt.prev?.ed||0));
+                    let c_en = Math.max(0, (apt.curr?.en||0) - (apt.prev?.en||0));
+                    let c_w = Math.max(0, (apt.curr?.w||0) - (apt.prev?.w||0));
+                    let c_g = Math.max(0, (apt.curr?.g||0) - (apt.prev?.g||0));
+                    
+                    cost.el = (c_ed * t_ed) + (c_en * t_en);
+                    cost.w = c_w * t_w;
+                    cost.g = c_g * t_g;
+
+                    let sTotal = 0;
+                    if (apt.services) apt.services.forEach(s => sTotal += parseFloat(String(s.val).replace(',', '.')) || 0);
+                    if (apt.customCosts) apt.customCosts.forEach(cc => {
+                        let diff = Math.max(0, (cc.curr||0) - (cc.prev||0));
+                        sTotal += diff * (parseFloat(String(cc.price).replace(',', '.')) || 0);
+                    });
+                    
+                    let mzkVal = 0;
+                    for (let k of Object.keys(apt)) {
+                        if (k.toLowerCase().includes('mzk') || k.toLowerCase().includes('мзк')) {
+                            let val = parseFloat(String(apt[k]).replace(',', '.'));
+                            if (!isNaN(val) && val > 0) mzkVal = val;
+                        }
+                    }
+                    cost.serv = sTotal + mzkVal;
+                }
+            }
+
+            dEl.push(cost.el);
+            dW.push(cost.w);
+            dG.push(cost.g);
+            dServ.push(cost.serv);
+            dBilled.push(cost.billed);
+            dPaid.push(cost.paid);
         });
 
-        const isDark = document.body.classList.contains('dark-mode');
-        const textColor = isDark ? '#ffffff' : '#1e293b';
-        const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
+        // 3. Формуємо масиви для графіка
+        const isDark = document.body.classList.contains('dark-mode') || getComputedStyle(document.body).backgroundColor === 'rgb(15, 23, 42)';
+        const textColor = isDark ? '#e2e8f0' : '#1e293b';
+        const gridColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
 
-        let datasets = [
-            { label: 'Електрика ⚡', data: dEl, quantity: qEl, unit: 'кВт', backgroundColor: '#f59e0b', borderColor: '#f59e0b' },
-            { label: 'Вода 💧', data: dW, quantity: qW, unit: 'м³', backgroundColor: '#3b82f6', borderColor: '#3b82f6' },
-            { label: 'Газ 🔥', data: dG, quantity: qG, unit: 'м³', backgroundColor: '#ef4444', borderColor: '#ef4444' },
-            { label: 'Лічильники 🔢', data: dCust, quantity: qCust, unit: 'од.', backgroundColor: '#10b981', borderColor: '#10b981', hidden: chartType==='line' },
-            { label: 'Послуги', data: dServ, quantity: [], unit: '', backgroundColor: '#64748b', borderColor: '#64748b', hidden: chartType==='line' }
-        ];
+        let datasets = [];
 
-        datasets.forEach(d => {
-            d.borderRadius = 4;      
-            d.tension = 0.4;         
-            d.borderWidth = 3;       
-            d.pointRadius = 4;       
-        });
+        if (targetId === 'finance') {
+            datasets = [
+                { label: '💰 Виставлено рахунків', data: dBilled, backgroundColor: '#3b82f6', borderRadius: 4 },
+                { label: '✅ Реально сплачено', data: dPaid, backgroundColor: '#10b981', borderRadius: 4 }
+            ];
+        } else {
+            datasets = [
+                { label: 'Електрика ⚡', data: dEl, backgroundColor: '#f59e0b', borderRadius: 4 },
+                { label: 'Вода 💧', data: dW, backgroundColor: '#3b82f6', borderRadius: 4 },
+                { label: 'Газ 🔥', data: dG, backgroundColor: '#ef4444', borderRadius: 4 },
+                { label: 'Послуги / МЗК 🏢', data: dServ, backgroundColor: '#64748b', borderRadius: 4 }
+            ];
+        }
 
         this.myChartInstance = new Chart(ctx, {
-            type: chartType,
+            type: 'bar',
             data: { labels: labels, datasets: datasets },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 interaction: { mode: 'index', intersect: false },
                 plugins: {
-                    legend: { position: 'bottom', labels: { color: textColor, usePointStyle: true } },
+                    legend: { position: 'bottom', labels: { color: textColor, usePointStyle: true, font: {size: 11} } },
                     tooltip: {
-                        backgroundColor: 'rgba(0,0,0,0.9)',
-                        padding: 10,
+                        backgroundColor: isDark ? 'rgba(15,23,42,0.95)' : 'rgba(255,255,255,0.95)',
+                        titleColor: isDark ? '#fff' : '#000',
+                        bodyColor: isDark ? '#cbd5e1' : '#334155',
+                        borderColor: isDark ? '#334155' : '#e2e8f0',
+                        borderWidth: 1,
+                        padding: 12,
                         cornerRadius: 8,
-                        titleFont: { size: 14, weight: 'bold' },
-                        bodyFont: { size: 13 },
                         callbacks: {
-                            label: function(c) {
-                                let val = c.raw.toFixed(2); 
-                                let qty = c.dataset.quantity ? c.dataset.quantity[c.dataIndex] : 0; 
-                                let unit = c.dataset.unit || '';
-                                
-                                if (qty > 0 && unit) return ` ${c.dataset.label}: ${qty} ${unit} / ${val} грн`;
-                                return ` ${c.dataset.label}: ${val} грн`;
-                            },
+                            label: function(c) { return c.dataset.label + ': ' + c.raw.toFixed(2) + ' грн'; },
                             footer: (items) => {
-                                let sum = 0;
-                                items.forEach(i => sum += i.raw);
-                                return 'Всього: ' + sum.toFixed(2) + ' грн';
+                                let sum = items.reduce((a, b) => a + b.raw, 0);
+                                return '\nВсього за місяць: ' + sum.toFixed(2) + ' грн';
                             }
                         }
                     }
                 },
                 scales: {
-                    x: { ticks: { color: textColor }, grid: { color: gridColor, drawBorder: false } },
+                    x: { ticks: { color: textColor, font: {weight: 'bold'} }, grid: { color: gridColor, drawBorder: false } },
                     y: { 
                         beginAtZero: true, 
                         ticks: { color: textColor }, 
-                        grid: { color: gridColor, drawBorder: false }, 
-                        title: { display: true, text: 'Сума (грн)', color: textColor } 
+                        grid: { color: gridColor, drawBorder: false },
+                        title: { display: true, text: 'Сума (грн)', color: textColor, font: {size: 11} }
                     }
                 }
             }
@@ -3377,22 +3645,26 @@ checkLimit() {
         const saveBtn = document.querySelector('.sticky-footer button.btn-warning');
         if(saveBtn) saveBtn.style.display = 'none';
     }
-   // --- ФУНКЦІЯ ІСТОРІЇ (Фінальна: Видалення тільки для Власника) ---
+   // --- ФУНКЦІЯ ІСТОРІЇ (Оновлено для Табів та різних Ролей) ---
     openHistory() {
         const modal = document.getElementById('historyModal');
-        let content = modal.querySelector('.history-list'); 
+        const listDiv = document.getElementById('history-list');
         
-        // Створюємо контейнер
-        if(!content) {
-             content = modal.querySelector('.modal-content div');
-             if(!content) {
-                 const c = document.createElement('div');
-                 c.className = 'history-list';
-                 modal.querySelector('.modal-content').appendChild(c);
-                 content = c;
-             }
+        // Скидаємо вікно на першу вкладку (Місяці) при відкритті
+        if(this.switchArchiveTab) this.switchArchiveTab('months');
+        
+        // Створюємо контейнер, якщо його немає
+        let content = modal.querySelector('.history-list');
+        if (!content) {
+            content = modal.querySelector('#history-tab-months div'); // Шукаємо новий контейнер
+            if (!content) {
+                const c = document.createElement('div');
+                c.className = 'history-list';
+                modal.querySelector('#history-tab-months').appendChild(c);
+                content = c;
+            }
         }
-        
+
         if (!this.currentData.history || this.currentData.history.length === 0) {
             content.innerHTML = '<p style="text-align:center; color:var(--text-sec); padding:20px;">Історія порожня 🤷‍♂️</p>';
             modal.style.display = 'flex';
@@ -3400,9 +3672,8 @@ checkLimit() {
         }
 
         let html = '<div style="display:flex; flex-direction:column; gap:10px; max-height:60vh; overflow-y:auto;">';
-        
+
         [...this.currentData.history].reverse().forEach(h => {
-            
             // 1. РЕМОНТ ДАТИ
             let dateStr = "Дата невідома";
             if (h.date) {
@@ -3425,60 +3696,55 @@ checkLimit() {
                 if (h.apartments && Array.isArray(h.apartments)) {
                     const myAptSnapshot = h.apartments.find(a => a.id == window.currentAptId);
                     if (myAptSnapshot) {
-                        // Показуємо збережену суму (bill) або перераховуємо, якщо старий запис
-                        sumDisplay = myAptSnapshot.bill || 0; 
-                        titleDisplay = `Нараховано за місяць`;
+                        sumDisplay = myAptSnapshot.bill || 0;
+                        titleDisplay = 'Нараховано за місяць';
                     } else { showRow = false; }
                 } else { showRow = false; }
             } else {
-                // --- ВЛАСНИК ---
+                // --- ВЛАСНИК (КЕРУЮЧИЙ) ---
                 sumDisplay = h.total_bill || 0;
                 titleDisplay = `Всього по об'єкту (${h.apartments ? h.apartments.length : 0} кв.)`;
             }
 
             // 3. КНОПКА ВИДАЛЕННЯ (ТІЛЬКИ ДЛЯ ВЛАСНИКА)
             let deleteBtn = "";
-            // Перевірка: Якщо ролі немає (адмін) АБО роль = owner
             if (!window.currentRole || window.currentRole === 'owner') {
                 deleteBtn = `
-                <div onclick="event.stopPropagation(); app.deleteHistoryItem(${h.id})" 
+                <div onclick="event.stopPropagation(); app.deleteHistoryItem('${h.id}')" 
                      style="cursor:pointer; padding:5px 10px; margin-left:10px; border:1px solid var(--danger); border-radius:5px; color:var(--danger); font-weight:bold; font-size:11px; opacity:0.7;">
-                     🗑
+                    🗑
                 </div>`;
             }
 
             if (showRow) {
-            html += `
-            <div style="background:var(--bg); padding:12px; border-radius:10px; border:1px solid var(--border); margin-bottom:12px; display:flex; flex-direction:column; gap:10px;">
-                
-                <div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="app.loadHistoryItem('${h.id}')">
-                    <div style="flex:1;">
-                        <div style="font-weight:bold; font-size:15px; color:var(--text);">🗓 ${dateStr}</div>
-                        <div style="font-size:12px; color:var(--text-sec); margin-top:4px;">${titleDisplay}</div>
+                html += `
+                <div style="background:var(--bg); padding:12px; border-radius:10px; border:1px solid var(--border); margin-bottom:12px; display:flex; flex-direction:column; gap:10px;">
+                    
+                    <div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="app.loadHistoryItem('${h.id}')">
+                        <div style="flex:1;">
+                            <div style="font-weight:bold; font-size:15px; color:var(--text);">${dateStr}</div>
+                            <div style="font-size:12px; color:var(--text-sec); margin-top:4px;">${titleDisplay}</div>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <div style="font-weight:bold; color:var(--accent); font-size:16px;">${parseFloat(sumDisplay).toFixed(2)} грн</div>
+                            ${deleteBtn}
+                        </div>
                     </div>
-                    <div style="display:flex; align-items:center; gap: 12px;">
-                        <div style="font-weight:bold; color:var(--accent); font-size:16px;">${parseFloat(sumDisplay).toFixed(2)} грн</div>
-                        ${deleteBtn}
-                    </div>
-                </div>
-
-                ${(!window.currentRole || window.currentRole === 'owner') ? `
-                <div style="display:flex; gap:6px; border-top:1px dashed var(--border); padding-top:10px;">
-                    <button onclick="event.stopPropagation(); app.loadHistoryItem('${h.id}')" class="btn" style="flex:1; padding:8px 4px; font-size:13px; border-radius:6px; background:var(--card); color:var(--text); border:1px solid var(--border); display:flex; justify-content:center; align-items:center; gap:4px;">
-                        👀 Огляд
-                    </button>
-                    <button onclick="event.stopPropagation(); app.exportToExcel('${h.id}')" class="btn" style="flex:1; padding:8px 4px; font-size:13px; border-radius:6px; background:#10B981; color:white; border:none; display:flex; justify-content:center; align-items:center; gap:4px;">
-                        📊 Excel
-                    </button>
-                    <button onclick="event.stopPropagation(); app.sendArchiveToTelegram('${h.id}')" class="btn" style="flex:1; padding:8px 4px; font-size:13px; border-radius:6px; background:#2AABEE; color:white; border:none; display:flex; justify-content:center; align-items:center; gap:4px;">
-                        ✈️ Надіслати
-                    </button>
-                </div>
-                ` : ''}
-
-            </div>
-            `;
-        }
+                    
+                    ${(!window.currentRole || window.currentRole === 'owner') ? `
+                    <div style="display:flex; gap:6px; border-top:1px dashed var(--border); padding-top:10px;">
+                        <button onclick="event.stopPropagation(); app.loadHistoryItem('${h.id}')" class="btn" style="flex:1; padding:8px 4px; font-size:13px; border-radius:6px; background:var(--card); color:var(--text); border:1px solid var(--border); display:flex; justify-content:center; align-items:center; gap:4px;">
+                            👀 Огляд
+                        </button>
+                        <button onclick="event.stopPropagation(); app.exportToExcel('${h.id}')" class="btn" style="flex:1; padding:8px 4px; font-size:13px; border-radius:6px; background:#10B981; color:white; border:none; display:flex; justify-content:center; align-items:center; gap:4px;">
+                            📊 Excel
+                        </button>
+                        <button onclick="event.stopPropagation(); app.sendArchiveToTelegram('${h.id}')" class="btn" style="flex:1; padding:8px 4px; font-size:13px; border-radius:6px; background:#2AABEE; color:white; border:none; display:flex; justify-content:center; align-items:center; gap:4px;">
+                            ✈️ Надіслати
+                        </button>
+                    </div>` : ''}
+                </div>`;
+            }
         });
 
         html += '</div>';
@@ -3492,7 +3758,332 @@ checkLimit() {
         this.currentData.history = this.currentData.history.filter(h => h.id !== id);
         this.save();
         this.openHistory();
-    } 
+    }
+    // --- ПЕРЕМИКАННЯ ВКЛАДОК АРХІВУ (Спрощений варіант) ---
+    switchArchiveTab(tabName) {
+        const btnM = document.getElementById('tab-btn-months');
+        const btnA = document.getElementById('tab-btn-apts');
+        const tabM = document.getElementById('history-tab-months');
+        const tabA = document.getElementById('history-tab-apts');
+
+        if (!btnM || !btnA || !tabM || !tabA) return;
+
+        if (tabName === 'months') {
+            btnM.style.color = 'var(--primary)';
+            btnM.style.borderBottomColor = 'var(--primary)';
+            btnA.style.color = 'var(--text-sec)';
+            btnA.style.borderBottomColor = 'transparent';
+            tabM.style.display = 'block';
+            tabA.style.display = 'none';
+        } else {
+            btnA.style.color = 'var(--primary)';
+            btnA.style.borderBottomColor = 'var(--primary)';
+            btnM.style.color = 'var(--text-sec)';
+            btnM.style.borderBottomColor = 'transparent';
+            tabM.style.display = 'none';
+            tabA.style.display = 'block';
+            
+            // Підвантажуємо список квартир
+            const select = document.getElementById('archive-apt-select');
+            if (select && select.options.length <= 1) {
+                this.populateArchiveApts();
+            }
+        }
+    }
+
+   // --- ЗБІР ВСІХ КВАРТИР ДЛЯ СЕЛЕКТА (Жорсткий темний стиль) ---
+    populateArchiveApts() {
+        const select = document.getElementById('archive-apt-select');
+        if (!select) return;
+        
+        // Примусово робимо темний фон і світлий текст, щоб не було "білого по білому"
+        select.style.color = "#f3f4f6";
+        select.style.backgroundColor = "#374151";
+        select.style.border = "1px solid #4b5563";
+        select.innerHTML = '<option value="">-- Оберіть квартиру --</option>';
+        
+        const aptsMap = {};
+        let foundAny = false;
+
+        if(this.currentData && this.currentData.history) {
+            this.currentData.history.forEach(h => {
+                if (h.apartments) {
+                    if (Array.isArray(h.apartments)) {
+                        h.apartments.forEach((apt, index) => {
+                            if (apt) {
+                                let aptId = (apt.id !== undefined && apt.id !== null) ? apt.id : index;
+                                aptsMap[aptId] = apt.name || `Кв. ${aptId}`;
+                                foundAny = true;
+                            }
+                        });
+                    } else {
+                        Object.keys(h.apartments).forEach(aptId => {
+                            aptsMap[aptId] = h.apartments[aptId].name || `Кв. ${aptId}`;
+                            foundAny = true;
+                        });
+                    }
+                }
+            });
+        }
+
+        if (foundAny) {
+            Object.keys(aptsMap).sort((a,b) => a.localeCompare(b, undefined, {numeric: true})).forEach(aptId => {
+                select.innerHTML += `<option value="${aptId}">${aptsMap[aptId]}</option>`;
+            });
+        } else {
+            select.innerHTML = '<option value="">(Квартири в архіві не знайдені)</option>';
+        }
+    }
+
+    // --- ПОКАЗ ІСТОРІЇ (ЧЕКІВ) ДЛЯ ОДНІЄЇ КВАРТИРИ (Жорстке сортування і час) ---
+    renderAptHistory(aptId) {
+        const list = document.getElementById('apt-history-list');
+        if (!list) return;
+
+        if (!aptId && aptId !== 0 && aptId !== "0") {
+            list.innerHTML = '<div style="text-align:center; color:var(--text-sec); padding:30px 10px;"><div style="font-size:30px; margin-bottom:10px;">👆</div>Оберіть квартиру зі списку вище</div>';
+            return;
+        }
+
+        let html = '';
+        if(this.currentData && this.currentData.history) {
+            // 🚀 ЖОРСТКЕ СОРТУВАННЯ: Найновіші (за ID/часом) ЗАВЖДИ зверху
+            const sortedHistory = [...this.currentData.history].sort((a, b) => b.id - a.id);
+            
+            sortedHistory.forEach(h => {
+                let a = null;
+                if (h.apartments) {
+                    if (Array.isArray(h.apartments)) {
+                        a = h.apartments.find((apt, idx) => apt && (String(apt.id) === String(aptId) || String(idx) === String(aptId)));
+                    } else {
+                        a = h.apartments[aptId] || Object.values(h.apartments).find(apt => apt && String(apt.id) === String(aptId));
+                    }
+                }
+                
+                if (a) {
+                    const paid = parseFloat(String(a.paid).replace(',', '.'))||0;
+                    
+                    // 🚀 ДОДАЄМО ТОЧНИЙ ЧАС, щоб ви бачили, який чек найсвіжіший
+                    let d = h.date ? new Date(h.date) : new Date(h.id);
+                    let dateStr = "АРХІВ";
+                    if (!isNaN(d.getTime())) {
+                        dateStr = d.toLocaleDateString('uk-UA', { month: 'long', year: 'numeric' }).toUpperCase() + 
+                                  ' <span style="font-size:11px; color:#6b7280; margin-left:6px;">(' + d.toLocaleTimeString('uk-UA', {hour: '2-digit', minute:'2-digit'}) + ')</span>';
+                    }
+
+                    html += `
+                        <div style="background:#111827; border:1px solid #374151; border-radius:12px; padding:18px; display:flex; justify-content:space-between; align-items:center; box-shadow: 0 4px 12px rgba(0,0,0,0.3); margin-bottom:12px;">
+                            <div>
+                                <div style="font-weight:bold; font-size:15px; color:#f3f4f6;">📅 ${dateStr}</div>
+                                <div style="font-size:12px; color:#9ca3af; margin-top:5px;">Сплачено: <span style="color:#10b981; font-weight:bold;">${paid.toFixed(2)} грн</span></div>
+                            </div>
+                            <button class="btn" onclick="app.viewSingleArchiveReceipt('${h.id}', '${aptId}')" style="background:#3b82f6; color:white; border:none; padding:10px 20px; font-size:13px; border-radius:8px; font-weight:bold; cursor:pointer; transition:background 0.2s;">
+                                🧾 Детальний чек
+                            </button>
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        if (html === '') {
+            html = '<div style="text-align:center; color:var(--text-sec); padding:20px;">Історія для цієї квартири порожня</div>';
+        }
+        
+        list.innerHTML = html;
+    }
+
+    // --- ВІДКРИТТЯ КОНКРЕТНОЇ КВИТАНЦІЇ З АРХІВУ (ЧЕК) (Фікс таблиць Supabase) ---
+    viewSingleArchiveReceipt(historyId, aptId) {
+        const h = this.currentData.history.find(x => x.id == historyId);
+        if (!h || !h.apartments) return;
+
+        let a = null;
+        if (Array.isArray(h.apartments)) {
+            a = h.apartments.find((apt, idx) => apt && (String(apt.id) === String(aptId) || String(idx) === String(aptId)));
+        } else {
+            a = h.apartments[aptId] || Object.values(h.apartments).find(apt => apt && String(apt.id) === String(aptId));
+        }
+        
+        if (!a) {
+            alert("Помилка: не вдалося знайти дані квартири в архіві!");
+            return;
+        }
+
+        const tArchive = h.tariffs || {};
+        const tLive = this.currentData.tariffs || {}; 
+        
+        // 🚀 СУПЕР-ПОШУК: Розуміє і прості списки, і таблиці Supabase
+        const getTariff = (obj1, obj2, ...keys) => {
+            for (let obj of [obj1, obj2]) {
+                if (!obj) continue;
+                
+                // Якщо це таблиця (масив), як у вашій базі (service_name, price_per_unit)
+                if (Array.isArray(obj)) {
+                    for (let item of obj) {
+                        let name = String(item.service_name || item.name || item.id).toLowerCase();
+                        if (keys.some(k => name === k.toLowerCase())) {
+                            let val = parseFloat(String(item.price_per_unit || item.price || item.val || item.value).replace(',', '.'));
+                            if (!isNaN(val) && val > 0) return val;
+                        }
+                    }
+                } 
+                // Якщо це простий об'єкт
+                else {
+                    for (let k of keys) {
+                        if (obj[k] !== undefined && obj[k] !== null && obj[k] !== '') {
+                            let val = parseFloat(String(obj[k]).replace(',', '.'));
+                            if (!isNaN(val) && val > 0) return val;
+                        }
+                    }
+                    // Пошук по шматочку слова
+                    for (let fullKey of Object.keys(obj)) {
+                        let fk = fullKey.toLowerCase();
+                        if (keys.some(k => fk.includes(k.toLowerCase()))) {
+                             let val = parseFloat(String(obj[fullKey]).replace(',', '.'));
+                             if (!isNaN(val) && val > 0) return val;
+                        }
+                    }
+                }
+            }
+            return 0;
+        };
+
+        // Ваші точні ключі з бази: el_d, el_n, w, g
+        const t_ed = getTariff(tArchive, tLive, 'el_d', 'day', 'ed');
+        const t_en = getTariff(tArchive, tLive, 'el_n', 'night', 'en');
+        const t_w  = getTariff(tArchive, tLive, 'w', 'water');
+        const t_g  = getTariff(tArchive, tLive, 'g', 'gas');
+
+        const prev = a.prev || {};
+        const curr = a.curr || {};
+        
+        const c_ed = Math.max(0, (curr.ed || 0) - (prev.ed || 0));
+        const c_en = Math.max(0, (curr.en || 0) - (prev.en || 0));
+        const c_w = Math.max(0, (curr.w || 0) - (prev.w || 0));
+        const c_g = Math.max(0, (curr.g || 0) - (prev.g || 0));
+
+        const cost_ed = c_ed * t_ed;
+        const cost_en = c_en * t_en;
+        const cost_w = c_w * t_w;
+        const cost_g = c_g * t_g;
+
+        let details = '';
+        if (c_ed > 0) details += `<div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>⚡ Електр (Д) <span style="font-size:10px; color:#9ca3af; margin-left:5px;">${prev.ed||0} → ${curr.ed||0}</span></span> <span>${c_ed} кВт · <b>${cost_ed.toFixed(2)}</b></span></div>`;
+        if (c_en > 0) details += `<div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>🌙 Електр (Н) <span style="font-size:10px; color:#9ca3af; margin-left:5px;">${prev.en||0} → ${curr.en||0}</span></span> <span>${c_en} кВт · <b>${cost_en.toFixed(2)}</b></span></div>`;
+        if (c_w > 0) details += `<div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>💧 Вода <span style="font-size:10px; color:#9ca3af; margin-left:5px;">${prev.w||0} → ${curr.w||0}</span></span> <span>${c_w} м³ · <b>${cost_w.toFixed(2)}</b></span></div>`;
+        if (c_g > 0) details += `<div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>🔥 Газ <span style="font-size:10px; color:#9ca3af; margin-left:5px;">${prev.g||0} → ${curr.g||0}</span></span> <span>${c_g} м³ · <b>${cost_g.toFixed(2)}</b></span></div>`;
+
+        let custTotal = 0;
+        if (a.customCosts) {
+            a.customCosts.forEach(cc => {
+                const diff = Math.max(0, (cc.curr || 0) - (cc.prev || 0));
+                const val = diff * (parseFloat(String(cc.price).replace(',', '.')) || 0);
+                custTotal += val;
+                if (diff > 0) details += `<div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>📌 ${cc.name} <span style="font-size:10px; color:#9ca3af; margin-left:5px;">${cc.prev||0} → ${cc.curr||0}</span></span> <span>${diff} од. · <b>${val.toFixed(2)}</b></span></div>`;
+            });
+        }
+
+        let sTxt = '';
+        let sTotal = 0;
+        if (a.services) {
+            a.services.forEach(s => {
+                const val = parseFloat(String(s.val).replace(',', '.')) || 0;
+                sTotal += val;
+                if (val > 0) sTxt += `<div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>🔧 ${s.name}</span> <span><b>${val.toFixed(2)}</b></span></div>`;
+            });
+        }
+
+        // 🚀 АГРЕСИВНИЙ ПОШУК МЗК
+        let mzkVal = 0;
+        for (let k of Object.keys(a)) {
+            if (k.toLowerCase().includes('mzk') || k.toLowerCase().includes('мзк')) {
+                let val = parseFloat(String(a[k]).replace(',', '.'));
+                if (!isNaN(val) && val > 0) mzkVal = val;
+            }
+        }
+        
+        const subTotalCounters = cost_ed + cost_en + cost_w + cost_g + custTotal + sTotal;
+        
+        // РЯТУВАЛЬНИЙ КРУГ: Якщо МЗК все ще 0, витягуємо його з загального збереженого рахунку
+        const savedBill = parseFloat(String(a.bill || a.total || a.sum || 0).replace(',', '.'));
+        if (mzkVal === 0 && savedBill > subTotalCounters) {
+            mzkVal = savedBill - subTotalCounters;
+        }
+        
+        const currentMonthTotal = subTotalCounters + mzkVal;
+        
+        const debt = parseFloat(String(a.debt).replace(',', '.')) || 0;
+        const paid = parseFloat(String(a.paid).replace(',', '.')) || 0;
+        const bal = currentMonthTotal + debt - paid;
+
+        let d = h.date ? new Date(h.date) : new Date(h.id);
+        let dateStr = "АРХІВ";
+        if (!isNaN(d.getTime())) {
+            dateStr = d.toLocaleDateString('uk-UA', { month: 'long', year: 'numeric' }).toUpperCase();
+        }
+        
+        document.getElementById('ard-date').innerText = `КВИТАНЦІЯ: ${dateStr}`;
+        document.getElementById('ard-apt').innerText = `🏠 ${a.name || 'Кв. ' + aptId}`;
+
+        const html = `
+            <div style="background:#1f2937; padding:12px; border-radius:8px; margin-bottom:15px; border:1px solid #374151;">
+                <div style="font-size:11px; color:#9ca3af; text-transform:uppercase; margin-bottom:8px; letter-spacing:1px;">Споживання</div>
+                ${details || '<div style="color:#9ca3af; font-style:italic;">Немає споживання по лічильниках</div>'}
+            </div>
+
+            <div style="padding:0 5px; margin-bottom:15px; border-bottom:1px solid #374151; padding-bottom:15px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>🏢 МЗК (Загальні витрати):</span> <span><b>${mzkVal.toFixed(2)} грн</b></span></div>
+                ${sTxt}
+            </div>
+            
+            <div style="padding:0 5px; margin-bottom:15px;">
+                <div style="display:flex; justify-content:space-between; color:#d1d5db; margin-bottom:4px;"><span>💰 Нараховано за місяць:</span> <span>${currentMonthTotal.toFixed(2)} грн</span></div>
+                <div style="display:flex; justify-content:space-between; color:#d1d5db; margin-bottom:4px;"><span>💚 Переплата / Борг:</span> <span>${debt.toFixed(2)} грн</span></div>
+                <div style="display:flex; justify-content:space-between; color:#10b981;"><span>✅ Сплачено:</span> <span>-${paid.toFixed(2)} грн</span></div>
+            </div>
+
+            <div style="background:#1f2937; border:1px solid #374151; padding:15px; border-radius:12px; display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size:14px; text-transform:uppercase; font-weight:bold; color:#f3f4f6;">До сплати:</span>
+                <span style="font-size:20px; font-weight:900; color:${bal > 0.01 ? '#ef4444' : '#10b981'}">${bal.toFixed(2)} грн</span>
+            </div>
+        `;
+
+        document.getElementById('archive-receipt-detail-content').innerHTML = html;
+        document.getElementById('archiveReceiptDetailModal').style.display = 'flex';
+    }
+	
+	// --- УПРАВЛІННЯ ДОСТУПАМИ (РОЛІ КОРИСТУВАЧІВ) ---
+    applyRoleRestrictions(role) {
+        this.currentUserRole = role; // 'admin' або 'operator'
+        
+        // Список функцій, які КАТЕГОРИЧНО не можна бачити Обліковцю
+        const adminActions = [
+            "openMenu('premium')",    // Тарифи
+            "openChartModal()",       // Аналітика
+            "openMenu('history')",    // Архів
+            "openAccessMenu()",       // Додавання користувачів
+            "closeMonth()"            // Закриття місяця (генерація квитанцій)
+        ];
+        
+        // Шукаємо ВСІ клікабельні елементи на сторінці (кнопки, посилання, меню)
+        const allClickables = document.querySelectorAll('span, div, button');
+        
+        allClickables.forEach(el => {
+            const clickEvent = el.getAttribute('onclick') || '';
+            
+            // Якщо елемент містить одну з "заборонених" функцій
+            if (adminActions.some(action => clickEvent.includes(action))) {
+                if (role === 'operator') {
+                    el.style.display = 'none'; // Ховаємо від обліковця
+                } else {
+                    el.style.display = '';     // Показуємо керуючому (адміну)
+                }
+            }
+        });
+
+        console.log(`🔐 Права доступу застосовано для ролі: ${role}`);
+    }
 }
 window.app = new App();
 
@@ -3576,23 +4167,36 @@ window.addEventListener('load', () => {
       if(btn && nameSpan) {
             try {
                 // 🚀 БЕЗПЕЧНИЙ ПОШУК ІМЕНІ
-                let displayName = "КОРИСТУВАЧ"; 
-                if (user.user_metadata && user.user_metadata.full_name) {
-                    displayName = user.user_metadata.full_name;
-                } else if (user.user_metadata && user.user_metadata.name) {
-                    displayName = user.user_metadata.name;
-                } else if (user.email) {
-                    displayName = user.email.split('@')[0]; 
-                } else if (user.phone) {
-                    displayName = user.phone; 
-                }
-                nameSpan.innerText = displayName.toUpperCase();
-            } catch (err) {
-                console.error("Помилка імені:", err);
-            }
+                let displayName = "КОРИСТУВАЧ";
+                    let avatarUrl = "";
+                    
+                    if (user.user_metadata && user.user_metadata.full_name) {
+                        // Беремо тільки перше слово (Ім'я) без прізвища
+                        displayName = user.user_metadata.full_name.split(' ')[0];
+                    } else if (user.user_metadata && user.user_metadata.name) {
+                        displayName = user.user_metadata.name.split(' ')[0];
+                    } else if (user.email) {
+                        displayName = user.email.split('@')[0];
+                    } else if (user.phone) {
+                        displayName = user.phone;
+                    }
+                    
+                    // Витягуємо аватарку, якщо вона є
+                    if (user.user_metadata && user.user_metadata.avatar_url) {
+                        avatarUrl = user.user_metadata.avatar_url;
+                    }
+
+                    nameSpan.innerText = displayName;
+                    
+                    // Показуємо аватарку, якщо вона знайдена
+                    const avatarImg = document.getElementById('user-avatar');
+                    if(avatarImg && avatarUrl) {
+                        avatarImg.src = avatarUrl;
+                        avatarImg.style.display = 'block';
+                    }
 
             btn.style.color = 'var(--success)';
-            btn.onclick = window.googleLogout; // ВИКЛИКАЄМО ЧИСТУ ФУНКЦІЮ ВИЩЕ
+            
         }
 
       try {
@@ -3623,17 +4227,21 @@ if (!profile) {
     } else {
         console.error("Помилка створення профілю:", error);
     }
-}
+} catch (error) {
+        console.error("Помилка профілю:", error);
+    }
 // --- КІНЕЦЬ МАГІЇ ---
           if (profile && profile.expires_at) {
               const expDate = new Date(profile.expires_at);
               if (subExpireEl) {
                 // Якщо рік 2140 - це наш довічний безліміт, не пишемо дату!
                 if (profile.expires_at && String(profile.expires_at).includes('2140')) {
-                    subExpireEl.innerHTML = `<span style="color:var(--primary); font-weight:800;">💎 PRO АКТИВНО</span> | <span style="font-size:11px; opacity:0.8;">Безліміт</span>`;
-                } else {
-                    subExpireEl.innerText = `PRO до ${expDate.toLocaleDateString()}`;
-                }
+                            // Безліміт
+                            subExpireEl.innerText = profile.apts_limit + ' кв | Безліміт';
+                        } else {
+                            // Показуємо кількість квартир і дату (без слова PRO)
+                            subExpireEl.innerText = profile.apts_limit + ' кв | до ' + expDate.toLocaleDateString();
+                        }
                 subExpireEl.style.display = 'block';
             }
               if(window.app) window.app.state.license = { type: 'pro', exp: profile.expires_at };
@@ -4782,7 +5390,6 @@ setInterval(checkAdminCommBadge, 15000); // І потім кожні 15 секу
     
 </body>
 </html>
-
 
 
 
