@@ -2173,10 +2173,18 @@ checkLimit() {
             const newUser = { id: Date.now(), email, role: this.selectedRole, accessLabel: label, aptId };
             
             if (!this.currentData.users) this.currentData.users = [];
+            
+            // 🔥 ФІКС 1: Видаляємо всі старі записи цієї людини, щоб не було конфлікту ролей
+            this.currentData.users = this.currentData.users.filter(u => u.email !== email);
+            
             this.currentData.users.push(newUser);
             
             const { error } = await sbClient.from('houses').update({ allowed_emails: this.currentData.users }).eq('id', this.currentData.id);
             if (error) throw error;
+            
+            // 🔥 ФІКС 2: Жорстко зберігаємо в пам'ять браузера і хмару, щоб доступ не зникав!
+            this.save();
+            if(window.cloudSave) window.cloudSave(this.state);
             
             this.renderUserList();
             emailInput.value = '';
@@ -2196,6 +2204,11 @@ checkLimit() {
             if (!confirm("Забрати доступ?")) return;
             this.currentData.users = this.currentData.users.filter(u => u.id !== id);
             await sbClient.from('houses').update({ allowed_emails: this.currentData.users }).eq('id', this.currentData.id);
+            
+            // 🔥 ФІКС 3: Зберігаємо видалення локально
+            this.save();
+            if(window.cloudSave) window.cloudSave(this.state);
+            
             this.renderUserList();
         } catch (e) {
             console.error(e);
