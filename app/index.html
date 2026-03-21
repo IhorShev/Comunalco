@@ -2158,6 +2158,7 @@ checkLimit() {
 
    async grantUserAccess() {
             const emailInput = document.getElementById('new-user-email');
+            if (!emailInput) return;
             const email = emailInput.value.trim().toLowerCase();
             if (!email || !email.includes('@')) { alert("Введіть коректний Email!"); return; }
 
@@ -2208,12 +2209,14 @@ checkLimit() {
             if (!confirm("Забрати доступ у цього користувача?")) return;
             this.currentData.users = this.currentData.users.filter(u => u.id !== id);
             try {
-                await sbClient.from('houses')
+                const { error } = await sbClient.from('houses')
                     .update({ allowed_emails: this.currentData.users })
                     .eq('id', this.currentData.id);
+                if (error) throw error;
                 this.renderUserList();
             } catch (e) {
                 console.error("Помилка видалення:", e);
+                alert("Помилка при видаленні");
             }
         },
 
