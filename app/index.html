@@ -1843,19 +1843,23 @@ checkLimit() {
         setTimeout(() => { if (typeof this.calculate === 'function') this.calculate(); }, 100);
 
         // --- ПЕРЕВІРКА ДОСТУПУ ПІСЛЯ ЗАВАНТАЖЕННЯ ДАНИХ ---
-        if (window.currentUser && this.currentData && this.currentData.users) {
-            // Шукаємо профіль поточного юзера в базі даних (по email)
-            const myProfile = this.currentData.users.find(u => u.email === window.currentUser.email);
+        if (window.currentUser && this.currentData) {
+            let myRole = 'admin';
             
-            // За замовчуванням всі мають роль 'admin' (щоб у вас як у власника нічого не зламалося)
-            let myRole = 'admin'; 
-            
-            // Але якщо в базі записано, що ця людина 'operator' (обліковець) - міняємо роль
-            if (myProfile && myProfile.role === 'operator') {
-                myRole = 'operator';
+            // Перевіряємо, чи завантажився список користувачів
+            if (this.currentData.users) {
+                const myProfile = this.currentData.users.find(u => u.email === window.currentUser.email);
+                if (myProfile && myProfile.role === 'operator') {
+                    myRole = 'operator';
+                }
             }
             
-            // Вмикаємо "Снайпер", який сховає зайві кнопки, якщо це обліковець
+            // Якщо це СПРАВЖНІЙ власник об'єкта, він точно адмін
+            if (this.currentData.owner_id === window.currentUser.id) {
+                myRole = 'admin';
+            }
+
+            window.currentRole = myRole; // Запам'ятовуємо глобально для CSS-щита
             this.applyRoleRestrictions(myRole);
         }
     }
