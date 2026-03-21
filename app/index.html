@@ -4188,12 +4188,15 @@ window.addEventListener('load', () => {
         }
 
         try {
-            // Шукаємо або створюємо профіль у Supabase
+            // 1. Отримуємо поточний профіль з бази
             let { data: profile } = await sbClient.from('profiles').select('*').eq('id', user.id).maybeSingle();
+            const today = new Date();
 
             if (!profile) {
+                // --- ЛОГІКА ДЛЯ НОВОГО КОРИСТУВАЧА (+45 днів) ---
                 const trialEnd = new Date();
-                trialEnd.setDate(trialEnd.getDate() + 45);
+                trialEnd.setDate(today.getDate() + 45);
+                
                 const { data: newProfile } = await sbClient.from('profiles').insert([{
                     id: user.id,
                     plan: 'pro',
@@ -4201,8 +4204,26 @@ window.addEventListener('load', () => {
                     apts_limit: 10
                 }]).select().single();
                 profile = newProfile;
-            }
+            } 
 
+            // --- ФУНКЦІЯ ЧЕСНОГО ПРОДОВЖЕННЯ (window.renewSubscription) ---
+            window.renewSubscription = async (daysToAdd) => {
+                let currentExpire = new Date(profile.expires_at);
+                // Якщо підписка ще активна — додаємо до неї, якщо ні — рахуємо від сьогодні
+                let baseDate = (currentExpire > today) ? currentExpire : today;
+                let newDate = new Date(baseDate.getTime() + (daysToAdd * 24 * 60 * 60 * 1000));
+                
+                const { data: updated, error: upErr } = await sbClient.from('profiles')
+                    .update({ expires_at: newDate.toISOString() })
+                    .eq('id', user.id).select().single();
+                
+                if (upErr) { alert("Помилка оновлення"); return; }
+                profile = updated;
+                alert("Дякуємо! Підписку продовжено до: " + new Date(profile.expires_at).toLocaleDateString());
+                location.reload(); 
+            };
+
+            // Відображення даних у шапці (чистий формат)
             if (profile && profile.expires_at) {
                 const expDate = new Date(profile.expires_at);
                 if (subExpireEl) {
@@ -4213,14 +4234,13 @@ window.addEventListener('load', () => {
                 }
                 if (window.app) window.app.state.license = { type: 'pro', exp: profile.expires_at };
             }
-            
-            // Завантаження даних
+
             if (window.app && window.app.state.objects && window.app.state.objects.length <= 1) {
                 await window.cloudLoad();
             }
 
         } catch (error) {
-            console.error("Помилка бази даних:", error);
+            console.error("Помилка профілю:", error);
         }
 
     } else {
