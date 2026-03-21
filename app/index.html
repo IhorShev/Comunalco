@@ -1842,24 +1842,31 @@ checkLimit() {
         
         setTimeout(() => { if (typeof this.calculate === 'function') this.calculate(); }, 100);
 
-        // --- ПЕРЕВІРКА ДОСТУПУ ПІСЛЯ ЗАВАНТАЖЕННЯ ДАНИХ ---
+        // --- 🛡 ЖОРСТКА ПЕРЕВІРКА ДОСТУПУ (ПАРАНОЯ) ---
         if (window.currentUser && this.currentData) {
-            let myRole = 'admin';
             
-            // Перевіряємо, чи завантажився список користувачів
-            if (this.currentData.users) {
-                const myProfile = this.currentData.users.find(u => u.email === window.currentUser.email);
-                if (myProfile && myProfile.role === 'operator') {
-                    myRole = 'operator';
+            // 1. ЗАБОРОНЯЄМО ВСЕ ЗА ЗАМОВЧУВАННЯМ! 
+            // Якщо система сумнівається - людина стає Обліковцем (найнижчий рівень)
+            let myRole = 'operator'; 
+
+            // 2. Шукаємо людину в списку доступу
+            if (this.currentData.users && Array.isArray(this.currentData.users)) {
+                const myEmail = String(window.currentUser.email).trim().toLowerCase();
+                const myProfile = this.currentData.users.find(u => String(u.email).trim().toLowerCase() === myEmail);
+                
+                if (myProfile) {
+                    myRole = myProfile.role; // Встановлюємо роль зі списку
                 }
             }
-            
-            // Якщо це СПРАВЖНІЙ власник об'єкта, він точно адмін
-            if (this.currentData.owner_id === window.currentUser.id) {
+
+            // 3. ПРАВА АДМІНА - ТІЛЬКИ СТОВІДСОТКОВОМУ ВЛАСНИКУ!
+            // (І тільки якщо ми не призначили його Обліковцем примусово)
+            if (this.currentData.owner_id === window.currentUser.id && myRole !== 'operator') {
                 myRole = 'admin';
             }
 
-            window.currentRole = myRole; // Запам'ятовуємо глобально для CSS-щита
+            console.log("🕵️ ФІНАЛЬНА РОЛЬ:", myRole); // Для перевірки
+            window.currentRole = myRole; 
             this.applyRoleRestrictions(myRole);
         }
     }
