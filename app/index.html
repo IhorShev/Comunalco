@@ -3574,7 +3574,7 @@ checkLimit() {
     applyRoleRestrictions(role = null) {
         const userRole = role || window.currentRole || 'admin';
         
-        // 1. Очищаємо старий щит (якщо ви зайшли під іншим акаунтом)
+        // 1. Очищаємо старий щит
         let style = document.getElementById('role-css-shield');
         if (style) style.remove();
         
@@ -3582,7 +3582,6 @@ checkLimit() {
         if (userRole === 'owner' || userRole === 'manager' || userRole === 'admin') return;
 
         // 2. СТВОРЮЄМО НЕПРОБИВНИЙ CSS-ЩИТ
-        // Цей код неможливо "перемалювати", він працює на рівні браузера
         style = document.createElement('style');
         style.id = 'role-css-shield';
         let css = '';
@@ -3594,7 +3593,7 @@ checkLimit() {
                 button[onclick*="addGroup"], button[onclick*="addApartment"],
                 span[title*="Видалити"], div[title*="Додати"] { display: none !important; }
                 
-                /* Приховуємо фінансові блоки та нижню панель */
+                /* Приховуємо загальні фінансові блоки та нижню панель */
                 #requisites-container, #extra-tariffs-container, .sticky-footer, #batch-controls { display: none !important; }
                 
                 /* Приховуємо розсилки і налаштування бота */
@@ -3602,13 +3601,18 @@ checkLimit() {
                 button[onclick*="copyBotLink"], button[onclick*="openSendFormatModal"], 
                 button[onclick*="sendAccessData"], div[onclick*="generateNewPin"] { display: none !important; }
                 
-                /* Блокуємо поля вводу (Борг, Сплачено, Телефон, Тарифи) */
-                input[onchange*="debt"], input[onchange*="paid"], input[onchange*="phone"], 
-                select[onchange*="messenger"],
+                /* 🔥 ПОВНІСТЮ ХОВАЄМО ПОЛЯ БОРГУ, ОПЛАТИ ТА ТЕЛЕФОНІВ У КВАРТИРАХ 🔥 */
+                input[placeholder*="Борг"], input[placeholder*="Сплачено"], 
+                input[placeholder*="Телефон"], select,
+                input[onchange*="debt"], input[onchange*="paid"], input[onchange*="phone"],
                 input[onchange*="updateTariff"], input[onchange*="updateExtraTariff"] { 
-                    pointer-events: none !important; 
-                    opacity: 0.5 !important; 
-                    background-color: transparent !important;
+                    display: none !important; 
+                }
+
+                /* Ховаємо цілі рядки, якщо в них є ці поля (для чистоти інтерфейсу) */
+                div:has(> input[placeholder*="Борг"]),
+                div:has(> input[placeholder*="Телефон"]) {
+                    display: none !important;
                 }
             `;
         }
@@ -3616,17 +3620,15 @@ checkLimit() {
         style.innerHTML = css;
         document.head.appendChild(style);
 
-        // 3. ХОВАЄМО ТЕКСТОВІ МЕНЮ ТА ОБРОБЛЯЄМО МЕШКАНЦЯ (із затримкою)
+        // 3. ХОВАЄМО ТЕКСТОВІ МЕНЮ ТА ОБРОБЛЯЄМО МЕШКАНЦЯ
         setTimeout(() => {
             if (userRole === 'operator') {
-                // Міняємо заголовок
                 const titleInput = document.getElementById('object-title');
                 if(titleInput && !titleInput.value.includes('ОБЛІКОВЦЯ')) {
                     titleInput.value = titleInput.value + ' (РЕЖИМ ОБЛІКОВЦЯ)';
                     titleInput.style.color = 'var(--gold)';
                 }
                 
-                // Ховаємо верхнє меню по назвах
                 const wordsToHide = ['Тарифи', 'Доступ', 'Аналітика', 'Локальні копії'];
                 document.querySelectorAll('span, div, a, button').forEach(el => {
                     if (el.children.length === 0 && wordsToHide.some(w => el.innerText.includes(w))) {
@@ -3664,7 +3666,7 @@ checkLimit() {
                 const saveBtn = document.querySelector('.sticky-footer button.btn-warning');
                 if(saveBtn) saveBtn.style.display = 'none';
             }
-        }, 150); // Затримка 150мс дає змогу браузеру намалювати весь HTML перед застосуванням
+        }, 150); 
     }
    // --- ФУНКЦІЯ ІСТОРІЇ (Оновлено для Табів та різних Ролей) ---
     openHistory() {
