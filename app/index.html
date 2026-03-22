@@ -4235,8 +4235,11 @@ checkLimit() {
 
     // --- 3. ЮВЕЛІРНА ІНТЕГРАЦІЯ КНОПКИ ПІД НАЗВУ ОБ'ЄКТА ---
     renderGlobalBackButton() {
-        const oldBtn = document.getElementById('global-back-btn');
+        const oldBtn = document.getElementById('inline-lobby-btn');
         if (oldBtn) oldBtn.remove();
+        
+        const oldFloating = document.getElementById('global-back-btn');
+        if (oldFloating) oldFloating.remove();
 
         if (!this.state || !this.state.objects || this.state.objects.length <= 1) return; 
 
@@ -4249,6 +4252,12 @@ checkLimit() {
             }
         });
 
+        let inlineBtn = document.createElement('button');
+        inlineBtn.id = 'inline-lobby-btn';
+        inlineBtn.innerHTML = '🔄 Змінити об\'єкт';
+        inlineBtn.setAttribute('onclick', 'app.goToLobby();');
+        inlineBtn.setAttribute('style', 'background: #3b82f6; color: white; border: none; padding: 5px 14px; border-radius: 12px; font-size: 12px; font-weight: bold; cursor: pointer; margin: 0 10px; box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4); transition: 0.2s; vertical-align: middle; display: inline-block;');
+
         let freeBadge = null;
         document.querySelectorAll('span, div, b').forEach(el => {
             const t = (el.innerText || '').toUpperCase().trim();
@@ -4257,24 +4266,22 @@ checkLimit() {
             }
         });
 
-        let inlineBtn = document.getElementById('inline-lobby-btn');
-        if (!inlineBtn) {
-            inlineBtn = document.createElement('button');
-            inlineBtn.id = 'inline-lobby-btn';
-            inlineBtn.innerHTML = '🔄 Змінити об\'єкт';
-            inlineBtn.setAttribute('onclick', 'app.goToLobby();');
-            inlineBtn.setAttribute('style', 'background: #3b82f6; color: white; border: none; padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: bold; cursor: pointer; margin: 0 8px; box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4); transition: 0.2s; vertical-align: middle;');
-        }
+        let trashIcon = Array.from(document.querySelectorAll('i, span, div, button')).find(el => {
+            const oc = (el.getAttribute('onclick') || '').toLowerCase();
+            return oc.includes('deletehouse') || oc.includes('deleteobj');
+        });
 
         if (freeBadge) {
             freeBadge.style.display = 'none'; 
             freeBadge.parentNode.insertBefore(inlineBtn, freeBadge.nextSibling); 
+        } else if (trashIcon && trashIcon.parentNode) {
+            // 🔥 СТАВИМО РІВНО МІЖ КОШИКОМ І ПЛЮСОМ (після кошика)
+            trashIcon.parentNode.insertBefore(inlineBtn, trashIcon.nextSibling);
         } else {
             const titleEl = document.getElementById('object-title');
-            if (titleEl && titleEl.parentNode) titleEl.parentNode.appendChild(inlineBtn);
+            if (titleEl) titleEl.insertAdjacentElement('afterend', inlineBtn);
         }
     }
-
     // --- 4. ДВОЄ ДВЕРЕЙ (Менеджер та Обліковець) ---
     applyRoleRestrictions(role) {
         document.body.className = document.body.className.replace(/role-\w+/g, '').trim();
