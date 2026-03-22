@@ -1842,30 +1842,25 @@ checkLimit() {
         
         setTimeout(() => { if (typeof this.calculate === 'function') this.calculate(); }, 100);
 
-        // --- 🛡 ЖОРСТКА ПЕРЕВІРКА ДОСТУПУ (ПАРАНОЯ) ---
         if (window.currentUser && this.currentData) {
-            
-            // 1. ЗАБОРОНЯЄМО ВСЕ ЗА ЗАМОВЧУВАННЯМ! 
-            // Якщо система сумнівається - людина стає Обліковцем (найнижчий рівень)
-            let myRole = 'operator'; 
+            let myRole = 'operator'; // За замовчуванням всі обліковці
 
-            // 2. Шукаємо людину в списку доступу
             if (this.currentData.users && Array.isArray(this.currentData.users)) {
                 const myEmail = String(window.currentUser.email).trim().toLowerCase();
                 const myProfile = this.currentData.users.find(u => String(u.email).trim().toLowerCase() === myEmail);
-                
-                if (myProfile) {
-                    myRole = myProfile.role; // Встановлюємо роль зі списку
-                }
+                if (myProfile) myRole = myProfile.role; 
             }
 
-            // 3. ПРАВА АДМІНА - ТІЛЬКИ СТОВІДСОТКОВОМУ ВЛАСНИКУ!
-            // (І тільки якщо ми не призначили його Обліковцем примусово)
             if (this.currentData.owner_id === window.currentUser.id && myRole !== 'operator') {
                 myRole = 'admin';
             }
 
-            console.log("🕵️ ФІНАЛЬНА РОЛЬ:", myRole); // Для перевірки
+            // 🔥 ЖОРСТКИЙ ТЕСТ: Примусово робимо Матвія обліковцем
+            if (window.currentUser.email.toLowerCase().includes('m25.shevchenko')) {
+                myRole = 'operator';
+                alert("УВАГА! Код оновився. Ви зайшли як ОБЛІКОВЕЦЬ!");
+            }
+
             window.currentRole = myRole; 
             this.applyRoleRestrictions(myRole);
         }
