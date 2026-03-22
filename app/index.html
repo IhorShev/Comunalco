@@ -4135,9 +4135,10 @@ checkLimit() {
     enterObject(index) {
         window.showLobby = false;
         window.userPickedObject = true;
+        
+        // Просто вказуємо програмі новий індекс
         this.state.currentObjIdx = index; 
-        this.state.selectedHouseIndex = index; // Залізобетонна прив'язка
-        this.currentData = this.state.objects[index]; 
+        if (this.state.selectedHouseIndex !== undefined) this.state.selectedHouseIndex = index;
         
         // Гарантований запуск оновлення інтерфейсу
         if (typeof this.render === 'function') {
