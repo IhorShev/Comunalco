@@ -888,7 +888,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '8.5';
+    const APP_VERSION = '8.6';
     if (localStorage.getItem('app_version') !== APP_VERSION) {
         localStorage.setItem('app_version', APP_VERSION);
         if (navigator.serviceWorker) {
@@ -1830,7 +1830,7 @@ checkLimit() {
         return true;
     }
 
-    // --- RENDERING ---
+    // --- РЕНДЕРИНГ ОБ'ЄКТА ---
     renderAll() {
         document.getElementById('object-title').value = this.currentData.name;
         ['ed','en','w','g'].forEach(k => { 
@@ -1842,8 +1842,9 @@ checkLimit() {
         
         setTimeout(() => { if (typeof this.calculate === 'function') this.calculate(); }, 100);
 
+        // Жорстка перевірка доступу (Параноя)
         if (window.currentUser && this.currentData) {
-            let myRole = 'operator'; // За замовчуванням всі обліковці
+            let myRole = 'operator'; // ЗА ЗАМОВЧУВАННЯМ - ОБЛІКОВЕЦЬ
 
             if (this.currentData.users && Array.isArray(this.currentData.users)) {
                 const myEmail = String(window.currentUser.email).trim().toLowerCase();
@@ -1855,14 +1856,8 @@ checkLimit() {
                 myRole = 'admin';
             }
 
-            // 🔥 ЖОРСТКИЙ ТЕСТ: Примусово робимо Матвія обліковцем
-            if (window.currentUser.email.toLowerCase().includes('m25.shevchenko')) {
-                myRole = 'operator';
-                alert("УВАГА! Код оновився. Ви зайшли як ОБЛІКОВЕЦЬ!");
-            }
-
             window.currentRole = myRole; 
-            this.applyRoleRestrictions(myRole);
+            this.applyRoleRestrictions(myRole); // Запускаємо щит!
         }
     }
 
@@ -3585,38 +3580,38 @@ checkLimit() {
         this.updateSubscriptionCalc();
     }
 
-           // --- 🛡 ФУНКЦІЯ ЗАХИСТУ ІНТЕРФЕЙСУ ---
+           // --- 🛡 ФУНКЦІЯ ЗАХИСТУ ІНТЕРФЕЙСУ (CSS-ЩИТ) ---
     applyRoleRestrictions(role = null) {
-        const userRole = role || window.currentRole || 'admin';
+        const userRole = role || window.currentRole || 'operator';
         
         // 1. Очищаємо старий щит
         let style = document.getElementById('role-css-shield');
         if (style) style.remove();
         
         // Якщо це власник або менеджер - виходимо, все дозволено
-        if (userRole === 'owner' || userRole === 'manager' || userRole === 'admin') return;
+        if (userRole === 'admin' || userRole === 'owner' || userRole === 'manager') return;
 
-        // 2. СТВОРЮЄМО НЕПРОБИВНИЙ CSS-ЩИТ
+        // 2. СТВОРЮЄМО НЕПРОБИВНИЙ CSS-ЩИТ ДЛЯ ОБЛІКОВЦЯ
         style = document.createElement('style');
         style.id = 'role-css-shield';
         let css = '';
 
         if (userRole === 'operator') {
             css = `
-                /* Приховуємо кнопки додавання та видалення */
+                /* Ховаємо всі кнопки додавання/видалення */
                 .btn-add, .btn-add-counter, .del-icon,
                 button[onclick*="addGroup"], button[onclick*="addApartment"],
                 span[title*="Видалити"], div[title*="Додати"] { display: none !important; }
                 
-                /* Приховуємо загальні фінансові блоки та нижню панель */
+                /* Ховаємо фінансові блоки, налаштування та футер */
                 #requisites-container, #extra-tariffs-container, .sticky-footer, #batch-controls { display: none !important; }
                 
-                /* Приховуємо розсилки і налаштування бота */
+                /* Ховаємо розсилки і налаштування бота */
                 .mass-send-chk, .switch, 
                 button[onclick*="copyBotLink"], button[onclick*="openSendFormatModal"], 
                 button[onclick*="sendAccessData"], div[onclick*="generateNewPin"] { display: none !important; }
                 
-                /* 🔥 ПОВНІСТЮ ХОВАЄМО ПОЛЯ БОРГУ, ОПЛАТИ ТА ТЕЛЕФОНІВ У КВАРТИРАХ 🔥 */
+                /* ПОВНІСТЮ ХОВАЄМО ПОЛЯ БОРГУ, ОПЛАТИ ТА ТЕЛЕФОНІВ У КВАРТИРАХ */
                 input[placeholder*="Борг"], input[placeholder*="Сплачено"], 
                 input[placeholder*="Телефон"], select,
                 input[onchange*="debt"], input[onchange*="paid"], input[onchange*="phone"],
@@ -3624,7 +3619,7 @@ checkLimit() {
                     display: none !important; 
                 }
 
-                /* Ховаємо цілі рядки, якщо в них є ці поля (для чистоти інтерфейсу) */
+                /* Ховаємо контейнери цих полів, щоб не було порожніх дірок */
                 div:has(> input[placeholder*="Борг"]),
                 div:has(> input[placeholder*="Телефон"]) {
                     display: none !important;
@@ -3652,7 +3647,7 @@ checkLimit() {
                 });
             }
             
-            // Логіка для мешканця (залишається як була)
+            // Логіка для мешканця
             if (userRole === 'tenant' && window.currentAptId) {
                 const apartmentsDiv = document.getElementById('apartments-container');
                 if (apartmentsDiv) {
