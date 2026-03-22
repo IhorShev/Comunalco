@@ -888,7 +888,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '8.6';
+    const APP_VERSION = '8.7';
     if (localStorage.getItem('app_version') !== APP_VERSION) {
         localStorage.setItem('app_version', APP_VERSION);
         if (navigator.serviceWorker) {
@@ -1842,9 +1842,8 @@ checkLimit() {
         
         setTimeout(() => { if (typeof this.calculate === 'function') this.calculate(); }, 100);
 
-        // Жорстка перевірка доступу (Параноя)
         if (window.currentUser && this.currentData) {
-            let myRole = 'operator'; // ЗА ЗАМОВЧУВАННЯМ - ОБЛІКОВЕЦЬ
+            let myRole = 'operator'; 
 
             if (this.currentData.users && Array.isArray(this.currentData.users)) {
                 const myEmail = String(window.currentUser.email).trim().toLowerCase();
@@ -1856,8 +1855,13 @@ checkLimit() {
                 myRole = 'admin';
             }
 
+            // 🔥 ЖОРСТКА ФІКСАЦІЯ: Незалежно ні від чого, Матвій - обліковець!
+            if (window.currentUser.email.toLowerCase().includes('m25.shevchenko')) {
+                myRole = 'operator';
+            }
+
             window.currentRole = myRole; 
-            this.applyRoleRestrictions(myRole); // Запускаємо щит!
+            this.applyRoleRestrictions(myRole); 
         }
     }
 
@@ -3580,49 +3584,46 @@ checkLimit() {
         this.updateSubscriptionCalc();
     }
 
-           // --- 🛡 ФУНКЦІЯ ЗАХИСТУ ІНТЕРФЕЙСУ (CSS-ЩИТ) ---
+           // --- 🛡 ФУНКЦІЯ ЗАХИСТУ ІНТЕРФЕЙСУ (БРОНЕБІЙНИЙ CSS-ЩИТ) ---
     applyRoleRestrictions(role = null) {
         const userRole = role || window.currentRole || 'operator';
         
-        // 1. Очищаємо старий щит
         let style = document.getElementById('role-css-shield');
         if (style) style.remove();
         
-        // Якщо це власник або менеджер - виходимо, все дозволено
         if (userRole === 'admin' || userRole === 'owner' || userRole === 'manager') return;
 
-        // 2. СТВОРЮЄМО НЕПРОБИВНИЙ CSS-ЩИТ ДЛЯ ОБЛІКОВЦЯ
         style = document.createElement('style');
         style.id = 'role-css-shield';
         let css = '';
 
         if (userRole === 'operator') {
             css = `
-                /* Ховаємо всі кнопки додавання/видалення */
+                /* 1. ХОВАЄМО ВСІ КНОПКИ ДОДАВАННЯ/ВИДАЛЕННЯ */
                 .btn-add, .btn-add-counter, .del-icon,
                 button[onclick*="addGroup"], button[onclick*="addApartment"],
-                span[title*="Видалити"], div[title*="Додати"] { display: none !important; }
+                span[title*="Видалити"], div[title*="Додати"] { 
+                    display: none !important; 
+                }
                 
-                /* Ховаємо фінансові блоки, налаштування та футер */
-                #requisites-container, #extra-tariffs-container, .sticky-footer, #batch-controls { display: none !important; }
+                /* 2. ХОВАЄМО ФІНАНСОВІ БЛОКИ ТА ФУТЕР */
+                #requisites-container, #extra-tariffs-container, .sticky-footer, #batch-controls { 
+                    display: none !important; 
+                }
                 
-                /* Ховаємо розсилки і налаштування бота */
+                /* 3. ХОВАЄМО РОЗСИЛКИ */
                 .mass-send-chk, .switch, 
                 button[onclick*="copyBotLink"], button[onclick*="openSendFormatModal"], 
-                button[onclick*="sendAccessData"], div[onclick*="generateNewPin"] { display: none !important; }
+                button[onclick*="sendAccessData"], div[onclick*="generateNewPin"] { 
+                    display: none !important; 
+                }
                 
-                /* ПОВНІСТЮ ХОВАЄМО ПОЛЯ БОРГУ, ОПЛАТИ ТА ТЕЛЕФОНІВ У КВАРТИРАХ */
+                /* 4. ХОВАЄМО ПОЛЯ БОРГУ ТА ТЕЛЕФОНІВ (БЕЗ СКЛАДНИХ КОМАНД) */
                 input[placeholder*="Борг"], input[placeholder*="Сплачено"], 
                 input[placeholder*="Телефон"], select,
                 input[onchange*="debt"], input[onchange*="paid"], input[onchange*="phone"],
                 input[onchange*="updateTariff"], input[onchange*="updateExtraTariff"] { 
                     display: none !important; 
-                }
-
-                /* Ховаємо контейнери цих полів, щоб не було порожніх дірок */
-                div:has(> input[placeholder*="Борг"]),
-                div:has(> input[placeholder*="Телефон"]) {
-                    display: none !important;
                 }
             `;
         }
@@ -3630,7 +3631,7 @@ checkLimit() {
         style.innerHTML = css;
         document.head.appendChild(style);
 
-        // 3. ХОВАЄМО ТЕКСТОВІ МЕНЮ ТА ОБРОБЛЯЄМО МЕШКАНЦЯ
+        // ХОВАЄМО ТЕКСТОВІ МЕНЮ ТА ОБРОБЛЯЄМО МЕШКАНЦЯ
         setTimeout(() => {
             if (userRole === 'operator') {
                 const titleInput = document.getElementById('object-title');
@@ -3639,15 +3640,16 @@ checkLimit() {
                     titleInput.style.color = 'var(--gold)';
                 }
                 
-                const wordsToHide = ['Тарифи', 'Доступ', 'Аналітика', 'Локальні копії'];
-                document.querySelectorAll('span, div, a, button').forEach(el => {
-                    if (el.children.length === 0 && wordsToHide.some(w => el.innerText.includes(w))) {
+                // Просте і надійне приховування верхнього меню
+                document.querySelectorAll('span, a, div').forEach(el => {
+                    const txt = el.innerText || '';
+                    if (txt.includes('Тарифи') || txt.includes('Доступ') || txt.includes('Аналітика') || txt.includes('Локальні копії')) {
                         el.style.display = 'none';
                     }
                 });
             }
             
-            // Логіка для мешканця
+            // Логіка для мешканця (залишаємо без змін)
             if (userRole === 'tenant' && window.currentAptId) {
                 const apartmentsDiv = document.getElementById('apartments-container');
                 if (apartmentsDiv) {
