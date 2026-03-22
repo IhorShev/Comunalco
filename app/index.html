@@ -888,7 +888,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '9.0';
+    const APP_VERSION = '9.1';
     if (localStorage.getItem('app_version') !== APP_VERSION) {
         localStorage.setItem('app_version', APP_VERSION);
         if (navigator.serviceWorker) {
@@ -1830,9 +1830,9 @@ checkLimit() {
         return true;
     }
 
-    // 1. ГОЛОВНИЙ РОУТЕР ДОСТУПУ
+    // 1. ГОЛОВНИЙ РОУТЕР ДОСТУПУ (Запускається при малюванні об'єкта)
     renderAll() {
-        // Базове малювання для Адміна/Менеджера
+        // Стандартне малювання для Адміна/Менеджера
         try { document.getElementById('object-title').value = this.currentData.name; } catch(e){}
         ['ed','en','w','g'].forEach(k => { 
             const el = document.getElementById('t_'+k); 
@@ -1842,7 +1842,7 @@ checkLimit() {
         this.renderExtraTariffs(); this.renderRequisites(); this.renderGroups(); this.renderApartments();
         setTimeout(() => { if (typeof this.calculate === 'function') this.calculate(); }, 100);
 
-        // ВИЗНАЧЕННЯ РОЛІ
+        // ВИЗНАЧЕННЯ РОЛІ КОРІСТУВАЧА
         let role = 'admin'; // За замовчуванням - Керуючий (Власник)
 
         if (window.currentUser && this.currentData) {
@@ -1850,14 +1850,14 @@ checkLimit() {
             const ownerId = String(this.currentData.owner_id);
             const currentUserId = String(window.currentUser.id);
 
-            // Якщо ID користувача не збігається з ID власника бази:
+            // Якщо людина НЕ ВЛАСНИК цього будинку:
             if (ownerId !== currentUserId) {
                 role = 'tenant'; // Падаємо до мінімальних прав
                 
                 // Шукаємо, які права ми йому видали у меню "Доступ"
                 if (this.currentData.users && Array.isArray(this.currentData.users)) {
                     const profile = this.currentData.users.find(u => (u.email || '').toLowerCase().trim() === myEmail);
-                    if (profile) role = profile.role; // Отримуємо 'manager' або 'operator'
+                    if (profile) role = profile.role; // manager, operator або tenant
                 }
             }
         }
@@ -4092,43 +4092,39 @@ checkLimit() {
         document.body.className = document.body.className.replace(/role-\w+/g, '').trim();
         document.body.classList.add('role-' + role);
 
-        // Створюємо "Кімнату Обліковця", якщо її ще немає
         let operatorRoom = document.getElementById('operator-room');
         if (!operatorRoom) {
             operatorRoom = document.createElement('div');
             operatorRoom.id = 'operator-room';
-            document.body.appendChild(operatorRoom); // Кладемо поверх усього сайту
+            document.body.appendChild(operatorRoom); // Кладемо поверх сайту
         }
 
         if (role === 'operator') {
-            // 🚪 ДВЕРІ 1: ОБЛІКОВЕЦЬ
-            // 1. Бронебійно ховаємо весь головний додаток
+            // 🚪 ДВЕРІ 1: ОБЛІКОВЕЦЬ (Кімната ізоляції)
             let style = document.getElementById('operator-shield');
             if (!style) {
                 style = document.createElement('style');
                 style.id = 'operator-shield';
                 document.head.appendChild(style);
             }
-            // CSS, який ховає абсолютно всі теги, крім нашої кімнати Обліковця
             style.innerHTML = `
                 body.role-operator > *:not(#operator-room):not(script):not(style) {
                     display: none !important;
                 }
-                body.role-operator { background-color: #f0f2f5; }
+                body.role-operator { background-color: #f0f2f5; font-family: sans-serif; }
             `;
             
-            // 2. Запускаємо малювання безпечної кімнати
+            // Запускаємо малювання кімнати з лічильниками МЗК та Об'єкта
             this.renderOperatorRoom(); 
             
         } else {
-            // 🚪 ДВЕРІ 2: КЕРУЮЧИЙ ТА МЕНЕДЖЕР
+            // 🚪 ДВЕРІ 2: КЕРУЮЧИЙ ТА МЕНЕДЖЕР (Стандартна Адмінка)
             operatorRoom.style.display = 'none'; // Ховаємо кімнату Обліковця
             
-            // Якщо це Менеджер - ювелірно відрізаємо права на видалення/створення об'єктів
+            // Якщо це Менеджер - ювелірно відрізаємо права на видалення об'єктів
             if (role === 'manager') {
                 document.querySelectorAll('[onclick]').forEach(el => {
                     const fn = (el.getAttribute('onclick') || '').toLowerCase();
-                    // Ховаємо кнопки, які створюють або видаляють глобальні об'єкти
                     if (fn.includes('deleteobj') || fn.includes('addobj') || fn.includes('deletehouse') || fn.includes('addhouse') || fn.includes('newobject')) {
                         el.style.display = 'none';
                     }
@@ -4137,84 +4133,163 @@ checkLimit() {
         }
     }
 
-    // 3. БЕЗПЕЧНИЙ ІНТЕРФЕЙС ТІЛЬКИ ДЛЯ ОБЛІКОВЦЯ (Генерується з нуля)
+    // 3. БЕЗПЕЧНИЙ ІНТЕРФЕЙС ОБЛІКОВЦЯ (Генерується з нуля)
     renderOperatorRoom() {
         const room = document.getElementById('operator-room');
         room.style.display = 'block';
+
+        const currentObjName = this.currentData ? this.currentData.name : "Завантаження...";
         
+        // --- 🛰 НАВІГАЦІЯ ТА СТРІЛОЧКИ (ЯКІ ПРАЦЮЮТЬ!) ---
         let html = `
-            <div style="padding: 20px; max-width: 800px; margin: 0 auto; font-family: sans-serif; padding-bottom: 50px;">
-                <div style="text-align: center; margin-bottom: 20px; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
-                    <h2 style="color: #0d6efd; margin-top: 0;">${this.currentData.name}</h2>
-                    <div style="background: #ffc107; color: #000; display: inline-block; padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 14px;">📝 РЕЖИМ ОБЛІКОВЦЯ</div>
-                    <p style="color: #6c757d; margin-top: 10px; font-size: 14px;">Внесіть поточні показники. Зміни зберігаються автоматично.</p>
+            <div style="padding: 15px; max-width: 800px; margin: 0 auto; padding-bottom: 70px;">
+                <div style="background: white; padding: 10px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
+                    <button onclick="app.prevOpObject()" style="background: none; border: none; font-size: 24px; color: #0d6efd; cursor: pointer;">&#10094;</button>
+                    <div style="text-align: center; flex: 1; padding: 0 10px;">
+                        <h3 style="margin: 0; color: #212529;">${currentObjName}</h3>
+                        <div style="background: #ffc107; color: #000; display: inline-block; padding: 3px 10px; border-radius: 15px; font-weight: bold; font-size: 11px;">📝 РЕЖИМ ОБЛІКОВЦЯ</div>
+                    </div>
+                    <button onclick="app.nextOpObject()" style="background: none; border: none; font-size: 24px; color: #0d6efd; cursor: pointer;">&#10095;</button>
                 </div>
         `;
 
+        if (!this.currentData) {
+            html += `<p style="text-align:center; color: #6c757d;">Завантаження даних...</p></div>`;
+            room.innerHTML = html;
+            return;
+        }
+
+        // --- 📊 РОЗДІЛ 1: ГОЛОВНІ ЛІЧИЛЬНИКИ ОБ'ЄКТА ---
+        if (!this.currentData.curr) this.currentData.curr = {}; // Запобіжник
+        html += `
+            <div style="background: #e7f1ff; border: 1px solid #b8daff; border-radius: 12px; padding: 15px; margin-bottom: 15px;">
+                <h4 style="margin-top: 0; color: #004085; text-align:center; padding-bottom: 8px; border-bottom: 1px solid #b8daff;">🏭 Головні лічильники</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-top: 10px;">
+                    ${this.genOpInHTML('Object', null, 'ed', '⚡ Е/Е День (заг)', this.currentData.curr.el_d)}
+                    ${this.genOpInHTML('Object', null, 'en', '🌙 Е/Е Ніч (заг)', this.currentData.curr.el_n)}
+                    ${this.genOpInHTML('Object', null, 'w', '💧 Вода (заг)', this.currentData.curr.w)}
+                    ${this.genOpInHTML('Object', null, 'g', '🔥 Газ (заг)', this.currentData.curr.g)}
+                </div>
+            </div>`;
+
+        // --- 🤝 РОЗДІЛ 2: ЛІЧИЛЬНИКИ МЗК ТА ГРУП ---
+        if (this.currentData.groups && this.currentData.groups.length > 0) {
+            this.currentData.groups.forEach(group => {
+                if (!group.curr) group.curr = {}; // Запобіжник
+                html += `
+                <div style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 12px; padding: 15px; margin-bottom: 15px;">
+                    <h4 style="margin-top: 0; color: #495057; text-align:center; padding-bottom: 8px; border-bottom: 1px solid #dee2e6;">🤝 МЗК: ${group.name}</h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-top: 10px;">
+                        ${this.genOpInHTML('Group', group.id, 'ed', '⚡ Е/Е День (МЗК)', group.curr.el_d)}
+                        ${this.genOpInHTML('Group', group.id, 'en', '🌙 Е/Е Ніч (МЗК)', group.curr.el_n)}
+                        ${this.genOpInHTML('Group', group.id, 'w', '💧 Вода (МЗК)', group.curr.w)}
+                        ${this.genOpInHTML('Group', group.id, 'g', '🔥 Газ (МЗК)', group.curr.g)}
+                    </div>
+                </div>`;
+            });
+        }
+
+        // --- 🏠 РОЗДІЛ 3: КВАРТИРИ ---
+        html += `<h4 style="text-align:center; color: #6c757d; margin-top: 15px; margin-bottom: 10px;">🏠 Квартири</h4>`;
+        
         if (this.currentData.apartments && this.currentData.apartments.length > 0) {
             this.currentData.apartments.forEach(apt => {
+                if (!apt.curr) apt.curr = { ed:0, en:0, w:0, g:0 }; // Запобіжник
                 html += `
                 <div style="background: #fff; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
-                    <h4 style="margin-top: 0; color: #212529; border-bottom: 1px solid #eee; padding-bottom: 10px;">🏠 ${apt.name}</h4>
-                    
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px; margin-top: 15px;">
-                        <div>
-                            <label style="font-size: 12px; color: #6c757d; font-weight: bold;">⚡ Е/Е День</label>
-                            <input type="number" value="${apt.curr.ed || ''}" onchange="app.updateOpRead(${apt.id}, 'ed', this.value)" style="width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 8px; font-size: 16px;">
-                        </div>
-                        <div>
-                            <label style="font-size: 12px; color: #6c757d; font-weight: bold;">🌙 Е/Е Ніч</label>
-                            <input type="number" value="${apt.curr.en || ''}" onchange="app.updateOpRead(${apt.id}, 'en', this.value)" style="width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 8px; font-size: 16px;">
-                        </div>
-                        <div>
-                            <label style="font-size: 12px; color: #6c757d; font-weight: bold;">💧 Вода</label>
-                            <input type="number" value="${apt.curr.w || ''}" onchange="app.updateOpRead(${apt.id}, 'w', this.value)" style="width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 8px; font-size: 16px;">
-                        </div>
-                        <div>
-                            <label style="font-size: 12px; color: #6c757d; font-weight: bold;">🔥 Газ</label>
-                            <input type="number" value="${apt.curr.g || ''}" onchange="app.updateOpRead(${apt.id}, 'g', this.value)" style="width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 8px; font-size: 16px;">
-                        </div>
+                    <h5 style="margin-top: 0; color: #212529; border-bottom: 1px solid #eee; padding-bottom: 8px;">🏠 ${apt.name}</h5>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-top: 10px;">
+                        ${this.genOpInHTML('Apartment', apt.id, 'ed', '⚡ Е/Е День', apt.curr.ed)}
+                        ${this.genOpInHTML('Apartment', apt.id, 'en', '🌙 Е/Е Ніч', apt.curr.en)}
+                        ${this.genOpInHTML('Apartment', apt.id, 'w', '💧 Вода', apt.curr.w)}
+                        ${this.genOpInHTML('Apartment', apt.id, 'g', '🔥 Газ', apt.curr.g)}
                     </div>
                 </div>`;
             });
         } else {
-            html += `<p style="text-align: center;">Квартир ще не створено.</p>`;
+            html += `<p style="text-align: center; color: #6c757d; font-size: 14px;">Квартир ще не створено.</p>`;
         }
 
+        // Кнопки збереження та правильного Виходу
         html += `
-            <button onclick="app.saveOpData()" id="op-save-btn" style="width: 100%; background: #198754; color: white; border: none; padding: 18px; border-radius: 12px; font-size: 18px; font-weight: bold; margin-top: 10px; cursor: pointer; box-shadow: 0 4px 10px rgba(25, 135, 84, 0.3); transition: 0.3s;">
+            <button onclick="app.saveOpData()" id="op-save-btn" style="width: 100%; background: #198754; color: white; border: none; padding: 18px; border-radius: 12px; font-size: 18px; font-weight: bold; margin-top: 10px; cursor: pointer; box-shadow: 0 4px 10px rgba(25, 135, 84, 0.3); transition: 0.3s; position: sticky; bottom: 15px;">
                 💾 ЗБЕРЕГТИ ВСІ ПОКАЗНИКИ
             </button>
             <div style="text-align: center; margin-top: 30px;">
-                <button onclick="window.logout()" style="background: none; border: none; color: #dc3545; font-size: 16px; text-decoration: underline; cursor: pointer;">🚪 Вийти з акаунту</button>
+                <button onclick="app.logout()" style="background: none; border: none; color: #dc3545; font-size: 15px; text-decoration: underline; cursor: pointer;">🚪 Вийти з акаунту</button>
             </div>
         </div>`;
 
         room.innerHTML = html;
     }
 
-    // 4. МІНІ-ФУНКЦІЇ ДЛЯ ОБЛІКОВЦЯ (Щоб не ламати головну логіку)
-    updateOpRead(aptId, key, val) {
-        const apt = this.currentData.apartments.find(a => a.id === aptId);
-        if (apt) {
-            apt.curr[key] = parseFloat(val) || 0;
-            if (typeof this.calculate === 'function') this.calculate(); // Фоновий перерахунок
-            this.save(); // Зберігаємо локально в браузер
+    // 🔧 ХЕЛПЕРИ ДЛЯ МАЛЮВАННЯ ТА РОБОТИ ОБЛІКОВЦЯ
+
+    // Помічник для створення полів вводу (щоб код був чистим)
+    genOpInHTML(type, id, key, label, value) {
+        const val = (value === undefined || value === null) ? '' : value;
+        
+        // Мапування ключів: Апарт використовує ed, заг/групи використовують el_d
+        let standardKey = key;
+        if (type !== 'Apartment') {
+            const keyMap = {ed:'el_d', en:'el_n', w:'w', g:'g'};
+            standardKey = keyMap[key];
         }
+
+        // updateOpRead(id_обєкта, тип_лічильника, значення, тип_елемента)
+        return `
+        <div>
+            <label style="font-size: 11px; color: #6c757d; font-weight: bold; display: block; margin-bottom: 2px;">${label}</label>
+            <input type="number" value="${val}" onchange="app.updateOpRead(${id}, '${standardKey}', this.value, '${type}')" style="width: 100%; padding: 8px; border: 1px solid #ced4da; border-radius: 7px; font-size: 15px; box-sizing: border-box;">
+        </div>`;
     }
 
+    // Помічник для оновлення показників (Обєкт, МЗК та Квартири)
+    updateOpRead(id, key, val, type = 'Apartment') {
+        const numericalVal = parseFloat(val) || 0;
+        
+        if (type === 'Apartment') {
+            const apt = this.currentData.apartments.find(a => a.id === id);
+            if (apt) apt.curr[key] = numericalVal; 
+        } else if (type === 'Group') {
+            const grp = this.currentData.groups.find(g => g.id === id);
+            if (grp) grp.curr[key] = numericalVal;
+        } else if (type === 'Object') {
+            this.currentData.curr[key] = numericalVal;
+        }
+
+        if (typeof this.calculate === 'function') this.calculate(); 
+        this.save(); // Зберігаємо локально в браузер
+    }
+
+    // Хелпери для стрілочок перемикання (працюють в Кімнаті Обліковця)
+    prevOpObject() {
+        if (!this.state.houses || this.state.houses.length <= 1) return;
+        this.state.selectedHouseIndex = (this.state.selectedHouseIndex - 1 + this.state.houses.length) % this.state.houses.length;
+        this.render(); // Глобальний рендер перезавантажить роль і інтерфейс
+    }
+
+    nextOpObject() {
+        if (!this.state.houses || this.state.houses.length <= 1) return;
+        this.state.selectedHouseIndex = (this.state.selectedHouseIndex + 1) % this.state.houses.length;
+        this.render(); // Глобальний рендер перезавантажить роль і інтерфейс
+    }
+
+    // Глобальне збереження
     async saveOpData() {
         if(window.cloudSave) {
             const btn = document.getElementById('op-save-btn');
             const oldTxt = btn.innerText;
-            btn.innerText = "⏳ Відправка в базу...";
+            btn.innerText = "⏳ Збереження...";
             btn.style.background = "#0dcaf0";
+            btn.style.boxShadow = "none";
             
             await window.cloudSave(this.state); // Відправляємо в Supabase
             
-            btn.innerText = "✅ УСПІШНО ЗБЕРЕЖЕНО!";
+            btn.innerText = "✅ ВСЕ ЗБЕРЕЖЕНО!";
             btn.style.background = "#198754";
-            setTimeout(() => { btn.innerText = oldTxt; }, 3000);
+            btn.style.boxShadow = "0 4px 10px rgba(25, 135, 84, 0.3)";
+            setTimeout(() => { btn.innerText = oldTxt; btn.style.boxShadow = "0 4px 10px rgba(25, 135, 84, 0.3)"; }, 3000);
         }
     }
 }
