@@ -888,7 +888,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '9.2';
+    const APP_VERSION = '9.3';
     if (localStorage.getItem('app_version') !== APP_VERSION) {
         localStorage.setItem('app_version', APP_VERSION);
         if (navigator.serviceWorker) {
@@ -4096,21 +4096,22 @@ checkLimit() {
         document.getElementById('archive-receipt-detail-content').innerHTML = html;
         document.getElementById('archiveReceiptDetailModal').style.display = 'flex';
     }
-	
 	// =======================================================
     // 🏛 АРХІТЕКТУРА 3.0: ХАБ, ДОСТУП ТА КІМНАТА ОБЛІКОВЦЯ
     // =======================================================
 
     // --- 1. НАВІГАЦІЯ ХАБУ ---
     goToLobby() {
-        this.inLobby = true;
+        window.showLobby = true;
+        window.userPickedObject = false;
         this.renderAll(); 
     }
 
     enterObject(index) {
-        this.state.selectedHouseIndex = index;
-        this.inLobby = false;
-        this.currentData = this.state.houses[index]; 
+        window.showLobby = false;
+        window.userPickedObject = true;
+        this.state.currentObjIdx = index; // Правильна назва індексу!
+        this.currentData = this.state.objects[index]; // Правильна назва масиву!
         this.renderAll(); 
     }
 
@@ -4153,16 +4154,16 @@ checkLimit() {
                 <div style="display: flex; flex-direction: column; gap: 15px;">
         `;
 
-        this.state.houses.forEach((house, index) => {
+        this.state.objects.forEach((obj, index) => { // ЗМІНЕНО НА objects
             let role = 'admin'; let roleName = '👑 Керуючий';
             let roleBg = '#e7f1ff'; let roleColor = '#0d6efd';
 
             if (window.currentUser) {
                 const myEmail = (window.currentUser.email || '').toLowerCase().trim();
-                if (String(house.owner_id) !== String(window.currentUser.id)) {
+                if (String(obj.owner_id) !== String(window.currentUser.id)) {
                     role = 'tenant'; roleName = '🏠 Мешканець'; roleBg = '#e9ecef'; roleColor = '#6c757d';
-                    if (house.users && Array.isArray(house.users)) {
-                        const profile = house.users.find(u => (u.email || '').toLowerCase().trim() === myEmail);
+                    if (obj.users && Array.isArray(obj.users)) {
+                        const profile = obj.users.find(u => (u.email || '').toLowerCase().trim() === myEmail);
                         if (profile) {
                             if (profile.role === 'manager') { roleName = '💼 Менеджер'; roleBg = '#f3e8ff'; roleColor = '#6f42c1'; }
                             if (profile.role === 'operator') { roleName = '📝 Обліковець'; roleBg = '#fff3cd'; roleColor = '#856404'; }
@@ -4174,7 +4175,7 @@ checkLimit() {
             html += `
                 <div onclick="app.enterObject(${index})" style="background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); cursor: pointer; display: flex; justify-content: space-between; align-items: center; border: 1px solid #f1f3f5; transition: 0.2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 25px rgba(0,0,0,0.08)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(0,0,0,0.03)';">
                     <div>
-                        <h3 style="margin: 0 0 8px 0; color: #212529; font-size: 19px;">${house.name}</h3>
+                        <h3 style="margin: 0 0 8px 0; color: #212529; font-size: 19px;">${obj.name}</h3>
                         <span style="display: inline-block; background: ${roleBg}; color: ${roleColor}; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold;">${roleName}</span>
                     </div>
                     <div style="color: #ced4da; font-size: 24px;">&#10095;</div>
@@ -4194,17 +4195,17 @@ checkLimit() {
         lobby.innerHTML = html;
     }
 
-    // --- 3. КНОПКА "НАЗАД У ЛОБІ" (Для Адміна/Менеджера) ---
+    // --- 3. КНОПКА "НАЗАД У ЛОБІ" ---
     renderGlobalBackButton() {
-        if (!this.state || !this.state.houses || this.state.houses.length <= 1) return;
+        if (!this.state || !this.state.objects || this.state.objects.length <= 1) return; // ЗМІНЕНО НА objects
 
         let btn = document.getElementById('global-back-btn');
         if (!btn) {
             btn = document.createElement('button');
             btn.id = 'global-back-btn';
-            btn.innerHTML = '⬅ Об\'єкти';
+            btn.innerHTML = '⬅ Змінити об\'єкт';
             btn.onclick = () => app.goToLobby();
-            btn.setAttribute('style', 'position: fixed; top: 12px; left: 15px; z-index: 9999; background: #212529; color: white; border: none; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: 0.2s;');
+            btn.setAttribute('style', 'position: fixed; bottom: 25px; right: 25px; z-index: 9999; background: #0d6efd; color: white; border: none; padding: 12px 20px; border-radius: 30px; font-size: 14px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(13, 110, 253, 0.4); transition: 0.2s;');
             document.body.appendChild(btn);
         }
         btn.style.display = 'block';
@@ -4260,7 +4261,7 @@ checkLimit() {
         
         let html = `<div style="padding: 15px; max-width: 800px; margin: 0 auto; padding-bottom: 70px;">`;
 
-        if (this.state && this.state.houses && this.state.houses.length > 1) {
+        if (this.state && this.state.objects && this.state.objects.length > 1) { // ЗМІНЕНО НА objects
             html += `<button onclick="app.goToLobby()" style="background: none; border: none; color: #0d6efd; font-size: 15px; font-weight: bold; cursor: pointer; padding: 0; margin-bottom: 15px; display: flex; align-items: center; gap: 5px;">&#10094; До списку об'єктів</button>`;
         }
 
