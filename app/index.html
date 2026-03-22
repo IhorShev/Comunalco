@@ -888,7 +888,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '9.4';
+    const APP_VERSION = '9.5';
     if (localStorage.getItem('app_version') !== APP_VERSION) {
         localStorage.setItem('app_version', APP_VERSION);
         if (navigator.serviceWorker) {
@@ -1834,10 +1834,13 @@ checkLimit() {
     renderAll() {
         if (!this.state || !this.state.objects) return;
 
-        // ПРАВИЛО 1: При першому вході в новій вкладці - обов'язково показуємо Лобі
-        if (sessionStorage.getItem('appStarted') !== 'yes' && this.state.objects.length > 1) {
-            sessionStorage.setItem('appStarted', 'yes');
-            window.showLobby = true;
+        // ПРАВИЛО 1: Завжди показуємо Лобі при оновленні сторінки або новому вході
+        if (window.userPickedObject === undefined) {
+            window.userPickedObject = false; // Фіксуємо, що це свіже завантаження
+        }
+        
+        if (!window.userPickedObject && this.state.objects.length > 1) {
+            window.showLobby = true; // Завжди вмикаємо Лобі на старті
         }
 
         // АНТИ-ГЛЮК: Перевіряємо чи довантажила база нові об'єкти
@@ -1866,7 +1869,12 @@ checkLimit() {
             const map = {ed:'el_d', en:'el_n', w:'w', g:'g'};
             if(el) el.value = this.currentData.tariffs[map[k]]; 
         });
-        this.renderExtraTariffs(); this.renderRequisites(); this.renderGroups(); this.renderApartments();
+        
+        if(typeof this.renderExtraTariffs === 'function') this.renderExtraTariffs(); 
+        if(typeof this.renderRequisites === 'function') this.renderRequisites(); 
+        if(typeof this.renderGroups === 'function') this.renderGroups(); 
+        if(typeof this.renderApartments === 'function') this.renderApartments();
+        
         setTimeout(() => { if (typeof this.calculate === 'function') this.calculate(); }, 100);
 
         let role = 'admin'; 
@@ -4115,8 +4123,8 @@ checkLimit() {
     goToLobby() {
         window.showLobby = true;
         window.userPickedObject = false;
-        if(document.activeElement) document.activeElement.blur(); // Знімаємо фокус з полів
-        if (window.app) window.app.renderAll(); else this.renderAll(); 
+        if(document.activeElement) document.activeElement.blur(); 
+        this.renderAll(); 
     }
 
     enterObject(index) {
@@ -4124,7 +4132,7 @@ checkLimit() {
         window.userPickedObject = true;
         this.state.currentObjIdx = index; 
         this.currentData = this.state.objects[index]; 
-        if (window.app) window.app.renderAll(); else this.renderAll(); 
+        this.renderAll(); 
     }
 
     // --- 2. МАЛЮВАННЯ ЛОБІ (Екран вибору об'єкта) ---
@@ -4181,8 +4189,9 @@ checkLimit() {
                 }
             }
 
+            // ВИПРАВЛЕНО: Залізобетонний клік по картці!
             html += `
-                <div onclick="if(window.app) window.app.enterObject(${index})" style="background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); cursor: pointer; display: flex; justify-content: space-between; align-items: center; border: 1px solid #f1f3f5; transition: 0.2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 25px rgba(0,0,0,0.08)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(0,0,0,0.03)';">
+                <div onclick="app.enterObject(${index})" style="background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); cursor: pointer; display: flex; justify-content: space-between; align-items: center; border: 1px solid #f1f3f5; transition: 0.2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 25px rgba(0,0,0,0.08)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(0,0,0,0.03)';">
                     <div>
                         <h3 style="margin: 0 0 8px 0; color: #212529; font-size: 19px;">${obj.name}</h3>
                         <span style="display: inline-block; background: ${roleBg}; color: ${roleColor}; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold;">${roleName}</span>
@@ -4206,13 +4215,11 @@ checkLimit() {
 
     // --- 3. ЮВЕЛІРНА ІНТЕГРАЦІЯ КНОПКИ ПІД НАЗВУ ОБ'ЄКТА ---
     renderGlobalBackButton() {
-        // Видаляємо стару кнопку з кута, якщо вона там застрягла
         const oldBtn = document.getElementById('global-back-btn');
         if (oldBtn) oldBtn.remove();
 
         if (!this.state || !this.state.objects || this.state.objects.length <= 1) return; 
 
-        // 1. ХОВАЄМО СТРІЛОЧКИ < ТА >
         document.querySelectorAll('div, span, i, a, button').forEach(el => {
             const txt = (el.innerText || '').trim();
             const fn = (el.getAttribute('onclick') || '').toLowerCase();
@@ -4222,7 +4229,6 @@ checkLimit() {
             }
         });
 
-        // 2. ШУКАЄМО ЗНАЧОК "FREE" АБО "PRO"
         let freeBadge = null;
         document.querySelectorAll('span, div, b').forEach(el => {
             const t = (el.innerText || '').toUpperCase().trim();
@@ -4231,23 +4237,19 @@ checkLimit() {
             }
         });
 
-        // 3. СТВОРЮЄМО КРАСИВУ КНОПКУ
         let inlineBtn = document.getElementById('inline-lobby-btn');
         if (!inlineBtn) {
             inlineBtn = document.createElement('button');
             inlineBtn.id = 'inline-lobby-btn';
             inlineBtn.innerHTML = '🔄 Змінити об\'єкт';
-            // Залізобетонний виклик
-            inlineBtn.setAttribute('onclick', 'if(window.app) window.app.goToLobby();');
+            inlineBtn.setAttribute('onclick', 'app.goToLobby();');
             inlineBtn.setAttribute('style', 'background: #0d6efd; color: white; border: none; padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: bold; cursor: pointer; margin: 0 8px; box-shadow: 0 2px 4px rgba(13, 110, 253, 0.3); transition: 0.2s; vertical-align: middle;');
         }
 
-        // 4. ВСТАВЛЯЄМО ЗАМІСТЬ FREE
         if (freeBadge) {
             freeBadge.style.display = 'none'; 
             freeBadge.parentNode.insertBefore(inlineBtn, freeBadge.nextSibling); 
         } else {
-            // Резервний варіант (якщо FREE не знайшли)
             const titleEl = document.getElementById('object-title');
             if (titleEl && titleEl.parentNode) titleEl.parentNode.appendChild(inlineBtn);
         }
@@ -4299,7 +4301,7 @@ checkLimit() {
         let html = `<div style="padding: 15px; max-width: 800px; margin: 0 auto; padding-bottom: 70px;">`;
 
         if (this.state && this.state.objects && this.state.objects.length > 1) { 
-            html += `<button onclick="if(window.app) window.app.goToLobby();" style="background: none; border: none; color: #0d6efd; font-size: 15px; font-weight: bold; cursor: pointer; padding: 0; margin-bottom: 15px; display: flex; align-items: center; gap: 5px;">&#10094; До списку об'єктів</button>`;
+            html += `<button onclick="app.goToLobby();" style="background: none; border: none; color: #0d6efd; font-size: 15px; font-weight: bold; cursor: pointer; padding: 0; margin-bottom: 15px; display: flex; align-items: center; gap: 5px;">&#10094; До списку об'єктів</button>`;
         }
 
         html += `
@@ -4359,7 +4361,7 @@ checkLimit() {
         }
 
         html += `
-            <button onclick="if(window.app) window.app.saveOpData();" id="op-save-btn" style="width: 100%; background: #198754; color: white; border: none; padding: 18px; border-radius: 12px; font-size: 18px; font-weight: bold; margin-top: 15px; cursor: pointer; box-shadow: 0 4px 10px rgba(25, 135, 84, 0.3); transition: 0.3s; position: sticky; bottom: 15px;">
+            <button onclick="app.saveOpData();" id="op-save-btn" style="width: 100%; background: #198754; color: white; border: none; padding: 18px; border-radius: 12px; font-size: 18px; font-weight: bold; margin-top: 15px; cursor: pointer; box-shadow: 0 4px 10px rgba(25, 135, 84, 0.3); transition: 0.3s; position: sticky; bottom: 15px;">
                 💾 ЗБЕРЕГТИ ВСІ ПОКАЗНИКИ
             </button>
         </div>`;
@@ -4377,7 +4379,7 @@ checkLimit() {
         return `
         <div>
             <label style="font-size: 11px; color: #6c757d; font-weight: bold; display: block; margin-bottom: 2px;">${label}</label>
-            <input type="number" value="${val}" onchange="if(window.app) window.app.updateOpRead(${id}, '${standardKey}', this.value, '${type}')" style="width: 100%; padding: 8px; border: 1px solid #ced4da; border-radius: 7px; font-size: 15px; box-sizing: border-box;">
+            <input type="number" value="${val}" onchange="app.updateOpRead(${id}, '${standardKey}', this.value, '${type}')" style="width: 100%; padding: 8px; border: 1px solid #ced4da; border-radius: 7px; font-size: 15px; box-sizing: border-box;">
         </div>`;
     }
 
