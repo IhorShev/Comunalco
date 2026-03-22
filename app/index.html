@@ -888,7 +888,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '9.1';
+    const APP_VERSION = '9.2';
     if (localStorage.getItem('app_version') !== APP_VERSION) {
         localStorage.setItem('app_version', APP_VERSION);
         if (navigator.serviceWorker) {
@@ -1830,9 +1830,21 @@ checkLimit() {
         return true;
     }
 
-    // 1. ГОЛОВНИЙ РОУТЕР ДОСТУПУ (Запускається при малюванні об'єкта)
+    // --- RENDERING (РОУТЕР АРХІТЕКТУРИ 3.0) ---
     renderAll() {
-        // Стандартне малювання для Адміна/Менеджера
+        // Якщо будинків > 1 і ми не обрали конкретний (inLobby) -> Малюємо ЛОБІ
+        if (this.inLobby !== false && this.state && this.state.houses && this.state.houses.length > 1) {
+            if(typeof this.renderLobby === 'function') this.renderLobby();
+            return; // Зупиняємо малювання внутрішньої програми!
+        }
+
+        this.inLobby = false; // Фіксуємо, що ми зайшли всередину об'єкта
+        
+        // Ховаємо Лобі, якщо воно відкрите
+        const lobby = document.getElementById('lobby-room');
+        if (lobby) lobby.style.display = 'none';
+
+        // --- СТАНДАРТНЕ МАЛЮВАННЯ ДЛЯ АДМІНА ---
         try { document.getElementById('object-title').value = this.currentData.name; } catch(e){}
         ['ed','en','w','g'].forEach(k => { 
             const el = document.getElementById('t_'+k); 
@@ -1842,28 +1854,26 @@ checkLimit() {
         this.renderExtraTariffs(); this.renderRequisites(); this.renderGroups(); this.renderApartments();
         setTimeout(() => { if (typeof this.calculate === 'function') this.calculate(); }, 100);
 
-        // ВИЗНАЧЕННЯ РОЛІ КОРІСТУВАЧА
-        let role = 'admin'; // За замовчуванням - Керуючий (Власник)
+        // --- ВИЗНАЧЕННЯ РОЛІ ДЛЯ ПОТОЧНОГО ОБ'ЄКТА ---
+        let role = 'admin'; 
 
         if (window.currentUser && this.currentData) {
             const myEmail = (window.currentUser.email || '').toLowerCase().trim();
             const ownerId = String(this.currentData.owner_id);
             const currentUserId = String(window.currentUser.id);
 
-            // Якщо людина НЕ ВЛАСНИК цього будинку:
             if (ownerId !== currentUserId) {
-                role = 'tenant'; // Падаємо до мінімальних прав
-                
-                // Шукаємо, які права ми йому видали у меню "Доступ"
+                role = 'tenant'; 
                 if (this.currentData.users && Array.isArray(this.currentData.users)) {
                     const profile = this.currentData.users.find(u => (u.email || '').toLowerCase().trim() === myEmail);
-                    if (profile) role = profile.role; // manager, operator або tenant
+                    if (profile) role = profile.role; 
                 }
             }
         }
 
         window.currentRole = role; 
-        this.applyRoleRestrictions(role);
+        if(typeof this.applyRoleRestrictions === 'function') this.applyRoleRestrictions(role);
+        if(typeof this.renderGlobalBackButton === 'function') this.renderGlobalBackButton(); 
     }
 
         // --- ВІДКРИТТЯ ВІКНА АНАЛІТИКИ (Підвантаження квартир) ---
@@ -4087,7 +4097,120 @@ checkLimit() {
         document.getElementById('archiveReceiptDetailModal').style.display = 'flex';
     }
 	
-	// 2. ФІЗИЧНЕ РОЗМЕЖУВАННЯ ІНТЕРФЕЙСУ (ДВОЄ ДВЕРЕЙ)
+	// =======================================================
+    // 🏛 АРХІТЕКТУРА 3.0: ХАБ, ДОСТУП ТА КІМНАТА ОБЛІКОВЦЯ
+    // =======================================================
+
+    // --- 1. НАВІГАЦІЯ ХАБУ ---
+    goToLobby() {
+        this.inLobby = true;
+        this.renderAll(); 
+    }
+
+    enterObject(index) {
+        this.state.selectedHouseIndex = index;
+        this.inLobby = false;
+        this.currentData = this.state.houses[index]; 
+        this.renderAll(); 
+    }
+
+    // --- 2. МАЛЮВАННЯ ЛОБІ (Екран вибору об'єкта) ---
+    renderLobby() {
+        document.body.className = document.body.className.replace(/role-\w+/g, '').trim();
+        document.body.classList.add('role-lobby');
+
+        let operatorRoom = document.getElementById('operator-room');
+        if (operatorRoom) operatorRoom.style.display = 'none';
+
+        const globalBtn = document.getElementById('global-back-btn');
+        if (globalBtn) globalBtn.style.display = 'none';
+
+        let lobby = document.getElementById('lobby-room');
+        if (!lobby) {
+            lobby = document.createElement('div');
+            lobby.id = 'lobby-room';
+            document.body.appendChild(lobby);
+        }
+        lobby.style.display = 'block';
+
+        let style = document.getElementById('lobby-shield');
+        if (!style) {
+            style = document.createElement('style');
+            style.id = 'lobby-shield';
+            document.head.appendChild(style);
+        }
+        style.innerHTML = `
+            body.role-lobby > *:not(#lobby-room):not(script):not(style) { display: none !important; }
+            body.role-lobby { background-color: #f8f9fa; font-family: sans-serif; margin: 0; padding: 0; }
+        `;
+
+        let html = `
+            <div style="max-width: 600px; margin: 0 auto; padding: 30px 20px;">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h2 style="color: #0d6efd; font-size: 26px; margin: 0 0 5px 0;">COMUNALCO</h2>
+                    <p style="color: #6c757d; font-size: 15px; margin: 0;">Оберіть робочий простір</p>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+        `;
+
+        this.state.houses.forEach((house, index) => {
+            let role = 'admin'; let roleName = '👑 Керуючий';
+            let roleBg = '#e7f1ff'; let roleColor = '#0d6efd';
+
+            if (window.currentUser) {
+                const myEmail = (window.currentUser.email || '').toLowerCase().trim();
+                if (String(house.owner_id) !== String(window.currentUser.id)) {
+                    role = 'tenant'; roleName = '🏠 Мешканець'; roleBg = '#e9ecef'; roleColor = '#6c757d';
+                    if (house.users && Array.isArray(house.users)) {
+                        const profile = house.users.find(u => (u.email || '').toLowerCase().trim() === myEmail);
+                        if (profile) {
+                            if (profile.role === 'manager') { roleName = '💼 Менеджер'; roleBg = '#f3e8ff'; roleColor = '#6f42c1'; }
+                            if (profile.role === 'operator') { roleName = '📝 Обліковець'; roleBg = '#fff3cd'; roleColor = '#856404'; }
+                        }
+                    }
+                }
+            }
+
+            html += `
+                <div onclick="app.enterObject(${index})" style="background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); cursor: pointer; display: flex; justify-content: space-between; align-items: center; border: 1px solid #f1f3f5; transition: 0.2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 25px rgba(0,0,0,0.08)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(0,0,0,0.03)';">
+                    <div>
+                        <h3 style="margin: 0 0 8px 0; color: #212529; font-size: 19px;">${house.name}</h3>
+                        <span style="display: inline-block; background: ${roleBg}; color: ${roleColor}; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold;">${roleName}</span>
+                    </div>
+                    <div style="color: #ced4da; font-size: 24px;">&#10095;</div>
+                </div>
+            `;
+        });
+
+        html += `
+                </div>
+                <div style="text-align: center; margin-top: 40px;">
+                    <button onclick="try{ if(typeof window.logout==='function') window.logout(); else if(window.app && typeof window.app.logout==='function') window.app.logout(); else { localStorage.clear(); window.location.href='/'; } }catch(e){ localStorage.clear(); window.location.reload(); }" style="background: none; border: none; color: #dc3545; font-size: 15px; text-decoration: underline; cursor: pointer;">
+                        🚪 Вийти з акаунту
+                    </button>
+                </div>
+            </div>
+        `;
+        lobby.innerHTML = html;
+    }
+
+    // --- 3. КНОПКА "НАЗАД У ЛОБІ" (Для Адміна/Менеджера) ---
+    renderGlobalBackButton() {
+        if (!this.state || !this.state.houses || this.state.houses.length <= 1) return;
+
+        let btn = document.getElementById('global-back-btn');
+        if (!btn) {
+            btn = document.createElement('button');
+            btn.id = 'global-back-btn';
+            btn.innerHTML = '⬅ Об\'єкти';
+            btn.onclick = () => app.goToLobby();
+            btn.setAttribute('style', 'position: fixed; top: 12px; left: 15px; z-index: 9999; background: #212529; color: white; border: none; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: 0.2s;');
+            document.body.appendChild(btn);
+        }
+        btn.style.display = 'block';
+    }
+
+    // --- 4. ДВОЄ ДВЕРЕЙ (Менеджер та Обліковець) ---
     applyRoleRestrictions(role) {
         document.body.className = document.body.className.replace(/role-\w+/g, '').trim();
         document.body.classList.add('role-' + role);
@@ -4096,11 +4219,10 @@ checkLimit() {
         if (!operatorRoom) {
             operatorRoom = document.createElement('div');
             operatorRoom.id = 'operator-room';
-            document.body.appendChild(operatorRoom); // Кладемо поверх сайту
+            document.body.appendChild(operatorRoom); 
         }
 
         if (role === 'operator') {
-            // 🚪 ДВЕРІ 1: ОБЛІКОВЕЦЬ (Кімната ізоляції)
             let style = document.getElementById('operator-shield');
             if (!style) {
                 style = document.createElement('style');
@@ -4108,20 +4230,17 @@ checkLimit() {
                 document.head.appendChild(style);
             }
             style.innerHTML = `
-                body.role-operator > *:not(#operator-room):not(script):not(style) {
-                    display: none !important;
-                }
+                body.role-operator > *:not(#operator-room):not(script):not(style) { display: none !important; }
                 body.role-operator { background-color: #f0f2f5; font-family: sans-serif; }
             `;
             
-            // Запускаємо малювання кімнати з лічильниками МЗК та Об'єкта
+            const globalBtn = document.getElementById('global-back-btn');
+            if (globalBtn) globalBtn.style.display = 'none';
+
             this.renderOperatorRoom(); 
             
         } else {
-            // 🚪 ДВЕРІ 2: КЕРУЮЧИЙ ТА МЕНЕДЖЕР (Стандартна Адмінка)
-            operatorRoom.style.display = 'none'; // Ховаємо кімнату Обліковця
-            
-            // Якщо це Менеджер - ювелірно відрізаємо права на видалення об'єктів
+            operatorRoom.style.display = 'none'; 
             if (role === 'manager') {
                 document.querySelectorAll('[onclick]').forEach(el => {
                     const fn = (el.getAttribute('onclick') || '').toLowerCase();
@@ -4133,34 +4252,30 @@ checkLimit() {
         }
     }
 
-    // 3. БЕЗПЕЧНИЙ ІНТЕРФЕЙС ОБЛІКОВЦЯ (Генерується з нуля)
+    // --- 5. БЕЗПЕЧНА КІМНАТА ОБЛІКОВЦЯ ---
     renderOperatorRoom() {
         const room = document.getElementById('operator-room');
         room.style.display = 'block';
-
         const currentObjName = this.currentData ? this.currentData.name : "Завантаження...";
         
-        // --- 🛰 НАВІГАЦІЯ ТА СТРІЛОЧКИ (ЯКІ ПРАЦЮЮТЬ!) ---
-        let html = `
-            <div style="padding: 15px; max-width: 800px; margin: 0 auto; padding-bottom: 70px;">
-                <div style="background: white; padding: 10px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
-                    <button onclick="app.prevOpObject()" style="background: none; border: none; font-size: 24px; color: #0d6efd; cursor: pointer;">&#10094;</button>
-                    <div style="text-align: center; flex: 1; padding: 0 10px;">
-                        <h3 style="margin: 0; color: #212529;">${currentObjName}</h3>
-                        <div style="background: #ffc107; color: #000; display: inline-block; padding: 3px 10px; border-radius: 15px; font-weight: bold; font-size: 11px;">📝 РЕЖИМ ОБЛІКОВЦЯ</div>
-                    </div>
-                    <button onclick="app.nextOpObject()" style="background: none; border: none; font-size: 24px; color: #0d6efd; cursor: pointer;">&#10095;</button>
-                </div>
+        let html = `<div style="padding: 15px; max-width: 800px; margin: 0 auto; padding-bottom: 70px;">`;
+
+        if (this.state && this.state.houses && this.state.houses.length > 1) {
+            html += `<button onclick="app.goToLobby()" style="background: none; border: none; color: #0d6efd; font-size: 15px; font-weight: bold; cursor: pointer; padding: 0; margin-bottom: 15px; display: flex; align-items: center; gap: 5px;">&#10094; До списку об'єктів</button>`;
+        }
+
+        html += `
+            <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; text-align: center;">
+                <h2 style="margin: 0 0 8px 0; color: #212529;">${currentObjName}</h2>
+                <div style="background: #fff3cd; color: #856404; display: inline-block; padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 13px;">📝 РЕЖИМ ОБЛІКОВЦЯ</div>
+            </div>
         `;
 
         if (!this.currentData) {
-            html += `<p style="text-align:center; color: #6c757d;">Завантаження даних...</p></div>`;
-            room.innerHTML = html;
-            return;
+            room.innerHTML = html + `<p style="text-align:center;">Завантаження...</p></div>`; return;
         }
 
-        // --- 📊 РОЗДІЛ 1: ГОЛОВНІ ЛІЧИЛЬНИКИ ОБ'ЄКТА ---
-        if (!this.currentData.curr) this.currentData.curr = {}; // Запобіжник
+        if (!this.currentData.curr) this.currentData.curr = {}; 
         html += `
             <div style="background: #e7f1ff; border: 1px solid #b8daff; border-radius: 12px; padding: 15px; margin-bottom: 15px;">
                 <h4 style="margin-top: 0; color: #004085; text-align:center; padding-bottom: 8px; border-bottom: 1px solid #b8daff;">🏭 Головні лічильники</h4>
@@ -4172,29 +4287,26 @@ checkLimit() {
                 </div>
             </div>`;
 
-        // --- 🤝 РОЗДІЛ 2: ЛІЧИЛЬНИКИ МЗК ТА ГРУП ---
         if (this.currentData.groups && this.currentData.groups.length > 0) {
             this.currentData.groups.forEach(group => {
-                if (!group.curr) group.curr = {}; // Запобіжник
+                if (!group.curr) group.curr = {}; 
                 html += `
                 <div style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 12px; padding: 15px; margin-bottom: 15px;">
                     <h4 style="margin-top: 0; color: #495057; text-align:center; padding-bottom: 8px; border-bottom: 1px solid #dee2e6;">🤝 МЗК: ${group.name}</h4>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-top: 10px;">
-                        ${this.genOpInHTML('Group', group.id, 'ed', '⚡ Е/Е День (МЗК)', group.curr.el_d)}
-                        ${this.genOpInHTML('Group', group.id, 'en', '🌙 Е/Е Ніч (МЗК)', group.curr.el_n)}
-                        ${this.genOpInHTML('Group', group.id, 'w', '💧 Вода (МЗК)', group.curr.w)}
-                        ${this.genOpInHTML('Group', group.id, 'g', '🔥 Газ (МЗК)', group.curr.g)}
+                        ${this.genOpInHTML('Group', group.id, 'ed', '⚡ Е/Е День', group.curr.el_d)}
+                        ${this.genOpInHTML('Group', group.id, 'en', '🌙 Е/Е Ніч', group.curr.el_n)}
+                        ${this.genOpInHTML('Group', group.id, 'w', '💧 Вода', group.curr.w)}
+                        ${this.genOpInHTML('Group', group.id, 'g', '🔥 Газ', group.curr.g)}
                     </div>
                 </div>`;
             });
         }
 
-        // --- 🏠 РОЗДІЛ 3: КВАРТИРИ ---
-        html += `<h4 style="text-align:center; color: #6c757d; margin-top: 15px; margin-bottom: 10px;">🏠 Квартири</h4>`;
-        
+        html += `<h4 style="text-align:center; color: #6c757d; margin-top: 20px; margin-bottom: 10px;">🏠 Квартири</h4>`;
         if (this.currentData.apartments && this.currentData.apartments.length > 0) {
             this.currentData.apartments.forEach(apt => {
-                if (!apt.curr) apt.curr = { ed:0, en:0, w:0, g:0 }; // Запобіжник
+                if (!apt.curr) apt.curr = { ed:0, en:0, w:0, g:0 }; 
                 html += `
                 <div style="background: #fff; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
                     <h5 style="margin-top: 0; color: #212529; border-bottom: 1px solid #eee; padding-bottom: 8px;">🏠 ${apt.name}</h5>
@@ -4206,37 +4318,24 @@ checkLimit() {
                     </div>
                 </div>`;
             });
-        } else {
-            html += `<p style="text-align: center; color: #6c757d; font-size: 14px;">Квартир ще не створено.</p>`;
         }
 
-        // Кнопки збереження та правильного Виходу
         html += `
-            <button onclick="app.saveOpData()" id="op-save-btn" style="width: 100%; background: #198754; color: white; border: none; padding: 18px; border-radius: 12px; font-size: 18px; font-weight: bold; margin-top: 10px; cursor: pointer; box-shadow: 0 4px 10px rgba(25, 135, 84, 0.3); transition: 0.3s; position: sticky; bottom: 15px;">
+            <button onclick="app.saveOpData()" id="op-save-btn" style="width: 100%; background: #198754; color: white; border: none; padding: 18px; border-radius: 12px; font-size: 18px; font-weight: bold; margin-top: 15px; cursor: pointer; box-shadow: 0 4px 10px rgba(25, 135, 84, 0.3); transition: 0.3s; position: sticky; bottom: 15px;">
                 💾 ЗБЕРЕГТИ ВСІ ПОКАЗНИКИ
             </button>
-            <div style="text-align: center; margin-top: 30px;">
-                <button onclick="app.logout()" style="background: none; border: none; color: #dc3545; font-size: 15px; text-decoration: underline; cursor: pointer;">🚪 Вийти з акаунту</button>
-            </div>
         </div>`;
-
         room.innerHTML = html;
     }
 
-    // 🔧 ХЕЛПЕРИ ДЛЯ МАЛЮВАННЯ ТА РОБОТИ ОБЛІКОВЦЯ
-
-    // Помічник для створення полів вводу (щоб код був чистим)
+    // --- 6. ХЕЛПЕРИ ДЛЯ МАЛЮВАННЯ ТА РОБОТИ З ДАНИМИ ---
     genOpInHTML(type, id, key, label, value) {
         const val = (value === undefined || value === null) ? '' : value;
-        
-        // Мапування ключів: Апарт використовує ed, заг/групи використовують el_d
         let standardKey = key;
         if (type !== 'Apartment') {
             const keyMap = {ed:'el_d', en:'el_n', w:'w', g:'g'};
             standardKey = keyMap[key];
         }
-
-        // updateOpRead(id_обєкта, тип_лічильника, значення, тип_елемента)
         return `
         <div>
             <label style="font-size: 11px; color: #6c757d; font-weight: bold; display: block; margin-bottom: 2px;">${label}</label>
@@ -4244,10 +4343,8 @@ checkLimit() {
         </div>`;
     }
 
-    // Помічник для оновлення показників (Обєкт, МЗК та Квартири)
     updateOpRead(id, key, val, type = 'Apartment') {
         const numericalVal = parseFloat(val) || 0;
-        
         if (type === 'Apartment') {
             const apt = this.currentData.apartments.find(a => a.id === id);
             if (apt) apt.curr[key] = numericalVal; 
@@ -4257,38 +4354,21 @@ checkLimit() {
         } else if (type === 'Object') {
             this.currentData.curr[key] = numericalVal;
         }
-
         if (typeof this.calculate === 'function') this.calculate(); 
-        this.save(); // Зберігаємо локально в браузер
+        this.save(); 
     }
 
-    // Хелпери для стрілочок перемикання (працюють в Кімнаті Обліковця)
-    prevOpObject() {
-        if (!this.state.houses || this.state.houses.length <= 1) return;
-        this.state.selectedHouseIndex = (this.state.selectedHouseIndex - 1 + this.state.houses.length) % this.state.houses.length;
-        this.render(); // Глобальний рендер перезавантажить роль і інтерфейс
-    }
-
-    nextOpObject() {
-        if (!this.state.houses || this.state.houses.length <= 1) return;
-        this.state.selectedHouseIndex = (this.state.selectedHouseIndex + 1) % this.state.houses.length;
-        this.render(); // Глобальний рендер перезавантажить роль і інтерфейс
-    }
-
-    // Глобальне збереження
     async saveOpData() {
         if(window.cloudSave) {
             const btn = document.getElementById('op-save-btn');
             const oldTxt = btn.innerText;
             btn.innerText = "⏳ Збереження...";
-            btn.style.background = "#0dcaf0";
-            btn.style.boxShadow = "none";
+            btn.style.background = "#0dcaf0"; btn.style.boxShadow = "none";
             
-            await window.cloudSave(this.state); // Відправляємо в Supabase
+            await window.cloudSave(this.state); 
             
             btn.innerText = "✅ ВСЕ ЗБЕРЕЖЕНО!";
-            btn.style.background = "#198754";
-            btn.style.boxShadow = "0 4px 10px rgba(25, 135, 84, 0.3)";
+            btn.style.background = "#198754"; btn.style.boxShadow = "0 4px 10px rgba(25, 135, 84, 0.3)";
             setTimeout(() => { btn.innerText = oldTxt; btn.style.boxShadow = "0 4px 10px rgba(25, 135, 84, 0.3)"; }, 3000);
         }
     }
