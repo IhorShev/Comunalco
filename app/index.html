@@ -888,7 +888,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '8.9';
+    const APP_VERSION = '9.0';
     if (localStorage.getItem('app_version') !== APP_VERSION) {
         localStorage.setItem('app_version', APP_VERSION);
         if (navigator.serviceWorker) {
@@ -1830,8 +1830,9 @@ checkLimit() {
         return true;
     }
 
-    // --- РЕНДЕРИНГ ОБ'ЄКТА ---
+    // 1. ГОЛОВНИЙ РОУТЕР ДОСТУПУ
     renderAll() {
+        // Базове малювання для Адміна/Менеджера
         try { document.getElementById('object-title').value = this.currentData.name; } catch(e){}
         ['ed','en','w','g'].forEach(k => { 
             const el = document.getElementById('t_'+k); 
@@ -1839,38 +1840,30 @@ checkLimit() {
             if(el) el.value = this.currentData.tariffs[map[k]]; 
         });
         this.renderExtraTariffs(); this.renderRequisites(); this.renderGroups(); this.renderApartments();
-        
         setTimeout(() => { if (typeof this.calculate === 'function') this.calculate(); }, 100);
 
-        // 🔥 ІДЕАЛЬНА ЛОГІКА ДОСТУПУ 🔥
-        let myRole = 'admin'; // ⚠️ ЗА ЗАМОВЧУВАННЯМ ПОВЕРТАЄМО АДМІНА
+        // ВИЗНАЧЕННЯ РОЛІ
+        let role = 'admin'; // За замовчуванням - Керуючий (Власник)
 
         if (window.currentUser && this.currentData) {
             const myEmail = (window.currentUser.email || '').toLowerCase().trim();
-            
-            // Надійно порівнюємо ID (перетворюючи обидва в текст)
             const ownerId = String(this.currentData.owner_id);
             const currentUserId = String(window.currentUser.id);
 
-            // Якщо людина НЕ ВЛАСНИК
+            // Якщо ID користувача не збігається з ID власника бази:
             if (ownerId !== currentUserId) {
-                myRole = 'tenant'; // Падаємо до мінімальних прав
-
-                // Шукаємо її в списку доступу
-                if (this.currentData.users && Array.isArray(this.currentData.users)) {
-                    const myProfile = this.currentData.users.find(u => (u.email || '').toLowerCase().trim() === myEmail);
-                    if (myProfile) myRole = myProfile.role; // manager, operator або tenant
-                }
+                role = 'tenant'; // Падаємо до мінімальних прав
                 
-                // Жорстка перевірка пошти Матвія (Контрольний постріл)
-                if (myEmail.includes('m25.shevchenko')) {
-                    myRole = 'operator';
+                // Шукаємо, які права ми йому видали у меню "Доступ"
+                if (this.currentData.users && Array.isArray(this.currentData.users)) {
+                    const profile = this.currentData.users.find(u => (u.email || '').toLowerCase().trim() === myEmail);
+                    if (profile) role = profile.role; // Отримуємо 'manager' або 'operator'
                 }
             }
         }
 
-        window.currentRole = myRole; 
-        this.applyRoleRestrictions(myRole); 
+        window.currentRole = role; 
+        this.applyRoleRestrictions(role);
     }
 
         // --- ВІДКРИТТЯ ВІКНА АНАЛІТИКИ (Підвантаження квартир) ---
@@ -4094,36 +4087,135 @@ checkLimit() {
         document.getElementById('archiveReceiptDetailModal').style.display = 'flex';
     }
 	
-	// --- УПРАВЛІННЯ ДОСТУПАМИ (РОЛІ КОРИСТУВАЧІВ) ---
+	// 2. ФІЗИЧНЕ РОЗМЕЖУВАННЯ ІНТЕРФЕЙСУ (ДВОЄ ДВЕРЕЙ)
     applyRoleRestrictions(role) {
-        this.currentUserRole = role; // 'admin' або 'operator'
-        
-        // Список функцій, які КАТЕГОРИЧНО не можна бачити Обліковцю
-        const adminActions = [
-            "openMenu('premium')",    // Тарифи
-            "openChartModal()",       // Аналітика
-            "openMenu('history')",    // Архів
-            "openAccessMenu()",       // Додавання користувачів
-            "closeMonth()"            // Закриття місяця (генерація квитанцій)
-        ];
-        
-        // Шукаємо ВСІ клікабельні елементи на сторінці (кнопки, посилання, меню)
-        const allClickables = document.querySelectorAll('span, div, button');
-        
-        allClickables.forEach(el => {
-            const clickEvent = el.getAttribute('onclick') || '';
-            
-            // Якщо елемент містить одну з "заборонених" функцій
-            if (adminActions.some(action => clickEvent.includes(action))) {
-                if (role === 'operator') {
-                    el.style.display = 'none'; // Ховаємо від обліковця
-                } else {
-                    el.style.display = '';     // Показуємо керуючому (адміну)
-                }
-            }
-        });
+        document.body.className = document.body.className.replace(/role-\w+/g, '').trim();
+        document.body.classList.add('role-' + role);
 
-        console.log(`🔐 Права доступу застосовано для ролі: ${role}`);
+        // Створюємо "Кімнату Обліковця", якщо її ще немає
+        let operatorRoom = document.getElementById('operator-room');
+        if (!operatorRoom) {
+            operatorRoom = document.createElement('div');
+            operatorRoom.id = 'operator-room';
+            document.body.appendChild(operatorRoom); // Кладемо поверх усього сайту
+        }
+
+        if (role === 'operator') {
+            // 🚪 ДВЕРІ 1: ОБЛІКОВЕЦЬ
+            // 1. Бронебійно ховаємо весь головний додаток
+            let style = document.getElementById('operator-shield');
+            if (!style) {
+                style = document.createElement('style');
+                style.id = 'operator-shield';
+                document.head.appendChild(style);
+            }
+            // CSS, який ховає абсолютно всі теги, крім нашої кімнати Обліковця
+            style.innerHTML = `
+                body.role-operator > *:not(#operator-room):not(script):not(style) {
+                    display: none !important;
+                }
+                body.role-operator { background-color: #f0f2f5; }
+            `;
+            
+            // 2. Запускаємо малювання безпечної кімнати
+            this.renderOperatorRoom(); 
+            
+        } else {
+            // 🚪 ДВЕРІ 2: КЕРУЮЧИЙ ТА МЕНЕДЖЕР
+            operatorRoom.style.display = 'none'; // Ховаємо кімнату Обліковця
+            
+            // Якщо це Менеджер - ювелірно відрізаємо права на видалення/створення об'єктів
+            if (role === 'manager') {
+                document.querySelectorAll('[onclick]').forEach(el => {
+                    const fn = (el.getAttribute('onclick') || '').toLowerCase();
+                    // Ховаємо кнопки, які створюють або видаляють глобальні об'єкти
+                    if (fn.includes('deleteobj') || fn.includes('addobj') || fn.includes('deletehouse') || fn.includes('addhouse') || fn.includes('newobject')) {
+                        el.style.display = 'none';
+                    }
+                });
+            }
+        }
+    }
+
+    // 3. БЕЗПЕЧНИЙ ІНТЕРФЕЙС ТІЛЬКИ ДЛЯ ОБЛІКОВЦЯ (Генерується з нуля)
+    renderOperatorRoom() {
+        const room = document.getElementById('operator-room');
+        room.style.display = 'block';
+        
+        let html = `
+            <div style="padding: 20px; max-width: 800px; margin: 0 auto; font-family: sans-serif; padding-bottom: 50px;">
+                <div style="text-align: center; margin-bottom: 20px; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+                    <h2 style="color: #0d6efd; margin-top: 0;">${this.currentData.name}</h2>
+                    <div style="background: #ffc107; color: #000; display: inline-block; padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 14px;">📝 РЕЖИМ ОБЛІКОВЦЯ</div>
+                    <p style="color: #6c757d; margin-top: 10px; font-size: 14px;">Внесіть поточні показники. Зміни зберігаються автоматично.</p>
+                </div>
+        `;
+
+        if (this.currentData.apartments && this.currentData.apartments.length > 0) {
+            this.currentData.apartments.forEach(apt => {
+                html += `
+                <div style="background: #fff; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                    <h4 style="margin-top: 0; color: #212529; border-bottom: 1px solid #eee; padding-bottom: 10px;">🏠 ${apt.name}</h4>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px; margin-top: 15px;">
+                        <div>
+                            <label style="font-size: 12px; color: #6c757d; font-weight: bold;">⚡ Е/Е День</label>
+                            <input type="number" value="${apt.curr.ed || ''}" onchange="app.updateOpRead(${apt.id}, 'ed', this.value)" style="width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 8px; font-size: 16px;">
+                        </div>
+                        <div>
+                            <label style="font-size: 12px; color: #6c757d; font-weight: bold;">🌙 Е/Е Ніч</label>
+                            <input type="number" value="${apt.curr.en || ''}" onchange="app.updateOpRead(${apt.id}, 'en', this.value)" style="width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 8px; font-size: 16px;">
+                        </div>
+                        <div>
+                            <label style="font-size: 12px; color: #6c757d; font-weight: bold;">💧 Вода</label>
+                            <input type="number" value="${apt.curr.w || ''}" onchange="app.updateOpRead(${apt.id}, 'w', this.value)" style="width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 8px; font-size: 16px;">
+                        </div>
+                        <div>
+                            <label style="font-size: 12px; color: #6c757d; font-weight: bold;">🔥 Газ</label>
+                            <input type="number" value="${apt.curr.g || ''}" onchange="app.updateOpRead(${apt.id}, 'g', this.value)" style="width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 8px; font-size: 16px;">
+                        </div>
+                    </div>
+                </div>`;
+            });
+        } else {
+            html += `<p style="text-align: center;">Квартир ще не створено.</p>`;
+        }
+
+        html += `
+            <button onclick="app.saveOpData()" id="op-save-btn" style="width: 100%; background: #198754; color: white; border: none; padding: 18px; border-radius: 12px; font-size: 18px; font-weight: bold; margin-top: 10px; cursor: pointer; box-shadow: 0 4px 10px rgba(25, 135, 84, 0.3); transition: 0.3s;">
+                💾 ЗБЕРЕГТИ ВСІ ПОКАЗНИКИ
+            </button>
+            <div style="text-align: center; margin-top: 30px;">
+                <button onclick="window.logout()" style="background: none; border: none; color: #dc3545; font-size: 16px; text-decoration: underline; cursor: pointer;">🚪 Вийти з акаунту</button>
+            </div>
+        </div>`;
+
+        room.innerHTML = html;
+    }
+
+    // 4. МІНІ-ФУНКЦІЇ ДЛЯ ОБЛІКОВЦЯ (Щоб не ламати головну логіку)
+    updateOpRead(aptId, key, val) {
+        const apt = this.currentData.apartments.find(a => a.id === aptId);
+        if (apt) {
+            apt.curr[key] = parseFloat(val) || 0;
+            if (typeof this.calculate === 'function') this.calculate(); // Фоновий перерахунок
+            this.save(); // Зберігаємо локально в браузер
+        }
+    }
+
+    async saveOpData() {
+        if(window.cloudSave) {
+            const btn = document.getElementById('op-save-btn');
+            const oldTxt = btn.innerText;
+            btn.innerText = "⏳ Відправка в базу...";
+            btn.style.background = "#0dcaf0";
+            
+            await window.cloudSave(this.state); // Відправляємо в Supabase
+            
+            btn.innerText = "✅ УСПІШНО ЗБЕРЕЖЕНО!";
+            btn.style.background = "#198754";
+            setTimeout(() => { btn.innerText = oldTxt; }, 3000);
+        }
     }
 }
 window.app = new App();
