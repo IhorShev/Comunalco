@@ -888,7 +888,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '9.5';
+    const APP_VERSION = '9.6';
     if (localStorage.getItem('app_version') !== APP_VERSION) {
         localStorage.setItem('app_version', APP_VERSION);
         if (navigator.serviceWorker) {
@@ -1834,16 +1834,21 @@ checkLimit() {
     renderAll() {
         if (!this.state || !this.state.objects) return;
 
-        // ПРАВИЛО 1: Завжди показуємо Лобі при оновленні сторінки або новому вході
-        if (window.userPickedObject === undefined) {
-            window.userPickedObject = false; // Фіксуємо, що це свіже завантаження
-        }
-        
-        if (!window.userPickedObject && this.state.objects.length > 1) {
-            window.showLobby = true; // Завжди вмикаємо Лобі на старті
+        // 🌙 ПРАВИЛО ТЕМНОЇ ТЕМИ ЗА ЗАМОВЧУВАННЯМ (Спрацює при першому вході)
+        if (localStorage.getItem('theme_init') !== 'done') {
+            localStorage.setItem('theme_init', 'done');
+            localStorage.setItem('theme', 'dark'); // Зберігаємо в пам'ять
+            document.body.classList.add('dark', 'dark-theme', 'dark-mode'); 
+            document.documentElement.setAttribute('data-theme', 'dark');
         }
 
-        // АНТИ-ГЛЮК: Перевіряємо чи довантажила база нові об'єкти
+        // ПРАВИЛО ЛОБІ: Завжди показуємо Лобі при свіжому старті
+        if (window.userPickedObject === undefined) window.userPickedObject = false; 
+        if (!window.userPickedObject && this.state.objects.length > 1) {
+            window.showLobby = true; 
+        }
+
+        // АНТИ-ГЛЮК ДОЗАВАНТАЖЕННЯ БАЗИ
         if (window.prevObjCount === undefined) window.prevObjCount = this.state.objects.length;
         if (this.state.objects.length > window.prevObjCount && !window.userPickedObject) {
             window.showLobby = true; 
@@ -4131,11 +4136,18 @@ checkLimit() {
         window.showLobby = false;
         window.userPickedObject = true;
         this.state.currentObjIdx = index; 
+        this.state.selectedHouseIndex = index; // Залізобетонна прив'язка
         this.currentData = this.state.objects[index]; 
-        this.renderAll(); 
+        
+        // Гарантований запуск оновлення інтерфейсу
+        if (typeof this.render === 'function') {
+            this.render(); 
+        } else {
+            this.renderAll(); 
+        }
     }
 
-    // --- 2. МАЛЮВАННЯ ЛОБІ (Екран вибору об'єкта) ---
+    // --- 2. МАЛЮВАННЯ ЛОБІ (Темна фірмова тема) ---
     renderLobby() {
         document.body.className = document.body.className.replace(/role-\w+/g, '').trim();
         document.body.classList.add('role-lobby');
@@ -4157,54 +4169,61 @@ checkLimit() {
             style.id = 'lobby-shield';
             document.head.appendChild(style);
         }
+        
+        // 🎨 ПРЕМІУМ ТЕМНА ТЕМА ДЛЯ ЛОБІ
         style.innerHTML = `
             body.role-lobby > *:not(#lobby-room):not(script):not(style) { display: none !important; }
-            body.role-lobby { background-color: #f8f9fa; font-family: sans-serif; margin: 0; padding: 0; }
+            body.role-lobby { background-color: #111827; font-family: sans-serif; margin: 0; padding: 0; color: #f3f4f6; }
+            .lobby-card { background: #1f2937; border: 1px solid #374151; border-radius: 16px; padding: 22px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s ease; }
+            .lobby-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.5); border-color: #4b5563; }
+            .lobby-title { margin: 0 0 10px 0; color: #f9fafb; font-size: 20px; font-weight: 600; }
+            .lobby-arrow { color: #6b7280; font-size: 22px; transition: color 0.2s; }
+            .lobby-card:hover .lobby-arrow { color: #60a5fa; }
         `;
 
         let html = `
-            <div style="max-width: 600px; margin: 0 auto; padding: 30px 20px;">
-                <div style="text-align: center; margin-bottom: 30px;">
-                    <h2 style="color: #0d6efd; font-size: 26px; margin: 0 0 5px 0;">COMUNALCO</h2>
-                    <p style="color: #6c757d; font-size: 15px; margin: 0;">Оберіть робочий простір</p>
+            <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+                <div style="text-align: center; margin-bottom: 40px;">
+                    <h2 style="color: #60a5fa; font-size: 28px; font-weight: 800; letter-spacing: 1px; margin: 0 0 8px 0;">COMUNALCO</h2>
+                    <p style="color: #9ca3af; font-size: 15px; margin: 0;">Оберіть робочий простір</p>
                 </div>
-                <div style="display: flex; flex-direction: column; gap: 15px;">
+                <div style="display: flex; flex-direction: column; gap: 16px;">
         `;
 
         this.state.objects.forEach((obj, index) => { 
             let role = 'admin'; let roleName = '👑 Керуючий';
-            let roleBg = '#e7f1ff'; let roleColor = '#0d6efd';
+            let roleBg = 'rgba(59, 130, 246, 0.2)'; let roleColor = '#93c5fd';
 
             if (window.currentUser) {
                 const myEmail = (window.currentUser.email || '').toLowerCase().trim();
                 if (String(obj.owner_id) !== String(window.currentUser.id)) {
-                    role = 'tenant'; roleName = '🏠 Мешканець'; roleBg = '#e9ecef'; roleColor = '#6c757d';
+                    role = 'tenant'; roleName = '🏠 Мешканець'; roleBg = 'rgba(107, 114, 128, 0.2)'; roleColor = '#d1d5db';
                     if (obj.users && Array.isArray(obj.users)) {
                         const profile = obj.users.find(u => (u.email || '').toLowerCase().trim() === myEmail);
                         if (profile) {
-                            if (profile.role === 'manager') { roleName = '💼 Менеджер'; roleBg = '#f3e8ff'; roleColor = '#6f42c1'; }
-                            if (profile.role === 'operator') { roleName = '📝 Обліковець'; roleBg = '#fff3cd'; roleColor = '#856404'; }
+                            if (profile.role === 'manager') { roleName = '💼 Менеджер'; roleBg = 'rgba(139, 92, 246, 0.2)'; roleColor = '#c4b5fd'; }
+                            if (profile.role === 'operator') { roleName = '📝 Обліковець'; roleBg = 'rgba(245, 158, 11, 0.2)'; roleColor = '#fcd34d'; }
                         }
                     }
                 }
             }
 
-            // ВИПРАВЛЕНО: Залізобетонний клік по картці!
+            // ПРАЦЮЮЧИЙ КЛІК НА КАРТКУ!
             html += `
-                <div onclick="app.enterObject(${index})" style="background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); cursor: pointer; display: flex; justify-content: space-between; align-items: center; border: 1px solid #f1f3f5; transition: 0.2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 25px rgba(0,0,0,0.08)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(0,0,0,0.03)';">
+                <div onclick="app.enterObject(${index})" class="lobby-card">
                     <div>
-                        <h3 style="margin: 0 0 8px 0; color: #212529; font-size: 19px;">${obj.name}</h3>
-                        <span style="display: inline-block; background: ${roleBg}; color: ${roleColor}; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold;">${roleName}</span>
+                        <h3 class="lobby-title">${obj.name}</h3>
+                        <span style="display: inline-block; background: ${roleBg}; color: ${roleColor}; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: bold; letter-spacing: 0.5px;">${roleName}</span>
                     </div>
-                    <div style="color: #ced4da; font-size: 24px;">&#10095;</div>
+                    <div class="lobby-arrow">&#10095;</div>
                 </div>
             `;
         });
 
         html += `
                 </div>
-                <div style="text-align: center; margin-top: 40px;">
-                    <button onclick="try{ if(typeof window.logout==='function') window.logout(); else if(window.app && typeof window.app.logout==='function') window.app.logout(); else { localStorage.clear(); window.location.href='/'; } }catch(e){ localStorage.clear(); window.location.reload(); }" style="background: none; border: none; color: #dc3545; font-size: 15px; text-decoration: underline; cursor: pointer;">
+                <div style="text-align: center; margin-top: 50px;">
+                    <button onclick="try{ if(typeof window.logout==='function') window.logout(); else if(window.app && typeof window.app.logout==='function') window.app.logout(); else { localStorage.clear(); window.location.href='/'; } }catch(e){ localStorage.clear(); window.location.reload(); }" style="background: none; border: none; color: #f87171; font-size: 15px; text-decoration: underline; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='#ef4444';" onmouseout="this.style.color='#f87171';">
                         🚪 Вийти з акаунту
                     </button>
                 </div>
@@ -4243,7 +4262,7 @@ checkLimit() {
             inlineBtn.id = 'inline-lobby-btn';
             inlineBtn.innerHTML = '🔄 Змінити об\'єкт';
             inlineBtn.setAttribute('onclick', 'app.goToLobby();');
-            inlineBtn.setAttribute('style', 'background: #0d6efd; color: white; border: none; padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: bold; cursor: pointer; margin: 0 8px; box-shadow: 0 2px 4px rgba(13, 110, 253, 0.3); transition: 0.2s; vertical-align: middle;');
+            inlineBtn.setAttribute('style', 'background: #3b82f6; color: white; border: none; padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: bold; cursor: pointer; margin: 0 8px; box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4); transition: 0.2s; vertical-align: middle;');
         }
 
         if (freeBadge) {
@@ -4301,13 +4320,13 @@ checkLimit() {
         let html = `<div style="padding: 15px; max-width: 800px; margin: 0 auto; padding-bottom: 70px;">`;
 
         if (this.state && this.state.objects && this.state.objects.length > 1) { 
-            html += `<button onclick="app.goToLobby();" style="background: none; border: none; color: #0d6efd; font-size: 15px; font-weight: bold; cursor: pointer; padding: 0; margin-bottom: 15px; display: flex; align-items: center; gap: 5px;">&#10094; До списку об'єктів</button>`;
+            html += `<button onclick="app.goToLobby();" style="background: none; border: none; color: #3b82f6; font-size: 15px; font-weight: bold; cursor: pointer; padding: 0; margin-bottom: 15px; display: flex; align-items: center; gap: 5px;">&#10094; До списку об'єктів</button>`;
         }
 
         html += `
             <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; text-align: center;">
                 <h2 style="margin: 0 0 8px 0; color: #212529;">${currentObjName}</h2>
-                <div style="background: #fff3cd; color: #856404; display: inline-block; padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 13px;">📝 РЕЖИМ ОБЛІКОВЦЯ</div>
+                <div style="background: #fef3c7; color: #b45309; display: inline-block; padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 13px;">📝 РЕЖИМ ОБЛІКОВЦЯ</div>
             </div>
         `;
 
@@ -4317,8 +4336,8 @@ checkLimit() {
 
         if (!this.currentData.curr) this.currentData.curr = {}; 
         html += `
-            <div style="background: #e7f1ff; border: 1px solid #b8daff; border-radius: 12px; padding: 15px; margin-bottom: 15px;">
-                <h4 style="margin-top: 0; color: #004085; text-align:center; padding-bottom: 8px; border-bottom: 1px solid #b8daff;">🏭 Головні лічильники</h4>
+            <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; padding: 15px; margin-bottom: 15px;">
+                <h4 style="margin-top: 0; color: #1e3a8a; text-align:center; padding-bottom: 8px; border-bottom: 1px solid #bfdbfe;">🏭 Головні лічильники</h4>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-top: 10px;">
                     ${this.genOpInHTML('Object', null, 'ed', '⚡ Е/Е День (заг)', this.currentData.curr.el_d)}
                     ${this.genOpInHTML('Object', null, 'en', '🌙 Е/Е Ніч (заг)', this.currentData.curr.el_n)}
@@ -4331,8 +4350,8 @@ checkLimit() {
             this.currentData.groups.forEach(group => {
                 if (!group.curr) group.curr = {}; 
                 html += `
-                <div style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 12px; padding: 15px; margin-bottom: 15px;">
-                    <h4 style="margin-top: 0; color: #495057; text-align:center; padding-bottom: 8px; border-bottom: 1px solid #dee2e6;">🤝 МЗК: ${group.name}</h4>
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 15px; margin-bottom: 15px;">
+                    <h4 style="margin-top: 0; color: #334155; text-align:center; padding-bottom: 8px; border-bottom: 1px solid #e2e8f0;">🤝 МЗК: ${group.name}</h4>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-top: 10px;">
                         ${this.genOpInHTML('Group', group.id, 'ed', '⚡ Е/Е День', group.curr.el_d)}
                         ${this.genOpInHTML('Group', group.id, 'en', '🌙 Е/Е Ніч', group.curr.el_n)}
@@ -4343,13 +4362,13 @@ checkLimit() {
             });
         }
 
-        html += `<h4 style="text-align:center; color: #6c757d; margin-top: 20px; margin-bottom: 10px;">🏠 Квартири</h4>`;
+        html += `<h4 style="text-align:center; color: #64748b; margin-top: 20px; margin-bottom: 10px;">🏠 Квартири</h4>`;
         if (this.currentData.apartments && this.currentData.apartments.length > 0) {
             this.currentData.apartments.forEach(apt => {
                 if (!apt.curr) apt.curr = { ed:0, en:0, w:0, g:0 }; 
                 html += `
                 <div style="background: #fff; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
-                    <h5 style="margin-top: 0; color: #212529; border-bottom: 1px solid #eee; padding-bottom: 8px;">🏠 ${apt.name}</h5>
+                    <h5 style="margin-top: 0; color: #1e293b; border-bottom: 1px solid #f1f5f9; padding-bottom: 8px;">🏠 ${apt.name}</h5>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-top: 10px;">
                         ${this.genOpInHTML('Apartment', apt.id, 'ed', '⚡ Е/Е День', apt.curr.ed)}
                         ${this.genOpInHTML('Apartment', apt.id, 'en', '🌙 Е/Е Ніч', apt.curr.en)}
@@ -4361,7 +4380,7 @@ checkLimit() {
         }
 
         html += `
-            <button onclick="app.saveOpData();" id="op-save-btn" style="width: 100%; background: #198754; color: white; border: none; padding: 18px; border-radius: 12px; font-size: 18px; font-weight: bold; margin-top: 15px; cursor: pointer; box-shadow: 0 4px 10px rgba(25, 135, 84, 0.3); transition: 0.3s; position: sticky; bottom: 15px;">
+            <button onclick="app.saveOpData();" id="op-save-btn" style="width: 100%; background: #059669; color: white; border: none; padding: 18px; border-radius: 12px; font-size: 18px; font-weight: bold; margin-top: 15px; cursor: pointer; box-shadow: 0 4px 10px rgba(5, 150, 105, 0.3); transition: 0.3s; position: sticky; bottom: 15px;">
                 💾 ЗБЕРЕГТИ ВСІ ПОКАЗНИКИ
             </button>
         </div>`;
@@ -4378,8 +4397,8 @@ checkLimit() {
         }
         return `
         <div>
-            <label style="font-size: 11px; color: #6c757d; font-weight: bold; display: block; margin-bottom: 2px;">${label}</label>
-            <input type="number" value="${val}" onchange="app.updateOpRead(${id}, '${standardKey}', this.value, '${type}')" style="width: 100%; padding: 8px; border: 1px solid #ced4da; border-radius: 7px; font-size: 15px; box-sizing: border-box;">
+            <label style="font-size: 11px; color: #64748b; font-weight: bold; display: block; margin-bottom: 2px;">${label}</label>
+            <input type="number" value="${val}" onchange="app.updateOpRead(${id}, '${standardKey}', this.value, '${type}')" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 7px; font-size: 15px; box-sizing: border-box;">
         </div>`;
     }
 
@@ -4403,13 +4422,13 @@ checkLimit() {
             const btn = document.getElementById('op-save-btn');
             const oldTxt = btn.innerText;
             btn.innerText = "⏳ Збереження...";
-            btn.style.background = "#0dcaf0"; btn.style.boxShadow = "none";
+            btn.style.background = "#38bdf8"; btn.style.boxShadow = "none";
             
             await window.cloudSave(this.state); 
             
             btn.innerText = "✅ ВСЕ ЗБЕРЕЖЕНО!";
-            btn.style.background = "#198754"; btn.style.boxShadow = "0 4px 10px rgba(25, 135, 84, 0.3)";
-            setTimeout(() => { btn.innerText = oldTxt; btn.style.boxShadow = "0 4px 10px rgba(25, 135, 84, 0.3)"; }, 3000);
+            btn.style.background = "#059669"; btn.style.boxShadow = "0 4px 10px rgba(5, 150, 105, 0.3)";
+            setTimeout(() => { btn.innerText = oldTxt; btn.style.boxShadow = "0 4px 10px rgba(5, 150, 105, 0.3)"; }, 3000);
         }
     }
 }
