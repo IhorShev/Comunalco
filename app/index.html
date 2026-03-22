@@ -888,7 +888,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '8.8';
+    const APP_VERSION = '8.9';
     if (localStorage.getItem('app_version') !== APP_VERSION) {
         localStorage.setItem('app_version', APP_VERSION);
         if (navigator.serviceWorker) {
@@ -1832,7 +1832,6 @@ checkLimit() {
 
     // --- РЕНДЕРИНГ ОБ'ЄКТА ---
     renderAll() {
-        // Стандартний рендер
         try { document.getElementById('object-title').value = this.currentData.name; } catch(e){}
         ['ed','en','w','g'].forEach(k => { 
             const el = document.getElementById('t_'+k); 
@@ -1843,20 +1842,30 @@ checkLimit() {
         
         setTimeout(() => { if (typeof this.calculate === 'function') this.calculate(); }, 100);
 
-        // 🔥 ЖОРСТКА ПЕРЕВІРКА ДОСТУПУ 🔥
-        let myRole = 'operator'; // За замовчуванням всі Обліковці
+        // 🔥 ІДЕАЛЬНА ЛОГІКА ДОСТУПУ 🔥
+        let myRole = 'admin'; // ⚠️ ЗА ЗАМОВЧУВАННЯМ ПОВЕРТАЄМО АДМІНА
 
-        if (window.currentUser && window.currentUser.email) {
-            const mail = window.currentUser.email.toLowerCase().trim();
+        if (window.currentUser && this.currentData) {
+            const myEmail = (window.currentUser.email || '').toLowerCase().trim();
             
-            // Залізобетонна фіксація пошти Матвія
-            if (mail.includes('m25.shevchenko')) {
-                myRole = 'operator';
-            } else if (this.currentData && this.currentData.owner_id === window.currentUser.id) {
-                myRole = 'admin';
-            } else if (this.currentData && this.currentData.users) {
-                const myProfile = this.currentData.users.find(u => (u.email || '').toLowerCase().trim() === mail);
-                if (myProfile) myRole = myProfile.role;
+            // Надійно порівнюємо ID (перетворюючи обидва в текст)
+            const ownerId = String(this.currentData.owner_id);
+            const currentUserId = String(window.currentUser.id);
+
+            // Якщо людина НЕ ВЛАСНИК
+            if (ownerId !== currentUserId) {
+                myRole = 'tenant'; // Падаємо до мінімальних прав
+
+                // Шукаємо її в списку доступу
+                if (this.currentData.users && Array.isArray(this.currentData.users)) {
+                    const myProfile = this.currentData.users.find(u => (u.email || '').toLowerCase().trim() === myEmail);
+                    if (myProfile) myRole = myProfile.role; // manager, operator або tenant
+                }
+                
+                // Жорстка перевірка пошти Матвія (Контрольний постріл)
+                if (myEmail.includes('m25.shevchenko')) {
+                    myRole = 'operator';
+                }
             }
         }
 
@@ -3583,67 +3592,72 @@ checkLimit() {
         this.updateSubscriptionCalc();
     }
 
-           // --- 🛡 ФУНКЦІЯ ЗАХИСТУ ІНТЕРФЕЙСУ (АКТИВНИЙ СНАЙПЕР) ---
-    applyRoleRestrictions(role = null) {
-        const userRole = role || window.currentRole || 'operator';
-        
-        // Якщо це власник або адмін - виходимо, все дозволено
-        if (userRole === 'admin' || userRole === 'owner' || userRole === 'manager') return;
+           // --- 🛡 ФУНКЦІЯ ЗАХИСТУ ІНТЕРФЕЙСУ (ГІПЕР-РЕЖИМ) ---
+    applyRoleRestrictions(role = 'admin') {
+        // 1. Скидаємо всі старі класи і вішаємо поточну роль на <body>
+        document.body.classList.remove('role-admin', 'role-operator', 'role-tenant', 'archive-mode');
+        document.body.classList.add('role-' + role);
 
-        // ЯКЩО ЦЕ ОБЛІКОВЕЦЬ: Запускаємо вічний цикл очищення екрану (кожні 500 мс)
-        if (userRole === 'operator') {
-            setInterval(() => {
-                
-                // 1. ВБИВАЄМО ВЕРХНЄ МЕНЮ (незалежно від регістру)
-                document.querySelectorAll('span, a, div, button').forEach(el => {
-                    if (el.children.length === 0) {
-                        const txt = (el.innerText || '').toLowerCase();
-                        if (txt === 'тарифи' || txt === 'доступ' || txt === 'аналітика' || txt === 'локальні копії' || txt === 'архів') {
-                            el.style.display = 'none';
-                        }
-                    }
-                });
-
-                // 2. ВБИВАЄМО НИЖНІ КНОПКИ ТА КНОПКИ ДОДАВАННЯ
-                document.querySelectorAll('button, .btn, .del-icon').forEach(btn => {
-                    const txt = (btn.innerText || '').toLowerCase();
-                    if (txt.includes('надіслати') || txt.includes('закрити місяць') || txt.includes('додати') || txt.includes('видалити')) {
-                        btn.style.display = 'none';
-                    }
-                });
-
-                // 3. ВБИВАЄМО ФІНАНСОВІ ПОЛЯ ТА РЕКВІЗИТИ (Борг, Сплачено, Телефон)
-                document.querySelectorAll('input').forEach(inp => {
-                    const p = (inp.placeholder || '').toLowerCase();
-                    if (p.includes('борг') || p.includes('сплачено') || p.includes('телефон') || p.includes('картка') || p.includes('iban')) {
-                        inp.style.display = 'none';
-                        if(inp.parentElement) inp.parentElement.style.display = 'none'; // Ховаємо весь рядок
-                    }
-                });
-                
-                // Ховаємо вибір месенджера
-                document.querySelectorAll('select').forEach(sel => sel.style.display = 'none');
-                
-                // Ховаємо цілі блоки реквізитів і тарифів
-                const reqs = document.getElementById('requisites-container');
-                if (reqs) reqs.style.display = 'none';
-                const extraT = document.getElementById('extra-tariffs-container');
-                if (extraT) extraT.style.display = 'none';
-
-                // 4. МІНЯЄМО ГОЛОВНИЙ ЗАГОЛОВОК НА ЕКРАНІ
-                document.querySelectorAll('div, span, h1, h2').forEach(el => {
-                    if (el.innerText && el.innerText.trim() === 'КИТОБІЙНА') {
-                        el.innerText = 'КИТОБІЙНА (РЕЖИМ ОБЛІКОВЦЯ)';
-                        el.style.color = '#ff9800'; // Робимо золотим
-                        el.style.fontWeight = 'bold';
-                    }
-                });
-
-            }, 500); // 500 мс - гарантує, що жодна кнопка не проскочить
+        // 2. Встановлюємо Глобальний CSS-Щит (Без складних команд, працює на 100% пристроїв)
+        if (!document.getElementById('hyper-role-shield')) {
+            const style = document.createElement('style');
+            style.id = 'hyper-role-shield';
+            style.innerHTML = `
+                /* --- ПРАВИЛА ХОВАННЯ ДЛЯ ОБЛІКОВЦЯ --- */
+                body.role-operator .btn-add,
+                body.role-operator .btn-add-counter,
+                body.role-operator .del-icon,
+                body.role-operator button[onclick*="addGroup"],
+                body.role-operator button[onclick*="addApartment"],
+                body.role-operator span[title*="Видалити"],
+                body.role-operator div[title*="Додати"],
+                body.role-operator #requisites-container,
+                body.role-operator #extra-tariffs-container,
+                body.role-operator .sticky-footer,
+                body.role-operator #batch-controls,
+                body.role-operator input[placeholder*="Борг"],
+                body.role-operator input[placeholder*="Сплачено"],
+                body.role-operator input[placeholder*="Телефон"],
+                body.role-operator select[onchange*="messenger"],
+                body.role-operator input[onchange*="debt"],
+                body.role-operator input[onchange*="paid"],
+                body.role-operator input[onchange*="phone"],
+                body.role-operator input[onchange*="updateTariff"],
+                body.role-operator input[onchange*="updateExtraTariff"] {
+                    display: none !important;
+                }
+            `;
+            document.head.appendChild(style);
         }
 
-        // Логіка для мешканця (залишається як була)
-        if (userRole === 'tenant' && window.currentAptId) {
+        // 3. Відновлюємо/Ховаємо Верхнє Меню (Надійно)
+        document.querySelectorAll('span, a, div').forEach(el => {
+            const txt = (el.innerText || '').toUpperCase();
+            if (txt.includes('ТАРИФИ') || txt.includes('ДОСТУП') || txt.includes('АНАЛІТИКА') || txt.includes('ЛОКАЛЬНІ КОПІЇ')) {
+                // Перевіряємо, чи це дійсно меню
+                if (el.closest('.desktop-only') || el.closest('#mobile-dropdown')) {
+                    // Якщо Адмін - показуємо, якщо інший - ховаємо
+                    el.style.display = (role === 'admin' || role === 'owner' || role === 'manager') ? '' : 'none';
+                }
+            }
+        });
+
+        // 4. Заголовок Обліковця
+        const titleInput = document.getElementById('object-title');
+        if (titleInput) {
+            if (role === 'operator') {
+                if (!titleInput.value.includes('ОБЛІКОВЦЯ')) {
+                    titleInput.value = titleInput.value + ' (РЕЖИМ ОБЛІКОВЦЯ)';
+                    titleInput.style.color = 'var(--gold)';
+                }
+            } else {
+                titleInput.value = titleInput.value.replace(' (РЕЖИМ ОБЛІКОВЦЯ)', '');
+                titleInput.style.color = ''; 
+            }
+        }
+
+        // 5. Логіка для мешканця (залишаємо як було)
+        if (role === 'tenant' && window.currentAptId) {
             const apartmentsDiv = document.getElementById('apartments-container');
             if (apartmentsDiv) {
                 const allApts = apartmentsDiv.querySelectorAll('details');
