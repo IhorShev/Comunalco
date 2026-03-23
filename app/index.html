@@ -1690,6 +1690,8 @@ class App {
 
                 } catch (e) {
                     console.error("Помилка:", e);
+                    alert("❌ Втрачено зв'язок з сервером (або час сесії вийшов). Сторінка буде оновлена.");
+                    window.location.reload(); // Примусове оновлення, щоб не брехати користувачу!
                     toast.innerHTML = "❌ Помилка";
                     toast.style.backgroundColor = "var(--danger)";
                     setTimeout(() => {
