@@ -4785,6 +4785,14 @@ window.addEventListener('load', () => {
                 await window.cloudLoad();
             }
 
+			// Перевірка налаштувань для Global версії
+      setTimeout(() => {
+          if (window.app && !window.app.state.settings.initialized) {
+              document.getElementById('setupModal').style.display = 'flex';
+              window.app.previewSetupLang('uk');
+          }
+      }, 2500); // 2.5 сек затримки, щоб дані з хмари встигли завантажитись
+
         } catch (error) {
             console.error("Помилка профілю:", error);
         }
