@@ -398,16 +398,14 @@
                 margin-bottom: 30px;
             }
 
-            /* ========================================= */
-            /* 📱 ГЛОБАЛЬНИЙ МОБІЛЬНИЙ ПАТЧ (ЛІКУЄМО СКРОЛ) */
-            /* ========================================= */
+            /* 1. Блокуємо скрол вбік */
             html, body {
                 max-width: 100vw !important;
                 overflow-x: hidden !important;
                 position: relative; 
             }
 
-            /* Приборкуємо гігантські заголовки */
+            /* 2. Приборкуємо гігантські заголовки */
             h1, h2, h3, .section-title {
                 font-size: 1.7rem !important; 
                 line-height: 1.3 !important;
@@ -415,23 +413,64 @@
                 padding: 0 10px; 
             }
 
-            /* Оптимізуємо відступи всередині карток */
+            /* 3. Оптимізуємо картки */
             .world-card, .price-card, .step-card {
                 padding: 25px 15px !important;
                 width: 100% !important;
                 box-sizing: border-box !important;
             }
 
-            /* Зменшуємо текст у списках фіч */
+            /* 4. Робимо списки читабельними */
             .world-features li, .democracy-list li, .finance-list li, .community-list li {
+                display: block !important;
                 font-size: 0.95rem !important;
-                padding-right: 5px;
+                margin-bottom: 15px !important;
+            }
+            .world-features i { margin-right: 8px; }
+
+            /* ========================================= */
+            /* 5. РЕМОНТ КАРТИНОК (Відключаємо 3D для мобільних) */
+            /* ========================================= */
+            .world-image-wrapper, .democracy-media .world-image-wrapper {
+                height: auto !important; 
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: center !important;
+                perspective: none !important;
+                margin-bottom: 25px !important;
             }
 
-            /* Адаптуємо 3Д-картинки */
-            .world-image-wrapper, .democracy-media .world-image-wrapper {
-                height: 200px !important;
+            .world-image-wrapper img, .democracy-media .world-image-wrapper img {
+                position: relative !important;
+                width: 95% !important;
+                height: auto !important;
+                transform: none !important; 
+                filter: none !important;
+                opacity: 1 !important;
             }
+
+            /* Задня картинка акуратно виглядає з-під передньої */
+            .img-back {
+                width: 85% !important;
+                margin-bottom: -20% !important; 
+                opacity: 0.5 !important;
+                z-index: 1 !important;
+            }
+
+            .img-front {
+                z-index: 2 !important;
+                box-shadow: 0 10px 25px rgba(0,0,0,0.5) !important;
+            }
+
+            /* Відключаємо реакцію на дотик */
+            .world-card:hover .img-back, .world-card:hover .img-front,
+            .democracy-media:hover .img-back, .democracy-media:hover .img-front {
+                transform: none !important;
+            }
+            
+            /* Ремонт одиночних картинок */
+            .single-image-wrapper { width: 100% !important; }
+            .single-image-wrapper img { width: 100% !important; transform: none !important; }
         }
     </style>	
 </head>
