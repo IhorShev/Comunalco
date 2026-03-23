@@ -2360,7 +2360,7 @@ checkLimit() {
                 <div class="row">
                     <div class="col">
                         <label>Телефон (Логін)</label>
-                        <input type="tel" value="${a.phone||''}" placeholder="380..." oninput="app.updateApt(${i},'phone',this.value)">
+                        <input type="tel" value="${a.phone||''}" placeholder="380..." onchange="app.updateApt(${i},'phone',this.value)">
                     </div>
                     <div class="col">
                         <label>Месенджер</label>
