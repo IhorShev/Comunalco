@@ -1372,6 +1372,39 @@ class App {
         if(id === 'premium') this.renderTariffs();
     }
 
+	// Попередній перегляд мови у вікні налаштувань
+    previewSetupLang(lang) {
+        const t = translations[lang];
+        if (!t) return;
+        document.getElementById('setup-title').innerText = t.setupWelcome;
+        document.getElementById('setup-description').innerText = t.setupDesc;
+        document.getElementById('setup-save-btn').innerText = t.save + " ➔";
+    }
+
+    // Фінальне збереження налаштувань
+    async completeSetup() {
+        const lang = document.getElementById('setup-lang').value;
+        const currency = document.getElementById('setup-currency').value;
+
+        this.state.settings = {
+            lang: lang,
+            currency: currency,
+            initialized: true
+        };
+
+        // Закриваємо модалку та зберігаємо
+        document.getElementById('setupModal').style.display = 'none';
+        this.save();
+        
+        // Перемальовуємо все вибраною мовою
+        this.renderAll();
+        
+        // Якщо користувач залогінений — відправляємо в хмару відразу
+        if (window.currentUser && window.cloudSave) {
+            await window.cloudSave(this.state);
+        }
+    }
+
    loadHistoryItem(index) {
         try {
             let item = (typeof index === 'string' || index > 1000) 
