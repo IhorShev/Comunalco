@@ -390,8 +390,12 @@
             .footer-desc { margin: 0 auto; }
             .footer-logo { justify-content: center; }
         }
-		* {
-    outline: 1px solid red !important;
+		@media (max-width: 768px) {
+    .column-step {
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+        margin-bottom: 30px; /* Додамо відступ між колонками, які тепер стоять одна під одною */
+    }
 }
     </style>	
 </head>
