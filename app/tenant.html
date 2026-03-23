@@ -423,11 +423,6 @@
                 maxVal = Math.floor(myConsumption * 2.5);
             }
 
-            // Якщо у нас нуль (і немає інших даних), даємо дефолтні дані для краси графіка
-            if (myConsumption === 0 && maxVal === 0) {
-                myConsumption = 150 * multiplier; minVal = 50 * multiplier; avgVal = 200 * multiplier; maxVal = 400 * multiplier;
-            }
-
             // Шукаємо найбільше число, щоб вирахувати 100% висоти
             const maxScale = Math.max(minVal, myConsumption, avgVal, maxVal) * 1.1;
 
