@@ -909,7 +909,16 @@ class App {
             { id: 'vip', name: 'LIFETIME', limit: 9999, price: 2900, desc: 'Назавжди. Оплата 1 раз.', isVip: true }
         ];
 
-        this.state = { license: { type: 'free', exp: null }, currentObjIdx: 0, objects: [] };
+        this.state = { 
+    settings: { 
+        lang: null,        // Буде встановлено при першому вході
+        currency: null,    // Буде встановлено при першому вході
+        initialized: false // Прапор для показу вікна налаштувань
+    },
+    license: { type: 'free', exp: null }, 
+    currentObjIdx: 0, 
+    objects: [] 
+};
         this.checks = {};
         this.STORAGE_KEY = 'komunalka_v30_pro'; 
         this.pendingPayment = null;
