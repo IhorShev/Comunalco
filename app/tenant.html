@@ -401,16 +401,34 @@
             const multiplier = parseInt(period);
             myConsumption = myConsumption * multiplier; 
             
-            let minVal = Math.floor(myConsumption * 0.3); // Хтось не жив
-            let avgVal = Math.floor(myConsumption * 1.2); // Середнє по будинку
-            let maxVal = Math.floor(myConsumption * 2.5); // Хтось майнить біткоїни :)
+            // 1. Отримуємо РЕАЛЬНІ дані (без МЗК) замість штучних
+            let minVal = 0, avgVal = 0, maxVal = 0;
+            
+            // ПЕРЕВІРКА: якщо в кабінеті мешканця є завантажений масив всіх квартир
+            if (typeof allApts !== 'undefined') {
+                // Відкидаємо МЗК
+                let realApts = Object.values(allApts).filter(a => a.name && !a.name.toLowerCase().includes('мзк'));
+                // Беремо значення для поточного сервісу і відкидаємо нулі
+                let aptValues = realApts.map(a => Number(a.bills?.[serviceType] || 0)).filter(v => v > 0);
+                
+                if (aptValues.length > 0) {
+                    minVal = Math.min(...aptValues);
+                    maxVal = Math.max(...aptValues);
+                    avgVal = Math.round(aptValues.reduce((a, b) => a + b, 0) / aptValues.length);
+                }
+            } else {
+                // Якщо даних інших квартир тут немає, доведеться тимчасово залишити заглушку
+                minVal = Math.floor(myConsumption * 0.3);
+                avgVal = Math.floor(myConsumption * 1.2);
+                maxVal = Math.floor(myConsumption * 2.5);
+            }
 
-            // Якщо у нас нуль, даємо штучні дані для краси графіка
-            if (myConsumption === 0) {
+            // Якщо у нас нуль (і немає інших даних), даємо дефолтні дані для краси графіка
+            if (myConsumption === 0 && maxVal === 0) {
                 myConsumption = 150 * multiplier; minVal = 50 * multiplier; avgVal = 200 * multiplier; maxVal = 400 * multiplier;
             }
 
-            // Шукаємо найбільше число, щоб вирахувати 100% висоти стовпчика
+            // Шукаємо найбільше число, щоб вирахувати 100% висоти
             const maxScale = Math.max(minVal, myConsumption, avgVal, maxVal) * 1.1;
 
             const bars = [
@@ -420,25 +438,31 @@
                 { label: 'Макс.', val: maxVal, color: 'var(--danger)' }
             ];
 
-            // 3. Малюємо графік
+            // 3. Малюємо ідеально рівний графік
             chart.innerHTML = '';
             legend.innerHTML = '';
+
+            // Налаштовуємо батьківські контейнери, щоб все було симетрично
+            chart.style.display = 'flex';
+            chart.style.justifyContent = 'space-between';
+            legend.style.display = 'flex';
+            legend.style.justifyContent = 'space-between';
 
             bars.forEach(b => {
                 const heightPct = maxScale > 0 ? (b.val / maxScale) * 100 : 0;
                 
-                // Стовпчик з анімацією
+                // Стовпчик (width: 25% рівно на 4 колонки, justify-content: flex-end притискає їх донизу)
                 chart.insertAdjacentHTML('beforeend', `
-                    <div style="display:flex; flex-direction:column; align-items:center; width:20%;">
+                    <div style="display:flex; flex-direction:column; align-items:center; justify-content:flex-end; width:25%; height:100%;">
                         <div style="font-size:11px; margin-bottom:5px; font-weight:bold; color:${b.color}">${b.val}</div>
-                        <div style="width:100%; height:${heightPct}%; background:${b.color}; border-radius:4px 4px 0 0; transition: height 0.6s ease-out;"></div>
+                        <div style="width:70%; max-width:40px; height:${heightPct}%; background:${b.color}; border-radius:4px 4px 0 0; transition: height 0.6s ease-out;"></div>
                     </div>
                 `);
 
-                // Підпис
+                // Підпис (також width: 25% і жорстке центрування тексту)
                 const isMe = b.label === 'ВИ';
                 legend.insertAdjacentHTML('beforeend', `
-                    <div style="width:20%; ${isMe ? 'color:var(--primary); font-weight:bold;' : ''}">${b.label}</div>
+                    <div style="width:25%; text-align:center; font-size:12px; ${isMe ? 'color:var(--primary); font-weight:bold;' : 'color:var(--text-sec);'}">${b.label}</div>
                 `);
             });
         }
