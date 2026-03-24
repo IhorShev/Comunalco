@@ -905,7 +905,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '9.6';
+    const APP_VERSION = '9.7';
     if (localStorage.getItem('app_version') !== APP_VERSION) {
         localStorage.setItem('app_version', APP_VERSION);
         if (navigator.serviceWorker) {
@@ -1916,13 +1916,46 @@ class App {
         this.save(); this.renderAll(); 
     }
 
-    deleteObject() {
+    async deleteObject() {
         if(this.state.objects.length <= 1) { alert("Не можна видалити останній об'єкт!"); return; }
         if(confirm(`Видалити об'єкт "${this.currentData.name}" та всі його дані?`)) {
+            
+            const houseIdToDelete = this.currentData.id; // Запам'ятовуємо ID перед видаленням
+            
+            // 1. Спочатку фізично знищуємо об'єкт у базі Supabase (через нашу нову функцію)
+            if (window.__sbClient) {
+                await window.__sbClient.rpc('delete_house_as_admin', { target_house_id: String(houseIdToDelete) });
+            }
+
+            // 2. Тепер прибираємо його з екрана
             this.state.objects.splice(this.state.currentObjIdx, 1);
             this.state.currentObjIdx = 0;
-            this.save(); this.renderAll();
+            this.save(); 
+            this.renderAll();
         }
+    }
+
+	addApartment() {
+        const newApt = { 
+            id: Date.now(), 
+            name: `Кв. ${this.currentData.apartments.length + 1}`, 
+            group_id: 1, 
+            messenger: 'viber', 
+            email: '', 
+            phone: '', 
+            prev: { ed: 0, en: 0, w: 0, g: 0 }, 
+            curr: { ed: 0, en: 0, w: 0, g: 0 }, 
+            custom_counters: [], 
+            services: [], 
+            paid: 0, 
+            debt: 0 
+        };
+        
+        if (!this.currentData.apartments) this.currentData.apartments = [];
+        this.currentData.apartments.push(newApt);
+        this.save();
+        this.renderApartments();
+        this.updateStatus();
     }
     
     prevObject() { if(this.state.currentObjIdx>0){this.state.currentObjIdx--; this.save(); this.renderAll();} }
