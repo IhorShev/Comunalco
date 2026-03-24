@@ -4436,7 +4436,8 @@ checkLimit() {
                     <div style="margin-bottom: 10px; border-bottom: 1px solid #f1f5f9; padding-bottom: 8px; display: flex; align-items: center; gap: 8px;">
                         <span>🏠</span>
                         <input type="text" 
-                               value="${apt.name}" 
+                               value="${apt.name}"
+							   onkeydown="event.stopPropagation()"
                                onchange="app.updateAptName('${apt.id}', this.value)" 
                                style="border: none; background: transparent; color: #1e293b; font-size: 1.1em; font-weight: bold; width: 100%; outline: none;"
                         >
