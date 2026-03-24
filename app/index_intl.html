@@ -4598,7 +4598,14 @@ checkLimit() {
                 if (!apt.curr) apt.curr = { ed:0, en:0, w:0, g:0 }; 
                 html += `
                 <div style="background: #fff; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
-                    <h5 style="margin-top: 0; color: #1e293b; border-bottom: 1px solid #f1f5f9; padding-bottom: 8px;">🏠 ${apt.name}</h5>
+                    <div style="margin-bottom: 10px; border-bottom: 1px solid #f1f5f9; padding-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+    <span>🏠</span>
+    <input type="text" 
+           value="${apt.name}" 
+           onchange="app.updateAptName(${apt.id}, this.value)" 
+           style="border: none; background: transparent; color: #1e293b; font-size: 1.1em; font-weight: bold; width: 100%; outline: none;"
+    >
+</div>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-top: 10px;">
                         ${this.genOpInHTML('Apartment', apt.id, 'ed', '⚡ Е/Е День', apt.curr.ed)}
                         ${this.genOpInHTML('Apartment', apt.id, 'en', '🌙 Е/Е Ніч', apt.curr.en)}
