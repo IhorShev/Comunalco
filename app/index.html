@@ -1748,6 +1748,15 @@ class App {
         }
     }
 
+	updateAptName(aptId, newName) {
+    const apt = this.currentData.apartments.find(a => a.id == aptId);
+    if (apt) {
+        apt.name = newName;
+        this.save(); 
+        console.log(`Назву змінено на ${newName}`);
+    }
+}
+
 	addApartment() {
         const newApt = { 
             id: Date.now(), 
