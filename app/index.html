@@ -1749,13 +1749,26 @@ class App {
     }
 
 	updateAptName(aptId, newName) {
-    const apt = this.currentData.apartments.find(a => a.id == aptId);
-    if (apt) {
-        apt.name = newName;
-        this.save(); 
-        console.log(`Назву змінено на ${newName}`);
+        const apt = this.currentData.apartments.find(a => a.id == aptId);
+        
+        // ЗАПОБІЖНИК: Зберігаємо тільки якщо назва дійсно нова
+        if (apt && apt.name !== newName) { 
+            apt.name = newName;
+            
+            // Примусово забираємо фокус у поля, щоб не було подвійного спрацьовування
+            if (document.activeElement) {
+                document.activeElement.blur();
+            }
+            
+            this.save();
+            
+            // Жорстко перемальовуємо інтерфейс, щоб зняти зависання
+            setTimeout(() => {
+                if (typeof this.renderAll === 'function') this.renderAll();
+                else if (typeof this.renderApartments === 'function') this.renderApartments();
+            }, 300);
+        }
     }
-}
 
 	addApartment() {
         const newApt = { 
