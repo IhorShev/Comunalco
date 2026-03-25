@@ -2405,6 +2405,8 @@ checkLimit() {
             <summary style="display:flex; align-items:center; padding:12px;">
                 <div style="flex:1;">
                     <div style="display:flex; align-items:center; gap:10px;">
+<span class="drag-handle" onclick="event.preventDefault(); event.stopPropagation();" style="cursor: grab; color: #94a3b8; font-size: 20px; margin-right: 8px;" title="Потягніть, щоб змінити порядок">☰</span>
+					
                         <input type="text" 
        value="${a.name}" 
        onchange="app.updateApt(${i}, 'name', this.value)" 
