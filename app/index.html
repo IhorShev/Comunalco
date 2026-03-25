@@ -2533,16 +2533,26 @@ checkLimit() {
                     handle: '.drag-handle', // Дозволяємо тягнути ТІЛЬКИ за нашу ручку ☰
                     animation: 150,         // Плавна анімація
                     onEnd: (evt) => {
-                    // Якщо кинули на те саме місце - нічого не робимо
-                    if (evt.oldIndex === evt.newIndex) return;
+                    const oldIndex = evt.oldIndex;
+                    const newIndex = evt.newIndex;
+                    
+                    if (oldIndex === newIndex) return;
 
-                    // 1. Міняємо порядок у масиві даних
-                    const movedItem = app.currentData.apartments.splice(evt.oldIndex, 1)[0];
-                    app.currentData.apartments.splice(evt.newIndex, 0, movedItem);
+                    // 1. Надійно міняємо місцями через глобальну змінну app
+                    const movedItem = app.currentData.apartments.splice(oldIndex, 1)[0];
+                    app.currentData.apartments.splice(newIndex, 0, movedItem);
 
-                    // 2. Стандартне автозбереження і перемальовування (як у всіх твоїх інпутах)
+                    // 2. Зберігаємо новий порядок
                     app.save();
-                    app.calculate();
+
+                    // 3. ОБОВ'ЯЗКОВО перемальовуємо екран, щоб оновилися індекси для кнопок
+                    setTimeout(() => {
+                        if (typeof app.calculate === 'function') {
+                            app.calculate();
+                        } else {
+                            app.renderApartments();
+                        }
+                    }, 50);
                 }
                 });
             }
