@@ -2383,6 +2383,11 @@ checkLimit() {
     } // <-- КОМА ТУТ!
 
     renderApartments() {
+		// --- ДОДАЄМО ЦЕ: Сортуємо квартири перед малюванням ---
+    if (this.currentData.apartments) {
+        this.currentData.apartments.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+    }
+		
             document.getElementById('apartments-container').innerHTML = (this.currentData.apartments || []).map((a, i) => { 
             
             // 1. Статус підключення до бота
