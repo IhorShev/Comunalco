@@ -2700,6 +2700,32 @@ checkLimit() {
         if(controls) controls.style.display = (this.currentData.apartments.length > 0) ? 'flex' : 'none';
         
         this.calculate();
+
+        // --- Активація Drag-and-Drop для квартир ---
+        setTimeout(() => {
+            const container = document.getElementById('apartments-container');
+            if (container) {
+                Sortable.create(container, {
+                    handle: '.drag-handle', // Дозволяємо тягнути ТІЛЬКИ за нашу ручку ☰
+                    animation: 150,         // Плавна анімація
+                    onEnd: (evt) => {
+                        const oldIndex = evt.oldIndex;
+                        const newIndex = evt.newIndex;
+                        
+                        // Якщо просто клікнули і не перетягнули - нічого не робимо
+                        if (oldIndex === newIndex) return;
+
+                        // 1. Міняємо порядок у масиві даних
+                        const movedItem = this.currentData.apartments.splice(oldIndex, 1)[0];
+                        this.currentData.apartments.splice(newIndex, 0, movedItem);
+
+                        // 2. Зберігаємо новий порядок у базу Supabase
+                        this.save();
+                    }
+                });
+            }
+        }, 100);
+		
     }
     
     renderMR(i, obj, mode, label, key) { 
