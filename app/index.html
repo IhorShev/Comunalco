@@ -2399,7 +2399,7 @@ checkLimit() {
             if (isDebt) { balanceColor = "var(--danger)"; balanceLabel = "БОРГ"; }
             if (isOverpay) { balanceColor = "var(--success)"; balanceLabel = "ПЕРЕПЛАТА"; }
 
-            return `<details open style="border-left: 4px solid ${isConnected ? 'var(--success)' : 'var(--primary)'}; margin-bottom:15px; height: fit-content; align-self: start;">`
+            return `<details open style="border-left: 4px solid ${isConnected ? 'var(--success)' : 'var(--primary)'}; margin-bottom:15px; align-self: start; height: fit-content;">`
             <summary style="display:flex; align-items:center; padding:12px;">
                 <div style="flex:1;">
                     <div style="display:flex; align-items:center; gap:10px;">
