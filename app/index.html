@@ -2535,41 +2535,38 @@ checkLimit() {
         if(controls) controls.style.display = (this.currentData.apartments.length > 0) ? 'flex' : 'none';
         
         this.calculate();
-		// --- Активація Drag-and-Drop для квартир ---
+		// --- 2. АКТИВАЦІЯ DRAG-AND-DROP (Без перемальовок і зависань) ---
     setTimeout(() => {
         const container = document.getElementById('apartments-container');
         if (container) {
             Sortable.create(container, {
                 handle: '.drag-handle',
                 animation: 150,
-                onEnd: async (evt) => {
+                onEnd: (evt) => {
                     if (evt.oldIndex === evt.newIndex) return;
 
-                    // 1. Міняємо порядок локально в пам'яті
+                    // А. Синхронізуємо масив із реальним розміщенням карток (Sortable вже перемістив HTML)
                     const movedItem = app.currentData.apartments.splice(evt.oldIndex, 1)[0];
                     app.currentData.apartments.splice(evt.newIndex, 0, movedItem);
 
-                    // 2. Ставимо нові цифри
+                    // Б. Прописуємо правильні порядкові номери в масив
                     app.currentData.apartments.forEach((apt, index) => {
                         apt.sort_order = index;
                     });
 
-                    // 3. ХІРУРГІЧНИЙ ЗАПИС У БАЗУ (БЕЗ app.save і БЕЗ перемальовок)
-                    // Картка вже візуально перемістилася, застосунок не зависне!
+                    // В. Зберігаємо головний стан (виклик твоєї рідної функції)
+                    if (typeof app.save === 'function') {
+                        app.save(); 
+                    }
+
+                    // Г. Фоново оновлюємо колонки в таблиці (без блокування і помилок)
                     if (window.__sbClient) {
-                        try {
-                            const updates = app.currentData.apartments.map((apt, index) => {
-                                return window.__sbClient
-                                    .from('apartments')
-                                    .update({ sort_order: index })
-                                    .eq('id', apt.id);
-                            });
-                            // Відправляємо всі цифри миттєво і чекаємо завершення
-                            await Promise.all(updates);
-                            console.log("✅ Порядок успішно записано в базу!");
-                        } catch(err) {
-                            console.error("Помилка БД:", err);
-                        }
+                        app.currentData.apartments.forEach((apt, index) => {
+                            window.__sbClient.from('apartments')
+                                .update({ sort_order: index })
+                                .eq('id', apt.id)
+                                .then(() => {}).catch(() => {});
+                        });
                     }
                 }
             });
