@@ -2384,7 +2384,7 @@ checkLimit() {
 
     renderApartments() {
 		// --- ДОДАЄМО ЦЕ: Сортуємо квартири перед малюванням ---
-    if (this.currentData.apartments) {
+    if (this.currentData && this.currentData.apartments) {
         this.currentData.apartments.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
     }
 		
