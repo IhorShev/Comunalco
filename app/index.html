@@ -1701,7 +1701,10 @@ class App {
                     toast.style.display = "block"; // ПОКАЗУЄМО І ВИДІЛЯЄМО МІСЦЕ
                     setTimeout(() => { toast.style.opacity = "1"; }, 10);
 
-                    await window.cloudSave(this.state);
+                    await Promise.race([
+    window.cloudSave(this.state),
+    new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 15000))
+]);
 
                     toast.innerHTML = "✅ Збережено";
                     toast.style.backgroundColor = "var(--success)";
