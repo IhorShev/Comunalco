@@ -2540,58 +2540,36 @@ checkLimit() {
                 onEnd: async (evt) => {
                     if (evt.oldIndex === evt.newIndex) return;
 
-                    // 1. Міняємо порядок у масиві локально
+                    // 1. Міняємо порядок локально
                     const movedItem = app.currentData.apartments.splice(evt.oldIndex, 1)[0];
                     app.currentData.apartments.splice(evt.newIndex, 0, movedItem);
 
-                    // 2. Ставимо нові номери
+                    // 2. Присвоюємо нові номери
                     app.currentData.apartments.forEach((apt, index) => {
                         apt.sort_order = index;
                     });
 
-                    // 3. Миттєва перемальовка екрану
+                    // 3. Миттєво перемальовуємо екран
                     app.renderApartments();
 
-                    // 4. АВТОНОМНЕ ЗБЕРЕЖЕННЯ (повністю обходимо зламаний app.save)
+                    // 4. БЕЗПЕЧНИЙ ЗАПИС У БАЗУ
                     if (window.__sbClient) {
-                        const toast = document.getElementById("header-toast");
-                        if (toast) {
-                            toast.innerHTML = "⏳ Збереження порядку...";
-                            toast.style.backgroundColor = "var(--primary)";
-                            toast.style.display = "block";
-                            toast.style.opacity = "1";
-                        }
-
                         try {
-                            // А. Зберігаємо локально (надійний бекап для браузера)
-                            if (app.STORAGE_KEY) {
-                                localStorage.setItem(app.STORAGE_KEY, JSON.stringify(app.state));
-                            }
-
-                            // Б. Записуємо порядок в таблицю apartments (працює ідеально)
-                            app.currentData.apartments.forEach((apt, index) => {
-                                window.__sbClient.from('apartments').update({ sort_order: index }).eq('id', apt.id).then(()=>{});
+                            // Відправляємо всі номери в таблицю apartments і чекаємо відповіді
+                            const updates = app.currentData.apartments.map((apt, index) => {
+                                return window.__sbClient
+                                    .from('apartments')
+                                    .update({ sort_order: index })
+                                    .eq('id', apt.id);
                             });
+                            
+                            await Promise.all(updates);
 
-                            // В. ПРОБИВАЄМО БАЗУ: Жорстко оновлюємо JSON будинку робочим клієнтом!
-                            if (app.currentData && app.currentData.id) {
-                                await window.__sbClient
-                                    .from('houses')
-                                    .update({ current_data: app.currentData })
-                                    .eq('id', app.currentData.id);
-                            }
+                            // Тільки коли база підтвердила запис - робимо твоє рідне збереження
+                            app.save();
 
-                            // Успішне завершення (ховаємо плашку)
-                            if (toast) {
-                                toast.innerHTML = "✅ Порядок збережено";
-                                toast.style.backgroundColor = "var(--success)";
-                                setTimeout(() => { 
-                                    toast.style.opacity = "0"; 
-                                    setTimeout(() => { toast.style.display = "none"; }, 400);
-                                }, 2000);
-                            }
                         } catch(err) {
-                            console.error("Помилка збереження:", err);
+                            console.error("Помилка збереження порядку:", err);
                         }
                     }
                 } // закриває onEnd
