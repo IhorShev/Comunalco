@@ -2540,18 +2540,18 @@ checkLimit() {
                     onEnd: (evt) => {
                     if (evt.oldIndex === evt.newIndex) return;
 
-                    // 1. Міняємо порядок у масиві (щоб на екрані було красиво)
+                    // 1. Міняємо порядок у масиві локально
                     const movedItem = self.currentData.apartments.splice(evt.oldIndex, 1)[0];
                     self.currentData.apartments.splice(evt.newIndex, 0, movedItem);
 
-                    // 2. ПРЯМИЙ ЗАПИС У SUPABASE (Магія тут)
+                    // 2. ЗАПИСУЄМО В БАЗУ через правильного клієнта (__sbClient)
                     self.currentData.apartments.forEach(async (apt, index) => {
-                        apt.sort_order = index; // Записуємо номер локально
+                        apt.sort_order = index; // Ставимо номер локально
                         
                         try {
-                            // Жорстко оновлюємо колонку sort_order напряму в базі
-                            if (typeof supabase !== 'undefined') {
-                                await supabase.from('apartments')
+                            if (window.__sbClient) {
+                                await window.__sbClient
+                                    .from('apartments')
                                     .update({ sort_order: index })
                                     .eq('id', apt.id);
                             }
@@ -2560,7 +2560,7 @@ checkLimit() {
                         }
                     });
 
-                    // 3. Стандартне збереження та перемальовка
+                    // 3. Звичайне автозбереження (щоб JSON теж оновився) і перемальовка
                     self.save();
                     self.calculate();
                     
