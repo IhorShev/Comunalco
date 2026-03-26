@@ -2531,52 +2531,46 @@ checkLimit() {
         
         this.calculate();
 		// --- Активація Drag-and-Drop для квартир ---
-        setTimeout(() => {
-            const container = document.getElementById('apartments-container');
-            if (container) {
-                Sortable.create(container, {
-                    handle: '.drag-handle', // Дозволяємо тягнути ТІЛЬКИ за нашу ручку ☰
-                    animation: 150,         // Плавна анімація
-                    onEnd: (evt) => {
+    setTimeout(() => {
+        const container = document.getElementById('apartments-container');
+        if (container) {
+            Sortable.create(container, {
+                handle: '.drag-handle',
+                animation: 150,
+                onEnd: (evt) => {
                     if (evt.oldIndex === evt.newIndex) return;
 
-                    // 1. Міняємо порядок у масиві локально
-                    const movedItem = self.currentData.apartments.splice(evt.oldIndex, 1)[0];
-                    self.currentData.apartments.splice(evt.newIndex, 0, movedItem);
+                    // 1. Міняємо порядок локально (через глобальний app)
+                    const movedItem = app.currentData.apartments.splice(evt.oldIndex, 1)[0];
+                    app.currentData.apartments.splice(evt.newIndex, 0, movedItem);
 
-                    // 2. РЕНТГЕН-ЗАПИС У БАЗУ
-                    console.log("=== ПОЧАТОК ЗБЕРЕЖЕННЯ ПОРЯДКУ ===");
-                    console.log("1. Чи бачимо базу (__sbClient)?", !!window.__sbClient);
-
-                    self.currentData.apartments.forEach(async (apt, index) => {
-                        apt.sort_order = index; 
-                        console.log(`2. Пробуємо зберегти: ${apt.name}, ID: ${apt.id}, Порядок: ${index}`);
+                    // 2. ЗАПИСУЄМО В БАЗУ через правильного клієнта (__sbClient)
+                    app.currentData.apartments.forEach(async (apt, index) => {
+                        apt.sort_order = index; // Ставимо номер локально
                         
-                        if (window.__sbClient) {
-                            // Додали .select(), щоб база примусово повернула нам те, що вона оновила
-                            const { data, error } = await window.__sbClient
-                                .from('apartments')
-                                .update({ sort_order: index })
-                                .eq('id', apt.id)
-                                .select();
-                                
-                            console.log(`3. Відповідь бази для ${apt.name}:`, data, error);
-                        } else {
-                            console.error("ПОМИЛКА: Клієнт бази даних не знайдений!");
+                        try {
+                            if (window.__sbClient) {
+                                await window.__sbClient
+                                    .from('apartments')
+                                    .update({ sort_order: index })
+                                    .eq('id', apt.id);
+                            }
+                        } catch (err) {
+                            console.error("Помилка запису порядку:", err);
                         }
                     });
 
-                    // 3. Звичайне автозбереження (щоб JSON теж оновився) і перемальовка
-                    self.save();
-                    self.calculate();
+                    // 3. Звичайне автозбереження і перемальовка
+                    app.save();
+                    app.calculate();
                     
                     setTimeout(() => {
-                        self.renderApartments();
+                        app.renderApartments();
                     }, 50);
                 }
-                });
-            }
-        }, 100);
+            });
+        }
+    }, 100);
 		
     }
     
