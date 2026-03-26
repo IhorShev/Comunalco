@@ -4624,6 +4624,7 @@ window.addEventListener('load', () => {
   // 🚀 ЗАПОБІЖНИК ВІД ЗАВИСАНЬ (Створюємо підключення лише 1 раз)
         const sbClient = window.__sbClient || supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         window.__sbClient = sbClient;
+	window._supabase = sbClient; // один клієнт для всього
 	window._supabase = sbClient; // <--- ДОДАТИ ЦЕЙ РЯДОК, щоб інші функції не падали
   window.currentUser = null;
 
