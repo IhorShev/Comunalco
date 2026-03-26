@@ -4799,7 +4799,8 @@ window.addEventListener('load', () => {
                     };
                 });
 
-                cleanApts.sort((a, b) => a.id - b.id);
+                // Замінити сортування:
+          cleanApts.sort((a, b) => (a.sort_order ?? 999) - (b.sort_order ?? 999));
           }
 
           // 4. Розпаковуємо дані будинку
