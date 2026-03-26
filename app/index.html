@@ -417,15 +417,15 @@
 }
 
 @media (max-width: 768px) {
-    /* Піднімаємо кнопки Чат і Меню до самого верху */
+    /* 1. ПРИБИРАЄМО милиці для кнопок! Нехай стоять красиво і по центру, як раніше */
     .chat-btn, .menu-btn {
-        align-self: flex-start !important;
-        margin-top: 2px !important; 
+        align-self: center !important;
+        margin-top: 0 !important; 
     }
 
-    /* Плашку ховаємо рівно ПІД цими кнопками */
+    /* 2. Плашку просто опускаємо ПІД усю шапку (висота шапки ~65px) */
     #header-toast {
-        margin-top: 45px !important; 
+        margin-top: 65px !important; 
     }
 }
 </style>
