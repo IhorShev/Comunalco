@@ -2537,15 +2537,18 @@ checkLimit() {
             Sortable.create(container, {
                 handle: '.drag-handle',
                 animation: 150,
-                onEnd: (evt) => {
+                // Зверни увагу: ми додали слово async перед (evt)
+                onEnd: async (evt) => {
                     if (evt.oldIndex === evt.newIndex) return;
 
-                    // 1. Міняємо порядок локально (через глобальний app)
+                    // 1. Міняємо порядок локально
                     const movedItem = app.currentData.apartments.splice(evt.oldIndex, 1)[0];
                     app.currentData.apartments.splice(evt.newIndex, 0, movedItem);
 
-                    // 2. ЗАПИСУЄМО В БАЗУ через правильного клієнта (__sbClient)
-                    app.currentData.apartments.forEach(async (apt, index) => {
+                    // 2. БЕЗПЕЧНИЙ ЗАПИС У БАЗУ (через правильний цикл for...of)
+                    // Цей цикл чекає, поки збережеться одна квартира, і тільки потім бере наступну
+                    for (let index = 0; index < app.currentData.apartments.length; index++) {
+                        const apt = app.currentData.apartments[index];
                         apt.sort_order = index; // Ставимо номер локально
                         
                         try {
@@ -2558,15 +2561,17 @@ checkLimit() {
                         } catch (err) {
                             console.error("Помилка запису порядку:", err);
                         }
-                    });
+                    }
 
-                    // 3. Звичайне автозбереження і перемальовка
+                    // 3. ЗАПУСКАЄМО СИНХРОНІЗАЦІЮ ТІЛЬКИ ПІСЛЯ ТОГО, ЯК БАЗА ЗАКІНЧИЛА
                     app.save();
                     app.calculate();
                     
+                    // Знімаємо зависання збільшеною паузою
                     setTimeout(() => {
-                        app.renderApartments();
-                    }, 50);
+                        if (typeof app.renderAll === 'function') app.renderAll();
+                        else app.renderApartments();
+                    }, 300);
                 }
             });
         }
