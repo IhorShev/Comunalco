@@ -2538,25 +2538,34 @@ checkLimit() {
                     handle: '.drag-handle', // Дозволяємо тягнути ТІЛЬКИ за нашу ручку ☰
                     animation: 150,         // Плавна анімація
                     onEnd: (evt) => {
-                    const oldIndex = evt.oldIndex;
-                    const newIndex = evt.newIndex;
-                    
-                    if (oldIndex === newIndex) return;
+                    if (evt.oldIndex === evt.newIndex) return;
 
-                    // 1. Надійно міняємо місцями через глобальну змінну app
-                    const movedItem = app.currentData.apartments.splice(oldIndex, 1)[0];
-                    app.currentData.apartments.splice(newIndex, 0, movedItem);
+                    // 1. Міняємо порядок у масиві (щоб на екрані було красиво)
+                    const movedItem = self.currentData.apartments.splice(evt.oldIndex, 1)[0];
+                    self.currentData.apartments.splice(evt.newIndex, 0, movedItem);
 
-                    // 2. Зберігаємо новий порядок
-                    app.save();
-
-                    // 3. ОБОВ'ЯЗКОВО перемальовуємо екран, щоб оновилися індекси для кнопок
-                    setTimeout(() => {
-                        if (typeof app.calculate === 'function') {
-                            app.calculate();
-                        } else {
-                            app.renderApartments();
+                    // 2. ПРЯМИЙ ЗАПИС У SUPABASE (Магія тут)
+                    self.currentData.apartments.forEach(async (apt, index) => {
+                        apt.sort_order = index; // Записуємо номер локально
+                        
+                        try {
+                            // Жорстко оновлюємо колонку sort_order напряму в базі
+                            if (typeof supabase !== 'undefined') {
+                                await supabase.from('apartments')
+                                    .update({ sort_order: index })
+                                    .eq('id', apt.id);
+                            }
+                        } catch (err) {
+                            console.error("Помилка запису порядку:", err);
                         }
+                    });
+
+                    // 3. Стандартне збереження та перемальовка
+                    self.save();
+                    self.calculate();
+                    
+                    setTimeout(() => {
+                        self.renderApartments();
                     }, 50);
                 }
                 });
