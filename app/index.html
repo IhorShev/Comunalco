@@ -406,6 +406,21 @@
         .desktop-only-save { display: none !important; }  /* Ховаємо на телефоні */
         .mobile-only-save { display: inline !important; } /* Показуємо на телефоні */
     }
+		/* --- Піднімаємо меню над плашкою синхронізації --- */
+.top-menu-bar {
+    position: relative;
+    z-index: 99999 !important;
+}
+
+#header-toast {
+    z-index: 99998 !important; 
+}
+
+@media (max-width: 768px) {
+    #header-toast {
+        margin-top: 55px !important; 
+    }
+}
 </style>
 
 <div class="top-menu-bar" style="position: sticky; top: 0; background: var(--bg); z-index: 1000; padding: 10px 15px; border-bottom: 1px solid var(--border); margin: -10px -10px 10px -10px; box-shadow: 0 4px 10px rgba(0,0,0,0.35); display: flex; align-items: center; gap: 15px; justify-content: space-between;">
