@@ -2549,17 +2549,34 @@ checkLimit() {
                     const movedItem = app.currentData.apartments.splice(evt.oldIndex, 1)[0];
                     app.currentData.apartments.splice(evt.newIndex, 0, movedItem);
 
-                    // 2. МАГІЯ: Зберігаємо список ID у новому порядку прямо в головний JSON будинку!
-                    // Цей список не зітреться при оновленні показників
+                    // 2. Оновлюємо внутрішні номери і зберігаємо надійний порядок ID
                     app.currentData.apartment_order = app.currentData.apartments.map(a => a.id);
+                    app.currentData.apartments.forEach((apt, index) => { apt.sort_order = index; });
 
-                    // 3. Миттєво перемальовуємо екран і запускаємо ТВОЄ рідне збереження
-                    app.renderApartments();
+                    // УВАГА: Ми ПРИБРАЛИ app.renderApartments()! 
+                    // Картка вже візуально перемістилася, перемальовка більше не створить зависання.
+
+                    // 3. Запускаємо твоє рідне збереження (збереже apartment_order у хмару)
                     app.save(); 
-                }
-            });
-        }
-    }, 100);
+
+                    // 4. ТИХО оновлюємо колонку sort_order в базі (через 1 секунду, щоб не заважати)
+                    if (window.__sbClient) {
+                        setTimeout(() => {
+                            app.currentData.apartments.forEach((apt, index) => {
+                                try {
+                                    window.__sbClient
+                                        .from('apartments')
+                                        .update({ sort_order: index })
+                                        .eq('id', apt.id)
+                                        .then(() => {}); // Мовчки закриваємо
+                                } catch(e) {}
+                            });
+                        }, 1000);
+                    }
+                } // закриває onEnd
+            }); // закриває Sortable.create
+        } // закриває if (container)
+    }, 100); // закриває setTimeout
 
 } // <-- А ЦЕ ЗАКРИВАЄ ВСЮ ФУНКЦІЮ renderApartments()
     
