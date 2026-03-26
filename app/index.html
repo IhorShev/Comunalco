@@ -2537,45 +2537,24 @@ checkLimit() {
             Sortable.create(container, {
                 handle: '.drag-handle',
                 animation: 150,
-                onEnd: async (evt) => {
+                onEnd: (evt) => {
                     if (evt.oldIndex === evt.newIndex) return;
 
-                    // 1. Міняємо порядок локально
+                    // 1. Міняємо порядок у масиві локально
                     const movedItem = app.currentData.apartments.splice(evt.oldIndex, 1)[0];
                     app.currentData.apartments.splice(evt.newIndex, 0, movedItem);
 
-                    // 2. Присвоюємо нові номери
-                    app.currentData.apartments.forEach((apt, index) => {
-                        apt.sort_order = index;
-                    });
+                    // 2. МАГІЯ: Зберігаємо список ID у новому порядку прямо в головний JSON будинку!
+                    // Цей список не зітреться при оновленні показників
+                    app.currentData.apartment_order = app.currentData.apartments.map(a => a.id);
 
-                    // 3. Миттєво перемальовуємо екран
+                    // 3. Миттєво перемальовуємо екран і запускаємо ТВОЄ рідне збереження
                     app.renderApartments();
-
-                    // 4. БЕЗПЕЧНИЙ ЗАПИС У БАЗУ
-                    if (window.__sbClient) {
-                        try {
-                            // Відправляємо всі номери в таблицю apartments і чекаємо відповіді
-                            const updates = app.currentData.apartments.map((apt, index) => {
-                                return window.__sbClient
-                                    .from('apartments')
-                                    .update({ sort_order: index })
-                                    .eq('id', apt.id);
-                            });
-                            
-                            await Promise.all(updates);
-
-                            // Тільки коли база підтвердила запис - робимо твоє рідне збереження
-                            app.save();
-
-                        } catch(err) {
-                            console.error("Помилка збереження порядку:", err);
-                        }
-                    }
-                } // закриває onEnd
-            }); // закриває Sortable.create
-        } // закриває if (container)
-    }, 100); // закриває setTimeout
+                    app.save(); 
+                }
+            });
+        }
+    }, 100);
 
 } // <-- А ЦЕ ЗАКРИВАЄ ВСЮ ФУНКЦІЮ renderApartments()
     
