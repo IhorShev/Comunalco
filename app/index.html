@@ -2544,25 +2544,29 @@ checkLimit() {
                     const movedItem = app.currentData.apartments.splice(evt.oldIndex, 1)[0];
                     app.currentData.apartments.splice(evt.newIndex, 0, movedItem);
 
-                    // 2. ШВИДКО ПЕРЕМАЛЬОВУЄМО ІНТЕРФЕЙС
+                    // 2. Ставимо нові номери
                     app.currentData.apartments.forEach((apt, index) => {
                         apt.sort_order = index;
                     });
-                    app.renderApartments();
 
-                    // 3. ТИХИЙ ЗАПИС У БАЗУ
+                    // 3. МИТТЄВА ПЕРЕМАЛЬОВКА І ЗАПУСК СИНХРОНІЗАЦІЇ (з'явиться плашка)
+                    app.renderApartments();
+                    app.save();
+
+                    // 4. ТИХИЙ ЗАПИС У БАЗУ З ЗАТРИМКОЮ 2 СЕКУНДИ
                     if (window.__sbClient) {
-                        for (let index = 0; index < app.currentData.apartments.length; index++) {
-                            const apt = app.currentData.apartments[index];
-                            try {
-                                window.__sbClient
-                                    .from('apartments')
-                                    .update({ sort_order: index })
-                                    .eq('id', apt.id)
-                                    .then(() => {});
-                            } catch (err) {}
-                        }
-                    } // закриває if (__sbClient)
+                        setTimeout(() => {
+                            app.currentData.apartments.forEach((apt, index) => {
+                                try {
+                                    window.__sbClient
+                                        .from('apartments')
+                                        .update({ sort_order: index })
+                                        .eq('id', apt.id)
+                                        .then(() => {});
+                                } catch(err) {}
+                            });
+                        }, 2000); // Чекаємо, поки пройде синхронізація JSON
+                    }
                 } // закриває onEnd
             }); // закриває Sortable.create
         } // закриває if (container)
