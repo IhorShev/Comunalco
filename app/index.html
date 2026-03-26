@@ -2549,23 +2549,50 @@ checkLimit() {
                         apt.sort_order = index;
                     });
 
-                    // 3. МИТТЄВА ПЕРЕМАЛЬОВКА І ЗАПУСК СИНХРОНІЗАЦІЇ (з'явиться плашка)
+                    // 3. Миттєва перемальовка екрану
                     app.renderApartments();
-                    app.save();
 
-                    // 4. ТИХИЙ ЗАПИС У БАЗУ З ЗАТРИМКОЮ 2 СЕКУНДИ
+                    // 4. АВТОНОМНЕ ЗБЕРЕЖЕННЯ (повністю обходимо зламаний app.save)
                     if (window.__sbClient) {
-                        setTimeout(() => {
+                        const toast = document.getElementById("header-toast");
+                        if (toast) {
+                            toast.innerHTML = "⏳ Збереження порядку...";
+                            toast.style.backgroundColor = "var(--primary)";
+                            toast.style.display = "block";
+                            toast.style.opacity = "1";
+                        }
+
+                        try {
+                            // А. Зберігаємо локально (надійний бекап для браузера)
+                            if (app.STORAGE_KEY) {
+                                localStorage.setItem(app.STORAGE_KEY, JSON.stringify(app.state));
+                            }
+
+                            // Б. Записуємо порядок в таблицю apartments (працює ідеально)
                             app.currentData.apartments.forEach((apt, index) => {
-                                try {
-                                    window.__sbClient
-                                        .from('apartments')
-                                        .update({ sort_order: index })
-                                        .eq('id', apt.id)
-                                        .then(() => {});
-                                } catch(err) {}
+                                window.__sbClient.from('apartments').update({ sort_order: index }).eq('id', apt.id).then(()=>{});
                             });
-                        }, 2000); // Чекаємо, поки пройде синхронізація JSON
+
+                            // В. ПРОБИВАЄМО БАЗУ: Жорстко оновлюємо JSON будинку робочим клієнтом!
+                            if (app.currentData && app.currentData.id) {
+                                await window.__sbClient
+                                    .from('houses')
+                                    .update({ current_data: app.currentData })
+                                    .eq('id', app.currentData.id);
+                            }
+
+                            // Успішне завершення (ховаємо плашку)
+                            if (toast) {
+                                toast.innerHTML = "✅ Порядок збережено";
+                                toast.style.backgroundColor = "var(--success)";
+                                setTimeout(() => { 
+                                    toast.style.opacity = "0"; 
+                                    setTimeout(() => { toast.style.display = "none"; }, 400);
+                                }, 2000);
+                            }
+                        } catch(err) {
+                            console.error("Помилка збереження:", err);
+                        }
                     }
                 } // закриває onEnd
             }); // закриває Sortable.create
