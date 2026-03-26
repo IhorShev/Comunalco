@@ -2537,7 +2537,6 @@ checkLimit() {
             Sortable.create(container, {
                 handle: '.drag-handle',
                 animation: 150,
-                // Зверни увагу: ми додали слово async перед (evt)
                 onEnd: async (evt) => {
                     if (evt.oldIndex === evt.newIndex) return;
 
@@ -2545,31 +2544,31 @@ checkLimit() {
                     const movedItem = app.currentData.apartments.splice(evt.oldIndex, 1)[0];
                     app.currentData.apartments.splice(evt.newIndex, 0, movedItem);
 
-                    // 2. ШВИДКО ПЕРЕМАЛЬОВУЄМО ІНТЕРФЕЙС (Без зависань і бекапів)
+                    // 2. ШВИДКО ПЕРЕМАЛЬОВУЄМО ІНТЕРФЕЙС
                     app.currentData.apartments.forEach((apt, index) => {
-                        apt.sort_order = index; // Ставимо номер
+                        apt.sort_order = index;
                     });
-                    app.renderApartments(); // Оновлюємо номери кнопок
+                    app.renderApartments();
 
-                    // 3. ТИХИЙ ЗАПИС У БАЗУ (у фоні, не блокуючи застосунок)
+                    // 3. ТИХИЙ ЗАПИС У БАЗУ
                     if (window.__sbClient) {
                         for (let index = 0; index < app.currentData.apartments.length; index++) {
                             const apt = app.currentData.apartments[index];
                             try {
-                                // Відправляємо команду без await для загального потоку
                                 window.__sbClient
                                     .from('apartments')
                                     .update({ sort_order: index })
                                     .eq('id', apt.id)
-                                    .then(() => {}); // Просто мовчки завершуємо
+                                    .then(() => {});
                             } catch (err) {}
                         }
-                   } // закриває функцію onEnd
-            }); // закриває налаштування Sortable.create
+                    } // закриває if (__sbClient)
+                } // закриває onEnd
+            }); // закриває Sortable.create
         } // закриває if (container)
     }, 100); // закриває setTimeout
-		
-    }
+
+} // <-- А ЦЕ ЗАКРИВАЄ ВСЮ ФУНКЦІЮ renderApartments()
     
     renderMR(i, obj, mode, label, key) { 
         if (!obj.prev) obj.prev = {ed:0, en:0, w:0, g:0};
