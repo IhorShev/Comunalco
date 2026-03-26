@@ -2544,19 +2544,25 @@ checkLimit() {
                     const movedItem = self.currentData.apartments.splice(evt.oldIndex, 1)[0];
                     self.currentData.apartments.splice(evt.newIndex, 0, movedItem);
 
-                    // 2. ЗАПИСУЄМО В БАЗУ через правильного клієнта (__sbClient)
+                    // 2. РЕНТГЕН-ЗАПИС У БАЗУ
+                    console.log("=== ПОЧАТОК ЗБЕРЕЖЕННЯ ПОРЯДКУ ===");
+                    console.log("1. Чи бачимо базу (__sbClient)?", !!window.__sbClient);
+
                     self.currentData.apartments.forEach(async (apt, index) => {
-                        apt.sort_order = index; // Ставимо номер локально
+                        apt.sort_order = index; 
+                        console.log(`2. Пробуємо зберегти: ${apt.name}, ID: ${apt.id}, Порядок: ${index}`);
                         
-                        try {
-                            if (window.__sbClient) {
-                                await window.__sbClient
-                                    .from('apartments')
-                                    .update({ sort_order: index })
-                                    .eq('id', apt.id);
-                            }
-                        } catch (err) {
-                            console.error("Помилка запису порядку:", err);
+                        if (window.__sbClient) {
+                            // Додали .select(), щоб база примусово повернула нам те, що вона оновила
+                            const { data, error } = await window.__sbClient
+                                .from('apartments')
+                                .update({ sort_order: index })
+                                .eq('id', apt.id)
+                                .select();
+                                
+                            console.log(`3. Відповідь бази для ${apt.name}:`, data, error);
+                        } else {
+                            console.error("ПОМИЛКА: Клієнт бази даних не знайдений!");
                         }
                     });
 
