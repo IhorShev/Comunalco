@@ -417,8 +417,15 @@
 }
 
 @media (max-width: 768px) {
+    /* Піднімаємо кнопки Чат і Меню до самого верху */
+    .chat-btn, .menu-btn {
+        align-self: flex-start !important;
+        margin-top: 2px !important; 
+    }
+
+    /* Плашку ховаємо рівно ПІД цими кнопками */
     #header-toast {
-        margin-top: 55px !important; 
+        margin-top: 45px !important; 
     }
 }
 </style>
