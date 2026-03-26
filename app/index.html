@@ -2383,13 +2383,13 @@ checkLimit() {
     } // <-- КОМА ТУТ!
 
     renderApartments() {
-		// --- ЗАЛІЗОБЕТОННЕ СОРТУВАННЯ ПРИ ВХОДІ ---
-    if (this.currentData && this.currentData.apartments && this.currentData.apartment_order) {
+		// --- 1. ЧИСТЕ СОРТУВАННЯ ПРИ ВХОДІ (Без милиць) ---
+    if (this.currentData && Array.isArray(this.currentData.apartments)) {
         this.currentData.apartments.sort((a, b) => {
-            const posA = this.currentData.apartment_order.indexOf(a.id);
-            const posB = this.currentData.apartment_order.indexOf(b.id);
-            // Якщо квартира нова і її ще немає в збереженому порядку - ставимо в кінець
-            return (posA === -1 ? 999 : posA) - (posB === -1 ? 999 : posB);
+            // Якщо sort_order є - беремо його, якщо немає (нова квартира) - кидаємо в самий кінець (999)
+            const orderA = typeof a.sort_order === 'number' ? a.sort_order : 999;
+            const orderB = typeof b.sort_order === 'number' ? b.sort_order : 999;
+            return orderA - orderB;
         });
     }
 		
