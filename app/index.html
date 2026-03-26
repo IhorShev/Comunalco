@@ -2542,41 +2542,39 @@ checkLimit() {
             Sortable.create(container, {
                 handle: '.drag-handle',
                 animation: 150,
-                onEnd: (evt) => {
+                onEnd: async (evt) => {
                     if (evt.oldIndex === evt.newIndex) return;
 
-                    // 1. Міняємо порядок у масиві локально
+                    // 1. Міняємо порядок локально в пам'яті
                     const movedItem = app.currentData.apartments.splice(evt.oldIndex, 1)[0];
                     app.currentData.apartments.splice(evt.newIndex, 0, movedItem);
 
-                    // 2. Оновлюємо внутрішні номери і зберігаємо надійний порядок ID
-                    app.currentData.apartment_order = app.currentData.apartments.map(a => a.id);
-                    app.currentData.apartments.forEach((apt, index) => { apt.sort_order = index; });
+                    // 2. Ставимо нові цифри
+                    app.currentData.apartments.forEach((apt, index) => {
+                        apt.sort_order = index;
+                    });
 
-                    // УВАГА: Ми ПРИБРАЛИ app.renderApartments()! 
-                    // Картка вже візуально перемістилася, перемальовка більше не створить зависання.
-
-                    // 3. Запускаємо твоє рідне збереження (збереже apartment_order у хмару)
-                    app.save(); 
-
-                    // 4. ТИХО оновлюємо колонку sort_order в базі (через 1 секунду, щоб не заважати)
+                    // 3. ХІРУРГІЧНИЙ ЗАПИС У БАЗУ (БЕЗ app.save і БЕЗ перемальовок)
+                    // Картка вже візуально перемістилася, застосунок не зависне!
                     if (window.__sbClient) {
-                        setTimeout(() => {
-                            app.currentData.apartments.forEach((apt, index) => {
-                                try {
-                                    window.__sbClient
-                                        .from('apartments')
-                                        .update({ sort_order: index })
-                                        .eq('id', apt.id)
-                                        .then(() => {}); // Мовчки закриваємо
-                                } catch(e) {}
+                        try {
+                            const updates = app.currentData.apartments.map((apt, index) => {
+                                return window.__sbClient
+                                    .from('apartments')
+                                    .update({ sort_order: index })
+                                    .eq('id', apt.id);
                             });
-                        }, 1000);
+                            // Відправляємо всі цифри миттєво і чекаємо завершення
+                            await Promise.all(updates);
+                            console.log("✅ Порядок успішно записано в базу!");
+                        } catch(err) {
+                            console.error("Помилка БД:", err);
+                        }
                     }
-                } // закриває onEnd
-            }); // закриває Sortable.create
-        } // закриває if (container)
-    }, 100); // закриває setTimeout
+                }
+            });
+        }
+    }, 100);
 
 } // <-- А ЦЕ ЗАКРИВАЄ ВСЮ ФУНКЦІЮ renderApartments()
     
