@@ -2541,41 +2541,33 @@ checkLimit() {
                 onEnd: async (evt) => {
                     if (evt.oldIndex === evt.newIndex) return;
 
-                    // 1. Міняємо порядок локально
+                    // 1. Міняємо порядок у масиві локально
                     const movedItem = app.currentData.apartments.splice(evt.oldIndex, 1)[0];
                     app.currentData.apartments.splice(evt.newIndex, 0, movedItem);
 
-                    // 2. БЕЗПЕЧНИЙ ЗАПИС У БАЗУ (через правильний цикл for...of)
-                    // Цей цикл чекає, поки збережеться одна квартира, і тільки потім бере наступну
-                    for (let index = 0; index < app.currentData.apartments.length; index++) {
-                        const apt = app.currentData.apartments[index];
-                        apt.sort_order = index; // Ставимо номер локально
-                        
-                        try {
-                            if (window.__sbClient) {
-                                await window.__sbClient
+                    // 2. ШВИДКО ПЕРЕМАЛЬОВУЄМО ІНТЕРФЕЙС (Без зависань і бекапів)
+                    app.currentData.apartments.forEach((apt, index) => {
+                        apt.sort_order = index; // Ставимо номер
+                    });
+                    app.renderApartments(); // Оновлюємо номери кнопок
+
+                    // 3. ТИХИЙ ЗАПИС У БАЗУ (у фоні, не блокуючи застосунок)
+                    if (window.__sbClient) {
+                        for (let index = 0; index < app.currentData.apartments.length; index++) {
+                            const apt = app.currentData.apartments[index];
+                            try {
+                                // Відправляємо команду без await для загального потоку
+                                window.__sbClient
                                     .from('apartments')
                                     .update({ sort_order: index })
-                                    .eq('id', apt.id);
-                            }
-                        } catch (err) {
-                            console.error("Помилка запису порядку:", err);
+                                    .eq('id', apt.id)
+                                    .then(() => {}); // Просто мовчки завершуємо
+                            } catch (err) {}
                         }
-                    }
-
-                    // 3. ЗАПУСКАЄМО СИНХРОНІЗАЦІЮ ТІЛЬКИ ПІСЛЯ ТОГО, ЯК БАЗА ЗАКІНЧИЛА
-                    app.save();
-                    app.calculate();
-                    
-                    // Знімаємо зависання збільшеною паузою
-                    setTimeout(() => {
-                        if (typeof app.renderAll === 'function') app.renderAll();
-                        else app.renderApartments();
-                    }, 300);
-                }
-            });
-        }
-    }, 100);
+                   } // закриває функцію onEnd
+            }); // закриває налаштування Sortable.create
+        } // закриває if (container)
+    }, 100); // закриває setTimeout
 		
     }
     
