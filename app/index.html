@@ -440,58 +440,62 @@
         </div>
     </div>
 
-    <div class="chat-btn" style="position: relative; cursor: pointer; display: flex; align-items: center; justify-content: center; height: 38px; padding: 0 15px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; color: var(--text); flex-shrink: 0;" onclick="document.getElementById('chat-modal').style.display='flex'">
-        <span style="font-size: 16px;">💬</span>
-        <span class="desktop-text-chat" style="font-size: 12px; font-weight: bold; margin-left: 5px;">ЧАТ БУДИНКУ</span>
-        <span class="mobile-text-chat" style="font-size: 12px; font-weight: bold; margin-left: 5px;">ЧАТ</span>
-        <div id="admin-chat-badge" style="display: none; position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; font-size: 10px; font-weight: bold; padding: 2px 5px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">Нові</div>
-    </div>
-    	
-    <div class="desktop-only" style="display: flex; align-items: center; gap: 15px; margin-left: auto;">
-        <span onclick="app.openMenu('premium')" style="color:var(--primary); font-weight:bold; cursor:pointer; font-size:12px;">💎 Тарифи</span>
-        <span onclick="app.openMenu('history')" style="cursor:pointer; font-size:12px;">🕒 Архів</span>
-        <span onclick="app.openChartModal()" style="cursor: pointer; font-weight: bold; font-size: 12px;">📊 Аналітика</span>
-        <span onclick="app.openAccessMenu()" style="cursor:pointer; font-weight:bold; font-size:12px; display:flex; align-items:center; gap:2px;">👥 Доступ</span>
-        <span onclick="app.openMenu('info')" style="cursor:pointer; font-size:12px;">ℹ️ Інфо</span>
-        <span onclick="app.openMenu('backups')" style="cursor:pointer; font-size:12px;">📦 Локальні копії</span>
-        <span onclick="app.openMenu('contacts')" style="cursor:pointer; font-size:12px;">📞 Контакти</span>
-        
-        <button onclick="app.toggleTheme()" style="background:none; border:none; cursor:pointer; padding:0; display:flex; align-items:center; margin-left: 10px;" title="Змінити тему">
-            <svg id="theme-icon" viewBox="0 0 24 24" fill="none" stroke="var(--text-sec)" stroke-width="2" width="20" height="20"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-        </button>
-    </div>
+    <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px; margin-left:auto;">
 
-    <div class="mobile-only" style="position: relative; margin-left: auto; flex-shrink: 0;">
-        <button class="menu-btn" onclick="const m = document.getElementById('mobile-dropdown'); m.style.display = m.style.display === 'block' ? 'none' : 'block';" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; color: var(--text); padding: 0 10px; height: 38px; display: flex; align-items: center; justify-content: center; gap: 6px;">
-            <span style="font-size: 18px;">≡</span>
-            <span style="font-size: 12px; font-weight: bold;">МЕНЮ</span>
-        </button>
-        
-        <div id="mobile-dropdown" style="display: none; position: absolute; top: 45px; right: 0; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 5px; box-shadow: 0 10px 25px rgba(0,0,0,0.8); z-index: 2000; min-width: 180px; text-align: left; backdrop-filter: blur(10px);">
-            <div onclick="app.openMenu('history'); document.getElementById('mobile-dropdown').style.display='none'" style="padding: 12px 15px; border-bottom: 1px solid var(--border); cursor: pointer; display: flex; align-items: center; gap: 10px;">🕒 Архів</div>
-            <div onclick="app.openChartModal(); document.getElementById('mobile-dropdown').style.display='none'" style="...">📊 Аналітика</div>
-            <div onclick="app.openAccessMenu(); document.getElementById('mobile-dropdown').style.display='none'" style="padding: 12px 15px; border-bottom: 1px solid var(--border); cursor: pointer; display: flex; align-items: center; gap: 10px;">👥 Доступ</div>
-            <div onclick="app.openMenu('info'); document.getElementById('mobile-dropdown').style.display='none'" style="padding: 12px 15px; cursor: pointer; display: flex; align-items: center; gap: 10px;">ℹ️ Інфо</div>
-            <div onclick="app.toggleTheme(); document.getElementById('mobile-dropdown').style.display='none'" style="padding: 12px 15px; cursor: pointer; display: flex; align-items: center; gap: 10px; border-top: 1px solid var(--border);">🌓 Змінити тему</div>
+    <div style="display:flex; align-items:center; gap:8px;">
+        <div class="chat-btn" style="position:relative; cursor:pointer; display:flex; align-items:center; justify-content:center; height:38px; padding:0 15px; background:var(--bg-card); border:1px solid var(--border); border-radius:12px;">
+            <span style="font-size:16px;">💬</span>
+            <span class="desktop-text-chat" style="font-size:12px; font-weight:bold; margin-left:5px;">ЧАТ БУДИНКУ</span>
+            <span class="mobile-text-chat" style="font-size:12px; font-weight:bold; margin-left:5px;">ЧАТ</span>
+            <div id="admin-chat-badge" style="display:none; position:absolute; top:-5px; right:-5px; background:#ef4444; color:white; font-size:10px; font-weight:bold; padding:2px 6px; border-radius:10px;"></div>
         </div>
+
+        <div class="desktop-only" style="display:flex; align-items:center; gap:15px;">
+            <span onclick="app.openMenu('premium')" style="color:var(--primary); font-weight:bold; cursor:pointer; font-size:12px;">💎 Тарифи</span>
+            <span onclick="app.openMenu('history')" style="cursor:pointer; font-size:12px;">🕒 Архів</span>
+            <span onclick="app.openChartModal()" style="cursor:pointer; font-weight:bold; font-size:12px;">📊 Аналітика</span>
+            <span onclick="app.openAccessMenu()" style="cursor:pointer; font-weight:bold; font-size:12px; display:flex; align-items:center; gap:2px;">👥 Доступ</span>
+            <span onclick="app.openMenu('info')" style="cursor:pointer; font-size:12px;">ℹ️ Інфо</span>
+            <span onclick="app.openMenu('backups')" style="cursor:pointer; font-size:12px;">📦 Локальні копії</span>
+            <span onclick="app.openMenu('contacts')" style="cursor:pointer; font-size:12px;">📞 Контакти</span>
+            <button onclick="app.toggleTheme()" style="background:none; border:none; cursor:pointer; padding:0; display:flex; align-items:center; margin-left:10px;" title="Змінити тему">
+                <svg id="theme-icon" viewBox="0 0 24 24" fill="none" stroke="var(--text-sec)" stroke-width="2" width="20" height="20"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+            </button>
+        </div>
+
+        <div class="mobile-only" style="position:relative; flex-shrink:0;">
+            <button class="menu-btn" onclick="const m=document.getElementById('mobile-dropdown'); m.style.display = m.style.display === 'block' ? 'none' : 'block';" style="background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:0 10px; height:38px; display:flex; align-items:center; gap:5px; cursor:pointer; color:var(--text);">
+                <span style="font-size:18px;">≡</span>
+                <span style="font-size:12px; font-weight:bold;">МЕНЮ</span>
+            </button>
+            <div id="mobile-dropdown" style="display:none; position:absolute; top:45px; right:0; background:var(--bg-card); border:1px solid var(--border); border-radius:12px; overflow:hidden; z-index:9999; box-shadow:0 10px 30px rgba(0,0,0,0.5); min-width:180px;">
+                <div onclick="app.openMenu('history'); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; border-bottom:1px solid var(--border); cursor:pointer;">🕒 Архів</div>
+                <div onclick="app.openChartModal(); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; border-bottom:1px solid var(--border); cursor:pointer; font-weight:bold;">📊 Аналітика</div>
+                <div onclick="app.openAccessMenu(); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; border-bottom:1px solid var(--border); cursor:pointer;">👥 Доступ</div>
+                <div onclick="app.openMenu('info'); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; border-bottom:1px solid var(--border); cursor:pointer;">ℹ️ Інфо</div>
+                <div onclick="app.toggleTheme(); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; cursor:pointer; display:flex; align-items:center; gap:10px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    Тема
+                </div>
+            </div>
+        </div>
+        <div id="header-toast" style="
+        display:none; 
+        opacity:0; 
+        font-size:12px; 
+        font-weight:bold; 
+        color:white; 
+        padding:4px 12px; 
+        border-radius:8px; 
+        white-space:nowrap; 
+        transition:opacity 0.4s ease; 
+        box-shadow:0 2px 8px rgba(0,0,0,0.2); 
+        align-self:flex-end;
+    "></div>
+
     </div>
 </div>
-<div id="header-toast" style="
-    display: none;
-    opacity: 0;
-    position: sticky;
-    top: 57px;
-    z-index: 990;
-    margin: -10px -10px 10px -10px;
-    width: calc(100% + 20px);
-    text-align: center;
-    font-size: 13px;
-    font-weight: bold;
-    color: white;
-    padding: 8px 15px;
-    transition: opacity 0.4s ease;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.3);
-"></div>
+
 <script>
     function toggleAccountMenu() {
         const menu = document.getElementById('account-menu');
