@@ -265,10 +265,12 @@
             box-shadow: 0 0 5px rgba(255, 71, 87, 0.5);
         }
         .chat-modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center;
-            backdrop-filter: blur(5px);
-        }
+    display: none; position: fixed; top: 56px; left: 0; 
+    width: 100%; height: calc(100% - 56px);
+    background: rgba(0,0,0,0.95); z-index: 1500; 
+    align-items: flex-start; justify-content: center;
+    backdrop-filter: none;
+}
         .chat-container {
             background: var(--bg-card); width: 90%; max-width: 900px; height: 85vh;
             border-radius: 15px; display: flex; flex-direction: column; overflow: hidden;
