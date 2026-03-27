@@ -4938,6 +4938,7 @@ window.addEventListener('load', () => {
                   
                   return {
                         id: a.id,
+					    sort_order: a.sort_order ?? 999,
                         name: a.name,
                         phone: a.phone,
                         pin: a.pin || '',
@@ -4958,7 +4959,7 @@ window.addEventListener('load', () => {
                     };
                 });
 
-                cleanApts.sort((a, b) => a.id - b.id);
+                cleanApts.sort((a, b) => (a.sort_order ?? 999) - (b.sort_order ?? 999));
           }
 
           // 4. Розпаковуємо дані будинку
