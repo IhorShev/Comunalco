@@ -449,11 +449,11 @@
 
 </style>
 
-<div class="top-menu-bar" style="position:fixed; top:0; left:0; right:0; width:100%; background:#0f172a; z-index:1000; padding:8px 15px; border-bottom:1px solid #1e293b; margin:0; box-sizing:border-box;
+<div class="top-menu-bar" style="position:fixed; top:0; left:0; right:0; width:100%; background:#0f172a; z-index:1000; padding:8px 12px; border-bottom:1px solid #1e293b; margin:0; box-sizing:border-box; display:flex; align-items:center; justify-content:space-between; gap:8px; min-height:56px; max-height:56px;">
 
     <!-- ЛІВО: Акаунт -->
     <div style="position:relative; flex-shrink:0;" id="account-dropdown-wrapper">
-        <button onclick="toggleAccountMenu()" id="auth-btn" style="background:#1e293b; border:1px solid #334155; padding:6px 12px; border-radius:12px; display:flex; align-items:center; gap:8px; cursor:pointer; color:var(--text);">
+        <button onclick="toggleAccountMenu()" id="auth-btn" style="background:#1e293b; border:1px solid #334155; padding:6px 12px; border-radius:12px; display:flex; align-items:center; gap:8px; cursor:pointer; color:var(--text); max-height:44px; overflow:hidden;">
             <img id="user-avatar" src="" style="width:30px; height:30px; border-radius:50%; object-fit:cover; display:none; border:2px solid #334155;">
             <div style="display:flex; flex-direction:column; align-items:flex-start; line-height:1.2;">
                 <span id="user-name-display" style="font-weight:bold; font-size:13px; color:#f1f5f9;">Вхід</span>
