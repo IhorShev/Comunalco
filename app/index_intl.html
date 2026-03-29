@@ -444,11 +444,11 @@
     }
 </style>
 
-<div class="top-menu-bar" style="position:fixed; top:0; left:0; right:0; width:100%; background:#0f172a; z-index:1000; padding:8px 15px; border-bottom:1px solid #1e293b; margin:0; box-sizing:border-box; box-shadow:0 4px 10px rgba(0,0,0,0.35); display:flex; align-items:center; gap:10px; justify-content:space-between;">
+<div class="top-menu-bar" style="position:fixed; top:0; left:0; right:0; width:100%; background:#0f172a; z-index:1000; padding:8px 12px; border-bottom:1px solid #1e293b; margin:0; box-sizing:border-box; display:flex; align-items:center; justify-content:space-between; gap:8px; min-height:56px; max-height:56px;">
 
     <!-- ЛІВО: Акаунт -->
     <div style="position:relative; flex-shrink:1; min-width:0;" id="account-dropdown-wrapper">
-        <button onclick="toggleAccountMenu()" id="auth-btn" style="background:var(--bg-card); border:1px solid var(--border); padding:5px 12px; border-radius:12px; display:flex; align-items:center; gap:10px; cursor:pointer;">
+        <button onclick="toggleAccountMenu()" id="auth-btn" style="... max-height:44px; overflow:hidden;">
             <img id="user-avatar" src="" style="width:32px; height:32px; border-radius:50%; object-fit:cover; display:none; border:1px solid var(--border);">
             <div style="display:flex; flex-direction:column; align-items:flex-start; line-height:1.2;">
                 <span id="user-name-display" style="font-weight:bold; font-size:14px; color:var(--text);">Вхід</span>
@@ -536,17 +536,28 @@
         </div>
     </div>
 
-    <div class="app-header">
-        <div class="nav-btn" onclick="app.prevObject()">❮</div>
-        <div style="flex:1; text-align:center; position: relative;">
-            <div style="display:flex; align-items:center; justify-content:center; gap:5px;">
-                <input type="text" id="object-title" class="object-title" value="Мій Об'єкт" onchange="app.updateObjectName(this.value)" placeholder="НАЗВА ОБ'ЄКТУ">
-            </div>
-            <div style="display:flex; align-items:center; justify-content:center; gap: 15px; margin-top: 4px;">
-                <span onclick="app.deleteObject()" style="color:var(--danger); cursor:pointer; font-size:18px;" title="Видалити об'єкт">🗑</span>
-                <div id="status-badge" class="status-badge" onclick="app.openMenu('premium')">FREE</div>
-                <div onclick="app.addObject()" style="cursor:pointer; color:var(--primary); font-weight:900; font-size:22px; line-height:12px;" title="Додати об'єкт">+</div>
-            </div>
+    <div class="app-header" style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; background:var(--card); padding:10px 15px; border-radius:var(--radius); border:1px solid var(--border); box-shadow:0 4px 10px rgba(0,0,0,0.05);">
+    
+    <!-- ЛІВО: Видалити об'єкт -->
+    <span onclick="app.deleteObject()" 
+          style="color:var(--danger); cursor:pointer; font-size:20px; padding:5px; flex-shrink:0;" 
+          title="Видалити об'єкт">🗑</span>
+
+    <!-- ЦЕНТР: Назва -->
+    <input type="text" 
+           id="object-title" 
+           class="object-title" 
+           value="Мій Об'єкт" 
+           onchange="app.updateObjectName(this.value)" 
+           placeholder="НАЗВА ОБ'ЄКТУ"
+           style="font-size:16px; font-weight:700; border:none; text-align:center; flex:1; background:transparent; color:var(--text); text-transform:uppercase; font-family:'Montserrat',sans-serif; outline:none;">
+
+    <!-- ПРАВО: Додати об'єкт -->
+    <div onclick="app.addObject()" 
+         style="cursor:pointer; color:var(--primary); font-weight:900; font-size:26px; line-height:1; padding:5px; flex-shrink:0;" 
+         title="Додати об'єкт">+</div>
+
+    </div>
         </div>
         <div class="nav-btn" onclick="app.nextObject()">❯</div>
     </div>
