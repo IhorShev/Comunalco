@@ -1875,7 +1875,7 @@ setTimeout(() => { window.location.reload(); }, 2000);
             if (isGlobalPro) {
                 if (expireDisplay) {
                     expireDisplay.style.display = 'block';
-                    expireDisplay.innerHTML = `<span style="color:var(--primary); font-weight:800;">💎 PRO АКТИВНО</span> | <span style="font-size:11px; opacity:0.8;">Безліміт</span>`;
+                    expireDisplay.innerHTML = `<span style="font-size:11px; opacity:0.9;">♾️ Безліміт</span>`;
                 }
                 if (badge) {
                     badge.innerText = "PRO";
@@ -1911,7 +1911,7 @@ setTimeout(() => { window.location.reload(); }, 2000);
         } else {
             // Стан для юзера, в якого є активні дні (> 0)
             const units = typeof totalUnits !== 'undefined' ? totalUnits : '∞';
-            expireDisplay.innerHTML = `Залишилось <b>${daysLeft}</b> дн. | План: ${units} од.`;
+            expireDisplay.innerHTML = `⏳ <b>${daysLeft}</b> дн.`;
         }
 
         // Блок тарифу під текстом
