@@ -1022,15 +1022,77 @@
         // Створюємо клієнт для лендінгу
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Функція швидкого входу через Google
-        function loginDirectly() {
-            supabaseClient.auth.signInWithOAuth({
-                provider: 'google',
-                options: {
-                    redirectTo: 'https://comunalco.com/app/index.html'
-                }
-            });
-        }
+        // Стан вибору
+let selectedLang = localStorage.getItem('lang') || null;
+let selectedCurrency = null;
+
+function loginDirectly() {
+    // Показуємо модалку вибору
+    const modal = document.getElementById('lang-select-modal');
+    modal.style.display = 'flex';
+    
+    // Якщо мова вже обрана на лендінгу — пре-вибираємо її
+    if (selectedLang) {
+        selectLang(selectedLang);
+    }
+}
+
+function selectLang(lang) {
+    selectedLang = lang;
+    // Підсвічуємо обрану кнопку
+    document.querySelectorAll('.lang-sel-btn').forEach(btn => {
+        const isActive = btn.getAttribute('data-lang') === lang;
+        btn.style.borderColor = isActive ? '#00f0ff' : 'rgba(255,255,255,0.1)';
+        btn.style.background = isActive ? 'rgba(0,240,255,0.15)' : 'rgba(255,255,255,0.05)';
+        btn.style.color = isActive ? '#00f0ff' : '#e0e6ed';
+    });
+    
+    // Авто-вибір валюти по мові
+    const autoСurrency = { uk:'uah', en:'usd', pl:'pln', de:'eur', es:'eur', fr:'eur' };
+    if (autoСurrency[lang]) selectCurrency(autoСurrency[lang]);
+    
+    checkProceedBtn();
+}
+
+function selectCurrency(cur) {
+    selectedCurrency = cur;
+    document.querySelectorAll('.cur-sel-btn').forEach(btn => {
+        const isActive = btn.getAttribute('data-cur') === cur;
+        btn.style.borderColor = isActive ? '#00f0ff' : 'rgba(255,255,255,0.1)';
+        btn.style.background = isActive ? 'rgba(0,240,255,0.15)' : 'rgba(255,255,255,0.05)';
+        btn.style.color = isActive ? '#00f0ff' : '#e0e6ed';
+    });
+    checkProceedBtn();
+}
+
+function checkProceedBtn() {
+    const btn = document.getElementById('proceed-login-btn');
+    if (btn) {
+        const ready = selectedLang && selectedCurrency;
+        btn.disabled = !ready;
+        btn.style.opacity = ready ? '1' : '0.4';
+        btn.style.cursor = ready ? 'pointer' : 'not-allowed';
+    }
+}
+
+function proceedWithLogin() {
+    if (!selectedLang || !selectedCurrency) return;
+    
+    // Зберігаємо вибір
+    localStorage.setItem('lang', selectedLang);
+    localStorage.setItem('currency', selectedCurrency);
+    
+    // Вибираємо правильний застосунок
+    const appUrl = selectedLang === 'uk' 
+        ? 'https://comunalco.com/app/index.html'
+        : 'https://comunalco.com/app/index_intl.html';
+    
+    // Входимо через Google
+    supabaseClient.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: appUrl }
+    });
+}         
     </script>
 
 	<div id="imageLightbox" class="img-lightbox" onclick="closeLightbox()">
