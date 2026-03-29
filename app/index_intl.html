@@ -49,6 +49,7 @@
             color: var(--text);
             margin: 0;
             padding: 10px;
+			padding-top: 75px;
             padding-bottom: 140px;
             -webkit-tap-highlight-color: transparent;
             line-height: 1.4;
@@ -265,9 +266,9 @@
             box-shadow: 0 0 5px rgba(255, 71, 87, 0.5);
         }
         .chat-modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center;
-            backdrop-filter: blur(5px);
+            display: none; position: fixed; top: 72px; left: 0; width: 100%; height: calc(100% - 72px);
+            background: rgba(0,0,0,0.95); z-index: 1500; align-items: flex-start; justify-content: center;
+            backdrop-filter: none;
         }
         .chat-container {
             background: var(--bg-card); width: 90%; max-width: 900px; height: 85vh;
@@ -425,7 +426,7 @@
     }
 </style>
 
-<div class="top-menu-bar" style="position:sticky; top:0; background:var(--bg); z-index:1000; padding:10px 15px; border-bottom:1px solid var(--border); margin:-10px -10px 10px -10px; box-shadow:0 4px 10px rgba(0,0,0,0.35); display:flex; align-items:center; gap:10px; justify-content:space-between;">
+<div class="top-menu-bar" style="position:fixed; top:0; left:0; right:0; width:100%; background:#0f172a; z-index:1000; padding:8px 15px; border-bottom:1px solid #1e293b; margin:0; box-sizing:border-box; box-shadow:0 4px 10px rgba(0,0,0,0.35); display:flex; align-items:center; gap:10px; justify-content:space-between;">
 
     <!-- ЛІВО: Акаунт -->
     <div style="position:relative; flex-shrink:1; min-width:0;" id="account-dropdown-wrapper">
