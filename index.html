@@ -1078,19 +1078,21 @@ function checkProceedBtn() {
 function proceedWithLogin() {
     if (!selectedLang || !selectedCurrency) return;
     
-    // Зберігаємо вибір
     localStorage.setItem('lang', selectedLang);
     localStorage.setItem('currency', selectedCurrency);
     
-    // Вибираємо правильний застосунок
     const appUrl = selectedLang === 'uk' 
         ? 'https://comunalco.com/app/index.html'
         : 'https://comunalco.com/app/index_intl.html';
     
-    // Входимо через Google
     supabaseClient.auth.signInWithOAuth({
         provider: 'google',
-        options: { redirectTo: appUrl }
+        options: { 
+            redirectTo: appUrl,
+            queryParams: {
+                prompt: 'select_account'  // ← примусово показує вибір акаунту
+            }
+        }
     });
 }         
     </script>
