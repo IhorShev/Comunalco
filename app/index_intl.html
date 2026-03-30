@@ -4789,6 +4789,22 @@ window.addEventListener('load', () => {
         window.__sbClient = sbClient;
 	window._supabase = sbClient;
   window.currentUser = null;
+	
+	// === МОВА ТА ВАЛЮТА З ЛЕНДІНГУ === (додати сюди, рядок ~4792)
+const APP_LANG = localStorage.getItem('lang') || 'en';
+const APP_CURRENCY = localStorage.getItem('currency') || 'usd';
+
+const CURRENCY_SYMBOLS = {
+    uah: '₴', usd: '$', eur: '€', pln: 'zł', gbp: '£', czk: 'Kč'
+};
+const CURRENCY_NAMES = {
+    uah: 'UAH', usd: 'USD', eur: 'EUR', pln: 'PLN', gbp: 'GBP', czk: 'CZK'
+};
+window.APP_CURRENCY_SYMBOL = CURRENCY_SYMBOLS[APP_CURRENCY] || '$';
+window.APP_CURRENCY_NAME   = CURRENCY_NAMES[APP_CURRENCY]   || 'USD';
+window.APP_LANG = APP_LANG;
+
+console.log('🌍 Lang:', APP_LANG, '| 💰 Currency:', APP_CURRENCY, window.APP_CURRENCY_SYMBOL);
 
   // 2. ВХІД
   window.googleLogin = async () => {
