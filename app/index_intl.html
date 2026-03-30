@@ -4818,7 +4818,9 @@ console.log('🌍 Lang:', APP_LANG, '| 💰 Currency:', APP_CURRENCY, window.APP
     const { error } = await sbClient.auth.signInWithOAuth({
         provider: 'google',
         options: {
-            redirectTo: 'https://comunalco.com/app/index.html'
+            redirectTo: localStorage.getItem('lang') === 'uk'
+    ? 'https://comunalco.com/app/index.html'
+    : 'https://comunalco.com/app/index_intl.html'
         }
     });
     if (error) alert("Помилка: " + error.message);
