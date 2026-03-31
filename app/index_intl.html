@@ -2719,30 +2719,49 @@ checkLimit() {
     } // <-- КОМА ТУТ!
     
     renderGroups() { 
-        document.getElementById('groups-container').innerHTML = this.currentData.groups.map((g, i) => `
+    // 🌍 ПЕРЕКЛАД ДЛЯ ГРУП (МЗК)
+    const lang = window.APP_LANG || 'uk';
+    const GL = {
+        common_in:  {uk:'Загальнобудинкові (МЗК)', en:'Common Area (HOA)', pl:'Części Wspólne', de:'Allgemeinbereich', es:'Áreas Comunes', fr:'Parties Communes'},
+        enter_day:  {uk:'⚡ Вхід День', en:'⚡ Entry Day', pl:'⚡ Wejście Dzień', de:'⚡ Eingang Tag', es:'⚡ Entrada Día', fr:'⚡ Entrée Jour'},
+        enter_night:{uk:'🌙 Вхід Ніч', en:'🌙 Entry Night', pl:'🌙 Wejście Noc', de:'🌙 Eingang Nacht', es:'🌙 Entrada Noche', fr:'🌙 Entrée Nuit'},
+        enter_water:{uk:'💧 Вхід Вода', en:'💧 Entry Water', pl:'💧 Wejście Woda', de:'💧 Eingang Wasser', es:'💧 Entrada Agua', fr:'💧 Entrée Eau'},
+        enter_gas:  {uk:'🔥 Вхід Газ', en:'🔥 Entry Gas', pl:'🔥 Wejście Gaz', de:'🔥 Eingang Gas', es:'🔥 Entrada Gas', fr:'🔥 Entrée Gaz'},
+        services:   {uk:'СПІЛЬНІ ПОСЛУГИ (МЗК)', en:'COMMON SERVICES', pl:'USŁUGI WSPÓLNE', de:'ALLGEMEINE LEISTUNGEN', es:'SERVICIOS COMUNES', fr:'SERVICES COMMUNS'},
+        add_service:{uk:'+ Послуга', en:'+ Service', pl:'+ Usługa', de:'+ Leistung', es:'+ Servicio', fr:'+ Service'},
+        add_counter:{uk:'+ Лічильник', en:'+ Counter', pl:'+ Licznik', de:'+ Zähler', es:'+ Contador', fr:'+ Compteur'},
+        name_ph:    {uk:'Назва', en:'Name', pl:'Nazwa', de:'Name', es:'Nombre', fr:'Nom'},
+        sum_ph:     {uk:'Сума', en:'Amount', pl:'Kwota', de:'Betrag', es:'Monto', fr:'Montant'}
+    };
+    
+    const g_str = (key) => GL[key]?.[lang] || GL[key]?.['en'] || key;
+
+    document.getElementById('groups-container').innerHTML = this.currentData.groups.map((g, i) => `
         <details open class="card" style="border-left: 4px solid var(--text-sec); padding: 0; overflow: hidden;">
             <summary style="padding: 15px; background: rgba(0,0,0,0.03); display: flex; justify-content: space-between; align-items: center;">
-                <span contenteditable="true" onclick="event.preventDefault()" onblur="app.updateGroup(${i},'name',this.innerText)" style="font-weight:700; border-bottom:1px dashed var(--border); cursor:text;">${g.name}</span>
+                <span contenteditable="true" onclick="event.preventDefault()" onblur="app.updateGroup(${i},'name',this.innerText)" style="font-weight:700; border-bottom:1px dashed var(--border); cursor:text;">${g.name || g_str('common_in')}</span>
                 <span class="del-icon" onclick="app.delGroup(${i})">&times;</span>
             </summary>
             
             <div style="padding: 15px;">
-                ${this.renderMR(i,g,'prev','⚡ Вхід День','ed')} ${this.renderMR(i,g,'prev','🌙 Вхід Ніч','en')}
-                ${this.renderMR(i,g,'prev','💧 Вхід Вода','w')} ${this.renderMR(i,g,'prev','🔥 Вхід Газ','g')}
+                ${this.renderMR(i,g,'prev', g_str('enter_day'),'ed')} 
+                ${this.renderMR(i,g,'prev', g_str('enter_night'),'en')}
+                ${this.renderMR(i,g,'prev', g_str('enter_water'),'w')} 
+                ${this.renderMR(i,g,'prev', g_str('enter_gas'),'g')}
                 
                 <div id="g-counters-${i}">
                     ${(g.custom_counters||[]).map((c, ci) => this.renderCustomCounterRow('group', i, ci, c)).join('')}
                 </div>
-                <button class="btn btn-add-counter" onclick="app.addCustomCounter('group', ${i})">+ Лічильник</button>
+                <button class="btn btn-add-counter" onclick="app.addCustomCounter('group', ${i})">${g_str('add_counter')}</button>
 
                 <div style="margin-top:10px; border-top:1px dashed var(--border); padding-top:10px;">
-                    <div style="font-size:11px; font-weight:700; color:var(--text-sec); margin-bottom:5px;">СПІЛЬНІ ПОСЛУГИ (МЗК)</div>
-                    ${(g.services || []).map((s,si)=>`<div class="custom-row"><input type="text" value="${s.name}" placeholder="Назва" onchange="app.updateGS(${i},${si},'name',this.value)"><input type="number" value="${s.val}" placeholder="Сума" onchange="app.updateGS(${i},${si},'val',this.value)"><span class="del-icon" onclick="app.delGS(${i},${si})">&times;</span></div>`).join('')}
-                    <button class="btn btn-add" onclick="app.addGS(${i})">+ Послуга</button>
+                    <div style="font-size:11px; font-weight:700; color:var(--text-sec); margin-bottom:5px;">${g_str('services')}</div>
+                    ${(g.services || []).map((s,si)=>`<div class="custom-row"><input type="text" value="${s.name}" placeholder="${g_str('name_ph')}" onchange="app.updateGS(${i},${si},'name',this.value)"><input type="number" value="${s.val}" placeholder="${g_str('sum_ph')}" onchange="app.updateGS(${i},${si},'val',this.value)"><span class="del-icon" onclick="app.delGS(${i},${si})">&times;</span></div>`).join('')}
+                    <button class="btn btn-add" onclick="app.addGS(${i})">${g_str('add_service')}</button>
                 </div>
             </div>
         </details>`).join(''); 
-    } // <-- КОМА ТУТ!
+}, // <-- КОМА ТУТ!
 
     renderApartments() {
     // 🌍 ПЕРЕКЛАД ДЛЯ КАРТОК
