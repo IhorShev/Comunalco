@@ -946,7 +946,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '10.3';
+    const APP_VERSION = '10.4';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -2745,7 +2745,7 @@ checkLimit() {
     } // <-- КОМА ТУТ!
 
     renderApartments() {
-		    // 🌍 ПЕРЕКЛАД ДЛЯ КАРТОК
+    // 🌍 ПЕРЕКЛАД ДЛЯ КАРТОК
     const lang = window.APP_LANG || 'uk';
     const sym = window.APP_CURRENCY_SYMBOL || '₴';
     const RL = {
@@ -2771,33 +2771,46 @@ checkLimit() {
         send_access:{uk:'📤 Надіслати доступ мешканцю', en:'📤 Send Access to Resident', pl:'📤 Wyślij Dostęp', de:'📤 Zugang senden', es:'📤 Enviar Acceso', fr:'📤 Envoyer Accès'},
         bot_on:     {uk:'✅ Бот підключено', en:'✅ Bot connected', pl:'✅ Bot podłączony', de:'✅ Bot verbunden', es:'✅ Bot conectado', fr:'✅ Bot connecté'},
         bot_off:    {uk:'⚠️ Не підключено', en:'⚠️ Not connected', pl:'⚠️ Niepodłączony', de:'⚠️ Nicht verbunden', es:'⚠️ No conectado', fr:'⚠️ Non connecté'},
+        
+        // --- Додаткові ключі, які були в хардкоді ---
+        drag_hint:  {uk:'Потягніть, щоб змінити порядок', en:'Drag to reorder', pl:'Przeciągnij, aby zmienić kolejność', de:'Zum Neuordnen ziehen', es:'Arrastre para reordenar', fr:'Faites glisser pour réorganiser'},
+        name_ph:    {uk:'Назва', en:'Name', pl:'Nazwa', de:'Name', es:'Nombre', fr:'Nom'},
+        sum_ph:     {uk:'Сума', en:'Amount', pl:'Kwota', de:'Betrag', es:'Monto', fr:'Montant'},
+        new_pin_hint:{uk:'Згенерувати новий пароль', en:'Generate new password', pl:'Generuj nowe hasło', de:'Neues Passwort generieren', es:'Generar nueva contraseña', fr:'Générer un nouveau mot de passe'},
+        meter_el_d: {uk:'⚡ Е/Е День', en:'⚡ El. Day', pl:'⚡ Prąd Dzień', de:'⚡ Strom Tag', es:'⚡ El. Día', fr:'⚡ Él. Jour'},
+        meter_el_n: {uk:'🌙 Е/Е Ніч', en:'🌙 El. Night', pl:'🌙 Prąd Noc', de:'🌙 Strom Nacht', es:'🌙 El. Noche', fr:'🌙 Él. Nuit'},
+        meter_wat:  {uk:'💧 Вода', en:'💧 Water', pl:'💧 Woda', de:'💧 Wasser', es:'💧 Agua', fr:'💧 Eau'},
+        meter_gas:  {uk:'🔥 Газ', en:'🔥 Gas', pl:'🔥 Gaz', de:'🔥 Gas', es:'🔥 Gas', fr:'🔥 Gaz'}
     };
+    
     const r = (key) => RL[key]?.[lang] || RL[key]?.['en'] || key;
-            document.getElementById('apartments-container').innerHTML = (this.currentData.apartments || []).map((a, i) => { 
+    
+    document.getElementById('apartments-container').innerHTML = (this.currentData.apartments || []).map((a, i) => { 
             
-            // 1. Статус підключення до бота
-            const isConnected = !!(a.telegram_chat_id || a.tg_id || a.chat_id);
+        // 1. Статус підключення до бота
+        const isConnected = !!(a.telegram_chat_id || a.tg_id || a.chat_id);
             
-            // 2. Логіка кольору балансу (Борг - червоний, Переплата - зелений)
-            const currentBill = parseFloat(a.bill || 0);
-            const oldDebt = parseFloat(a.debt || 0);
-            const paid = parseFloat(a.paid || 0);
-            const totalBalance = (oldDebt + currentBill) - paid;
-            const isDebt = totalBalance > 0.01;
-            const isOverpay = totalBalance < -0.01;
+        // 2. Логіка кольору балансу (Борг - червоний, Переплата - зелений)
+        const currentBill = parseFloat(a.bill || 0);
+        const oldDebt = parseFloat(a.debt || 0);
+        const paid = parseFloat(a.paid || 0);
+        const totalBalance = (oldDebt + currentBill) - paid;
+        const isDebt = totalBalance > 0.01;
+        const isOverpay = totalBalance < -0.01;
             
-            let balanceColor = "var(--text)";
-            let balanceLabel = "До сплати";
-            if (isDebt) { balanceColor = "var(--danger)"; balanceLabel = "БОРГ"; }
-            if (isOverpay) { balanceColor = "var(--success)"; balanceLabel = "ПЕРЕПЛАТА"; }
+        let balanceColor = "var(--text)";
+        let balanceLabel = r('to_pay'); // Використовуємо переклад
+        
+        if (isDebt) { balanceColor = "var(--danger)"; balanceLabel = r('debt'); }
+        if (isOverpay) { balanceColor = "var(--success)"; balanceLabel = r('overpay'); }
 
-            return `<details open style="border-left: 4px solid ${isConnected ? 'var(--success)' : 'var(--primary)'}; margin-bottom:15px; align-self: start; height: fit-content;">
-            <summary style="display:flex; align-items:center; padding:12px;">
-                <div style="flex:1;">
-                    <div style="display:flex; align-items:center; gap:10px;">
-             
-				<span class="drag-handle" onclick="event.preventDefault(); event.stopPropagation();" style="cursor: grab; color: #94a3b8; font-size: 20px; margin-right: 8px;" title="Потягніть, щоб змінити порядок">☰</span>
-				
+        return `<details open style="border-left: 4px solid ${isConnected ? 'var(--success)' : 'var(--primary)'}; margin-bottom:15px; align-self: start; height: fit-content;">
+        <summary style="display:flex; align-items:center; padding:12px;">
+            <div style="flex:1;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                
+                <span class="drag-handle" onclick="event.preventDefault(); event.stopPropagation();" style="cursor: grab; color: #94a3b8; font-size: 20px; margin-right: 8px;" title="${r('drag_hint')}">☰</span>
+                
                         <input type="text" 
        value="${a.name}" 
        onchange="app.updateApt(${i}, 'name', this.value)" 
@@ -2808,7 +2821,7 @@ checkLimit() {
                         ${isConnected ? `<input type="checkbox" class="mass-send-chk" value="${i}" style="width:18px; height:18px; cursor:pointer;" ${a.tg_selected !== false ? 'checked' : ''} onchange="app.currentData.apartments[${i}].tg_selected = this.checked">` : ''}
                     </div>
                     <div style="font-size:11px; margin-top:2px;">
-                        ${isConnected ? '<span style="color:var(--success); font-weight:bold;">✅ Бот підключено</span>' : '<span style="color:var(--text-sec);">⚠️ Не підключено</span>'}
+                        ${isConnected ? `<span style="color:var(--success); font-weight:bold;">${r('bot_on')}</span>` : `<span style="color:var(--text-sec);">${r('bot_off')}</span>`}
                     </div>
                 </div>
                 <span class="del-icon" onclick="app.delApt(${i})">&times;</span>
@@ -2817,11 +2830,11 @@ checkLimit() {
             <div class="content">
                 <div class="row">
                     <div class="col">
-                        <label>Телефон (Логін)</label>
+                        <label>${r('phone')}</label>
                         <input type="tel" value="${a.phone||''}" placeholder="380..." onchange="app.updateApt(${i},'phone',this.value)">
                     </div>
                     <div class="col">
-                        <label>Месенджер</label>
+                        <label>${r('messenger')}</label>
                         <select onchange="app.updateApt(${i},'messenger',this.value)">
                             <option value="viber" ${a.messenger==='viber'?'selected':''}>Viber</option>
                             <option value="telegram" ${a.messenger==='telegram'?'selected':''}>Telegram</option>
@@ -2830,48 +2843,48 @@ checkLimit() {
                     </div>
                 </div>
 
-                <div class="section-title">Лічильники (Авто-рахунок)</div>
-                ${this.renderMR(i,a,'apt','⚡ Е/Е День','ed')} 
-                ${this.renderMR(i,a,'apt','🌙 Е/Е Ніч','en')}
-                ${this.renderMR(i,a,'apt','💧 Вода','w')} 
-                ${this.renderMR(i,a,'apt','🔥 Газ','g')}
+                <div class="section-title">${r('meters')}</div>
+                ${this.renderMR(i,a,'apt',r('meter_el_d'),'ed')} 
+                ${this.renderMR(i,a,'apt',r('meter_el_n'),'en')}
+                ${this.renderMR(i,a,'apt',r('meter_wat'),'w')} 
+                ${this.renderMR(i,a,'apt',r('meter_gas'),'g')}
                 
                 <div id="a-counters-${i}">
                     ${(a.custom_counters||[]).map((c, ci) => this.renderCustomCounterRow('apt', i, ci, c)).join('')}
                 </div>
-                <button class="btn btn-add-counter" onclick="app.addCustomCounter('apt', ${i})">+ Лічильник</button>
+                <button class="btn btn-add-counter" onclick="app.addCustomCounter('apt', ${i})">${r('add_counter')}</button>
 
                 <div style="margin-top:15px; border-top:1px dashed var(--border); padding-top:10px;">
-                    <div style="font-size:11px; font-weight:700; color:var(--text-sec); margin-bottom:5px;">ДОДАТКОВІ ПОСЛУГИ</div>
-                    ${(a.services || []).map((s,si)=>`<div class="custom-row"><input type="text" value="${s.name}" placeholder="Назва" onchange="app.updateAS(${i},${si},'name',this.value)"><input type="number" value="${s.val}" placeholder="Сума" onchange="app.updateAS(${i},${si},'val',this.value)"><span class="del-icon" onclick="app.delAS(${i},${si})">&times;</span></div>`).join('')}
-                    <button class="btn btn-add" onclick="app.addAS(${i})">+ Послуга</button>
+                    <div style="font-size:11px; font-weight:700; color:var(--text-sec); margin-bottom:5px;">${r('services')}</div>
+                    ${(a.services || []).map((s,si)=>`<div class="custom-row"><input type="text" value="${s.name}" placeholder="${r('name_ph')}" onchange="app.updateAS(${i},${si},'name',this.value)"><input type="number" value="${s.val}" placeholder="${r('sum_ph')}" onchange="app.updateAS(${i},${si},'val',this.value)"><span class="del-icon" onclick="app.delAS(${i},${si})">&times;</span></div>`).join('')}
+                    <button class="btn btn-add" onclick="app.addAS(${i})">${r('add_service')}</button>
                 </div>
 
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-top:20px; background:rgba(0,15,30,0.3); padding:15px; border-radius:12px; border:1px solid rgba(255,255,255,0.05);">
     <div>
-        <div style="font-size:10px; color:var(--text-sec); text-transform:uppercase; margin-bottom:5px; font-weight:bold;">Борг / Переплата</div>
+        <div style="font-size:10px; color:var(--text-sec); text-transform:uppercase; margin-bottom:5px; font-weight:bold;">${r('debt_overpay')}</div>
         <input type="text" inputmode="decimal" value="${a.debt ? parseFloat(a.debt).toFixed(2) : ''}" placeholder="0" style="background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:8px; padding:10px; font-size:15px; font-weight:bold; color:${(parseFloat(a.debt)||0) < 0 ? 'var(--success)' : 'var(--text)'}; width:100%; box-sizing:border-box;" onchange="app.updateApt(${i}, 'debt', this.value)">
     </div>
     <div>
-        <div style="font-size:10px; color:var(--text-sec); text-transform:uppercase; margin-bottom:5px; font-weight:bold;">Поточний місяць</div>
-        <div id="live-bill-${i}" style="background:rgba(0,0,0,0.2); border:1px solid var(--border); border-radius:8px; padding:10px; font-size:15px; font-weight:bold; color:var(--text); width:100%; box-sizing:border-box; text-align:center;">${currentBill.toFixed(2)}</div>
+        <div style="font-size:10px; color:var(--text-sec); text-transform:uppercase; margin-bottom:5px; font-weight:bold;">${r('curr_month')}</div>
+        <div id="live-bill-${i}" style="background:rgba(0,0,0,0.2); border:1px solid var(--border); border-radius:8px; padding:10px; font-size:15px; font-weight:bold; color:var(--text); width:100%; box-sizing:border-box; text-align:center;">${currentBill.toFixed(2)} ${sym}</div>
     </div>
 
     <div>
-        <div style="font-size:10px; color:var(--text-sec); text-transform:uppercase; margin-bottom:5px; font-weight:bold;">Сплачено</div>
+        <div style="font-size:10px; color:var(--text-sec); text-transform:uppercase; margin-bottom:5px; font-weight:bold;">${r('paid')}</div>
         <input type="text" inputmode="decimal" value="${a.paid ? parseFloat(a.paid).toFixed(2) : ''}" placeholder="0" style="background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:8px; padding:10px; font-size:15px; font-weight:bold; color:var(--success); width:100%; box-sizing:border-box;" onchange="app.updateApt(${i}, 'paid', this.value)">
     </div>
     <div>
-        <div style="font-size:10px; color:var(--text-sec); text-transform:uppercase; margin-bottom:5px; font-weight:bold;">До сплати</div>
+        <div style="font-size:10px; color:var(--text-sec); text-transform:uppercase; margin-bottom:5px; font-weight:bold;">${r('to_pay')}</div>
         <div style="background:rgba(0,0,0,0.4); border:1px solid ${ (parseFloat(a.debt||0) + currentBill - parseFloat(a.paid||0)) > 0.01 ? 'var(--danger)' : ((parseFloat(a.debt||0) + currentBill - parseFloat(a.paid||0)) < -0.01 ? 'var(--success)' : 'var(--border)') }; border-radius:8px; padding:10px; font-size:15px; font-weight:bold; color:${ (parseFloat(a.debt||0) + currentBill - parseFloat(a.paid||0)) > 0.01 ? 'var(--danger)' : ((parseFloat(a.debt||0) + currentBill - parseFloat(a.paid||0)) < -0.01 ? 'var(--success)' : 'var(--text)') }; width:100%; box-sizing:border-box; text-align:center;">
-            ${(parseFloat(a.debt || 0) + currentBill - parseFloat(a.paid || 0)).toFixed(2)}
+            ${(parseFloat(a.debt || 0) + currentBill - parseFloat(a.paid || 0)).toFixed(2)} ${sym}
         </div>
     </div>
 </div>
 
                 <div style="margin-top: 15px; margin-bottom: 10px; padding: 10px; background: ${a.can_submit_readings ? 'rgba(34, 197, 94, 0.1)' : 'rgba(0,0,0,0.03)'}; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--border);">
                     <label style="font-size: 12px; font-weight: bold; color: var(--text); cursor: pointer; margin: 0;">
-                        🤖 Дозвіл боту приймати показники
+                        ${r('bot_perm')}
                     </label>
                     <label class="switch" style="position: relative; display: inline-block; width: 40px; height: 20px;">
                         <input type="checkbox" onchange="app.toggleBotPermission('${a.id}', this)" ${a.can_submit_readings ? 'checked' : ''} style="opacity: 0; width: 0; height: 0;">
@@ -2883,29 +2896,29 @@ checkLimit() {
 
                 <div style="margin-top:15px;">
                     <button class="btn btn-outline" style="border-color:${isConnected ? 'var(--success)' : '#2AABEE'}; color:${isConnected ? 'var(--success)' : '#2AABEE'}; background: ${isConnected ? 'rgba(16, 185, 129, 0.1)' : 'transparent'};" onclick="app.copyBotLink('${a.id}', '${a.name}')">
-                        ${isConnected ? '✅ Квартира підключена' : '🔗 Підключити Телеграм-Бот'}
+                        ${isConnected ? r('connected') : r('connect_bot')}
                     </button>
                 </div>
 
                 <div style="margin-top:10px;">
                     <button class="btn" style="width:100%; background:var(--card); color:var(--text); border:1px solid var(--border); font-size:13px; font-weight:bold; box-shadow: 0 2px 5px rgba(0,0,0,0.05);" onclick="app.openSendFormatModal(${i})">
-                        📤 Відправити квитанцію
+                        ${r('send_receipt')}
                     </button>
                 </div>
 
                 <div style="margin-top:15px; border-top: 1px dashed var(--border); padding-top:15px;">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                        <div style="font-size:12px; color:var(--primary); font-weight:bold; text-transform:uppercase;">🔐 Доступ (MyComunalco)</div>
-                        <div style="font-size:11px; color:var(--text-sec); cursor:pointer; font-weight:bold;" onclick="app.generateNewPin(${i})" title="Згенерувати новий пароль">🔄 Новий PIN</div>
+                        <div style="font-size:12px; color:var(--primary); font-weight:bold; text-transform:uppercase;">${r('access')}</div>
+                        <div style="font-size:11px; color:var(--text-sec); cursor:pointer; font-weight:bold;" onclick="app.generateNewPin(${i})" title="${r('new_pin_hint')}">${r('new_pin')}</div>
                     </div>
                     
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; background:rgba(0,153,255,0.05); padding:10px 15px; border-radius:8px; border:1px solid var(--primary);">
-                        <div style="font-size:11px; color:var(--text-sec);">PIN-код:</div>
+                        <div style="font-size:11px; color:var(--text-sec);">${r('pin_code')}</div>
                         <div style="font-size:22px; font-weight:900; letter-spacing:4px; color:var(--text);">${a.pin && a.pin !== 'undefined' ? a.pin : '&nbsp;'}</div>
                     </div>
                     
                     <button class="btn btn-outline" style="width:100%; padding:12px; font-size:13px; border-color:var(--primary); color:var(--primary);" onclick="app.sendAccessData(${i})">
-                        📤 Надіслати доступ мешканцю
+                        ${r('send_access')}
                     </button>
                 </div>
 
@@ -2941,7 +2954,7 @@ checkLimit() {
                 });
             }
         }, 100);
-		
+        
     }
     
     renderMR(i, obj, mode, label, key) { 
