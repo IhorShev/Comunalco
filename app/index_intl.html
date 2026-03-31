@@ -946,7 +946,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '10.5';
+    const APP_VERSION = '10.6';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -2736,7 +2736,11 @@ checkLimit() {
     
     const g_str = (key) => GL[key]?.[lang] || GL[key]?.['en'] || key;
 
-    document.getElementById('groups-container').innerHTML = this.currentData.groups.map((g, i) => `
+    const container = document.getElementById('groups-container');
+    if (!container) return; // Захист від помилок, якщо контейнера немає на сторінці
+
+    // Додано ( || [] ) - тепер якщо груп немає, код не зламається!
+    container.innerHTML = (this.currentData.groups || []).map((g, i) => `
         <details open class="card" style="border-left: 4px solid var(--text-sec); padding: 0; overflow: hidden;">
             <summary style="padding: 15px; background: rgba(0,0,0,0.03); display: flex; justify-content: space-between; align-items: center;">
                 <span contenteditable="true" onclick="event.preventDefault()" onblur="app.updateGroup(${i},'name',this.innerText)" style="font-weight:700; border-bottom:1px dashed var(--border); cursor:text;">${g.name || g_str('common_in')}</span>
@@ -2744,13 +2748,13 @@ checkLimit() {
             </summary>
             
             <div style="padding: 15px;">
-                ${this.renderMR(i,g,'prev', g_str('enter_day'),'ed')} 
-                ${this.renderMR(i,g,'prev', g_str('enter_night'),'en')}
-                ${this.renderMR(i,g,'prev', g_str('enter_water'),'w')} 
-                ${this.renderMR(i,g,'prev', g_str('enter_gas'),'g')}
+                ${this.renderMR(i, g, 'prev', g_str('enter_day'), 'ed')} 
+                ${this.renderMR(i, g, 'prev', g_str('enter_night'), 'en')}
+                ${this.renderMR(i, g, 'prev', g_str('enter_water'), 'w')} 
+                ${this.renderMR(i, g, 'prev', g_str('enter_gas'), 'g')}
                 
                 <div id="g-counters-${i}">
-                    ${(g.custom_counters||[]).map((c, ci) => this.renderCustomCounterRow('group', i, ci, c)).join('')}
+                    ${(g.custom_counters || []).map((c, ci) => this.renderCustomCounterRow('group', i, ci, c)).join('')}
                 </div>
                 <button class="btn btn-add-counter" onclick="app.addCustomCounter('group', ${i})">${g_str('add_counter')}</button>
 
@@ -2761,7 +2765,7 @@ checkLimit() {
                 </div>
             </div>
         </details>`).join(''); 
-}, // <-- КОМА ТУТ!
+}
 
     renderApartments() {
     // 🌍 ПЕРЕКЛАД ДЛЯ КАРТОК
