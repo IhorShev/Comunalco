@@ -2745,6 +2745,34 @@ checkLimit() {
     } // <-- КОМА ТУТ!
 
     renderApartments() {
+		    // 🌍 ПЕРЕКЛАД ДЛЯ КАРТОК
+    const lang = window.APP_LANG || 'uk';
+    const sym = window.APP_CURRENCY_SYMBOL || '₴';
+    const RL = {
+        phone:      {uk:'Телефон (Логін)', en:'Phone (Login)', pl:'Telefon (Login)', de:'Telefon (Login)', es:'Teléfono (Login)', fr:'Téléphone (Login)'},
+        messenger:  {uk:'Месенджер', en:'Messenger', pl:'Komunikator', de:'Messenger', es:'Mensajero', fr:'Messagerie'},
+        meters:     {uk:'ЛІЧИЛЬНИКИ (АВТО-РАХУНОК)', en:'METERS (AUTO-BILL)', pl:'LICZNIKI (AUTO)', de:'ZÄHLER (AUTO)', es:'MEDIDORES (AUTO)', fr:'COMPTEURS (AUTO)'},
+        add_counter:{uk:'+ Лічильник', en:'+ Counter', pl:'+ Licznik', de:'+ Zähler', es:'+ Contador', fr:'+ Compteur'},
+        services:   {uk:'ДОДАТКОВІ ПОСЛУГИ', en:'ADDITIONAL SERVICES', pl:'USŁUGI DODATKOWE', de:'ZUSATZLEISTUNGEN', es:'SERVICIOS ADICIONALES', fr:'SERVICES SUPPLÉMENTAIRES'},
+        add_service:{uk:'+ Послуга', en:'+ Service', pl:'+ Usługa', de:'+ Leistung', es:'+ Servicio', fr:'+ Service'},
+        debt_overpay:{uk:'БОРГ / ПЕРЕПЛАТА', en:'DEBT / BALANCE', pl:'DŁUG / NADPŁATA', de:'SCHULDEN / GUTHABEN', es:'DEUDA / SALDO', fr:'DETTE / CRÉDIT'},
+        curr_month: {uk:'ПОТОЧНИЙ МІСЯЦЬ', en:'CURRENT MONTH', pl:'BIEŻĄCY MIESIĄC', de:'AKTUELLER MONAT', es:'MES ACTUAL', fr:'MOIS ACTUEL'},
+        paid:       {uk:'СПЛАЧЕНО', en:'PAID', pl:'ZAPŁACONO', de:'BEZAHLT', es:'PAGADO', fr:'PAYÉ'},
+        to_pay:     {uk:'ДО СПЛАТИ', en:'TO PAY', pl:'DO ZAPŁATY', de:'ZU ZAHLEN', es:'A PAGAR', fr:'À PAYER'},
+        debt:       {uk:'БОРГ', en:'DEBT', pl:'DŁUG', de:'SCHULDEN', es:'DEUDA', fr:'DETTE'},
+        overpay:    {uk:'ПЕРЕПЛАТА', en:'OVERPAY', pl:'NADPŁATA', de:'GUTHABEN', es:'SALDO', fr:'CRÉDIT'},
+        bot_perm:   {uk:'🤖 Дозвіл боту приймати показники', en:'🤖 Allow bot to accept readings', pl:'🤖 Zezwól botowi na odczyty', de:'🤖 Bot-Ablesungen erlauben', es:'🤖 Permitir lecturas del bot', fr:'🤖 Autoriser le bot à lire'},
+        connect_bot:{uk:'🔗 Підключити Телеграм-Бот', en:'🔗 Connect Telegram Bot', pl:'🔗 Połącz Bota Telegram', de:'🔗 Telegram-Bot verbinden', es:'🔗 Conectar Bot Telegram', fr:'🔗 Connecter le Bot Telegram'},
+        connected:  {uk:'✅ Квартира підключена', en:'✅ Unit Connected', pl:'✅ Lokal Połączony', de:'✅ Einheit verbunden', es:'✅ Unidad Conectada', fr:'✅ Unité Connectée'},
+        send_receipt:{uk:'📤 Відправити квитанцію', en:'📤 Send Receipt', pl:'📤 Wyślij Rachunek', de:'📤 Rechnung senden', es:'📤 Enviar Recibo', fr:'📤 Envoyer le Reçu'},
+        access:     {uk:'🔐 ДОСТУП (MYCOMUNALCO)', en:'🔐 ACCESS (MYCOMUNALCO)', pl:'🔐 DOSTĘP (MYCOMUNALCO)', de:'🔐 ZUGANG (MYCOMUNALCO)', es:'🔐 ACCESO (MYCOMUNALCO)', fr:'🔐 ACCÈS (MYCOMUNALCO)'},
+        new_pin:    {uk:'🔄 Новий PIN', en:'🔄 New PIN', pl:'🔄 Nowy PIN', de:'🔄 Neuer PIN', es:'🔄 Nuevo PIN', fr:'🔄 Nouveau PIN'},
+        pin_code:   {uk:'PIN-код:', en:'PIN:', pl:'PIN:', de:'PIN:', es:'PIN:', fr:'PIN:'},
+        send_access:{uk:'📤 Надіслати доступ мешканцю', en:'📤 Send Access to Resident', pl:'📤 Wyślij Dostęp', de:'📤 Zugang senden', es:'📤 Enviar Acceso', fr:'📤 Envoyer Accès'},
+        bot_on:     {uk:'✅ Бот підключено', en:'✅ Bot connected', pl:'✅ Bot podłączony', de:'✅ Bot verbunden', es:'✅ Bot conectado', fr:'✅ Bot connecté'},
+        bot_off:    {uk:'⚠️ Не підключено', en:'⚠️ Not connected', pl:'⚠️ Niepodłączony', de:'⚠️ Nicht verbunden', es:'⚠️ No conectado', fr:'⚠️ Non connecté'},
+    };
+    const r = (key) => RL[key]?.[lang] || RL[key]?.['en'] || key;
             document.getElementById('apartments-container').innerHTML = (this.currentData.apartments || []).map((a, i) => { 
             
             // 1. Статус підключення до бота
