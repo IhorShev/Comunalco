@@ -944,7 +944,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '10.7';
+    const APP_VERSION = '10.8';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -2358,77 +2358,93 @@ checkLimit() {
 }
 
     // --- 1. ГОЛОВНИЙ РОУТЕР ---
-    renderAll() {
-        if (!this.state || !this.state.objects) return;
+renderAll() {
+    if (!this.state || !this.state.objects) return;
 
-		// 🌍 ЗАСТОСОВУЄМО ПЕРЕКЛАД UI
-    this._applyUILang();
+    // 🌍 ЗАСТОСОВУЄМО ПЕРЕКЛАД UI
+    if (typeof this._applyUILang === 'function') this._applyUILang();
 
-        // 🌙 ПРАВИЛО ТЕМНОЇ ТЕМИ ЗА ЗАМОВЧУВАННЯМ (Спрацює при першому вході)
-        if (localStorage.getItem('theme_init') !== 'done') {
-            localStorage.setItem('theme_init', 'done');
-            localStorage.setItem('theme', 'dark'); // Зберігаємо в пам'ять
-            document.body.classList.add('dark', 'dark-theme', 'dark-mode'); 
-            document.documentElement.setAttribute('data-theme', 'dark');
+    // 🌙 ПРАВИЛО ТЕМИ (Ініціалізація + Застосування)
+    if (localStorage.getItem('theme_init') !== 'done') {
+        localStorage.setItem('theme_init', 'done');
+        localStorage.setItem('theme', 'dark'); 
+    }
+    // Завжди читаємо поточну тему і застосовуємо її при рендері
+    const currentTheme = localStorage.getItem('theme') || 'dark';
+    if (currentTheme === 'dark') {
+        document.body.classList.add('dark', 'dark-theme', 'dark-mode'); 
+        document.documentElement.setAttribute('data-theme', 'dark');
+    } else {
+        document.body.classList.remove('dark', 'dark-theme', 'dark-mode');
+        document.documentElement.removeAttribute('data-theme');
+    }
+
+    // ПРАВИЛО ЛОБІ: Завжди показуємо Лобі при свіжому старті
+    if (window.userPickedObject === undefined) window.userPickedObject = false; 
+    if (!window.userPickedObject && this.state.objects.length > 1) {
+        window.showLobby = true; 
+    }
+
+    // АНТИ-ГЛЮК ДОЗАВАНТАЖЕННЯ БАЗИ
+    if (window.prevObjCount === undefined) window.prevObjCount = this.state.objects.length;
+    if (this.state.objects.length > window.prevObjCount && !window.userPickedObject) {
+        window.showLobby = true; 
+    }
+    window.prevObjCount = this.state.objects.length;
+
+    // МАЛЮЄМО ЛОБІ (Якщо є вибір)
+    if (window.showLobby === true && this.state.objects.length > 1) {
+        if (typeof this.renderLobby === 'function') this.renderLobby();
+        return; // Зупиняємо малювання адмінки!
+    }
+
+    // Запобіжник: якщо об'єкт тільки 1, знімаємо статус Лобі
+    if (this.state.objects.length <= 1) window.showLobby = false;
+
+    const lobby = document.getElementById('lobby-room');
+    if (lobby) lobby.style.display = 'none';
+
+    // --- СТАНДАРТНЕ МАЛЮВАННЯ ДЛЯ АДМІНА ---
+    try { 
+        // Захист: оновлюємо ім'я, тільки якщо ми не в режимі перегляду архіву
+        if (!document.body.classList.contains('archive-mode')) {
+            document.getElementById('object-title').value = this.currentData.name || ''; 
         }
+    } catch(e){}
 
-        // ПРАВИЛО ЛОБІ: Завжди показуємо Лобі при свіжому старті
-        if (window.userPickedObject === undefined) window.userPickedObject = false; 
-        if (!window.userPickedObject && this.state.objects.length > 1) {
-            window.showLobby = true; 
+    ['ed','en','w','g'].forEach(k => { 
+        const el = document.getElementById('t_'+k); 
+        const map = {ed:'el_d', en:'el_n', w:'w', g:'g'};
+        if(el && this.currentData && this.currentData.tariffs) {
+            el.value = this.currentData.tariffs[map[k]] || ''; 
         }
+    });
+    
+    if(typeof this.renderExtraTariffs === 'function') this.renderExtraTariffs(); 
+    if(typeof this.renderRequisites === 'function') this.renderRequisites(); 
+    if(typeof this.renderGroups === 'function') this.renderGroups(); 
+    if(typeof this.renderApartments === 'function') this.renderApartments();
+    
+    setTimeout(() => { if (typeof this.calculate === 'function') this.calculate(); }, 100);
 
-        // АНТИ-ГЛЮК ДОЗАВАНТАЖЕННЯ БАЗИ
-        if (window.prevObjCount === undefined) window.prevObjCount = this.state.objects.length;
-        if (this.state.objects.length > window.prevObjCount && !window.userPickedObject) {
-            window.showLobby = true; 
-        }
-        window.prevObjCount = this.state.objects.length;
-
-        // МАЛЮЄМО ЛОБІ (Якщо є вибір)
-        if (window.showLobby === true && this.state.objects.length > 1) {
-            if (typeof this.renderLobby === 'function') this.renderLobby();
-            return; // Зупиняємо малювання адмінки!
-        }
-
-        // Запобіжник: якщо об'єкт тільки 1, знімаємо статус Лобі
-        if (this.state.objects.length <= 1) window.showLobby = false;
-
-        const lobby = document.getElementById('lobby-room');
-        if (lobby) lobby.style.display = 'none';
-
-        // --- СТАНДАРТНЕ МАЛЮВАННЯ ДЛЯ АДМІНА ---
-        try { document.getElementById('object-title').value = this.currentData.name; } catch(e){}
-        ['ed','en','w','g'].forEach(k => { 
-            const el = document.getElementById('t_'+k); 
-            const map = {ed:'el_d', en:'el_n', w:'w', g:'g'};
-            if(el) el.value = this.currentData.tariffs[map[k]]; 
-        });
-        
-        if(typeof this.renderExtraTariffs === 'function') this.renderExtraTariffs(); 
-        if(typeof this.renderRequisites === 'function') this.renderRequisites(); 
-        if(typeof this.renderGroups === 'function') this.renderGroups(); 
-        if(typeof this.renderApartments === 'function') this.renderApartments();
-        
-        setTimeout(() => { if (typeof this.calculate === 'function') this.calculate(); }, 100);
-
-        let role = 'admin'; 
-        if (window.currentUser && this.currentData) {
-            const myEmail = (window.currentUser.email || '').toLowerCase().trim();
-            const ownerId = String(this.currentData.owner_id);
-            if (ownerId !== String(window.currentUser.id)) {
-                role = 'tenant'; 
-                if (this.currentData.users && Array.isArray(this.currentData.users)) {
-                    const profile = this.currentData.users.find(u => (u.email || '').toLowerCase().trim() === myEmail);
-                    if (profile) role = profile.role; 
-                }
+    // --- РОЗПОДІЛ РОЛЕЙ ---
+    let role = 'admin'; 
+    if (window.currentUser && this.currentData) {
+        const myEmail = (window.currentUser.email || '').toLowerCase().trim();
+        const ownerId = String(this.currentData.owner_id);
+        if (ownerId !== String(window.currentUser.id)) {
+            role = 'tenant'; 
+            if (this.currentData.users && Array.isArray(this.currentData.users)) {
+                const profile = this.currentData.users.find(u => (u.email || '').toLowerCase().trim() === myEmail);
+                if (profile) role = profile.role || 'tenant'; 
             }
         }
-
-        window.currentRole = role; 
-        if(typeof this.applyRoleRestrictions === 'function') this.applyRoleRestrictions(role);
-        if(typeof this.renderGlobalBackButton === 'function') this.renderGlobalBackButton(); 
     }
+
+    window.currentRole = role; 
+    if(typeof this.applyRoleRestrictions === 'function') this.applyRoleRestrictions(role);
+    if(typeof this.renderGlobalBackButton === 'function') this.renderGlobalBackButton(); 
+}
 
         // --- ВІДКРИТТЯ ВІКНА АНАЛІТИКИ (Підвантаження квартир) ---
     openChartModal() {
