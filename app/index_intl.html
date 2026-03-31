@@ -470,39 +470,37 @@
 
             <div class="chat-btn" style="position:relative; cursor:pointer; display:flex; align-items:center; height:36px; padding:0 15px; background:var(--bg-card); border:1px solid var(--border); border-radius:12px; color:var(--text);" onclick="document.getElementById('chat-modal').style.display='flex'">
                 <span style="font-size:16px;">💬</span>
-                <span class="desktop-text-chat" style="font-size:12px; font-weight:bold; margin-left:5px;">ЧАТ БУДИНКУ</span>
-                <span class="mobile-text-chat" style="font-size:12px; font-weight:bold; margin-left:5px;">ЧАТ</span>
-                <div id="admin-chat-badge" style="display:none; position:absolute; top:-5px; right:-5px; background:#ef4444; color:white; font-size:10px; font-weight:bold; padding:2px 5px; border-radius:10px;">Нові</div>
+                <span class="desktop-text-chat" style="font-size:12px; font-weight:bold; margin-left:5px;" data-i18n="menu_chat_desktop">ЧАТ БУДИНКУ</span>
+<span class="mobile-text-chat" style="font-size:12px; font-weight:bold; margin-left:5px;" data-i18n="menu_chat_mobile">ЧАТ</span>
+<div id="admin-chat-badge" style="display:none; position:absolute; top:-5px; right:-5px; background:#ef4444; color:white; font-size:10px; font-weight:bold; padding:2px 5px; border-radius:10px;" data-i18n="chat_new">Нові</div>
             </div>
 
-            <!-- ДЕСКТОП меню -->
             <div class="desktop-only" style="display:flex; align-items:center; gap:15px;">
-                <span onclick="app.openMenu('premium')" style="color:var(--primary); font-weight:bold; cursor:pointer; font-size:12px;">💎 Тарифи</span>
-                <span onclick="app.openMenu('history')" style="cursor:pointer; font-size:12px;">🕒 Архів</span>
-                <span onclick="app.openChartModal()" style="cursor:pointer; font-size:12px;">📊 Аналітика</span>
-                <span onclick="app.openAccessMenu()" style="cursor:pointer; font-size:12px;">👥 Доступ</span>
-                <span onclick="app.openMenu('info')" style="cursor:pointer; font-size:12px;">ℹ️ Інфо</span>
-                <span onclick="app.openMenu('backups')" style="cursor:pointer; font-size:12px;">📦 Локальні копії</span>
-                <span onclick="app.openMenu('contacts')" style="cursor:pointer; font-size:12px;">📞 Контакти</span>
-                <button onclick="app.toggleTheme()" style="background:none; border:none; cursor:pointer; padding:0; display:flex; align-items:center; margin-left:10px;">
-                    <svg id="theme-icon" viewBox="0 0 24 24" fill="none" stroke="var(--text-sec)" stroke-width="2" width="20" height="20"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-                </button>
-            </div>
+    <span onclick="app.openMenu('premium')" style="color:var(--primary); font-weight:bold; cursor:pointer; font-size:12px;" data-i18n="menu_tariffs">💎 Тарифи</span>
+    <span onclick="app.openMenu('history')" style="cursor:pointer; font-size:12px;" data-i18n="menu_archive">🕒 Архів</span>
+    <span onclick="app.openChartModal()" style="cursor:pointer; font-size:12px;" data-i18n="menu_analytics">📊 Аналітика</span>
+    <span onclick="app.openAccessMenu()" style="cursor:pointer; font-size:12px;" data-i18n="menu_access">👥 Доступ</span>
+    <span onclick="app.openMenu('info')" style="cursor:pointer; font-size:12px;" data-i18n="menu_info">ℹ️ Інфо</span>
+    <span onclick="app.openMenu('backups')" style="cursor:pointer; font-size:12px;" data-i18n="menu_backups">📦 Локальні копії</span>
+    <span onclick="app.openMenu('contacts')" style="cursor:pointer; font-size:12px;" data-i18n="menu_contacts">📞 Контакти</span>
+    <button onclick="app.toggleTheme()" style="background:none; border:none; cursor:pointer; padding:0; display:flex; align-items:center; margin-left:10px;">
+        <svg id="theme-icon" viewBox="0 0 24 24" fill="none" stroke="var(--text-sec)" stroke-width="2" width="20" height="20"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+    </button>
+</div>
 
-            <!-- МОБІЛЬНЕ меню -->
-            <div class="mobile-only" style="position:relative; flex-shrink:0;">
-                <button class="menu-btn" onclick="const m=document.getElementById('mobile-dropdown'); m.style.display=m.style.display==='block'?'none':'block';" style="background:var(--bg-card); border:1px solid var(--border); border-radius:12px; cursor:pointer; color:var(--text); padding:0 10px; height:36px; display:flex; align-items:center; gap:6px;">
-                    <span style="font-size:18px;">≡</span>
-                    <span style="font-size:12px; font-weight:bold;">МЕНЮ</span>
-                </button>
-                <div id="mobile-dropdown" style="display:none; position:absolute; top:42px; right:0; background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:5px; box-shadow:0 10px 25px rgba(0,0,0,0.8); z-index:2000; min-width:180px;">
-                    <div onclick="app.openMenu('history'); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; border-bottom:1px solid var(--border); cursor:pointer;">🕒 Архів</div>
-                    <div onclick="app.openChartModal(); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; border-bottom:1px solid var(--border); cursor:pointer;">📊 Аналітика</div>
-                    <div onclick="app.openAccessMenu(); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; border-bottom:1px solid var(--border); cursor:pointer;">👥 Доступ</div>
-                    <div onclick="app.openMenu('info'); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; border-bottom:1px solid var(--border); cursor:pointer;">ℹ️ Інфо</div>
-                    <div onclick="app.toggleTheme(); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; cursor:pointer; display:flex; align-items:center; gap:10px; border-top:1px solid var(--border);">🌓 Змінити тему</div>
-                </div>
-            </div>
+<div class="mobile-only" style="position:relative; flex-shrink:0;">
+    <button class="menu-btn" onclick="const m=document.getElementById('mobile-dropdown'); m.style.display=m.style.display==='block'?'none':'block';" style="background:var(--bg-card); border:1px solid var(--border); border-radius:12px; cursor:pointer; color:var(--text); padding:0 10px; height:36px; display:flex; align-items:center; gap:6px;">
+        <span style="font-size:18px;">≡</span>
+        <span style="font-size:12px; font-weight:bold;" data-i18n="menu_title">МЕНЮ</span>
+    </button>
+    <div id="mobile-dropdown" style="display:none; position:absolute; top:42px; right:0; background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:5px; box-shadow:0 10px 25px rgba(0,0,0,0.8); z-index:2000; min-width:180px;">
+        <div onclick="app.openMenu('history'); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; border-bottom:1px solid var(--border); cursor:pointer;" data-i18n="menu_archive">🕒 Архів</div>
+        <div onclick="app.openChartModal(); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; border-bottom:1px solid var(--border); cursor:pointer;" data-i18n="menu_analytics">📊 Аналітика</div>
+        <div onclick="app.openAccessMenu(); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; border-bottom:1px solid var(--border); cursor:pointer;" data-i18n="menu_access">👥 Доступ</div>
+        <div onclick="app.openMenu('info'); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; border-bottom:1px solid var(--border); cursor:pointer;" data-i18n="menu_info">ℹ️ Інфо</div>
+        <div onclick="app.toggleTheme(); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; cursor:pointer; display:flex; align-items:center; gap:10px; border-top:1px solid var(--border);" data-i18n="menu_theme">🌓 Змінити тему</div>
+    </div>
+</div>
 
         </div>
 
