@@ -946,7 +946,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '10.1';
+    const APP_VERSION = '10.2';
     if (localStorage.getItem('app_version') !== APP_VERSION) {
         localStorage.setItem('app_version', APP_VERSION);
         if (navigator.serviceWorker) {
@@ -1119,7 +1119,19 @@ class App {
     }
     
     init() { 
-    this.load(); 
+    this.load();
+		// 🌍 ЗАСТОСОВУЄМО МОВУ З ЛЕНДІНГУ (якщо налаштування ще не збережені)
+    const landingLang = localStorage.getItem('lang');
+    const landingCurrency = localStorage.getItem('currency');
+    
+    if (landingLang && (!this.state.settings || !this.state.settings.initialized)) {
+        this.state.settings = {
+            lang: landingLang,
+            currency: landingCurrency || 'usd',
+            initialized: true
+        };
+        this.save(); // зберігаємо одразу
+    }
     this.initTheme(); 
     this.renderAll(); 
     this.updateStatus(); 
