@@ -584,32 +584,20 @@
 
         <div id="groups-container"></div>
         <div style="text-align:center; margin: 20px 0;">
-            <button class="btn btn-outline" style="width:auto; display:inline-block; padding:10px 20px;" onclick="app.addGroup()">+ Загальнобудинкові (МЗК)</button>
-        </div>
+           <button class="btn btn-outline" style="width:auto; display:inline-block; padding:10px 20px;" onclick="app.addGroup()" data-i18n="btn_add_mzk">+ Загальнобудинкові (МЗК)</button>
 
-        <div id="batch-controls" style="display:none; padding:10px 0; align-items:center; justify-content:flex-end;">
-            <label style="font-weight:bold; display:flex; align-items:center; gap:8px; cursor:pointer; background:var(--card); padding:8px 15px; border-radius:8px; border:1px solid var(--primary); color:var(--text);">
-                <input type="checkbox" onchange="app.toggleAllCheckboxes(this)" style="width:18px; height:18px;"> Вибрати всі (Telegram)
-            </label>
-        </div>
-        <div id="apartments-container"></div>
-        
-        <div style="text-align:center; margin: 30px 0;">
-            <button class="btn btn-primary" style="width:auto; display:inline-block; padding:12px 30px; font-size:16px; box-shadow: 0 4px 15px rgba(0, 153, 255, 0.4);" onclick="app.addApartment()">+ Додати Квартиру</button>
-            <div style="font-size:11px; color:var(--text-sec); margin-top:8px;">Ліміт: <span id="limit-counter">0/2</span></div>
-        </div>
-    </div>
-    
-    <div style="height: 120px;"></div>
+<label style="font-weight:bold; display:flex; align-items:center; gap:8px; cursor:pointer; background:var(--card); padding:8px 15px; border-radius:8px; border:1px solid var(--primary); color:var(--text);">
+    <input type="checkbox" onchange="app.toggleAllCheckboxes(this)" style="width:18px; height:18px;"> 
+    <span data-i18n="select_all">Вибрати всі (Telegram)</span>
+</label>
 
-    <div class="sticky-footer" style="flex-direction: row; padding: 12px; border-radius: 24px; bottom: 10px; width: 95%; max-width: 500px; left: 50%; transform: translateX(-50%); background: var(--card); border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-        
-        <button class="btn btn-success" style="flex:1; padding:15px; font-weight:bold; font-size:15px; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);" onclick="app.calculate(); document.getElementById('resultModal').style.display='flex'">
-            📊 Закрити місяць
-        </button>
-        <button id="tg-menu-btn" class="btn" style="flex:1; background:#2AABEE; color:white; padding:15px; font-weight:bold; font-size:15px; box-shadow: 0 4px 10px rgba(42, 171, 238, 0.3);" onclick="app.openTelegramMenu()">
-            ✈️ Надіслати
-        </button>
+<button class="btn btn-primary" style="width:auto; display:inline-block; padding:12px 30px; font-size:16px; box-shadow: 0 4px 15px rgba(0, 153, 255, 0.4);" onclick="app.addApartment()" data-i18n="btn_add_apt">+ Додати Квартиру</button>
+
+<div style="font-size:11px; color:var(--text-sec); margin-top:8px;"><span data-i18n="limit_text">Ліміт:</span> <span id="limit-counter">0/2</span></div>
+
+<button class="btn btn-success" style="flex:1; padding:15px; font-weight:bold; font-size:15px; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);" onclick="app.calculate(); document.getElementById('resultModal').style.display='flex'" data-i18n="btn_close_month">📗 Закрити місяць</button>
+
+<button id="tg-menu-btn" class="btn" style="flex:1; background:#2AABEE; color:white; padding:15px; font-weight:bold; font-size:15px; box-shadow: 0 4px 10px rgba(42, 171, 238, 0.3);" onclick="app.openTelegramMenu()" data-i18n="btn_send">🚀 Надіслати</button> 
 
     </div>
 
