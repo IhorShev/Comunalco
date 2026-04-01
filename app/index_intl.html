@@ -2230,128 +2230,37 @@ checkLimit() {
     }
 
 	_applyUILang() {
+    // 1. Визначаємо мову
     const lang = this.state?.settings?.lang || localStorage.getItem('lang') || 'uk';
-    const t = translations[lang] || translations['uk'];
-    const sym = this.state?.settings?.currency 
+    const t = translations[lang] || translations['en'];
+
+    // 2. Визначаємо валюту
+    const sym = this.state?.settings?.currency
         ? ({ uah:'₴', usd:'$', eur:'€', pln:'zł', gbp:'£', czk:'Kč' }[this.state.settings.currency] || '$')
-        : (localStorage.getItem('currency') === 'usd' ? '$' : 
+        : (localStorage.getItem('currency') === 'usd' ? '$' :
            localStorage.getItem('currency') === 'eur' ? '€' :
            localStorage.getItem('currency') === 'pln' ? 'zł' :
            localStorage.getItem('currency') === 'gbp' ? '£' :
            localStorage.getItem('currency') === 'czk' ? 'Kč' : '₴');
 
-    // Зберігаємо глобально для квитанцій
+    // Зберігаємо глобально
     window.APP_LANG = lang;
     window.APP_CURRENCY_SYMBOL = sym;
-
-    // Заголовок сторінки
     document.title = 'Comunalco';
 
-    // Секція тарифів
-    const tariffSummary = document.querySelector('#main-content-wrapper details summary');
-    if(tariffSummary) {
-        const titles = {
-            uk:'⚙️ Загальні Тарифи, Витрати, Реквізити',
-            en:'⚙️ General Rates, Costs, Details',
-            pl:'⚙️ Stawki, Koszty, Dane',
-            de:'⚙️ Tarife, Kosten, Details',
-            es:'⚙️ Tarifas, Costos, Detalles',
-            fr:'⚙️ Tarifs, Coûts, Détails'
-        };
-        tariffSummary.textContent = titles[lang] || titles['en'];
-    }
+    if (!t) return;
 
-    // Labels тарифів
-    const tariffLabels = {
-        t_ed: {uk:'⚡ День', en:'⚡ Day', pl:'⚡ Dzień', de:'⚡ Tag', es:'⚡ Día', fr:'⚡ Jour'},
-        t_en: {uk:'🌙 Ніч', en:'🌙 Night', pl:'🌙 Noc', de:'🌙 Nacht', es:'🌙 Noche', fr:'🌙 Nuit'},
-        t_w:  {uk:'💧 Вода', en:'💧 Water', pl:'💧 Woda', de:'💧 Wasser', es:'💧 Agua', fr:'💧 Eau'},
-        t_g:  {uk:'🔥 Газ', en:'🔥 Gas', pl:'🔥 Gaz', de:'🔥 Gas', es:'🔥 Gas', fr:'🔥 Gaz'}
-    };
-    Object.entries(tariffLabels).forEach(([id, vals]) => {
-        const input = document.getElementById(id);
-        if(input && input.previousElementSibling) {
-            input.previousElementSibling.textContent = vals[lang] || vals['en'];
-        }
-    });
-
-    // Section titles
-    document.querySelectorAll('.section-title').forEach(el => {
-        const txt = el.textContent.trim();
-        const map = {
-            'Базові Тарифи': {en:`Base Rates (${sym})`, pl:`Stawki (${sym})`, de:`Grundtarife (${sym})`, es:`Tarifas (${sym})`, fr:`Tarifs (${sym})`},
-            'Base Rates': {en:`Base Rates (${sym})`},
-            'Додаткові витрати': {en:'Additional Costs', pl:'Koszty Dodatkowe', de:'Zusatzkosten', es:'Costos Adicionales', fr:'Coûts Supplémentaires'},
-            'Банківські реквізити': {en:'Bank Details', pl:'Dane Bankowe', de:'Bankverbindung', es:'Datos Bancarios', fr:'Coordonnées Bancaires'},
-        };
-        for(const [key, vals] of Object.entries(map)) {
-            if(txt.includes(key) && lang !== 'uk') {
-                el.textContent = vals[lang] || vals['en'] || el.textContent;
-                break;
+    // 3. МАГІЯ: Універсальний переклад
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (t[key]) {
+            if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                if (el.hasAttribute('placeholder')) el.placeholder = t[key];
+                else el.value = t[key];
+            } else {
+                el.innerHTML = t[key]; // Використовуємо innerHTML, щоб працювали емодзі та іконки
             }
         }
-    });
-
-    // Кнопки додавання
-    document.querySelectorAll('button, .btn').forEach(btn => {
-        const txt = btn.textContent.trim();
-        const btnMap = [
-            {match:'Рядок витрат', en:'+ Add Cost', pl:'+ Dodaj Koszt', de:'+ Kosten', es:'+ Agregar Costo', fr:'+ Ajouter Coût'},
-            {match:'картку/IBAN', en:'+ Add Card/IBAN', pl:'+ Dodaj Kartę/IBAN', de:'+ Karte/IBAN', es:'+ Tarjeta/IBAN', fr:'+ Carte/IBAN'},
-            {match:'Загальнобудинкові', en:'+ Common Area Costs', pl:'+ Części Wspólne', de:'+ Gemeinschaftskosten', es:'+ Costos Comunes', fr:'+ Charges Communes'},
-            {match:'Додати Квартиру', en:'+ Add Unit', pl:'+ Dodaj Lokal', de:'+ Einheit', es:'+ Agregar Unidad', fr:'+ Ajouter Unité'},
-        ];
-        for(const map of btnMap) {
-            if(txt.includes(map.match) && lang !== 'uk' && map[lang]) {
-                btn.textContent = map[lang];
-                break;
-            }
-        }
-    });
-
-    // Footer кнопки
-    const closeBtn = document.querySelector('.sticky-footer .btn-success');
-    const sendBtn = document.querySelector('.sticky-footer #tg-menu-btn');
-    const closeBtns = {uk:'📊 Закрити місяць', en:'📊 Close Month', pl:'📊 Zamknij Miesiąc', de:'📊 Monat abschließen', es:'📊 Cerrar Mes', fr:'📊 Clôturer le Mois'};
-    const sendBtns = {uk:'✈️ Надіслати', en:'✈️ Send', pl:'✈️ Wyślij', de:'✈️ Senden', es:'✈️ Enviar', fr:'✈️ Envoyer'};
-    if(closeBtn) closeBtn.innerHTML = closeBtns[lang] || closeBtns['en'];
-    if(sendBtn) sendBtn.innerHTML = sendBtns[lang] || sendBtns['en'];
-
-    // Мобільне меню dropdown
-    const mobileItems = document.querySelectorAll('#mobile-dropdown div');
-    const mobileTexts = {
-        uk:  ['🕒 Архів','📊 Аналітика','👥 Доступ','ℹ️ Інфо','🌓 Змінити тему'],
-        en:  ['🕒 Archive','📊 Analytics','👥 Access','ℹ️ Info','🌓 Toggle Theme'],
-        pl:  ['🕒 Archiwum','📊 Analityka','👥 Dostęp','ℹ️ Info','🌓 Zmień Motyw'],
-        de:  ['🕒 Archiv','📊 Analytik','👥 Zugang','ℹ️ Info','🌓 Design wechseln'],
-        es:  ['🕒 Archivo','📊 Analítica','👥 Acceso','ℹ️ Info','🌓 Cambiar Tema'],
-        fr:  ['🕒 Archive','📊 Analytique','👥 Accès','ℹ️ Info','🌓 Changer le Thème'],
-    };
-    const texts = mobileTexts[lang] || mobileTexts['en'];
-    mobileItems.forEach((el, i) => { if(texts[i]) el.innerHTML = texts[i]; });
-
-    // Акаунт меню
-    const accItems = document.querySelectorAll('#account-menu div');
-    const accTexts = {
-        uk:  ['💎 Продовжити тариф','🚪 Вийти'],
-        en:  ['💎 Extend Plan','🚪 Log Out'],
-        pl:  ['💎 Przedłuż Plan','🚪 Wyloguj'],
-        de:  ['💎 Plan verlängern','🚪 Abmelden'],
-        es:  ['💎 Ampliar Plan','🚪 Cerrar sesión'],
-        fr:  ["💎 Prolonger le Plan","🚪 Déconnexion"],
-    };
-    const aTexts = accTexts[lang] || accTexts['en'];
-    accItems.forEach((el, i) => { if(aTexts[i]) el.innerHTML = aTexts[i]; });
-
-    // ЧАТ і МЕНЮ кнопки
-    const chatLabels = {uk:'ЧАТ БУДИНКУ', en:'BUILDING CHAT', pl:'CZAT', de:'CHAT', es:'CHAT', fr:'CHAT'};
-    const mobileChatLabels = {uk:'ЧАТ', en:'CHAT', pl:'CZAT', de:'CHAT', es:'CHAT', fr:'CHAT'};
-    const menuLabels = {uk:'МЕНЮ', en:'MENU', pl:'MENU', de:'MENÜ', es:'MENÚ', fr:'MENU'};
-    
-    document.querySelectorAll('.desktop-text-chat').forEach(el => el.textContent = chatLabels[lang] || 'CHAT');
-    document.querySelectorAll('.mobile-text-chat').forEach(el => el.textContent = mobileChatLabels[lang] || 'CHAT');
-    document.querySelectorAll('.menu-btn span:last-child').forEach(el => {
-        if(el.textContent.match(/МЕНЮ|MENU|MENÜ|MENÚ/)) el.textContent = menuLabels[lang] || 'MENU';
     });
 
     console.log(`🌍 UI language applied: ${lang} | 💰 ${sym}`);
