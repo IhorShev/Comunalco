@@ -585,7 +585,8 @@
         </details>
 
         <div id="groups-container"></div>
-        <div style="text-align:center; margin: 20px 0;">
+
+<div style="text-align:center; margin: 20px 0;">
     <button class="btn btn-outline" style="width:auto; display:inline-block; padding:10px 20px;" onclick="app.addGroup()" data-i18n="btn_add_mzk">+ Загальнобудинкові (МЗК)</button>
 </div>
 
@@ -595,6 +596,8 @@
         <span data-i18n="select_all">Вибрати всі (Telegram)</span>
     </label>
 </div>
+
+<div id="apartments-container"></div>
 
 <div style="text-align:center; margin: 30px 0;">
     <button class="btn btn-primary" style="width:auto; display:inline-block; padding:12px 30px; font-size:16px; box-shadow: 0 4px 15px rgba(0, 153, 255, 0.4);" onclick="app.addApartment()" data-i18n="btn_add_apt">+ Додати Квартиру</button>
@@ -933,7 +936,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '10.9';
+    const APP_VERSION = '11.0';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -1007,7 +1010,10 @@ prem_period_label: "Термін підписки:",
 prem_6_months: "6 місяців",
 prem_12_months: "1 рік (-20%)",
 prem_total_sum: "Сума до оплати:",
-prem_pay_card: "💳 Оплатити карткою (PayPro Global)"
+prem_pay_card: "💳 Оплатити карткою (PayPro Global)",
+		base_tariffs_title: "Базові Тарифи", t_day: "⚡ День", t_night: "🌙 Ніч", t_water: "💧 Вода", t_gas: "🔥 Газ",
+extra_costs_title: "Додаткові витрати (МЗК)", btn_add_cost: "+ Рядок витрат", 
+bank_details_title: "Банківські реквізити", btn_add_bank: "+ Додати картку/IBAN"
     },
     en: {
         receipt: "INVOICE",
@@ -1063,7 +1069,11 @@ prem_period_label: "Subscription period:",
 prem_6_months: "6 months",
 prem_12_months: "1 year (-20%)",
 prem_total_sum: "Total to pay:",
-prem_pay_card: "💳 Pay by card (PayPro Global)"
+prem_pay_card: "💳 Pay by card (PayPro Global)",
+		// --- ДОДАТИ ДО en: ---
+base_tariffs_title: "Base Tariffs", t_day: "⚡ Day", t_night: "🌙 Night", t_water: "💧 Water", t_gas: "🔥 Gas",
+extra_costs_title: "Additional Costs (HOA)", btn_add_cost: "+ Add Cost", 
+bank_details_title: "Bank Details", btn_add_bank: "+ Add Card/IBAN"
     },
     pl: {
         receipt: "RACHUNEK",
@@ -1119,7 +1129,11 @@ prem_period_label: "Okres subskrypcji:",
 prem_6_months: "6 miesięcy",
 prem_12_months: "1 rok (-20%)",
 prem_total_sum: "Suma do zapłaty:",
-prem_pay_card: "💳 Zapłać kartą (PayPro Global)"
+prem_pay_card: "💳 Zapłać kartą (PayPro Global)",
+		// --- ДОДАТИ ДО pl: ---
+base_tariffs_title: "Stawki Podstawowe", t_day: "⚡ Dzień", t_night: "🌙 Noc", t_water: "💧 Woda", t_gas: "🔥 Gaz",
+extra_costs_title: "Koszty Dodatkowe", btn_add_cost: "+ Dodaj Koszt", 
+bank_details_title: "Dane Bankowe", btn_add_bank: "+ Dodaj Kartę/IBAN"
     },
     de: {
         receipt: "RECHNUNG",
@@ -1175,7 +1189,11 @@ prem_period_label: "Abo-Zeitraum:",
 prem_6_months: "6 Monate",
 prem_12_months: "1 Jahr (-20%)",
 prem_total_sum: "Zu zahlender Betrag:",
-prem_pay_card: "💳 Mit Karte bezahlen (PayPro Global)"
+prem_pay_card: "💳 Mit Karte bezahlen (PayPro Global)",
+		// --- ДОДАТИ ДО de: ---
+base_tariffs_title: "Grundtarife", t_day: "⚡ Tag", t_night: "🌙 Nacht", t_water: "💧 Wasser", t_gas: "🔥 Gas",
+extra_costs_title: "Zusatzkosten", btn_add_cost: "+ Kosten hinzufügen", 
+bank_details_title: "Bankverbindung", btn_add_bank: "+ Karte/IBAN hinzufügen"
     },
     es: {
         receipt: "FACTURA",
@@ -1231,7 +1249,11 @@ prem_period_label: "Período de suscripción:",
 prem_6_months: "6 meses",
 prem_12_months: "1 año (-20%)",
 prem_total_sum: "Total a pagar:",
-prem_pay_card: "💳 Pagar con tarjeta (PayPro Global)"
+prem_pay_card: "💳 Pagar con tarjeta (PayPro Global)",
+		// --- ДОДАТИ ДО es: ---
+base_tariffs_title: "Tarifas Base", t_day: "⚡ Día", t_night: "🌙 Noche", t_water: "💧 Agua", t_gas: "🔥 Gas",
+extra_costs_title: "Costos Adicionales", btn_add_cost: "+ Agregar Costo", 
+bank_details_title: "Datos Bancarios", btn_add_bank: "+ Agregar Tarjeta/IBAN"
     },
     fr: {
         receipt: "FACTURE",
@@ -1287,7 +1309,11 @@ prem_period_label: "Période d'abonnement :",
 prem_6_months: "6 mois",
 prem_12_months: "1 an (-20%)",
 prem_total_sum: "Total à payer :",
-prem_pay_card: "💳 Payer par carte (PayPro Global)"
+prem_pay_card: "💳 Payer par carte (PayPro Global)",
+		// --- ДОДАТИ ДО fr: ---
+base_tariffs_title: "Tarifs de Base", t_day: "⚡ Jour", t_night: "🌙 Nuit", t_water: "💧 Eau", t_gas: "🔥 Gaz",
+extra_costs_title: "Coûts Supplémentaires", btn_add_cost: "+ Ajouter Coût", 
+bank_details_title: "Coordonnées Bancaires", btn_add_bank: "+ Ajouter Carte/IBAN"
     }
 };
 class App {
