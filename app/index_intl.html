@@ -3512,7 +3512,7 @@ renderAll() {
                 if(c.w > 0) details += `💧 Вода: ${a.prev.w}➔${a.curr.w} = ${c.w} (${cost.w.toFixed(2)})\n`;
                 if(c.g > 0) details += `🔥 Газ: ${a.prev.g}➔${a.curr.g} = ${c.g} (${cost.g.toFixed(2)})\n`;
 
-                const txt = `🧾 КВИТАНЦІЯ: ${dStr.toUpperCase()}\n🏠 ${a.name}\n\n${details}${custTxt}🏢 МЗК: ${mzkPerApt.toFixed(2)} грн\n${sTxt ? sTxt : ''}--------------------------------\n💰 НАРАХОВАНО: ${currentMonthTotal.toFixed(2)} грн\n${debt > 0 ? `❗️ Борг: ${debt.toFixed(2)} грн\n` : ''}${debt < 0 ? `💚 Переплата: ${Math.abs(debt).toFixed(2)} грн\n` : ''}--------------------------------\n💵 РАЗОМ: ${tot.toFixed(2)} грн\n${paid > 0 ? `✅ Сплачено: -${paid.toFixed(2)} грн\n📉 Залишок: ${bal.toFixed(2)} грн` : ''}\n\n${requisitesTxt}`;
+                let txt = `🧾 КВИТАНЦІЯ: ${dStr.toUpperCase()}\n🏠 ${a.name}\n\n${details}${custTxt}🏢 МЗК: ${mzkPerApt.toFixed(2)} грн\n${sTxt ? sTxt : ''}--------------------------------\n💰 НАРАХОВАНО: ${currentMonthTotal.toFixed(2)} грн\n${debt > 0 ? `❗️ Борг: ${debt.toFixed(2)} грн\n` : ''}${debt < 0 ? `💚 Переплата: ${Math.abs(debt).toFixed(2)} грн\n` : ''}--------------------------------\n💵 РАЗОМ: ${tot.toFixed(2)} грн\n${paid > 0 ? `✅ Сплачено: -${paid.toFixed(2)} грн\n📉 Залишок: ${bal.toFixed(2)} грн` : ''}\n\n${requisitesTxt}`;
                 // Замінюємо всі грн на потрібну валюту
                 const sym = window.APP_CURRENCY_SYMBOL || '$';
                 txt = txt.replace(/грн/g, sym);          
