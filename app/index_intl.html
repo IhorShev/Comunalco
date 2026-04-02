@@ -535,27 +535,21 @@
     </div>
 
     <div class="app-header" style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; background:var(--card); padding:10px 15px; border-radius:var(--radius); border:1px solid var(--border); box-shadow:0 4px 10px rgba(0,0,0,0.05);">
-    
-    <!-- ЛІВО: Видалити об'єкт -->
-    <span onclick="app.deleteObject()" 
-          style="color:var(--danger); cursor:pointer; font-size:20px; padding:5px; flex-shrink:0;" 
-          title="Видалити об'єкт">🗑</span>
 
-    <!-- ЦЕНТР: Назва -->
+    <span onclick="app.deleteObject()" style="color:var(--danger); cursor:pointer; font-size:20px; padding:5px; flex-shrink:0;" title="Видалити">🗑️</span>
+
     <input type="text" 
-           id="object-title" 
-           class="object-title" 
-           value="Мій Об'єкт" 
-           onchange="app.updateObjectName(this.value)" 
-           placeholder="НАЗВА ОБ'ЄКТУ"
-           style="font-size:16px; font-weight:700; border:none; text-align:center; flex:1; background:transparent; color:var(--text); text-transform:uppercase; font-family:'Montserrat',sans-serif; outline:none;">
+        id="object-title" 
+        class="object-title" 
+        value="Мій Об'єкт" 
+        onchange="app.updateObjectName(this.value)" 
+        data-i18n="obj_placeholder"
+        placeholder="НАЗВА ОБ'ЄКТУ" 
+        style="font-size:16px; font-weight:700; border:none; text-align:center; flex:1; background:transparent; color:var(--text); text-transform:uppercase; font-family:'Montserrat',sans-serif; outline:none;">
 
-    <!-- ПРАВО: Додати об'єкт -->
-    <div onclick="app.addObject()" 
-         style="cursor:pointer; color:var(--primary); font-weight:900; font-size:26px; line-height:1; padding:5px; flex-shrink:0;" 
-         title="Додати об'єкт">+</div>
+    <div onclick="app.addObject()" style="cursor:pointer; color:var(--primary); font-weight:900; font-size:26px; line-height:1; padding:5px; flex-shrink:0;" title="Додати">+</div>
 
-    </div>
+</div>
         </div>
         <div class="nav-btn" onclick="app.nextObject()">❯</div>
     </div>
