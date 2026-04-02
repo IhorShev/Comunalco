@@ -2159,7 +2159,7 @@ class App {
     createDefaultObject(name) {
         return {
             id: Date.now(), 
-            name: name || "Мій Об'єкт",
+            name: name || ((window.translations && window.currentLang && window.translations[window.currentLang]) ? window.translations[window.currentLang].myObject : "Мій Об'єкт"),
             tariffs: { el_d: 4.32, el_n: 2.16, w: 30.0, g: 8.0 }, 
             extra_tariffs: [], 
             requisites: [{ id: 1, name: "Картка", val: "" }],
@@ -2167,7 +2167,7 @@ class App {
             groups: [{ 
                 id: 1, 
                 // 👇 ТУТ ВИПРАВЛЕНО НАЗВУ
-                name: "Загальнобудинкові (МЗК)", 
+                name: (window.translations && window.currentLang && window.translations[window.currentLang]) ? window.translations[window.currentLang].mzk_name : "Загальнобудинкові (МЗК)", 
                 prev: { ed: 0, en: 0, w: 0, g: 0 }, 
                 curr: { ed: 0, en: 0, w: 0, g: 0 }, 
                 custom_counters: [], 
