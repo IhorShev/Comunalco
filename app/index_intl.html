@@ -1832,7 +1832,8 @@ class App {
                     
                     const title = document.getElementById('object-title');
                     if(title) {
-                        title.value = this.state.objects[this.state.currentObjIdx].name || "Мій Об'єкт";
+                        const defName = (window.translations && window.currentLang && window.translations[window.currentLang]) ? window.translations[window.currentLang].myObject : "Мій Об'єкт";
+        title.value = this.state.objects[this.state.currentObjIdx].name || defName;
                         title.disabled = false;
                         title.style.background = "";
                         title.style.color = "";
