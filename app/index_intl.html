@@ -930,7 +930,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '11.1';
+    const APP_VERSION = '11.2';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -1026,7 +1026,9 @@ arch_title: "🔄 Архів об'єкта", arch_tab_months: "📊 Фінанс
 chart_title: "📊 Аналітика об'єкта", chart_obj: "Об'єкт аналізу", chart_opt_mzk: "🏢 Чистий МЗК (Втрати будинку)", chart_opt_fin: "💰 Фінанси (Нараховано / Сплачено)", chart_period: "Період порівняння", chart_p_all: "За весь час", chart_p_1: "Останній місяць", chart_p_3: "Останні 3 місяці", chart_p_6: "Останні півроку", chart_p_12: "Останній рік",
 acc_title: "👥 Команда та Доступ", acc_add_user: "➕ Додати користувача", acc_select_role: "Оберіть рівень доступу:", acc_role_admin: "КЕРУЮЧИЙ", acc_role_admin_desc: "Повний доступ (фінанси, налаштування)", acc_role_operator: "ОБЛІКОВЕЦЬ", acc_role_operator_desc: "Тільки внесення показників квартир", acc_apt_select: "До якої квартири?", acc_btn_send: "Надіслати запрошення ➔", acc_users_list: "Користувачі з доступом", acc_owner_note: "* Власник (Ви) маєте доступ до всього за замовчуванням.",
 share_title: "📤 Відправити повідомлення", share_desc: "Оберіть месенджер для відправки:", share_copy: "📋 Копіювати",
-role_title: "🔥 З поверненням!", role_desc: "Ми знайшли запрошення для вас.<br>Як ви хочете увійти?", role_owner: "Мої Об'єкти", role_owner_desc: "Увійти в мій кабінет", role_guest: "Моя Квартира", role_guest_desc: "Перегляд квартири, яку я орендую"
+role_title: "🔥 З поверненням!", role_desc: "Ми знайшли запрошення для вас.<br>Як ви хочете увійти?", role_owner: "Мої Об'єкти", role_owner_desc: "Увійти в мій кабінет", role_guest: "Моя Квартира", role_guest_desc: "Перегляд квартири, яку я орендую",
+		// --- ДОДАТИ ДО uk: ---
+obj_placeholder: "НАЗВА ОБ'ЄКТУ", mzk_name: "Загальнобудинкові (МЗК)"
     },
     en: {
         receipt: "INVOICE",
@@ -1105,7 +1107,9 @@ arch_title: "🔄 Object Archive", arch_tab_months: "📊 Finances (Months)", ar
 chart_title: "📊 Object Analytics", chart_obj: "Analysis Object", chart_opt_mzk: "🏢 Net HOA (Building Losses)", chart_opt_fin: "💰 Finances (Billed / Paid)", chart_period: "Comparison Period", chart_p_all: "All time", chart_p_1: "Last month", chart_p_3: "Last 3 months", chart_p_6: "Last 6 months", chart_p_12: "Last year",
 acc_title: "👥 Team & Access", acc_add_user: "➕ Add User", acc_select_role: "Select access level:", acc_role_admin: "MANAGER", acc_role_admin_desc: "Full access (finances, settings)", acc_role_operator: "METER READER", acc_role_operator_desc: "Only inputting unit meters", acc_apt_select: "To which unit?", acc_btn_send: "Send Invitation ➔", acc_users_list: "Users with access", acc_owner_note: "* The Owner (You) has full access by default.",
 share_title: "📤 Send Message", share_desc: "Choose a messenger to send:", share_copy: "📋 Copy",
-role_title: "🔥 Welcome back!", role_desc: "We found an invitation for you.<br>How do you want to log in?", role_owner: "My Objects", role_owner_desc: "Log into my dashboard", role_guest: "My Unit", role_guest_desc: "View the unit I rent"
+role_title: "🔥 Welcome back!", role_desc: "We found an invitation for you.<br>How do you want to log in?", role_owner: "My Objects", role_owner_desc: "Log into my dashboard", role_guest: "My Unit", role_guest_desc: "View the unit I rent",
+		// --- ДОДАТИ ДО en: ---
+obj_placeholder: "OBJECT NAME", mzk_name: "Common Area (HOA)"
     },
     pl: {
         receipt: "RACHUNEK",
@@ -1184,7 +1188,9 @@ arch_title: "🔄 Archiwum obiektu", arch_tab_months: "📊 Finanse (Miesiące)"
 chart_title: "📊 Analityka obiektu", chart_obj: "Obiekt analizy", chart_opt_mzk: "🏢 Czyste koszty wspólne (Straty)", chart_opt_fin: "💰 Finanse (Naliczone / Zapłacone)", chart_period: "Okres porównawczy", chart_p_all: "Cały czas", chart_p_1: "Ostatni miesiąc", chart_p_3: "Ostatnie 3 miesiące", chart_p_6: "Ostatnie 6 miesięcy", chart_p_12: "Ostatni rok",
 acc_title: "👥 Zespół i Dostęp", acc_add_user: "➕ Dodaj użytkownika", acc_select_role: "Wybierz poziom dostępu:", acc_role_admin: "ZARZĄDCA", acc_role_admin_desc: "Pełny dostęp (finanse, ustawienia)", acc_role_operator: "INKASENT", acc_role_operator_desc: "Tylko wprowadzanie liczników", acc_apt_select: "Do którego mieszkania?", acc_btn_send: "Wyślij zaproszenie ➔", acc_users_list: "Użytkownicy z dostępem", acc_owner_note: "* Właściciel (Ty) domyślnie ma pełny dostęp.",
 share_title: "📤 Wyślij wiadomość", share_desc: "Wybierz komunikator:", share_copy: "📋 Kopiuj",
-role_title: "🔥 Witaj ponownie!", role_desc: "Znaleźliśmy zaproszenie dla Ciebie.<br>Jak chcesz się zalogować?", role_owner: "Moje Obiekty", role_owner_desc: "Zaloguj się do mojego panelu", role_guest: "Moje Mieszkanie", role_guest_desc: "Wyświetl wynajmowane mieszkanie"
+role_title: "🔥 Witaj ponownie!", role_desc: "Znaleźliśmy zaproszenie dla Ciebie.<br>Jak chcesz się zalogować?", role_owner: "Moje Obiekty", role_owner_desc: "Zaloguj się do mojego panelu", role_guest: "Moje Mieszkanie", role_guest_desc: "Wyświetl wynajmowane mieszkanie",
+		// --- ДОДАТИ ДО pl: ---
+obj_placeholder: "NAZWA OBIEKTU", mzk_name: "Części Wspólne (MZW)"
     },
     de: {
         receipt: "RECHNUNG",
@@ -1263,7 +1269,9 @@ arch_title: "🔄 Objektarchiv", arch_tab_months: "📊 Finanzen (Monate)", arch
 chart_title: "📊 Objektanalytik", chart_obj: "Analyseobjekt", chart_opt_mzk: "🏢 Netto-Nebenkosten (Gebäudeverluste)", chart_opt_fin: "💰 Finanzen (Abgerechnet / Bezahlt)", chart_period: "Vergleichszeitraum", chart_p_all: "Gesamte Zeit", chart_p_1: "Letzter Monat", chart_p_3: "Letzte 3 Monate", chart_p_6: "Letzte 6 Monate", chart_p_12: "Letztes Jahr",
 acc_title: "👥 Team & Zugriff", acc_add_user: "➕ Benutzer hinzufügen", acc_select_role: "Zugriffsebene auswählen:", acc_role_admin: "MANAGER", acc_role_admin_desc: "Vollzugriff (Finanzen, Einstellungen)", acc_role_operator: "ZÄHLERABLESER", acc_role_operator_desc: "Nur Zählereingabe", acc_apt_select: "Zu welcher Wohnung?", acc_btn_send: "Einladung senden ➔", acc_users_list: "Benutzer mit Zugriff", acc_owner_note: "* Der Eigentümer (Sie) hat standardmäßig Vollzugriff.",
 share_title: "📤 Nachricht senden", share_desc: "Wählen Sie einen Messenger:", share_copy: "📋 Kopieren",
-role_title: "🔥 Willkommen zurück!", role_desc: "Wir haben eine Einladung für Sie gefunden.<br>Wie möchten Sie sich anmelden?", role_owner: "Meine Objekte", role_owner_desc: "Anmeldung in meinem Dashboard", role_guest: "Meine Wohnung", role_guest_desc: "Mietwohnung anzeigen"
+role_title: "🔥 Willkommen zurück!", role_desc: "Wir haben eine Einladung für Sie gefunden.<br>Wie möchten Sie sich anmelden?", role_owner: "Meine Objekte", role_owner_desc: "Anmeldung in meinem Dashboard", role_guest: "Meine Wohnung", role_guest_desc: "Mietwohnung anzeigen",
+		// --- ДОДАТИ ДО de: ---
+obj_placeholder: "OBJEKTNAME", mzk_name: "Allgemeinbereich (Hausgemeinschaft)"
     },
     es: {
         receipt: "FACTURA",
@@ -1342,7 +1350,9 @@ arch_title: "🔄 Archivo del objeto", arch_tab_months: "📊 Finanzas (Meses)",
 chart_title: "📊 Analítica del objeto", chart_obj: "Objeto de análisis", chart_opt_mzk: "🏢 HOA neto (Pérdidas del edificio)", chart_opt_fin: "💰 Finanzas (Facturado / Pagado)", chart_period: "Período de comparación", chart_p_all: "Todo el tiempo", chart_p_1: "Último mes", chart_p_3: "Últimos 3 meses", chart_p_6: "Últimos 6 meses", chart_p_12: "Último año",
 acc_title: "👥 Equipo y Acceso", acc_add_user: "➕ Añadir usuario", acc_select_role: "Seleccione nivel de acceso:", acc_role_admin: "ADMINISTRADOR", acc_role_admin_desc: "Acceso total (finanzas, ajustes)", acc_role_operator: "LECTOR MEDIDORES", acc_role_operator_desc: "Solo introducción de medidores", acc_apt_select: "¿A qué apartamento?", acc_btn_send: "Enviar invitación ➔", acc_users_list: "Usuarios con acceso", acc_owner_note: "* El Propietario (Usted) tiene acceso total por defecto.",
 share_title: "📤 Enviar Mensaje", share_desc: "Elija una aplicación para enviar:", share_copy: "📋 Copiar",
-role_title: "🔥 ¡Bienvenido de nuevo!", role_desc: "Hemos encontrado una invitación para usted.<br>¿Cómo desea iniciar sesión?", role_owner: "Mis Objetos", role_owner_desc: "Entrar a mi panel", role_guest: "Mi Apartamento", role_guest_desc: "Ver el apartamento que alquilo"
+role_title: "🔥 ¡Bienvenido de nuevo!", role_desc: "Hemos encontrado una invitación para usted.<br>¿Cómo desea iniciar sesión?", role_owner: "Mis Objetos", role_owner_desc: "Entrar a mi panel", role_guest: "Mi Apartamento", role_guest_desc: "Ver el apartamento que alquilo",
+		// --- ДОДАТИ ДО es: ---
+obj_placeholder: "NOMBRE DEL OBJETO", mzk_name: "Área Común (HOA)"
     },
     fr: {
         receipt: "FACTURE",
@@ -1421,7 +1431,9 @@ arch_title: "🔄 Archive de l'objet", arch_tab_months: "📊 Finances (Mois)", 
 chart_title: "📊 Analytique de l'objet", chart_obj: "Objet d'analyse", chart_opt_mzk: "🏢 HOA net (Pertes du bâtiment)", chart_opt_fin: "💰 Finances (Facturé / Payé)", chart_period: "Période de comparaison", chart_p_all: "Tout le temps", chart_p_1: "Dernier mois", chart_p_3: "3 derniers mois", chart_p_6: "6 derniers mois", chart_p_12: "Dernière année",
 acc_title: "👥 Équipe & Accès", acc_add_user: "➕ Ajouter un utilisateur", acc_select_role: "Sélectionnez le niveau d'accès :", acc_role_admin: "GESTIONNAIRE", acc_role_admin_desc: "Accès complet (finances, paramètres)", acc_role_operator: "RELEVEUR", acc_role_operator_desc: "Uniquement la saisie des compteurs", acc_apt_select: "À quel appartement ?", acc_btn_send: "Envoyer l'invitation ➔", acc_users_list: "Utilisateurs avec accès", acc_owner_note: "* Le Propriétaire (Vous) a un accès complet par défaut.",
 share_title: "📤 Envoyer le message", share_desc: "Choisissez une messagerie :", share_copy: "📋 Copier",
-role_title: "🔥 Bon retour !", role_desc: "Nous avons trouvé une invitation pour vous.<br>Comment voulez-vous vous connecter ?", role_owner: "Mes Objets", role_owner_desc: "Accéder à mon tableau de bord", role_guest: "Mon Appartement", role_guest_desc: "Voir l'appartement que je loue"
+role_title: "🔥 Bon retour !", role_desc: "Nous avons trouvé une invitation pour vous.<br>Comment voulez-vous vous connecter ?", role_owner: "Mes Objets", role_owner_desc: "Accéder à mon tableau de bord", role_guest: "Mon Appartement", role_guest_desc: "Voir l'appartement que je loue",
+		// --- ДОДАТИ ДО fr: ---
+obj_placeholder: "NOM DE L'OBJET", mzk_name: "Parties Communes"
     }
 };
 class App {
