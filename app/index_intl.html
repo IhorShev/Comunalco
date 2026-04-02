@@ -695,31 +695,31 @@
 </div>
 
 <div style="margin-top:20px; padding:15px; background:rgba(0,0,0,0.03); border-radius:12px; border:1px solid var(--border);">
-    <label style="font-size:11px; color:var(--text-sec); text-transform:uppercase;">Маєте ключ активації?</label>
+    <label style="font-size:11px; color:var(--text-sec); text-transform:uppercase;" data-i18n="prem_promo_label">Маєте ключ активації?</label>
     <div style="display:flex; gap:10px; margin-top:5px;">
         <input type="text" id="promo-code-input" placeholder="PRO-365-XXXXX" style="text-transform:uppercase; font-family:monospace; font-weight:bold; font-size:14px; margin-bottom:0;">
-        <button id="btn-activate-promo" class="btn btn-primary" style="width:auto; padding:0 20px; margin-top:0;" onclick="app.activatePromoCode()">Активувати</button>
+        <button id="btn-activate-promo" class="btn btn-primary" style="width:auto; padding:0 20px; margin-top:0;" onclick="app.activatePromoCode()" data-i18n="prem_promo_btn">Активувати</button>
     </div>
 </div>
                 
                 <p style="font-size:10px; color:var(--text-sec); text-align:center; margin-top:15px; line-height:1.4;">
-                    * Активація відбувається автоматично після оплати.<br>
-                    Ваш ID: <b id="display-user-id" style="color:var(--text);">...</b>
+                    <span data-i18n="prem_promo_desc">* Активація відбувається автоматично після оплати.</span><br>
+                    <span data-i18n="prem_promo_id">Ваш ID:</span> <b id="display-user-id" style="color:var(--text);">...</b>
                 </p>
             </div>
 
             <div id="menu-content-backups" style="display:none; text-align:center; padding: 10px 0;">
                 <div style="font-size: 40px; margin-bottom: 10px;">📦</div>
-                <h3 style="margin-top:0; color: var(--text);">Локальні копії</h3>
-                <p style="font-size:13px; color:var(--text-sec); margin-bottom:25px;">
+                <h3 style="margin-top:0; color: var(--text);" data-i18n="backup_title">Локальні копії</h3>
+                <p style="font-size:13px; color:var(--text-sec); margin-bottom:25px;" data-i18n="backup_desc">
                     Якщо ви хочете додатково зберегти дані на свій пристрій вручну (для офлайн використання) або відновити їх з файлу.
                 </p>
                 <div style="display:flex; flex-direction:column; gap:12px;">
                     <button class="btn btn-warning" style="padding:15px; font-size:14px;" onclick="app.downloadBackup()">
-                        💾 Зберегти файл на пристрій
+                        <span data-i18n="backup_btn_save">💾 Зберегти файл на пристрій</span>
                     </button>
                     <label class="btn btn-outline" style="padding:15px; font-size:14px; margin:0; cursor:pointer; text-align:center; color:var(--text); border-color:var(--border);">
-                        📂 Відкрити файл з пристрою
+                        <span data-i18n="backup_btn_open">📂 Відкрити файл з пристрою</span>
                         <input type="file" style="display:none" onchange="app.loadBackup(this)">
                     </label>
                 </div>
@@ -727,10 +727,10 @@
 
             <div id="menu-content-contacts" style="display:none">
                 <div style="text-align:center;">
-                    <p>Виникли питання або пропозиції?</p>
-                    <p style="font-weight:bold; margin-bottom:5px;">Telegram Підтримка:</p>
+                    <p data-i18n="contacts_title">Виникли питання або пропозиції?</p>
+                    <p style="font-weight:bold; margin-bottom:5px;" data-i18n="contacts_tg">Telegram Підтримка:</p>
                     <a href="https://t.me/comunalco" target="_blank" class="btn btn-telegram" style="text-decoration:none; margin-bottom:15px;">@comunalco</a>
-                    <p style="font-weight:bold; margin-bottom:5px;">Email:</p>
+                    <p style="font-weight:bold; margin-bottom:5px;" data-i18n="contacts_email">Email:</p>
                     <a href="mailto:support@comunalco.com" class="btn btn-outline" style="text-decoration:none; color:var(--text); border-color:var(--border)">support@comunalco.com</a>
                 </div>
             </div>
@@ -740,16 +740,16 @@
     <div id="payModal" class="modal" style="z-index: 2100;">
         <div class="modal-content">
             <span class="modal-close" onclick="document.getElementById('payModal').style.display='none'">&times;</span>
-            <h3 style="margin-top:0; text-align:center;">Оформлення підписки</h3>
+            <h3 style="margin-top:0; text-align:center;" data-i18n="pay_modal_title">Оформлення підписки</h3>
             <div id="pay-details" style="text-align:center; font-weight:bold; margin-bottom:15px; color:var(--primary);"></div>
-            <p style="font-size:12px; color:var(--text-sec); margin-bottom:15px; text-align:center;">
+            <p style="font-size:12px; color:var(--text-sec); margin-bottom:15px; text-align:center;" data-i18n="pay_modal_desc">
                 Оберіть спосіб замовлення. Ми надішлемо вам реквізити та ключ активації.
             </p>
-            <label>Ваш контакт (Telegram / Viber / Email)</label>
+            <label data-i18n="pay_modal_contact">Ваш контакт (Telegram / Viber / Email)</label>
             <input type="text" id="pay-contact" placeholder="@username або +380..." oninput="app.validatePayForm()">
             <div style="display:flex; flex-direction:column; gap:10px; margin-top:20px;">
-                <button id="btn-pay-tg" class="btn btn-order-tg" disabled onclick="app.processPayment('telegram')">📨 Замовити через Telegram</button>
-                <button id="btn-pay-email" class="btn btn-order-email" disabled onclick="app.processPayment('email')">📧 Замовити через Email</button>
+                <button id="btn-pay-tg" class="btn btn-order-tg" disabled onclick="app.processPayment('telegram')" data-i18n="pay_btn_tg">📨 Замовити через Telegram</button>
+                <button id="btn-pay-email" class="btn btn-order-email" disabled onclick="app.processPayment('email')" data-i18n="pay_btn_email">📧 Замовити через Email</button>
             </div>
         </div>
     </div>
@@ -760,13 +760,13 @@
         <div style="padding: 15px 20px; border-bottom: 1px solid var(--border); position: relative; background: var(--bg-card);">
             <span class="modal-close" onclick="document.getElementById('historyModal').style.display='none'" style="position: absolute; right: 15px; top: 12px; cursor: pointer; color: var(--text-sec); font-size: 24px;">&times;</span>
             <h3 style="margin: 0; text-align: center; display: flex; align-items: center; justify-content: center; gap: 10px;">
-                🔄 Архів об'єкта
+                <span data-i18n="arch_title">🔄 Архів об'єкта</span>
             </h3>
         </div>
 
         <div style="display: flex; background: var(--bg-card); border-bottom: 2px solid var(--border);">
-            <button id="tab-btn-months" type="button" onclick="app.switchArchiveTab('months')" style="flex: 1; background: none; border: none; padding: 12px 5px; font-size: 11px; text-transform: uppercase; font-weight: bold; color: var(--primary); border-bottom: 3px solid var(--primary); cursor: pointer; transition: 0.3s; outline: none;">📊 Фінанси (Місяці)</button>
-            <button id="tab-btn-apts" type="button" onclick="app.switchArchiveTab('apts')" style="flex: 1; background: none; border: none; padding: 12px 5px; font-size: 11px; text-transform: uppercase; font-weight: bold; color: var(--text-sec); border-bottom: 3px solid transparent; cursor: pointer; transition: 0.3s; outline: none;">🧾 Квитанції (Квартири)</button>
+            <button id="tab-btn-months" type="button" onclick="app.switchArchiveTab('months')" style="flex: 1; background: none; border: none; padding: 12px 5px; font-size: 11px; text-transform: uppercase; font-weight: bold; color: var(--primary); border-bottom: 3px solid var(--primary); cursor: pointer; transition: 0.3s; outline: none;" data-i18n="arch_tab_months">📊 Фінанси (Місяці)</button>
+            <button id="tab-btn-apts" type="button" onclick="app.switchArchiveTab('apts')" style="flex: 1; background: none; border: none; padding: 12px 5px; font-size: 11px; text-transform: uppercase; font-weight: bold; color: var(--text-sec); border-bottom: 3px solid transparent; cursor: pointer; transition: 0.3s; outline: none;" data-i18n="arch_tab_apts">🧾 Квитанції (Квартири)</button>
         </div>
 
         <div id="history-tab-months" style="display: block; padding: 20px;">
@@ -776,12 +776,12 @@
 
         <div id="history-tab-apts" style="display: none; padding: 20px;">
             <div style="margin-bottom: 15px;">
-                <label style="font-size: 12px; color: var(--text-sec); display: block; margin-bottom: 8px;">Оберіть платника:</label>
+                <label style="font-size: 12px; color: var(--text-sec); display: block; margin-bottom: 8px;" data-i18n="arch_select_payer">Оберіть платника:</label>
                 <select id="archive-apt-select" onchange="app.renderAptHistory(this.value)" style="width: 100%; padding: 12px; background: var(--bg-card); color: var(--text); border: 1px solid var(--border); border-radius: 8px; font-weight: bold; outline: none; cursor: pointer;"></select>
             </div>
             
             <div id="apt-history-list" style="display: flex; flex-direction: column; gap: 10px; max-height: 45vh; overflow-y: auto; padding-right: 5px;">
-                <div style="text-align: center; color: var(--text-sec); padding: 30px 10px;">
+                <div style="text-align: center; color: var(--text-sec); padding: 30px 10px;" data-i18n="arch_placeholder">
                     <div style="font-size: 30px; margin-bottom: 10px;">👆</div>
                     Оберіть квартиру зі списку вище, щоб побачити всі її квитанції
                 </div>
@@ -796,39 +796,39 @@
         <span class="modal-close" onclick="document.getElementById('archiveReceiptDetailModal').style.display='none'" style="color: #9ca3af;">&times;</span>
         
         <div style="text-align:center; border-bottom: 2px dashed #374151; padding-bottom:15px; margin-bottom:15px;">
-            <div style="font-size:12px; color:#3b82f6; font-weight:bold; letter-spacing:1px;" id="ard-date">АРХІВНА КВИТАНЦІЯ</div>
+            <div style="font-size:12px; color:#3b82f6; font-weight:bold; letter-spacing:1px;" id="ard-date" data-i18n="arch_receipt_badge">АРХІВНА КВИТАНЦІЯ</div>
             <div style="font-size:22px; font-weight:900; color:#f3f4f6; margin-top:5px;" id="ard-apt">Кв. 0</div>
         </div>
         
         <div id="archive-receipt-detail-content" style="font-size: 13px; line-height: 1.6; color:#e5e7eb;">
             </div>
         
-        <button class="btn" style="width:100%; margin-top:20px; padding:12px; font-size:14px; background:#3b82f6; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="document.getElementById('archiveReceiptDetailModal').style.display='none'">Закрити квитанцію</button>
+        <button class="btn" style="width:100%; margin-top:20px; padding:12px; font-size:14px; background:#3b82f6; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="document.getElementById('archiveReceiptDetailModal').style.display='none'" data-i18n="arch_btn_close">Закрити квитанцію</button>
     </div>
 </div>
 
 <div id="chartModal" class="modal" style="z-index: 3100;">
     <div class="modal-content" style="width: 95%; max-width: 700px; background: var(--bg-card);">
         <span class="modal-close" onclick="document.getElementById('chartModal').style.display='none'">&times;</span>
-        <h3 style="margin-top:0; text-align:center;">📊 Аналітика об'єкта</h3>
+        <h3 style="margin-top:0; text-align:center;" data-i18n="chart_title">📊 Аналітика об'єкта</h3>
 
         <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap: wrap;">
             <div style="flex:1; min-width: 200px;">
-                <label style="font-size:11px; color:var(--text-sec); display:block; margin-bottom:4px;">Об'єкт аналізу</label>
+                <label style="font-size:11px; color:var(--text-sec); display:block; margin-bottom:4px;" data-i18n="chart_obj">Об'єкт аналізу</label>
                 <select id="chart-selector" onchange="app.updateChart()" style="width:100%; padding:8px; font-weight:bold; background:var(--input-bg); color:var(--text); border:1px solid var(--border); border-radius:8px;">
-                    <option value="group">🏢 Чистий МЗК (Втрати будинку)</option>
-                    <option value="finance">💰 Фінанси (Нараховано / Сплачено)</option>
+                    <option value="group" data-i18n="chart_opt_mzk">🏢 Чистий МЗК (Втрати будинку)</option>
+                    <option value="finance" data-i18n="chart_opt_fin">💰 Фінанси (Нараховано / Сплачено)</option>
                     </select>
             </div>
             
             <div style="flex:1; min-width: 200px;">
-                <label style="font-size:11px; color:var(--text-sec); display:block; margin-bottom:4px;">Період порівняння</label>
+                <label style="font-size:11px; color:var(--text-sec); display:block; margin-bottom:4px;" data-i18n="chart_period">Період порівняння</label>
                 <select id="chart-period" onchange="app.updateChart()" style="width:100%; padding:8px; font-weight:bold; background:var(--input-bg); color:var(--text); border:1px solid var(--border); border-radius:8px;">
-                    <option value="all">За весь час</option>
-                    <option value="1">Останній місяць (порівняння з попереднім)</option>
-                    <option value="3" selected>Останні 3 місяці</option>
-                    <option value="6">Останні півроку</option>
-                    <option value="12">Останній рік</option>
+                    <option value="all" data-i18n="chart_p_all">За весь час</option>
+                    <option value="1" data-i18n="chart_p_1">Останній місяць</option>
+                    <option value="3" selected data-i18n="chart_p_3">Останні 3 місяці</option>
+                    <option value="6" data-i18n="chart_p_6">Останні півроку</option>
+                    <option value="12" data-i18n="chart_p_12">Останній рік</option>
                 </select>
             </div>
         </div>
@@ -841,38 +841,38 @@
 <div id="accessModal" class="modal" style="z-index: 3200;">
     <div class="modal-content" style="max-width: 500px;">
         <span class="modal-close" onclick="document.getElementById('accessModal').style.display='none'">&times;</span>
-        <h3 style="margin-top:0; text-align:center;">👥 Команда та Доступ</h3>
+        <h3 style="margin-top:0; text-align:center;" data-i18n="acc_title">👥 Команда та Доступ</h3>
         
         <div style="background: var(--bg); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px dashed var(--primary);">
-            <label style="color:var(--primary);">➕ Додати користувача</label>
+            <label style="color:var(--primary);" data-i18n="acc_add_user">➕ Додати користувача</label>
             <input type="email" id="new-user-email" placeholder="email@gmail.com" style="margin-bottom:10px;">
             
-           <label style="font-size:11px; color:var(--text-sec); display:block; margin-bottom:8px;">Оберіть рівень доступу:</label>
+           <label style="font-size:11px; color:var(--text-sec); display:block; margin-bottom:8px;" data-i18n="acc_select_role">Оберіть рівень доступу:</label>
 <div class="role-selector" style="grid-template-columns: 1fr 1fr; margin-bottom: 20px;">
     <div class="role-card selected" onclick="app.selectRole(this, 'admin')">
         <span class="role-icon">👑</span>
-        <span class="role-name">КЕРУЮЧИЙ</span>
-        <span class="role-desc">Повний доступ (фінанси, налаштування)</span>
+        <span class="role-name" data-i18n="acc_role_admin">КЕРУЮЧИЙ</span>
+        <span class="role-desc" data-i18n="acc_role_admin_desc">Повний доступ (фінанси, налаштування)</span>
     </div>
     <div class="role-card" onclick="app.selectRole(this, 'operator')">
         <span class="role-icon">📝</span>
-        <span class="role-name">ОБЛІКОВЕЦЬ</span>
-        <span class="role-desc">Тільки внесення показників квартир</span>
+        <span class="role-name" data-i18n="acc_role_operator">ОБЛІКОВЕЦЬ</span>
+        <span class="role-desc" data-i18n="acc_role_operator_desc">Тільки внесення показників квартир</span>
     </div>
 </div>
 
             <div id="apt-selector-block" style="display:none; margin-bottom:10px;">
-                <label>До якої квартири?</label>
+                <label data-i18n="acc_apt_select">До якої квартири?</label>
                 <select id="access-apt-select"></select>
             </div>
 
-            <button class="btn btn-primary" onclick="app.grantUserAccess()">Надіслати запрошення ➔</button>
+            <button class="btn btn-primary" onclick="app.grantUserAccess()" data-i18n="acc_btn_send">Надіслати запрошення ➔</button>
         </div>
 
-        <div class="section-title">Користувачі з доступом</div>
+        <div class="section-title" data-i18n="acc_users_list">Користувачі з доступом</div>
         <div id="users-list-container">
             </div>
-        <div style="font-size:10px; color:var(--text-sec); text-align:center; margin-top:10px;">
+        <div style="font-size:10px; color:var(--text-sec); text-align:center; margin-top:10px;" data-i18n="acc_owner_note">
             * Власник (Ви) маєте доступ до всього за замовчуванням.
         </div>
     </div>
@@ -880,8 +880,8 @@
     <div id="shareModal" class="modal" style="z-index: 4000;">
     <div class="modal-content" style="max-width: 400px; text-align:center;">
         <span class="modal-close" onclick="document.getElementById('shareModal').style.display='none'">&times;</span>
-        <h3 style="margin-top:0;">📤 Відправити повідомлення</h3>
-        <p style="font-size:12px; color:var(--text-sec); margin-bottom:15px;">Оберіть месенджер для відправки:</p>
+        <h3 style="margin-top:0;" data-i18n="share_title">📤 Відправити повідомлення</h3>
+        <p style="font-size:12px; color:var(--text-sec); margin-bottom:15px;" data-i18n="share_desc">Оберіть месенджер для відправки:</p>
         
         <textarea id="share-text-area" style="width:100%; height:100px; padding:10px; border-radius:12px; border:1px solid var(--border); background:var(--bg); color:var(--text); font-size:12px; margin-bottom:20px; resize:none;" readonly></textarea>
 
@@ -896,15 +896,15 @@
                 WhatsApp 💚
             </a>
             <button onclick="app.copyFromModal()" class="btn btn-primary">
-                📋 Копіювати
+                <span data-i18n="share_copy">📋 Копіювати</span>
             </button>
         </div>
     </div>
 </div>
 <div id="roleChoiceModal" class="modal" style="z-index: 5000; background: var(--bg);">
     <div class="modal-content" style="text-align:center; max-width: 350px; background: var(--card); border: 1px solid var(--border);">
-        <h3 style="margin-top:0; color: var(--text);">🔥 З поверненням!</h3>
-        <p style="color:var(--text-sec); font-size:13px; margin-bottom:20px;">
+        <h3 style="margin-top:0; color: var(--text);" data-i18n="role_title">🔥 З поверненням!</h3>
+        <p style="color:var(--text-sec); font-size:13px; margin-bottom:20px;" data-i18n="role_desc">
             Ми знайшли запрошення для вас.<br>Як ви хочете увійти?
         </p>
         
@@ -912,16 +912,16 @@
             <button onclick="app.loginAs('owner')" class="role-card selected" style="padding:15px; border:2px solid var(--primary); background: transparent; text-align:left; display:flex; align-items:center; gap:15px; width:100%; box-sizing:border-box; cursor:pointer;">
                 <span style="font-size:24px;">👑</span>
                 <div>
-                    <div style="font-weight:bold; font-size:14px; color: var(--text);">Мої Об'єкти</div>
-                    <div style="font-size:11px; color:var(--text-sec);">Увійти в мій кабінет</div>
+                    <div style="font-weight:bold; font-size:14px; color: var(--text);" data-i18n="role_owner">Мої Об'єкти</div>
+                    <div style="font-size:11px; color:var(--text-sec);" data-i18n="role_owner_desc">Увійти в мій кабінет</div>
                 </div>
             </button>
 
             <button onclick="app.loginAs('guest')" class="role-card" style="padding:15px; border:2px solid var(--success); background: transparent; text-align:left; display:flex; align-items:center; gap:15px; width:100%; box-sizing:border-box; cursor:pointer;">
                 <span style="font-size:24px;">🏠</span>
                 <div>
-                     <div style="font-weight:bold; font-size:14px; color: var(--text);">Моя Квартира</div>
-                    <div style="font-size:11px; color:var(--text-sec);">Перегляд квартири, яку я орендую</div>
+                     <div style="font-weight:bold; font-size:14px; color: var(--text);" data-i18n="role_guest">Моя Квартира</div>
+                    <div style="font-size:11px; color:var(--text-sec);" data-i18n="role_guest_desc">Перегляд квартири, яку я орендую</div>
                 </div>
             </button>
         </div>
@@ -1022,7 +1022,17 @@ tg_debtors_only: "🚨 Борг > 100", tg_step2: "2. Що відправити 
 tg_send_receipts: "📨 Відправити квитанції", tg_write_message: "📢 Написати повідомлення", tg_remind_debt: "🔔 Нагадати про борг",
 ann_title: "📢 Нове повідомлення", ann_subtitle_1: "Текст буде надіслано", ann_subtitle_2: "обраним квартирам:",
 ann_placeholder: "Шановні мешканці, завтра буде відключення води... \n(Натискайте Enter для абзаців)",
-ann_cancel: "Скасувати", ann_send: "🚀 Надіслати"
+ann_cancel: "Скасувати", ann_send: "🚀 Надіслати",
+		// --- ДОДАТИ ДО uk: ---
+prem_promo_label: "Маєте ключ активації?", prem_promo_btn: "Активувати", prem_promo_desc: "* Активація відбувається автоматично після оплати.", prem_promo_id: "Ваш ID:",
+backup_title: "Локальні копії", backup_desc: "Якщо ви хочете додатково зберегти дані на свій пристрій вручну (для офлайн використання) або відновити їх з файлу.", backup_btn_save: "💾 Зберегти файл на пристрій", backup_btn_open: "📂 Відкрити файл з пристрою",
+contacts_title: "Виникли питання або пропозиції?", contacts_tg: "Telegram Підтримка:", contacts_email: "Email:",
+pay_modal_title: "Оформлення підписки", pay_modal_desc: "Оберіть спосіб замовлення. Ми надішлемо вам реквізити та ключ активації.", pay_modal_contact: "Ваш контакт (Telegram / Viber / Email)", pay_btn_tg: "📨 Замовити через Telegram", pay_btn_email: "📧 Замовити через Email",
+arch_title: "🔄 Архів об'єкта", arch_tab_months: "📊 Фінанси (Місяці)", arch_tab_apts: "🧾 Квитанції (Квартири)", arch_select_payer: "Оберіть платника:", arch_placeholder: "<div style=\"font-size: 30px; margin-bottom: 10px;\">👆</div>Оберіть квартиру зі списку вище, щоб побачити всі її квитанції", arch_receipt_badge: "АРХІВНА КВИТАНЦІЯ", arch_btn_close: "Закрити квитанцію",
+chart_title: "📊 Аналітика об'єкта", chart_obj: "Об'єкт аналізу", chart_opt_mzk: "🏢 Чистий МЗК (Втрати будинку)", chart_opt_fin: "💰 Фінанси (Нараховано / Сплачено)", chart_period: "Період порівняння", chart_p_all: "За весь час", chart_p_1: "Останній місяць", chart_p_3: "Останні 3 місяці", chart_p_6: "Останні півроку", chart_p_12: "Останній рік",
+acc_title: "👥 Команда та Доступ", acc_add_user: "➕ Додати користувача", acc_select_role: "Оберіть рівень доступу:", acc_role_admin: "КЕРУЮЧИЙ", acc_role_admin_desc: "Повний доступ (фінанси, налаштування)", acc_role_operator: "ОБЛІКОВЕЦЬ", acc_role_operator_desc: "Тільки внесення показників квартир", acc_apt_select: "До якої квартири?", acc_btn_send: "Надіслати запрошення ➔", acc_users_list: "Користувачі з доступом", acc_owner_note: "* Власник (Ви) маєте доступ до всього за замовчуванням.",
+share_title: "📤 Відправити повідомлення", share_desc: "Оберіть месенджер для відправки:", share_copy: "📋 Копіювати",
+role_title: "🔥 З поверненням!", role_desc: "Ми знайшли запрошення для вас.<br>Як ви хочете увійти?", role_owner: "Мої Об'єкти", role_owner_desc: "Увійти в мій кабінет", role_guest: "Моя Квартира", role_guest_desc: "Перегляд квартири, яку я орендую"
     },
     en: {
         receipt: "INVOICE",
@@ -1091,7 +1101,17 @@ tg_debtors_only: "🚨 Debt > 100", tg_step2: "2. What to send?",
 tg_send_receipts: "📨 Send receipts", tg_write_message: "📢 Write message", tg_remind_debt: "🔔 Remind about debt",
 ann_title: "📢 New message", ann_subtitle_1: "Message will be sent to", ann_subtitle_2: "selected units:",
 ann_placeholder: "Dear residents, tomorrow there will be a water shutoff... \n(Press Enter for paragraphs)",
-ann_cancel: "Cancel", ann_send: "🚀 Send"
+ann_cancel: "Cancel", ann_send: "🚀 Send",
+		// --- ДОДАТИ ДО en: ---
+prem_promo_label: "Have an activation key?", prem_promo_btn: "Activate", prem_promo_desc: "* Activation is automatic after payment.", prem_promo_id: "Your ID:",
+backup_title: "Local Backups", backup_desc: "If you want to manually save data to your device (for offline use) or restore it from a file.", backup_btn_save: "💾 Save file to device", backup_btn_open: "📂 Open file from device",
+contacts_title: "Questions or suggestions?", contacts_tg: "Telegram Support:", contacts_email: "Email:",
+pay_modal_title: "Subscription Checkout", pay_modal_desc: "Choose an order method. We will send you payment details and an activation key.", pay_modal_contact: "Your contact (Telegram / Viber / Email)", pay_btn_tg: "📨 Order via Telegram", pay_btn_email: "📧 Order via Email",
+arch_title: "🔄 Object Archive", arch_tab_months: "📊 Finances (Months)", arch_tab_apts: "🧾 Receipts (Units)", arch_select_payer: "Select payer:", arch_placeholder: "<div style=\"font-size: 30px; margin-bottom: 10px;\">👆</div>Select a unit from the list above to see all its receipts", arch_receipt_badge: "ARCHIVED RECEIPT", arch_btn_close: "Close Receipt",
+chart_title: "📊 Object Analytics", chart_obj: "Analysis Object", chart_opt_mzk: "🏢 Net HOA (Building Losses)", chart_opt_fin: "💰 Finances (Billed / Paid)", chart_period: "Comparison Period", chart_p_all: "All time", chart_p_1: "Last month", chart_p_3: "Last 3 months", chart_p_6: "Last 6 months", chart_p_12: "Last year",
+acc_title: "👥 Team & Access", acc_add_user: "➕ Add User", acc_select_role: "Select access level:", acc_role_admin: "MANAGER", acc_role_admin_desc: "Full access (finances, settings)", acc_role_operator: "METER READER", acc_role_operator_desc: "Only inputting unit meters", acc_apt_select: "To which unit?", acc_btn_send: "Send Invitation ➔", acc_users_list: "Users with access", acc_owner_note: "* The Owner (You) has full access by default.",
+share_title: "📤 Send Message", share_desc: "Choose a messenger to send:", share_copy: "📋 Copy",
+role_title: "🔥 Welcome back!", role_desc: "We found an invitation for you.<br>How do you want to log in?", role_owner: "My Objects", role_owner_desc: "Log into my dashboard", role_guest: "My Unit", role_guest_desc: "View the unit I rent"
     },
     pl: {
         receipt: "RACHUNEK",
@@ -1160,7 +1180,17 @@ tg_debtors_only: "🚨 Dług > 100", tg_step2: "2. Co wysłać?",
 tg_send_receipts: "📨 Wyślij rachunki", tg_write_message: "📢 Napisz wiadomość", tg_remind_debt: "🔔 Przypomnij o długu",
 ann_title: "📢 Nowa wiadomość", ann_subtitle_1: "Tekst zostanie wysłany do", ann_subtitle_2: "wybranych mieszkań:",
 ann_placeholder: "Szanowni mieszkańcy, jutro nastąpi przerwa w dostawie wody... \n(Naciśnij Enter, aby dodać akapity)",
-ann_cancel: "Anuluj", ann_send: "🚀 Wyślij"
+ann_cancel: "Anuluj", ann_send: "🚀 Wyślij",
+		// --- ДОДАТИ ДО pl: ---
+prem_promo_label: "Masz klucz aktywacyjny?", prem_promo_btn: "Aktywuj", prem_promo_desc: "* Aktywacja następuje automatycznie po dokonaniu płatności.", prem_promo_id: "Twój ID:",
+backup_title: "Lokalne kopie", backup_desc: "Jeśli chcesz ręcznie zapisać dane na urządzeniu (do użytku offline) lub przywrócić je z pliku.", backup_btn_save: "💾 Zapisz plik na urządzeniu", backup_btn_open: "📂 Otwórz plik z urządzenia",
+contacts_title: "Pytania lub sugestie?", contacts_tg: "Wsparcie Telegram:", contacts_email: "Email:",
+pay_modal_title: "Zamówienie subskrypcji", pay_modal_desc: "Wybierz metodę zamówienia. Wyślemy Ci dane do płatności i klucz aktywacyjny.", pay_modal_contact: "Twój kontakt (Telegram / Viber / Email)", pay_btn_tg: "📨 Zamów przez Telegram", pay_btn_email: "📧 Zamów przez Email",
+arch_title: "🔄 Archiwum obiektu", arch_tab_months: "📊 Finanse (Miesiące)", arch_tab_apts: "🧾 Rachunki (Mieszkania)", arch_select_payer: "Wybierz płatnika:", arch_placeholder: "<div style=\"font-size: 30px; margin-bottom: 10px;\">👆</div>Wybierz mieszkanie z listy powyżej, aby zobaczyć jego rachunki", arch_receipt_badge: "RACHUNEK Z ARCHIWUM", arch_btn_close: "Zamknij rachunek",
+chart_title: "📊 Analityka obiektu", chart_obj: "Obiekt analizy", chart_opt_mzk: "🏢 Czyste koszty wspólne (Straty)", chart_opt_fin: "💰 Finanse (Naliczone / Zapłacone)", chart_period: "Okres porównawczy", chart_p_all: "Cały czas", chart_p_1: "Ostatni miesiąc", chart_p_3: "Ostatnie 3 miesiące", chart_p_6: "Ostatnie 6 miesięcy", chart_p_12: "Ostatni rok",
+acc_title: "👥 Zespół i Dostęp", acc_add_user: "➕ Dodaj użytkownika", acc_select_role: "Wybierz poziom dostępu:", acc_role_admin: "ZARZĄDCA", acc_role_admin_desc: "Pełny dostęp (finanse, ustawienia)", acc_role_operator: "INKASENT", acc_role_operator_desc: "Tylko wprowadzanie liczników", acc_apt_select: "Do którego mieszkania?", acc_btn_send: "Wyślij zaproszenie ➔", acc_users_list: "Użytkownicy z dostępem", acc_owner_note: "* Właściciel (Ty) domyślnie ma pełny dostęp.",
+share_title: "📤 Wyślij wiadomość", share_desc: "Wybierz komunikator:", share_copy: "📋 Kopiuj",
+role_title: "🔥 Witaj ponownie!", role_desc: "Znaleźliśmy zaproszenie dla Ciebie.<br>Jak chcesz się zalogować?", role_owner: "Moje Obiekty", role_owner_desc: "Zaloguj się do mojego panelu", role_guest: "Moje Mieszkanie", role_guest_desc: "Wyświetl wynajmowane mieszkanie"
     },
     de: {
         receipt: "RECHNUNG",
@@ -1229,7 +1259,17 @@ tg_debtors_only: "🚨 Schulden > 100", tg_step2: "2. Was soll gesendet werden?"
 tg_send_receipts: "📨 Quittungen senden", tg_write_message: "📢 Nachricht schreiben", tg_remind_debt: "🔔 An Schulden erinnern",
 ann_title: "📢 Neue Nachricht", ann_subtitle_1: "Nachricht wird an", ann_subtitle_2: "ausgewählte Einheiten gesendet:",
 ann_placeholder: "Liebe Bewohner, morgen wird das Wasser abgestellt... \n(Drücken Sie Enter für Absätze)",
-ann_cancel: "Abbrechen", ann_send: "🚀 Senden"
+ann_cancel: "Abbrechen", ann_send: "🚀 Senden",
+		// --- ДОДАТИ ДО de: ---
+prem_promo_label: "Haben Sie einen Aktivierungsschlüssel?", prem_promo_btn: "Aktivieren", prem_promo_desc: "* Die Aktivierung erfolgt automatisch nach der Zahlung.", prem_promo_id: "Ihre ID:",
+backup_title: "Lokale Backups", backup_desc: "Wenn Sie Daten manuell auf Ihrem Gerät speichern (für Offline-Nutzung) oder aus einer Datei wiederherstellen möchten.", backup_btn_save: "💾 Datei auf Gerät speichern", backup_btn_open: "📂 Datei vom Gerät öffnen",
+contacts_title: "Fragen oder Vorschläge?", contacts_tg: "Telegram Support:", contacts_email: "Email:",
+pay_modal_title: "Abonnement-Kasse", pay_modal_desc: "Wählen Sie eine Bestellmethode. Wir senden Ihnen Zahlungsdetails und einen Aktivierungsschlüssel.", pay_modal_contact: "Ihr Kontakt (Telegram / Viber / Email)", pay_btn_tg: "📨 Über Telegram bestellen", pay_btn_email: "📧 Über Email bestellen",
+arch_title: "🔄 Objektarchiv", arch_tab_months: "📊 Finanzen (Monate)", arch_tab_apts: "🧾 Quittungen (Wohnungen)", arch_select_payer: "Zahler auswählen:", arch_placeholder: "<div style=\"font-size: 30px; margin-bottom: 10px;\">👆</div>Wählen Sie oben eine Wohnung aus, um alle Quittungen anzuzeigen", arch_receipt_badge: "ARCHIVIERTE QUITTUNG", arch_btn_close: "Quittung schließen",
+chart_title: "📊 Objektanalytik", chart_obj: "Analyseobjekt", chart_opt_mzk: "🏢 Netto-Nebenkosten (Gebäudeverluste)", chart_opt_fin: "💰 Finanzen (Abgerechnet / Bezahlt)", chart_period: "Vergleichszeitraum", chart_p_all: "Gesamte Zeit", chart_p_1: "Letzter Monat", chart_p_3: "Letzte 3 Monate", chart_p_6: "Letzte 6 Monate", chart_p_12: "Letztes Jahr",
+acc_title: "👥 Team & Zugriff", acc_add_user: "➕ Benutzer hinzufügen", acc_select_role: "Zugriffsebene auswählen:", acc_role_admin: "MANAGER", acc_role_admin_desc: "Vollzugriff (Finanzen, Einstellungen)", acc_role_operator: "ZÄHLERABLESER", acc_role_operator_desc: "Nur Zählereingabe", acc_apt_select: "Zu welcher Wohnung?", acc_btn_send: "Einladung senden ➔", acc_users_list: "Benutzer mit Zugriff", acc_owner_note: "* Der Eigentümer (Sie) hat standardmäßig Vollzugriff.",
+share_title: "📤 Nachricht senden", share_desc: "Wählen Sie einen Messenger:", share_copy: "📋 Kopieren",
+role_title: "🔥 Willkommen zurück!", role_desc: "Wir haben eine Einladung für Sie gefunden.<br>Wie möchten Sie sich anmelden?", role_owner: "Meine Objekte", role_owner_desc: "Anmeldung in meinem Dashboard", role_guest: "Meine Wohnung", role_guest_desc: "Mietwohnung anzeigen"
     },
     es: {
         receipt: "FACTURA",
@@ -1298,7 +1338,17 @@ tg_debtors_only: "🚨 Deuda > 100", tg_step2: "2. ¿Qué enviar?",
 tg_send_receipts: "📨 Enviar recibos", tg_write_message: "📢 Escribir mensaje", tg_remind_debt: "🔔 Recordar deuda",
 ann_title: "📢 Nuevo mensaje", ann_subtitle_1: "El texto se enviará a", ann_subtitle_2: "apartamentos seleccionados:",
 ann_placeholder: "Estimados residentes, mañana habrá un corte de agua... \n(Presione Enter para párrafos)",
-ann_cancel: "Cancelar", ann_send: "🚀 Enviar"
+ann_cancel: "Cancelar", ann_send: "🚀 Enviar",
+		// --- ДОДАТИ ДО es: ---
+prem_promo_label: "¿Tiene una clave de activación?", prem_promo_btn: "Activar", prem_promo_desc: "* La activación es automática tras el pago.", prem_promo_id: "Su ID:",
+backup_title: "Copias de seguridad locales", backup_desc: "Si desea guardar datos manualmente en su dispositivo (para uso sin conexión) o restaurarlos desde un archivo.", backup_btn_save: "💾 Guardar archivo en el dispositivo", backup_btn_open: "📂 Abrir archivo desde el dispositivo",
+contacts_title: "¿Preguntas o sugerencias?", contacts_tg: "Soporte en Telegram:", contacts_email: "Correo electrónico:",
+pay_modal_title: "Suscripción", pay_modal_desc: "Elija un método de pedido. Le enviaremos los detalles de pago y una clave de activación.", pay_modal_contact: "Su contacto (Telegram / Viber / Email)", pay_btn_tg: "📨 Pedir vía Telegram", pay_btn_email: "📧 Pedir vía Email",
+arch_title: "🔄 Archivo del objeto", arch_tab_months: "📊 Finanzas (Meses)", arch_tab_apts: "🧾 Recibos (Apartamentos)", arch_select_payer: "Seleccionar pagador:", arch_placeholder: "<div style=\"font-size: 30px; margin-bottom: 10px;\">👆</div>Seleccione un apartamento de la lista para ver sus recibos", arch_receipt_badge: "RECIBO ARCHIVADO", arch_btn_close: "Cerrar recibo",
+chart_title: "📊 Analítica del objeto", chart_obj: "Objeto de análisis", chart_opt_mzk: "🏢 HOA neto (Pérdidas del edificio)", chart_opt_fin: "💰 Finanzas (Facturado / Pagado)", chart_period: "Período de comparación", chart_p_all: "Todo el tiempo", chart_p_1: "Último mes", chart_p_3: "Últimos 3 meses", chart_p_6: "Últimos 6 meses", chart_p_12: "Último año",
+acc_title: "👥 Equipo y Acceso", acc_add_user: "➕ Añadir usuario", acc_select_role: "Seleccione nivel de acceso:", acc_role_admin: "ADMINISTRADOR", acc_role_admin_desc: "Acceso total (finanzas, ajustes)", acc_role_operator: "LECTOR MEDIDORES", acc_role_operator_desc: "Solo introducción de medidores", acc_apt_select: "¿A qué apartamento?", acc_btn_send: "Enviar invitación ➔", acc_users_list: "Usuarios con acceso", acc_owner_note: "* El Propietario (Usted) tiene acceso total por defecto.",
+share_title: "📤 Enviar Mensaje", share_desc: "Elija una aplicación para enviar:", share_copy: "📋 Copiar",
+role_title: "🔥 ¡Bienvenido de nuevo!", role_desc: "Hemos encontrado una invitación para usted.<br>¿Cómo desea iniciar sesión?", role_owner: "Mis Objetos", role_owner_desc: "Entrar a mi panel", role_guest: "Mi Apartamento", role_guest_desc: "Ver el apartamento que alquilo"
     },
     fr: {
         receipt: "FACTURE",
@@ -1367,7 +1417,17 @@ tg_debtors_only: "🚨 Dette > 100", tg_step2: "2. Que voulez-vous envoyer ?",
 tg_send_receipts: "📨 Envoyer les reçus", tg_write_message: "📢 Écrire un message", tg_remind_debt: "🔔 Rappeler la dette",
 ann_title: "📢 Nouveau message", ann_subtitle_1: "Le texte sera envoyé à", ann_subtitle_2: "appartements sélectionnés :",
 ann_placeholder: "Chers résidents, demain il y aura une coupure d'eau... \n(Appuyez sur Entrée pour les paragraphes)",
-ann_cancel: "Annuler", ann_send: "🚀 Envoyer"
+ann_cancel: "Annuler", ann_send: "🚀 Envoyer",
+		// --- ДОДАТИ ДО fr: ---
+prem_promo_label: "Avez-vous une clé d'activation ?", prem_promo_btn: "Activer", prem_promo_desc: "* L'activation est automatique après le paiement.", prem_promo_id: "Votre ID :",
+backup_title: "Sauvegardes locales", backup_desc: "Si vous souhaitez enregistrer manuellement des données sur votre appareil (pour une utilisation hors ligne) ou les restaurer à partir d'un fichier.", backup_btn_save: "💾 Enregistrer le fichier", backup_btn_open: "📂 Ouvrir le fichier",
+contacts_title: "Questions ou suggestions ?", contacts_tg: "Support Telegram :", contacts_email: "Email :",
+pay_modal_title: "Abonnement", pay_modal_desc: "Choisissez une méthode de commande. Nous vous enverrons les détails de paiement et une clé d'activation.", pay_modal_contact: "Votre contact (Telegram / Viber / Email)", pay_btn_tg: "📨 Commander via Telegram", pay_btn_email: "📧 Commander via Email",
+arch_title: "🔄 Archive de l'objet", arch_tab_months: "📊 Finances (Mois)", arch_tab_apts: "🧾 Reçus (Appartements)", arch_select_payer: "Sélectionner le payeur :", arch_placeholder: "<div style=\"font-size: 30px; margin-bottom: 10px;\">👆</div>Sélectionnez un appartement dans la liste ci-dessus pour voir ses reçus", arch_receipt_badge: "REÇU ARCHIVÉ", arch_btn_close: "Fermer le reçu",
+chart_title: "📊 Analytique de l'objet", chart_obj: "Objet d'analyse", chart_opt_mzk: "🏢 HOA net (Pertes du bâtiment)", chart_opt_fin: "💰 Finances (Facturé / Payé)", chart_period: "Période de comparaison", chart_p_all: "Tout le temps", chart_p_1: "Dernier mois", chart_p_3: "3 derniers mois", chart_p_6: "6 derniers mois", chart_p_12: "Dernière année",
+acc_title: "👥 Équipe & Accès", acc_add_user: "➕ Ajouter un utilisateur", acc_select_role: "Sélectionnez le niveau d'accès :", acc_role_admin: "GESTIONNAIRE", acc_role_admin_desc: "Accès complet (finances, paramètres)", acc_role_operator: "RELEVEUR", acc_role_operator_desc: "Uniquement la saisie des compteurs", acc_apt_select: "À quel appartement ?", acc_btn_send: "Envoyer l'invitation ➔", acc_users_list: "Utilisateurs avec accès", acc_owner_note: "* Le Propriétaire (Vous) a un accès complet par défaut.",
+share_title: "📤 Envoyer le message", share_desc: "Choisissez une messagerie :", share_copy: "📋 Copier",
+role_title: "🔥 Bon retour !", role_desc: "Nous avons trouvé une invitation pour vous.<br>Comment voulez-vous vous connecter ?", role_owner: "Mes Objets", role_owner_desc: "Accéder à mon tableau de bord", role_guest: "Mon Appartement", role_guest_desc: "Voir l'appartement que je loue"
     }
 };
 class App {
