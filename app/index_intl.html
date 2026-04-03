@@ -4541,12 +4541,9 @@ renderAll() {
         }
 
         if (!this.currentData.history || this.currentData.history.length === 0) {
-    let emptyText = "Історія порожня 🤷‍♂️";
-    if (window.translations && window.currentLang && window.translations[window.currentLang] && window.translations[window.currentLang].arch_empty) {
-        emptyText = window.translations[window.currentLang].arch_empty;
-    }
-    content.innerHTML = `<p style="text-align:center; color:var(--text-sec); padding:20px;">${emptyText}</p>`;
+    content.innerHTML = '<p style="text-align:center; color:var(--text-sec); padding:20px;" data-i18n="arch_empty">Історія порожня 🤷‍♂️</p>';
     modal.style.display = 'flex';
+    if (window._applyUILang) window._applyUILang(); // Смикаємо наш глобальний перекладач
     return;
 }
 
