@@ -1028,7 +1028,9 @@ acc_title: "👥 Команда та Доступ", acc_add_user: "➕ Дода�
 share_title: "📤 Відправити повідомлення", share_desc: "Оберіть месенджер для відправки:", share_copy: "📋 Копіювати",
 role_title: "🔥 З поверненням!", role_desc: "Ми знайшли запрошення для вас.<br>Як ви хочете увійти?", role_owner: "Мої Об'єкти", role_owner_desc: "Увійти в мій кабінет", role_guest: "Моя Квартира", role_guest_desc: "Перегляд квартири, яку я орендую",
 		// --- ДОДАТИ ДО uk: ---
-obj_placeholder: "НАЗВА ОБ'ЄКТУ", mzk_name: "Загальнобудинкові (МЗК)"
+obj_placeholder: "НАЗВА ОБ'ЄКТУ", mzk_name: "Загальнобудинкові (МЗК)",
+		// uk:
+arch_empty: "Історія порожня 🤷‍♂️"
     },
     en: {
         receipt: "INVOICE",
@@ -1109,7 +1111,9 @@ acc_title: "👥 Team & Access", acc_add_user: "➕ Add User", acc_select_role: 
 share_title: "📤 Send Message", share_desc: "Choose a messenger to send:", share_copy: "📋 Copy",
 role_title: "🔥 Welcome back!", role_desc: "We found an invitation for you.<br>How do you want to log in?", role_owner: "My Objects", role_owner_desc: "Log into my dashboard", role_guest: "My Unit", role_guest_desc: "View the unit I rent",
 		// --- ДОДАТИ ДО en: ---
-obj_placeholder: "OBJECT NAME", mzk_name: "Common Area (HOA)"
+obj_placeholder: "OBJECT NAME", mzk_name: "Common Area (HOA)",
+		// en:
+arch_empty: "History is empty 🤷‍♂️"
     },
     pl: {
         receipt: "RACHUNEK",
@@ -1190,7 +1194,9 @@ acc_title: "👥 Zespół i Dostęp", acc_add_user: "➕ Dodaj użytkownika", ac
 share_title: "📤 Wyślij wiadomość", share_desc: "Wybierz komunikator:", share_copy: "📋 Kopiuj",
 role_title: "🔥 Witaj ponownie!", role_desc: "Znaleźliśmy zaproszenie dla Ciebie.<br>Jak chcesz się zalogować?", role_owner: "Moje Obiekty", role_owner_desc: "Zaloguj się do mojego panelu", role_guest: "Moje Mieszkanie", role_guest_desc: "Wyświetl wynajmowane mieszkanie",
 		// --- ДОДАТИ ДО pl: ---
-obj_placeholder: "NAZWA OBIEKTU", mzk_name: "Części Wspólne (MZW)"
+obj_placeholder: "NAZWA OBIEKTU", mzk_name: "Części Wspólne (MZW)",
+		// pl:
+arch_empty: "Historia jest pusta 🤷‍♂️"
     },
     de: {
         receipt: "RECHNUNG",
@@ -1271,7 +1277,9 @@ acc_title: "👥 Team & Zugriff", acc_add_user: "➕ Benutzer hinzufügen", acc_
 share_title: "📤 Nachricht senden", share_desc: "Wählen Sie einen Messenger:", share_copy: "📋 Kopieren",
 role_title: "🔥 Willkommen zurück!", role_desc: "Wir haben eine Einladung für Sie gefunden.<br>Wie möchten Sie sich anmelden?", role_owner: "Meine Objekte", role_owner_desc: "Anmeldung in meinem Dashboard", role_guest: "Meine Wohnung", role_guest_desc: "Mietwohnung anzeigen",
 		// --- ДОДАТИ ДО de: ---
-obj_placeholder: "OBJEKTNAME", mzk_name: "Allgemeinbereich (Hausgemeinschaft)"
+obj_placeholder: "OBJEKTNAME", mzk_name: "Allgemeinbereich (Hausgemeinschaft)",
+		// de:
+arch_empty: "Der Verlauf ist leer 🤷‍♂️"
     },
     es: {
         receipt: "FACTURA",
@@ -1352,7 +1360,9 @@ acc_title: "👥 Equipo y Acceso", acc_add_user: "➕ Añadir usuario", acc_sele
 share_title: "📤 Enviar Mensaje", share_desc: "Elija una aplicación para enviar:", share_copy: "📋 Copiar",
 role_title: "🔥 ¡Bienvenido de nuevo!", role_desc: "Hemos encontrado una invitación para usted.<br>¿Cómo desea iniciar sesión?", role_owner: "Mis Objetos", role_owner_desc: "Entrar a mi panel", role_guest: "Mi Apartamento", role_guest_desc: "Ver el apartamento que alquilo",
 		// --- ДОДАТИ ДО es: ---
-obj_placeholder: "NOMBRE DEL OBJETO", mzk_name: "Área Común (HOA)"
+obj_placeholder: "NOMBRE DEL OBJETO", mzk_name: "Área Común (HOA)",
+		// es:
+arch_empty: "El historial está vacío 🤷‍♂️"
     },
     fr: {
         receipt: "FACTURE",
@@ -1433,7 +1443,9 @@ acc_title: "👥 Équipe & Accès", acc_add_user: "➕ Ajouter un utilisateur", 
 share_title: "📤 Envoyer le message", share_desc: "Choisissez une messagerie :", share_copy: "📋 Copier",
 role_title: "🔥 Bon retour !", role_desc: "Nous avons trouvé une invitation pour vous.<br>Comment voulez-vous vous connecter ?", role_owner: "Mes Objets", role_owner_desc: "Accéder à mon tableau de bord", role_guest: "Mon Appartement", role_guest_desc: "Voir l'appartement que je loue",
 		// --- ДОДАТИ ДО fr: ---
-obj_placeholder: "NOM DE L'OBJET", mzk_name: "Parties Communes"
+obj_placeholder: "NOM DE L'OBJET", mzk_name: "Parties Communes",
+		// fr:
+arch_empty: "L'historique est vide 🤷‍♂️"
     }
 };
 class App {
@@ -4529,10 +4541,11 @@ renderAll() {
         }
 
         if (!this.currentData.history || this.currentData.history.length === 0) {
-            content.innerHTML = '<p style="text-align:center; color:var(--text-sec); padding:20px;">Історія порожня 🤷‍♂️</p>';
-            modal.style.display = 'flex';
-            return;
-        }
+    const emptyText = (window.translations && window.currentLang && window.translations[window.currentLang]) ? window.translations[window.currentLang].arch_empty : "Історія порожня 🤷‍♂️";
+    content.innerHTML = `<p style="text-align:center; color:var(--text-sec); padding:20px;">${emptyText}</p>`;
+    modal.style.display = 'flex';
+    return;
+}
 
         let html = '<div style="display:flex; flex-direction:column; gap:10px; max-height:60vh; overflow-y:auto;">';
 
