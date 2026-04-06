@@ -799,6 +799,24 @@
     </footer>
 
    <script>
+	   const loginTranslations = {
+    uk: { login_title: "Оберіть мову та валюту", login_subtitle: "Будь ласка, оберіть налаштування для входу", login_lang: "🗣 МОВА", login_curr: "💰 ВАЛЮТА", login_btn: "УВІЙТИ ЧЕРЕЗ GOOGLE ➔", login_cancel: "Скасувати" },
+    en: { login_title: "Choose language & currency", login_subtitle: "Please select your login preferences", login_lang: "🗣 LANGUAGE", login_curr: "💰 CURRENCY", login_btn: "LOGIN VIA GOOGLE ➔", login_cancel: "Cancel" },
+    pl: { login_title: "Wybierz język i walutę", login_subtitle: "Wybierz preferencje logowania", login_lang: "🗣 JĘZYK", login_curr: "💰 WALUTA", login_btn: "ZALOGUJ PRZEZ GOOGLE ➔", login_cancel: "Anuluj" },
+    de: { login_title: "Sprache & Währung wählen", login_subtitle: "Bitte wählen Sie Ihre Anmeldeeinstellungen", login_lang: "🗣 SPRACHE", login_curr: "💰 WÄHRUNG", login_btn: "MIT GOOGLE ANMELDEN ➔", login_cancel: "Abbrechen" },
+    es: { login_title: "Elija idioma y moneda", login_subtitle: "Seleccione sus preferencias de acceso", login_lang: "🗣 IDIOMA", login_curr: "💰 MONEDA", login_btn: "ENTRAR CON GOOGLE ➔", login_cancel: "Cancelar" },
+    fr: { login_title: "Choisissez la langue et la devise", login_subtitle: "Veuillez sélectionner vos préférences", login_lang: "🗣 LANGUE", login_curr: "💰 DEVISE", login_btn: "CONNEXION VIA GOOGLE ➔", login_cancel: "Annuler" }
+};
+
+function applyLoginLang(lang) {
+    if (!loginTranslations[lang]) return;
+    document.querySelectorAll('#lang-select-modal [data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (loginTranslations[lang][key]) {
+            el.innerText = loginTranslations[lang][key];
+        }
+    });
+}
         // ТЕМА
         const themeToggleBtn = document.getElementById('theme-toggle');
         if(themeToggleBtn) {
@@ -943,6 +961,8 @@
         function setLanguage(lang) {
             currentLang = lang;
             localStorage.setItem('lang', lang);
+
+			applyLoginLang(lang);
             
             // 1. Активна мова в шапці
             document.querySelectorAll('.lang-link').forEach(el => {
