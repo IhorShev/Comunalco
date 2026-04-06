@@ -4776,9 +4776,16 @@ window.addEventListener('load', () => {
                 if (window.app) window.app.state.license = { type: 'pro', exp: profile.expires_at };
             }
 
-            if (window.app && window.app.state.objects && window.app.state.objects.length <= 1) {
+            if (window.app) {
+            // Завантажуємо дані з хмари, якщо локально пусто або тільки 1 об'єкт
+            if (window.app.state.objects && window.app.state.objects.length <= 1) {
                 await window.cloudLoad();
             }
+            
+            // 🔥 ОСЬ ГОЛОВНА МАГІЯ: Змушуємо екран оновитися новими даними!
+            if (typeof window.app.renderAll === 'function') window.app.renderAll();
+            if (typeof window.app.updateStatus === 'function') window.app.updateStatus();
+        }
 
         } catch (error) {
             console.error("Помилка профілю:", error);
