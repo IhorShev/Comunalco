@@ -1032,7 +1032,9 @@ obj_placeholder: "НАЗВА ОБ'ЄКТУ", mzk_name: "Загальнобуди
 		// uk:
 arch_empty: "Історія порожня 🤷‍♂️",
 		// uk:
-toast_saved: "✅ Збережено", alert_sync_error: "❌ Втрачено зв'язок з сервером. Сторінка буде оновлена.", toast_local: "✅ Збережено локально"
+toast_saved: "✅ Збережено", alert_sync_error: "❌ Втрачено зв'язок з сервером. Сторінка буде оновлена.", toast_local: "✅ Збережено локально",
+		// uk:
+sub_expired: "⚠️ Тестовий період закінчився.", sub_extend: "Подовжити?"
     },
     en: {
         receipt: "INVOICE",
@@ -1117,7 +1119,9 @@ obj_placeholder: "OBJECT NAME", mzk_name: "Common Area (HOA)",
 		// en:
 arch_empty: "History is empty 🤷‍♂️",
 		// en:
-toast_saved: "✅ Saved", alert_sync_error: "❌ Connection lost. The page will reload.", toast_local: "✅ Saved locally"
+toast_saved: "✅ Saved", alert_sync_error: "❌ Connection lost. The page will reload.", toast_local: "✅ Saved locally",
+		// en:
+sub_expired: "⚠️ Test period ended.", sub_extend: "Extend?"
     },
     pl: {
         receipt: "RACHUNEK",
@@ -1202,7 +1206,9 @@ obj_placeholder: "NAZWA OBIEKTU", mzk_name: "Części Wspólne (MZW)",
 		// pl:
 arch_empty: "Historia jest pusta 🤷‍♂️",
 		// pl:
-toast_saved: "✅ Zapisano", alert_sync_error: "❌ Utracono połączenie z serwerem. Strona zostanie odświeżona.", toast_local: "✅ Zapisano lokalnie"
+toast_saved: "✅ Zapisano", alert_sync_error: "❌ Utracono połączenie z serwerem. Strona zostanie odświeżona.", toast_local: "✅ Zapisano lokalnie",
+		// pl:
+sub_expired: "⚠️ Okres próbny zakończony.", sub_extend: "Przedłużyć?"
     },
     de: {
         receipt: "RECHNUNG",
@@ -1287,7 +1293,9 @@ obj_placeholder: "OBJEKTNAME", mzk_name: "Allgemeinbereich (Hausgemeinschaft)",
 		// de:
 arch_empty: "Der Verlauf ist leer 🤷‍♂️",
 		// de:
-toast_saved: "✅ Gespeichert", alert_sync_error: "❌ Verbindung zum Server verloren. Seite wird neu geladen.", toast_local: "✅ Lokal gespeichert"
+toast_saved: "✅ Gespeichert", alert_sync_error: "❌ Verbindung zum Server verloren. Seite wird neu geladen.", toast_local: "✅ Lokal gespeichert",
+		// de:
+sub_expired: "⚠️ Testphase beendet.", sub_extend: "Verlängern?"
     },
     es: {
         receipt: "FACTURA",
@@ -1372,7 +1380,9 @@ obj_placeholder: "NOMBRE DEL OBJETO", mzk_name: "Área Común (HOA)",
 		// es:
 arch_empty: "El historial está vacío 🤷‍♂️",
 		// es:
-toast_saved: "✅ Guardado", alert_sync_error: "❌ Conexión perdida. La página se recargará.", toast_local: "✅ Guardado localmente"
+toast_saved: "✅ Guardado", alert_sync_error: "❌ Conexión perdida. La página se recargará.", toast_local: "✅ Guardado localmente",
+		// es:
+sub_expired: "⚠️ Período de prueba finalizado.", sub_extend: "¿Extender?"
     },
     fr: {
         receipt: "FACTURE",
@@ -1457,7 +1467,9 @@ obj_placeholder: "NOM DE L'OBJET", mzk_name: "Parties Communes",
 		// fr:
 arch_empty: "L'historique est vide 🤷‍♂️",
 		// fr:
-toast_saved: "✅ Enregistré", alert_sync_error: "❌ Connexion perdue. La page va se recharger.", toast_local: "✅ Enregistré localement"
+toast_saved: "✅ Enregistré", alert_sync_error: "❌ Connexion perdue. La page va se recharger.", toast_local: "✅ Enregistré localement",
+		// fr:
+sub_expired: "⚠️ Période d'essai terminée.", sub_extend: "Prolonger ?"
     }
 };
 class App {
@@ -2450,7 +2462,11 @@ class App {
             if (!window.currentUser || window.currentUser.id === 'guest' || window.currentUser.id === 'unknown') {
                 expireDisplay.innerHTML = '<span style="color:var(--success); font-weight:bold; cursor:pointer;" onclick="window.googleLogin()">🎁 Отримайте 45 днів безкоштовно!</span>';
             } else {
-                expireDisplay.innerHTML = '⚠️ Тестовий період закінчився. <b style="cursor:pointer; color:var(--primary)" onclick="app.openMenu(\'premium\')">Подовжити?</b>';
+                let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+    let expiredTxt = (window.translations && window.translations[lang] && window.translations[lang].sub_expired) ? window.translations[lang].sub_expired : "⚠️ Тестовий період закінчився.";
+    let extendTxt = (window.translations && window.translations[lang] && window.translations[lang].sub_extend) ? window.translations[lang].sub_extend : "Подовжити?";
+    
+    expireDisplay.innerHTML = `${expiredTxt} <b style="cursor:pointer; color:var(--primary)" onclick="app.openMenu('premium')">${extendTxt}</b>`;
             }
         } else {
             // Стан для юзера, в якого є активні дні (> 0)
