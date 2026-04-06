@@ -930,7 +930,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '11.2';
+    const APP_VERSION = '11.3';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -1030,7 +1030,9 @@ role_title: "🔥 З поверненням!", role_desc: "Ми знайшли �
 		// --- ДОДАТИ ДО uk: ---
 obj_placeholder: "НАЗВА ОБ'ЄКТУ", mzk_name: "Загальнобудинкові (МЗК)",
 		// uk:
-arch_empty: "Історія порожня 🤷‍♂️"
+arch_empty: "Історія порожня 🤷‍♂️",
+		// uk:
+toast_saved: "✅ Збережено", alert_sync_error: "❌ Втрачено зв'язок з сервером. Сторінка буде оновлена.", toast_local: "✅ Збережено локально"
     },
     en: {
         receipt: "INVOICE",
@@ -1113,7 +1115,9 @@ role_title: "🔥 Welcome back!", role_desc: "We found an invitation for you.<br
 		// --- ДОДАТИ ДО en: ---
 obj_placeholder: "OBJECT NAME", mzk_name: "Common Area (HOA)",
 		// en:
-arch_empty: "History is empty 🤷‍♂️"
+arch_empty: "History is empty 🤷‍♂️",
+		// en:
+toast_saved: "✅ Saved", alert_sync_error: "❌ Connection lost. The page will reload.", toast_local: "✅ Saved locally"
     },
     pl: {
         receipt: "RACHUNEK",
@@ -1196,7 +1200,9 @@ role_title: "🔥 Witaj ponownie!", role_desc: "Znaleźliśmy zaproszenie dla Ci
 		// --- ДОДАТИ ДО pl: ---
 obj_placeholder: "NAZWA OBIEKTU", mzk_name: "Części Wspólne (MZW)",
 		// pl:
-arch_empty: "Historia jest pusta 🤷‍♂️"
+arch_empty: "Historia jest pusta 🤷‍♂️",
+		// pl:
+toast_saved: "✅ Zapisano", alert_sync_error: "❌ Utracono połączenie z serwerem. Strona zostanie odświeżona.", toast_local: "✅ Zapisano lokalnie"
     },
     de: {
         receipt: "RECHNUNG",
@@ -1279,7 +1285,9 @@ role_title: "🔥 Willkommen zurück!", role_desc: "Wir haben eine Einladung fü
 		// --- ДОДАТИ ДО de: ---
 obj_placeholder: "OBJEKTNAME", mzk_name: "Allgemeinbereich (Hausgemeinschaft)",
 		// de:
-arch_empty: "Der Verlauf ist leer 🤷‍♂️"
+arch_empty: "Der Verlauf ist leer 🤷‍♂️",
+		// de:
+toast_saved: "✅ Gespeichert", alert_sync_error: "❌ Verbindung zum Server verloren. Seite wird neu geladen.", toast_local: "✅ Lokal gespeichert"
     },
     es: {
         receipt: "FACTURA",
@@ -1362,7 +1370,9 @@ role_title: "🔥 ¡Bienvenido de nuevo!", role_desc: "Hemos encontrado una invi
 		// --- ДОДАТИ ДО es: ---
 obj_placeholder: "NOMBRE DEL OBJETO", mzk_name: "Área Común (HOA)",
 		// es:
-arch_empty: "El historial está vacío 🤷‍♂️"
+arch_empty: "El historial está vacío 🤷‍♂️",
+		// es:
+toast_saved: "✅ Guardado", alert_sync_error: "❌ Conexión perdida. La página se recargará.", toast_local: "✅ Guardado localmente"
     },
     fr: {
         receipt: "FACTURE",
@@ -1445,7 +1455,9 @@ role_title: "🔥 Bon retour !", role_desc: "Nous avons trouvé une invitation p
 		// --- ДОДАТИ ДО fr: ---
 obj_placeholder: "NOM DE L'OBJET", mzk_name: "Parties Communes",
 		// fr:
-arch_empty: "L'historique est vide 🤷‍♂️"
+arch_empty: "L'historique est vide 🤷‍♂️",
+		// fr:
+toast_saved: "✅ Enregistré", alert_sync_error: "❌ Connexion perdue. La page va se recharger.", toast_local: "✅ Enregistré localement"
     }
 };
 class App {
@@ -2274,53 +2286,51 @@ class App {
 
             // СЦЕНАРІЙ А: Зберігаємо в Хмару
             if (window.currentUser && window.cloudSave) {
-                try {
-                    toast.innerHTML = "⏳ Синхронізація...";
-                    toast.style.backgroundColor = "var(--primary)";
-                    toast.style.display = "block"; // ПОКАЗУЄМО І ВИДІЛЯЄМО МІСЦЕ
-                    setTimeout(() => { toast.style.opacity = "1"; }, 10);
-
-                    await window.cloudSave(this.state);
-
-                    toast.innerHTML = "✅ Збережено";
-                    toast.style.backgroundColor = "var(--success)";
-
-                    setTimeout(() => {
-                        if (toast.innerHTML === "✅ Збережено") {
-                            toast.style.opacity = "0";
-                            // Після завершення анімації (0.4с) повністю ПРИБИРАЄМО елемент
-                            setTimeout(() => { toast.style.display = "none"; }, 400);
-                        }
-                    }, 6000);
-
-                } catch (e) {
-                    console.error("Помилка:", e);
-                    alert("❌ Втрачено зв'язок з сервером (або час сесії вийшов). Сторінка буде оновлена.");
-                    window.location.reload(); // Примусове оновлення, щоб не брехати користувачу!
-                    toast.innerHTML = "❌ Помилка";
-                    toast.style.backgroundColor = "var(--danger)";
-                    setTimeout(() => {
-                        if (toast.innerHTML === "❌ Помилка") {
-                            toast.style.opacity = "0";
-                            setTimeout(() => { toast.style.display = "none"; }, 400);
-                        }
-                    }, 6000);
-                }
-            } 
-            // СЦЕНАРІЙ Б: Зберігаємо локально
-            else {
-                toast.innerHTML = `<span class="desktop-only-save">✅ Збережено локально</span><span class="mobile-only-save">✅ Локально</span>`;
-                toast.style.backgroundColor = "var(--text-sec)";
-                toast.style.display = "block"; // ПОКАЗУЄМО
+            try {
+            // 👇 ОСЬ ГОЛОВНЕ ВИПРАВЛЕННЯ: вказуємо програмі, що таке toast
+            const toast = document.getElementById('header-toast'); 
+            
+            if (toast) {
+                toast.style.display = "block";
                 setTimeout(() => { toast.style.opacity = "1"; }, 10);
-
-                setTimeout(() => {
-                    if (toast.innerHTML.includes("✅ Локально")) {
-                        toast.style.opacity = "0";
-                        setTimeout(() => { toast.style.display = "none"; }, 400); // ПРИБИРАЄМО
-                    }
-                }, 3000);
             }
+
+            await window.cloudSave(this.state);
+
+            if (toast) {
+                const successTxt = (window.translations && window.currentLang && window.translations[window.currentLang]) ? window.translations[window.currentLang].toast_saved : "✅ Збережено";
+                toast.innerHTML = successTxt;
+                toast.style.backgroundColor = "var(--success)";
+                
+                setTimeout(() => {
+                    toast.style.opacity = "0";
+                    setTimeout(() => { toast.style.display = "none"; }, 400);
+                }, 6000);
+            }
+
+        } catch (e) {
+            console.error("Помилка:", e);
+            const errorMsg = (window.translations && window.currentLang && window.translations[window.currentLang]) ? window.translations[window.currentLang].alert_sync_error : "❌ Втрачено зв'язок з сервером (або час сесії вийшов). Сторінка буде оновлена.";
+            alert(errorMsg);
+            window.location.reload();
+            
+        }
+    } else {
+        // СЦЕНАРІЙ Б: Зберігаємо локально
+        const toast = document.getElementById('header-toast');
+        if (toast) {
+            const localMsg = (window.translations && window.currentLang && window.translations[window.currentLang]) ? window.translations[window.currentLang].toast_local : "✅ Збережено локально";
+            toast.innerHTML = localMsg;
+            toast.style.backgroundColor = "var(--text-sec)";
+            toast.style.display = "block";
+            setTimeout(() => { toast.style.opacity = "1"; }, 10);
+
+            setTimeout(() => {
+                toast.style.opacity = "0";
+                setTimeout(() => { toast.style.display = "none"; }, 400);
+            }, 3000);
+        }
+    }
         }, 800);
     }
     
