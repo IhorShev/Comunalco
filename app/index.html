@@ -953,7 +953,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '10.0';
+    const APP_VERSION = '10.1';
     if (localStorage.getItem('app_version') !== APP_VERSION) {
         localStorage.setItem('app_version', APP_VERSION);
         if (navigator.serviceWorker) {
@@ -1735,58 +1735,47 @@ class App {
             // СЦЕНАРІЙ А: Зберігаємо в Хмару
             if (window.currentUser && window.cloudSave) {
                 try {
+                    const toast = document.getElementById('header-toast');
+                    if (toast) {
+                        toast.innerHTML = "⏳ Синхронізація...";
+                        toast.style.backgroundColor = "var(--primary)";
+                        toast.style.display = "block";
+                        setTimeout(() => { toast.style.opacity = "1"; }, 10);
+                    }
 
-                    const toast = document.getElementById('header-toast');    
-					
-                    toast.innerHTML = "⏳ Синхронізація...";
-                    toast.style.backgroundColor = "var(--primary)";
-                    toast.style.display = "block"; // ПОКАЗУЄМО І ВИДІЛЯЄМО МІСЦЕ
-                    setTimeout(() => { toast.style.opacity = "1"; }, 10);
+                    // Чисте збереження без штучних таймерів
+                    await window.cloudSave(this.state);
 
-                    await Promise.race([
-    window.cloudSave(this.state),
-    new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 15000))
-]);
-
-                    toast.innerHTML = "✅ Збережено";
-                    toast.style.backgroundColor = "var(--success)";
-
-                    setTimeout(() => {
-                        if (toast.innerHTML === "✅ Збережено") {
+                    if (toast) {
+                        toast.innerHTML = "✅ Збережено";
+                        toast.style.backgroundColor = "var(--success)";
+                        setTimeout(() => {
                             toast.style.opacity = "0";
-                            // Після завершення анімації (0.4с) повністю ПРИБИРАЄМО елемент
                             setTimeout(() => { toast.style.display = "none"; }, 400);
-                        }
-                    }, 6000);
+                        }, 6000);
+                    }
 
                 } catch (e) {
-                    console.error("Помилка:", e);
+                    console.error("Помилка хмарного збереження:", e);
+                    // Якщо справді пропав інтернет, тихо перезавантажуємо без страшних alert
+                    // або залишаємо alert, якщо тобі критично знати про збій
                     alert("❌ Втрачено зв'язок з сервером (або час сесії вийшов). Сторінка буде оновлена.");
-                    toast.innerHTML = "❌ Помилка зв'язку";
-toast.style.backgroundColor = "var(--danger)";
-setTimeout(() => { window.location.reload(); }, 2000);
-                    toast.style.backgroundColor = "var(--danger)";
-                    setTimeout(() => {
-                        if (toast.innerHTML === "❌ Помилка") {
-                            toast.style.opacity = "0";
-                            setTimeout(() => { toast.style.display = "none"; }, 400);
-                        }
-                    }, 6000);
+                    window.location.reload();
                 }
-            } 
-            // СЦЕНАРІЙ Б: Зберігаємо локально
-            else {
-                toast.innerHTML = `<span class="desktop-only-save">✅ Збережено локально</span><span class="mobile-only-save">✅ Локально</span>`;
-                toast.style.backgroundColor = "var(--text-sec)";
-                toast.style.display = "block"; // ПОКАЗУЄМО
-                setTimeout(() => { toast.style.opacity = "1"; }, 10);
+            } else {
+                // СЦЕНАРІЙ Б: Зберігаємо локально
+                const toast = document.getElementById('header-toast');
+                if (toast) {
+                    toast.innerHTML = '<span class="desktop-only-save">✅ Збережено локально</span><span class="mobile-only-save">✅ Локально</span>';
+                    toast.style.backgroundColor = "var(--text-sec)";
+                    toast.style.display = "block";
+                    setTimeout(() => { toast.style.opacity = "1"; }, 10);
 
-                setTimeout(() => {
-                    if (toast.innerHTML.includes("✅ Локально")) {
+                    setTimeout(() => {
                         toast.style.opacity = "0";
-                        setTimeout(() => { toast.style.display = "none"; }, 400); // ПРИБИРАЄМО
-                    }
-                }, 3000);
+                        setTimeout(() => { toast.style.display = "none"; }, 400);
+                    }, 3000);
+                }
             }
         }, 800);
     }
