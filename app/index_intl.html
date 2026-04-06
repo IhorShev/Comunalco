@@ -930,7 +930,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '11.3';
+    const APP_VERSION = '11.4';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -5452,9 +5452,16 @@ console.log('🌍 Lang:', APP_LANG, '| 💰 Currency:', APP_CURRENCY, window.APP
                 if (window.app) window.app.state.license = { type: 'pro', exp: profile.expires_at };
             }
 
-            if (window.app && window.app.state.objects && window.app.state.objects.length <= 1) {
+            if (window.app) {
+            // Завантажуємо дані з хмари, якщо локально пусто або тільки 1 об'єкт
+            if (window.app.state.objects && window.app.state.objects.length <= 1) {
                 await window.cloudLoad();
             }
+            
+            // 🔥 ОСЬ ГОЛОВНА МАГІЯ: Змушуємо екран оновитися новими даними!
+            if (typeof window.app.renderAll === 'function') window.app.renderAll();
+            if (typeof window.app.updateStatus === 'function') window.app.updateStatus();
+        }
 
 			// Перевірка налаштувань для Global версії
       setTimeout(() => {
