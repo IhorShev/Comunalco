@@ -953,7 +953,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '9.9';
+    const APP_VERSION = '10.0';
     if (localStorage.getItem('app_version') !== APP_VERSION) {
         localStorage.setItem('app_version', APP_VERSION);
         if (navigator.serviceWorker) {
@@ -1735,6 +1735,9 @@ class App {
             // СЦЕНАРІЙ А: Зберігаємо в Хмару
             if (window.currentUser && window.cloudSave) {
                 try {
+
+                    const toast = document.getElementById('header-toast');    
+					
                     toast.innerHTML = "⏳ Синхронізація...";
                     toast.style.backgroundColor = "var(--primary)";
                     toast.style.display = "block"; // ПОКАЗУЄМО І ВИДІЛЯЄМО МІСЦЕ
