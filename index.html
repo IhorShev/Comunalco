@@ -760,17 +760,15 @@
             </div>
         </div>
 
-		<!-- МОДАЛКА ВИБОРУ МОВИ/ВАЛЮТИ -->
-<div id="lang-select-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999; align-items:center; justify-content:center; backdrop-filter:blur(10px);">
+		<div id="lang-select-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999; align-items:center; justify-content:center; backdrop-filter:blur(10px);">
     <div style="background:#0f172a; border:1px solid rgba(0,240,255,0.2); border-radius:24px; padding:40px 30px; max-width:480px; width:90%; text-align:center; box-shadow:0 30px 80px rgba(0,0,0,0.8);">
         
         <div style="font-size:40px; margin-bottom:15px;">🌍</div>
-        <h2 style="color:#e0e6ed; font-size:1.4rem; margin:0 0 8px 0; font-family:'Montserrat',sans-serif;">Оберіть мову та валюту</h2>
-        <p style="color:#64748b; font-size:0.85rem; margin:0 0 30px 0;">Choose your language and currency</p>
+        <h2 style="color:#e0e6ed; font-size:1.4rem; margin:0 0 8px 0; font-family:'Montserrat',sans-serif;" data-i18n="login_title">Оберіть мову та валюту</h2>
+        <p style="color:#64748b; font-size:0.85rem; margin:0 0 30px 0;" data-i18n="login_subtitle">Будь ласка, оберіть налаштування для входу</p>
 
-        <!-- МОВА -->
         <div style="margin-bottom:25px; text-align:left;">
-            <label style="color:#94a3b8; font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; display:block; margin-bottom:10px;">🗣 Мова / Language</label>
+            <label style="color:#94a3b8; font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; display:block; margin-bottom:10px;" data-i18n="login_lang">🗣 МОВА</label>
             <div id="lang-grid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px;">
                 <button onclick="selectLang('uk')" class="lang-sel-btn" data-lang="uk" style="padding:10px 8px; border:2px solid rgba(255,255,255,0.1); border-radius:10px; background:rgba(255,255,255,0.05); color:#e0e6ed; cursor:pointer; font-size:0.85rem; font-weight:700; transition:0.2s;">🇺🇦 UA</button>
                 <button onclick="selectLang('en')" class="lang-sel-btn" data-lang="en" style="padding:10px 8px; border:2px solid rgba(255,255,255,0.1); border-radius:10px; background:rgba(255,255,255,0.05); color:#e0e6ed; cursor:pointer; font-size:0.85rem; font-weight:700; transition:0.2s;">🇬🇧 EN</button>
@@ -780,9 +778,8 @@
                 <button onclick="selectLang('fr')" class="lang-sel-btn" data-lang="fr" style="padding:10px 8px; border:2px solid rgba(255,255,255,0.1); border-radius:10px; background:rgba(255,255,255,0.05); color:#e0e6ed; cursor:pointer; font-size:0.85rem; font-weight:700; transition:0.2s;">🇫🇷 FR</button>
             </div>
         </div>
-        <!-- ВАЛЮТА -->
         <div style="margin-bottom:30px; text-align:left;">
-            <label style="color:#94a3b8; font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; display:block; margin-bottom:10px;">💰 Валюта / Currency</label>
+            <label style="color:#94a3b8; font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; display:block; margin-bottom:10px;" data-i18n="login_curr">💰 ВАЛЮТА</label>
             <div id="currency-grid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px;">
                 <button onclick="selectCurrency('uah')" class="cur-sel-btn" data-cur="uah" style="padding:10px 8px; border:2px solid rgba(255,255,255,0.1); border-radius:10px; background:rgba(255,255,255,0.05); color:#e0e6ed; cursor:pointer; font-size:0.85rem; font-weight:700; transition:0.2s;">₴ UAH</button>
                 <button onclick="selectCurrency('usd')" class="cur-sel-btn" data-cur="usd" style="padding:10px 8px; border:2px solid rgba(255,255,255,0.1); border-radius:10px; background:rgba(255,255,255,0.05); color:#e0e6ed; cursor:pointer; font-size:0.85rem; font-weight:700; transition:0.2s;">$ USD</button>
@@ -793,11 +790,10 @@
             </div>
         </div>
 
-        <!-- КНОПКА ВХОДУ -->
-        <button id="proceed-login-btn" onclick="proceedWithLogin()" disabled style="width:100%; padding:16px; background:linear-gradient(90deg,#007cf0,#00dfd8); border:none; border-radius:12px; color:white; font-size:1rem; font-weight:800; cursor:pointer; opacity:0.4; transition:0.3s; font-family:'Montserrat',sans-serif; text-transform:uppercase; letter-spacing:1px;">
+        <button id="proceed-login-btn" onclick="proceedWithLogin()" disabled style="width:100%; padding:16px; background:linear-gradient(90deg,#007cf0,#00dfd8); border:none; border-radius:12px; color:white; font-size:1rem; font-weight:800; cursor:pointer; opacity:0.4; transition:0.3s; font-family:'Montserrat',sans-serif; text-transform:uppercase; letter-spacing:1px;" data-i18n="login_btn">
             Увійти через Google →
         </button>
-        <button onclick="document.getElementById('lang-select-modal').style.display='none'" style="margin-top:12px; background:none; border:none; color:#475569; cursor:pointer; font-size:0.8rem; text-decoration:underline;">Скасувати / Cancel</button>
+        <button onclick="document.getElementById('lang-select-modal').style.display='none'" style="margin-top:12px; background:none; border:none; color:#475569; cursor:pointer; font-size:0.8rem; text-decoration:underline;" data-i18n="login_cancel">Скасувати</button>
     </div>
 </div>
     </footer>
@@ -1052,6 +1048,9 @@ function selectLang(lang) {
     if (autoСurrency[lang]) selectCurrency(autoСurrency[lang]);
     
     checkProceedBtn();
+
+	window.currentLang = lang;
+    if (typeof window._applyUILang === 'function') window._applyUILang();
 }
 
 function selectCurrency(cur) {
