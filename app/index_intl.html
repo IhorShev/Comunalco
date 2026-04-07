@@ -457,8 +457,12 @@
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="opacity:0.5;"><path d="m6 9 6 6 6-6"/></svg>
         </button>
         <div id="account-menu" style="display:none; position:absolute; top:45px; left:0; background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:5px; box-shadow:0 10px 25px rgba(0,0,0,0.8); z-index:2000; min-width:180px;">
-            <div onclick="app.openMenu('premium'); toggleAccountMenu();" style="padding:12px 15px; border-bottom:1px solid var(--border); cursor:pointer; font-weight:bold; color:var(--primary);">💎 Продовжити тариф</div>
-            <div onclick="window.googleLogout();" style="padding:12px 15px; cursor:pointer; color:#ef4444;">🚪 Вийти</div>
+            <div onclick="app.openMenu('premium'); toggleAccountMenu();" style="padding:12px 15px; border-bottom:1px solid var(--border); cursor:pointer; font-weight:bold; color:var(--primary);">
+    💎 <span data-i18n="menu_extend">Продовжити тариф</span>
+</div>
+<div onclick="window.googleLogout();" style="padding:12px 15px; cursor:pointer; color:#ef4444;">
+    🚪 <span data-i18n="menu_logout">Вийти</span>
+</div>
         </div>
     </div>
 
@@ -1034,7 +1038,9 @@ arch_empty: "Історія порожня 🤷‍♂️",
 		// uk:
 toast_saved: "✅ Збережено", alert_sync_error: "❌ Втрачено зв'язок з сервером. Сторінка буде оновлена.", toast_local: "✅ Збережено локально",
 		// uk:
-sub_expired: "⚠️ Тестовий період закінчився.", sub_extend: "Подовжити?"
+sub_expired: "⚠️ Тестовий період закінчився.", sub_extend: "Подовжити?",
+		// --- ДОДАТИ ДО uk: ---
+menu_extend: "ПРОДОВЖИТИ ТАРИФ", menu_logout: "ВИЙТИ", btn_close_month: "Закрити місяць", btn_send: "Надіслати", tariffs_title: "⚙️ Загальні Тарифи, Витрати, Реквізити", t_day: "⚡ День", t_night: "🌙 Ніч", t_water: "💧 Вода", t_gas: "🔥 Газ"
     },
     en: {
         receipt: "INVOICE",
@@ -1121,7 +1127,9 @@ arch_empty: "History is empty 🤷‍♂️",
 		// en:
 toast_saved: "✅ Saved", alert_sync_error: "❌ Connection lost. The page will reload.", toast_local: "✅ Saved locally",
 		// en:
-sub_expired: "⚠️ Test period ended.", sub_extend: "Extend?"
+sub_expired: "⚠️ Test period ended.", sub_extend: "Extend?",
+		// --- ДОДАТИ ДО en: ---
+menu_extend: "EXTEND TARIFF", menu_logout: "LOG OUT", btn_close_month: "Close Month", btn_send: "Send", tariffs_title: "⚙️ General Tariffs, Costs, Details", t_day: "⚡ Day", t_night: "🌙 Night", t_water: "💧 Water", t_gas: "🔥 Gas"
     },
     pl: {
         receipt: "RACHUNEK",
@@ -1208,7 +1216,9 @@ arch_empty: "Historia jest pusta 🤷‍♂️",
 		// pl:
 toast_saved: "✅ Zapisano", alert_sync_error: "❌ Utracono połączenie z serwerem. Strona zostanie odświeżona.", toast_local: "✅ Zapisano lokalnie",
 		// pl:
-sub_expired: "⚠️ Okres próbny zakończony.", sub_extend: "Przedłużyć?"
+sub_expired: "⚠️ Okres próbny zakończony.", sub_extend: "Przedłużyć?",
+		// --- ДОДАТИ ДО pl: ---
+menu_extend: "PRZEDŁUŻ TARYFĘ", menu_logout: "WYLOGUJ", btn_close_month: "Zamknij miesiąc", btn_send: "Wyślij", tariffs_title: "⚙️ Ogólne Taryfy, Koszty, Dane", t_day: "⚡ Dzień", t_night: "🌙 Noc", t_water: "💧 Woda", t_gas: "🔥 Gaz"
     },
     de: {
         receipt: "RECHNUNG",
@@ -1295,7 +1305,9 @@ arch_empty: "Der Verlauf ist leer 🤷‍♂️",
 		// de:
 toast_saved: "✅ Gespeichert", alert_sync_error: "❌ Verbindung zum Server verloren. Seite wird neu geladen.", toast_local: "✅ Lokal gespeichert",
 		// de:
-sub_expired: "⚠️ Testphase beendet.", sub_extend: "Verlängern?"
+sub_expired: "⚠️ Testphase beendet.", sub_extend: "Verlängern?",
+		// --- ДОДАТИ ДО de: ---
+menu_extend: "TARIF VERLÄNGERN", menu_logout: "ABMELDEN", btn_close_month: "Monat abschließen", btn_send: "Senden", tariffs_title: "⚙️ Allgemeine Tarife, Kosten, Details", t_day: "⚡ Tag", t_night: "🌙 Nacht", t_water: "💧 Wasser", t_gas: "🔥 Gas"
     },
     es: {
         receipt: "FACTURA",
@@ -1382,7 +1394,9 @@ arch_empty: "El historial está vacío 🤷‍♂️",
 		// es:
 toast_saved: "✅ Guardado", alert_sync_error: "❌ Conexión perdida. La página se recargará.", toast_local: "✅ Guardado localmente",
 		// es:
-sub_expired: "⚠️ Período de prueba finalizado.", sub_extend: "¿Extender?"
+sub_expired: "⚠️ Período de prueba finalizado.", sub_extend: "¿Extender?",
+		// --- ДОДАТИ ДО es: ---
+menu_extend: "EXTENDER TARIFA", menu_logout: "CERRAR SESIÓN", btn_close_month: "Cerrar mes", btn_send: "Enviar", tariffs_title: "⚙️ Tarifas Generales, Costos, Detalles", t_day: "⚡ Día", t_night: "🌙 Noche", t_water: "💧 Agua", t_gas: "🔥 Gas"
     },
     fr: {
         receipt: "FACTURE",
@@ -1469,7 +1483,9 @@ arch_empty: "L'historique est vide 🤷‍♂️",
 		// fr:
 toast_saved: "✅ Enregistré", alert_sync_error: "❌ Connexion perdue. La page va se recharger.", toast_local: "✅ Enregistré localement",
 		// fr:
-sub_expired: "⚠️ Période d'essai terminée.", sub_extend: "Prolonger ?"
+sub_expired: "⚠️ Période d'essai terminée.", sub_extend: "Prolonger ?",
+		// --- ДОДАТИ ДО fr: ---
+menu_extend: "PROLONGER LE TARIF", menu_logout: "SE DÉCONNECTER", btn_close_month: "Clôturer le mois", btn_send: "Envoyer", tariffs_title: "⚙️ Tarifs Généraux, Coûts, Détails", t_day: "⚡ Jour", t_night: "🌙 Nuit", t_water: "💧 Eau", t_gas: "🔥 Gaz"
     }
 };
 class App {
