@@ -934,7 +934,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '11.6';
+    const APP_VERSION = '11.7';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -2221,9 +2221,12 @@ class App {
     }
     
     createDefaultObject(name) {
+        let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+        let defName = (window.translations && window.translations[lang] && window.translations[lang].myObject) ? window.translations[lang].myObject : "Мій об'єкт";
+
         return {
-            id: Date.now(), 
-            name: name || (window.translations[window.currentLang || localStorage.getItem('lang') || 'uk']?.myObject || "Мій об'єкт").toUpperCase(),
+            id: Date.now(),
+            name: name || defName.toUpperCase(),
             tariffs: { el_d: 4.32, el_n: 2.16, w: 30.0, g: 8.0 }, 
             extra_tariffs: [], 
             requisites: [{ id: 1, name: "Картка", val: "" }],
