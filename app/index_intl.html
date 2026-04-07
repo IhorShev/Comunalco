@@ -936,7 +936,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '12.0';
+    const APP_VERSION = '12.1';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -1048,7 +1048,9 @@ chat_header_title: "Чат", chat_btn_polls: "Опитування", chat_btn_cl
 		// --- ДОДАТИ ДО uk ---
 status_unlimited: "Безліміт", status_units: "Одиниці:", status_pro_active: "PRO АКТИВНО", status_free_promo: "Отримайте 45 днів безкоштовно!", status_tariff: "Тариф:", status_currency_6m: "грн / 6 міс",
 		// uk
-menu_setup_region: "Мова та Валюта"
+menu_setup_region: "Мова та Валюта",
+		// uk
+per_apt_mo: "/ об'єкт / міс", guest_id: "ГІСТЬ"
 	},
     en: {
         receipt: "INVOICE",
@@ -1143,7 +1145,9 @@ chat_header_title: "Chat", chat_btn_polls: "Polls", chat_btn_close: "Close", cha
 		// --- ДОДАТИ ДО en ---
 status_unlimited: "Unlimited", status_units: "Units:", status_pro_active: "PRO ACTIVE", status_free_promo: "Get 45 days for free!", status_tariff: "Tariff:", status_currency_6m: "UAH / 6 mo",
 		// en
-menu_setup_region: "Language & Currency"
+menu_setup_region: "Language & Currency",
+		// en
+per_apt_mo: "/ unit / mo", guest_id: "GUEST"
     },
     pl: {
         receipt: "RACHUNEK",
@@ -1238,7 +1242,9 @@ chat_header_title: "Czat", chat_btn_polls: "Ankiety", chat_btn_close: "Zamknij",
 		// --- ДОДАТИ ДО pl ---
 status_unlimited: "Bez limitu", status_units: "Jednostki:", status_pro_active: "PRO AKTYWNE", status_free_promo: "Zdobądź 45 dni za darmo!", status_tariff: "Taryfa:", status_currency_6m: "UAH / 6 mies.",
 		// pl
-menu_setup_region: "Język i Waluta"
+menu_setup_region: "Język i Waluta",
+		// pl
+per_apt_mo: "/ lokal / mc", guest_id: "GOŚĆ"
     },
     de: {
         receipt: "RECHNUNG",
@@ -1333,7 +1339,9 @@ chat_header_title: "Chat", chat_btn_polls: "Umfragen", chat_btn_close: "Schließ
 		// --- ДОДАТИ ДО de ---
 status_unlimited: "Unbegrenzt", status_units: "Einheiten:", status_pro_active: "PRO AKTIV", status_free_promo: "Erhalten Sie 45 Tage kostenlos!", status_tariff: "Tarif:", status_currency_6m: "UAH / 6 Mon.",
 		// de
-menu_setup_region: "Sprache & Währung"
+menu_setup_region: "Sprache & Währung",
+		// de
+per_apt_mo: "/ einh. / mon", guest_id: "GAST"
     },
     es: {
         receipt: "FACTURA",
@@ -1428,7 +1436,9 @@ chat_header_title: "Chat", chat_btn_polls: "Encuestas", chat_btn_close: "Cerrar"
 		// --- ДОДАТИ ДО es ---
 status_unlimited: "Ilimitado", status_units: "Unidades:", status_pro_active: "PRO ACTIVO", status_free_promo: "¡Consigue 45 días gratis!", status_tariff: "Tarifa:", status_currency_6m: "UAH / 6 mes",
 		// es
-menu_setup_region: "Idioma y Moneda"
+menu_setup_region: "Idioma y Moneda",
+		// es
+per_apt_mo: "/ unid. / mes", guest_id: "INVITADO"
     },
     fr: {
         receipt: "FACTURE",
@@ -1523,7 +1533,9 @@ chat_header_title: "Chat", chat_btn_polls: "Sondages", chat_btn_close: "Fermer",
 		// --- ДОДАТИ ДО fr ---
 status_unlimited: "Illimité", status_units: "Unités :", status_pro_active: "PRO ACTIF", status_free_promo: "Obtenez 45 jours gratuitement !", status_tariff: "Tarif :", status_currency_6m: "UAH / 6 mois",
 		// fr
-menu_setup_region: "Langue et Devise"
+menu_setup_region: "Langue et Devise",
+		// fr
+per_apt_mo: "/ unité / mois", guest_id: "INVITÉ"
     }
 };
 class App {
@@ -1593,68 +1605,95 @@ class App {
         }, 500);
     }
 }
-    // 1. Розрахунок ціни (Ваша прогресивна шкала)
-    updateSubscriptionCalc() {
-        const aptsInput = document.getElementById('calc-apts');
-        const apts = aptsInput ? (parseInt(aptsInput.value) || 1) : 1;
-        const period = this.subPeriod;
+    // 1. Розрахунок ціни (Мультивалютна прогресивна шкала)
+updateSubscriptionCalc() {
+    const aptsInput = document.getElementById('calc-apts');
+    const apts = aptsInput ? (parseInt(aptsInput.value) || 1) : 1;
+    const period = this.subPeriod;
+    
+    // Отримуємо поточну мову (для тексту) та ВАЛЮТУ (для математики)
+    const appLang = window.currentLang || localStorage.getItem('lang') || 'uk';
+    const appCurrency = (localStorage.getItem('currency') || 'uah').toLowerCase();
+    
+    // Підтягуємо словник для перекладу дрібних текстів у калькуляторі
+    let tr = (window.translations && window.translations[appLang]) ? window.translations[appLang] : window.translations['uk'];
+    let perAptText = tr.per_apt_mo || "/ об'єкт / міс"; 
+    let guestText = tr.guest_id || "ГІСТЬ";
+
+    // Базові змінні
+    let pricePerMonth = 1.50;
+    let currencyLabel = "$";
+    let isSymbolFirst = true; // true для $1.50, false для 25 грн
+
+    // 🌍 МУЛЬТИВАЛЮТНА СІТКА ТАРИФІВ
+    if (appCurrency === 'uah') {
+        pricePerMonth = 25; currencyLabel = "грн"; isSymbolFirst = false;
+        if (apts >= 6) pricePerMonth = 20;
+        if (apts >= 21) pricePerMonth = 15;
+        if (apts >= 51) pricePerMonth = 10;
         
-        // Отримуємо поточну мову системи (як на лендінгу)
-        const appLang = localStorage.getItem('lang') || 'uk';
+    } else if (appCurrency === 'pln') {
+        pricePerMonth = 4; currencyLabel = "zł"; isSymbolFirst = false;
+        if (apts >= 6) pricePerMonth = 3;
+        if (apts >= 21) pricePerMonth = 2.5;
+        if (apts >= 51) pricePerMonth = 2;
         
-        // Базові змінні
-        let pricePerMonth = 25;
-        let currencyLabel = "грн";
-        let perAptLabel = "грн/кв в міс";
-
-        // МУЛЬТИВАЛЮТНА СІТКА ТАРИФІВ
-        if (appLang === 'uk') {
-            pricePerMonth = 25; currencyLabel = "грн"; perAptLabel = "грн/кв в міс";
-            if (apts >= 6) pricePerMonth = 20;
-            if (apts >= 21) pricePerMonth = 15;
-            if (apts >= 51) pricePerMonth = 10;
-        } else if (appLang === 'pl') {
-            pricePerMonth = 4; currencyLabel = "PLN"; perAptLabel = "PLN/lokal/mc";
-            if (apts >= 6) pricePerMonth = 3;
-            if (apts >= 21) pricePerMonth = 2.5;
-            if (apts >= 51) pricePerMonth = 2;
-        } else {
-            pricePerMonth = 1.50; currencyLabel = "$"; perAptLabel = "$/unit/mo";
-            if (apts >= 6) pricePerMonth = 1.20;
-            if (apts >= 21) pricePerMonth = 0.90;
-            if (apts >= 51) pricePerMonth = 0.60;
-        }
-
-        let total = apts * pricePerMonth * period;
-
-        // Додаткова знижка -20% якщо передплата на рік (залишаємо вашу логіку)
-        if (period === 12) total = total * 0.8;
-
-        // Для гривні та злотих округлюємо до цілого, для доларів - залишаємо центи
-        this.lastCalcAmount = (appLang === 'uk' || appLang === 'pl') ? Math.ceil(total) : parseFloat(total.toFixed(2));
-
-        // Оновлюємо цифри на екрані
-        const totalSumEl = document.getElementById('calc-total-sum');
-        const pricePerAptEl = document.getElementById('calc-price-per-apt');
-
-        if (totalSumEl) {
-            totalSumEl.innerText = (appLang === 'uk' || appLang === 'pl') 
-                ? `${this.lastCalcAmount} ${currencyLabel}` 
-                : `${currencyLabel}${this.lastCalcAmount.toFixed(2)}`;
-        }
+    } else if (appCurrency === 'eur') {
+        pricePerMonth = 1.50; currencyLabel = "€"; isSymbolFirst = true;
+        if (apts >= 6) pricePerMonth = 1.20;
+        if (apts >= 21) pricePerMonth = 0.90;
+        if (apts >= 51) pricePerMonth = 0.60;
         
-        if (pricePerAptEl) {
-            const effectivePrice = (this.lastCalcAmount / period / apts).toFixed(2);
-            pricePerAptEl.innerText = `(${effectivePrice} ${perAptLabel})`;
-        }
+    } else if (appCurrency === 'gbp') {
+        pricePerMonth = 1.50; currencyLabel = "£"; isSymbolFirst = true;
+        if (apts >= 6) pricePerMonth = 1.20;
+        if (apts >= 21) pricePerMonth = 0.90;
+        if (apts >= 51) pricePerMonth = 0.60;
         
-        // Показуємо ID користувача (короткий варіант для коментаря)
-        const displayIdEl = document.getElementById('display-user-id');
-        if (displayIdEl) {
-            const userId = window.currentUser ? window.currentUser.id.split('-')[0].toUpperCase() : 'ГІСТЬ';
-            displayIdEl.innerText = userId;
-        }
+    } else { 
+        // За замовчуванням USD ($)
+        pricePerMonth = 1.50; currencyLabel = "$"; isSymbolFirst = true;
+        if (apts >= 6) pricePerMonth = 1.20;
+        if (apts >= 21) pricePerMonth = 0.90;
+        if (apts >= 51) pricePerMonth = 0.60;
     }
+
+    let total = apts * pricePerMonth * period;
+
+    // Додаткова знижка -20% якщо передплата на рік
+    if (period === 12) total = total * 0.8;
+
+    // Для гривні округлюємо до цілого (Math.ceil), для валюти - залишаємо центи (toFixed(2))
+    this.lastCalcAmount = (appCurrency === 'uah') ? Math.ceil(total) : parseFloat(total.toFixed(2));
+
+    // Оновлюємо цифри на екрані
+    const totalSumEl = document.getElementById('calc-total-sum');
+    const pricePerAptEl = document.getElementById('calc-price-per-apt');
+
+    if (totalSumEl) {
+        totalSumEl.innerText = isSymbolFirst 
+            ? `${currencyLabel}${this.lastCalcAmount.toFixed(2)}` 
+            : `${this.lastCalcAmount} ${currencyLabel}`;
+    }
+    
+    if (pricePerAptEl) {
+        const effectivePrice = (this.lastCalcAmount / period / apts).toFixed(2);
+        const formattedPrice = isSymbolFirst 
+            ? `${currencyLabel}${effectivePrice}` 
+            : `${effectivePrice} ${currencyLabel}`;
+            
+        pricePerAptEl.innerText = `(${formattedPrice} ${perAptText})`;
+    }
+    
+    // Показуємо ID користувача 
+    const displayIdEl = document.getElementById('display-user-id');
+    if (displayIdEl) {
+        const userId = window.currentUser && window.currentUser.id !== 'guest' && window.currentUser.id !== 'unknown' 
+            ? window.currentUser.id.split('-')[0].toUpperCase() 
+            : guestText;
+        displayIdEl.innerText = userId;
+    }
+}
     
     payViaPayPro() {
         const amount = this.lastCalcAmount;
