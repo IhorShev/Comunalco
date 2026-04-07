@@ -2490,7 +2490,9 @@ class App {
         } else {
             // Стан для юзера, в якого є активні дні (> 0)
             const units = typeof totalUnits !== 'undefined' ? totalUnits : '∞';
-            expireDisplay.innerHTML = `⏳ <b>${daysLeft}</b> дн.`;
+            let dLang = window.currentLang || localStorage.getItem('lang') || 'uk';
+    let dTxt = (window.translations && window.translations[dLang] && window.translations[dLang].days_short) ? window.translations[dLang].days_short : "дн.";
+    expireDisplay.innerHTML = `⏳ <b>${daysLeft}</b> ${dTxt}`;
         }
 
         // Блок тарифу під текстом
