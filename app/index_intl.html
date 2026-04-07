@@ -1605,93 +1605,108 @@ class App {
         }, 500);
     }
 }
-    // 1. Розрахунок ціни (Мультивалютна прогресивна шкала)
+    // 1. Розрахунок ціни (Мультивалютна бронебійна шкала)
 updateSubscriptionCalc() {
-    const aptsInput = document.getElementById('calc-apts');
-    const apts = aptsInput ? (parseInt(aptsInput.value) || 1) : 1;
-    const period = this.subPeriod;
-    
-    // Отримуємо поточну мову (для тексту) та ВАЛЮТУ (для математики)
-    const appLang = window.currentLang || localStorage.getItem('lang') || 'uk';
-    const appCurrency = (localStorage.getItem('currency') || 'uah').toLowerCase();
-    
-    // Підтягуємо словник для перекладу дрібних текстів у калькуляторі
-    let tr = (window.translations && window.translations[appLang]) ? window.translations[appLang] : window.translations['uk'];
-    let perAptText = tr.per_apt_mo || "/ об'єкт / міс"; 
-    let guestText = tr.guest_id || "ГІСТЬ";
-
-    // Базові змінні
-    let pricePerMonth = 1.50;
-    let currencyLabel = "$";
-    let isSymbolFirst = true; // true для $1.50, false для 25 грн
-
-    // 🌍 МУЛЬТИВАЛЮТНА СІТКА ТАРИФІВ
-    if (appCurrency === 'uah') {
-        pricePerMonth = 25; currencyLabel = "грн"; isSymbolFirst = false;
-        if (apts >= 6) pricePerMonth = 20;
-        if (apts >= 21) pricePerMonth = 15;
-        if (apts >= 51) pricePerMonth = 10;
+    try {
+        const aptsInput = document.getElementById('calc-apts');
+        let apts = 1;
+        if (aptsInput && aptsInput.value) {
+            apts = parseInt(aptsInput.value);
+            if (isNaN(apts) || apts <= 0) apts = 1; // Захист від нуля та тексту
+        }
         
-    } else if (appCurrency === 'pln') {
-        pricePerMonth = 4; currencyLabel = "zł"; isSymbolFirst = false;
-        if (apts >= 6) pricePerMonth = 3;
-        if (apts >= 21) pricePerMonth = 2.5;
-        if (apts >= 51) pricePerMonth = 2;
+        // 🛡️ Захист періоду: якщо this.subPeriod порожній, ставимо 6 за замовчуванням
+        const period = this.subPeriod || 6; 
         
-    } else if (appCurrency === 'eur') {
-        pricePerMonth = 1.50; currencyLabel = "€"; isSymbolFirst = true;
-        if (apts >= 6) pricePerMonth = 1.20;
-        if (apts >= 21) pricePerMonth = 0.90;
-        if (apts >= 51) pricePerMonth = 0.60;
+        // Отримуємо поточну мову та валюту
+        const appLang = window.currentLang || localStorage.getItem('lang') || 'uk';
+        const appCurrency = (localStorage.getItem('currency') || 'uah').toLowerCase();
         
-    } else if (appCurrency === 'gbp') {
-        pricePerMonth = 1.50; currencyLabel = "£"; isSymbolFirst = true;
-        if (apts >= 6) pricePerMonth = 1.20;
-        if (apts >= 21) pricePerMonth = 0.90;
-        if (apts >= 51) pricePerMonth = 0.60;
+        // 📚 БЕЗПЕЧНЕ завантаження словника (щоб не зламалося, якщо він ще вантажиться)
+        let tr = {};
+        if (window.translations && window.translations[appLang]) {
+            tr = window.translations[appLang];
+        } else if (window.translations && window.translations['uk']) {
+            tr = window.translations['uk'];
+        }
         
-    } else { 
-        // За замовчуванням USD ($)
-        pricePerMonth = 1.50; currencyLabel = "$"; isSymbolFirst = true;
-        if (apts >= 6) pricePerMonth = 1.20;
-        if (apts >= 21) pricePerMonth = 0.90;
-        if (apts >= 51) pricePerMonth = 0.60;
-    }
+        let perAptText = tr.per_apt_mo || "/ об'єкт / міс"; 
+        let guestText = tr.guest_id || "ГІСТЬ";
 
-    let total = apts * pricePerMonth * period;
+        // Базові змінні
+        let pricePerMonth = 1.50;
+        let currencyLabel = "$";
+        let isSymbolFirst = true;
 
-    // Додаткова знижка -20% якщо передплата на рік
-    if (period === 12) total = total * 0.8;
+        // 🌍 МУЛЬТИВАЛЮТНА СІТКА
+        if (appCurrency === 'uah') {
+            pricePerMonth = 25; currencyLabel = "грн"; isSymbolFirst = false;
+            if (apts >= 6) pricePerMonth = 20;
+            if (apts >= 21) pricePerMonth = 15;
+            if (apts >= 51) pricePerMonth = 10;
+        } else if (appCurrency === 'pln') {
+            pricePerMonth = 4; currencyLabel = "zł"; isSymbolFirst = false;
+            if (apts >= 6) pricePerMonth = 3;
+            if (apts >= 21) pricePerMonth = 2.5;
+            if (apts >= 51) pricePerMonth = 2;
+        } else if (appCurrency === 'eur') {
+            pricePerMonth = 1.50; currencyLabel = "€"; isSymbolFirst = true;
+            if (apts >= 6) pricePerMonth = 1.20;
+            if (apts >= 21) pricePerMonth = 0.90;
+            if (apts >= 51) pricePerMonth = 0.60;
+        } else if (appCurrency === 'gbp') {
+            pricePerMonth = 1.50; currencyLabel = "£"; isSymbolFirst = true;
+            if (apts >= 6) pricePerMonth = 1.20;
+            if (apts >= 21) pricePerMonth = 0.90;
+            if (apts >= 51) pricePerMonth = 0.60;
+        } else { 
+            // За замовчуванням USD ($)
+            pricePerMonth = 1.50; currencyLabel = "$"; isSymbolFirst = true;
+            if (apts >= 6) pricePerMonth = 1.20;
+            if (apts >= 21) pricePerMonth = 0.90;
+            if (apts >= 51) pricePerMonth = 0.60;
+        }
 
-    // Для гривні округлюємо до цілого (Math.ceil), для валюти - залишаємо центи (toFixed(2))
-    this.lastCalcAmount = (appCurrency === 'uah') ? Math.ceil(total) : parseFloat(total.toFixed(2));
+        // РАХУЄМО!
+        let total = apts * pricePerMonth * period;
+        if (period === 12) total = total * 0.8; // Знижка 20%
 
-    // Оновлюємо цифри на екрані
-    const totalSumEl = document.getElementById('calc-total-sum');
-    const pricePerAptEl = document.getElementById('calc-price-per-apt');
+        // Округлення
+        this.lastCalcAmount = (appCurrency === 'uah' || appCurrency === 'pln') ? Math.ceil(total) : parseFloat(total.toFixed(2));
 
-    if (totalSumEl) {
-        totalSumEl.innerText = isSymbolFirst 
-            ? `${currencyLabel}${this.lastCalcAmount.toFixed(2)}` 
-            : `${this.lastCalcAmount} ${currencyLabel}`;
-    }
-    
-    if (pricePerAptEl) {
-        const effectivePrice = (this.lastCalcAmount / period / apts).toFixed(2);
-        const formattedPrice = isSymbolFirst 
-            ? `${currencyLabel}${effectivePrice}` 
-            : `${effectivePrice} ${currencyLabel}`;
-            
-        pricePerAptEl.innerText = `(${formattedPrice} ${perAptText})`;
-    }
-    
-    // Показуємо ID користувача 
-    const displayIdEl = document.getElementById('display-user-id');
-    if (displayIdEl) {
-        const userId = window.currentUser && window.currentUser.id !== 'guest' && window.currentUser.id !== 'unknown' 
-            ? window.currentUser.id.split('-')[0].toUpperCase() 
-            : guestText;
-        displayIdEl.innerText = userId;
+        // 🕵️‍♂️ ЛОГ ДЛЯ КОНСОЛІ (щоб бачити, що рахує програма)
+        console.log(`Калькулятор: квартир=${apts}, період=${period}, ціна=${pricePerMonth}, валюта=${appCurrency}, сума=${total}`);
+
+        // Виводимо на екран
+        const totalSumEl = document.getElementById('calc-total-sum');
+        const pricePerAptEl = document.getElementById('calc-price-per-apt');
+
+        if (totalSumEl) {
+            totalSumEl.innerText = isSymbolFirst 
+                ? `${currencyLabel}${this.lastCalcAmount.toFixed(2)}` 
+                : `${this.lastCalcAmount} ${currencyLabel}`;
+        }
+        
+        if (pricePerAptEl) {
+            const effectivePrice = (this.lastCalcAmount / period / apts).toFixed(2);
+            const formattedPrice = isSymbolFirst 
+                ? `${currencyLabel}${effectivePrice}` 
+                : `${effectivePrice} ${currencyLabel}`;
+                
+            pricePerAptEl.innerText = `(${formattedPrice} ${perAptText})`;
+        }
+        
+        // Показуємо ID користувача 
+        const displayIdEl = document.getElementById('display-user-id');
+        if (displayIdEl) {
+            const userId = window.currentUser && window.currentUser.id !== 'guest' && window.currentUser.id !== 'unknown' 
+                ? window.currentUser.id.split('-')[0].toUpperCase() 
+                : guestText;
+            displayIdEl.innerText = userId;
+        }
+
+    } catch (err) {
+        console.error("🚨 Помилка калькулятора:", err);
     }
 }
     
