@@ -487,6 +487,7 @@
     <span onclick="app.openMenu('info')" style="cursor:pointer; font-size:12px;" data-i18n="menu_info">ℹ️ Інфо</span>
     <span onclick="app.openMenu('backups')" style="cursor:pointer; font-size:12px;" data-i18n="menu_backups">📦 Локальні копії</span>
     <span onclick="app.openMenu('contacts')" style="cursor:pointer; font-size:12px;" data-i18n="menu_contacts">📞 Контакти</span>
+	<span onclick="document.getElementById('setupModal').style.display='flex'" style="cursor:pointer; font-size:12px; margin-left:15px;" data-i18n="menu_setup_region">🌍 Мова та Валюта</span>			
     <button onclick="app.toggleTheme()" style="background:none; border:none; cursor:pointer; padding:0; display:flex; align-items:center; margin-left:10px;">
         <svg id="theme-icon" viewBox="0 0 24 24" fill="none" stroke="var(--text-sec)" stroke-width="2" width="20" height="20"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
     </button>
@@ -502,6 +503,7 @@
         <div onclick="app.openChartModal(); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; border-bottom:1px solid var(--border); cursor:pointer;" data-i18n="menu_analytics">📊 Аналітика</div>
         <div onclick="app.openAccessMenu(); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; border-bottom:1px solid var(--border); cursor:pointer;" data-i18n="menu_access">👥 Доступ</div>
         <div onclick="app.openMenu('info'); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; border-bottom:1px solid var(--border); cursor:pointer;" data-i18n="menu_info">ℹ️ Інфо</div>
+		<div onclick="document.getElementById('setupModal').style.display='flex'; document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; border-bottom:1px solid var(--border); cursor:pointer;" data-i18n="menu_setup_region">🌍 Мова та Валюта</div>
         <div onclick="app.toggleTheme(); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; cursor:pointer; display:flex; align-items:center; gap:10px; border-top:1px solid var(--border);" data-i18n="menu_theme">🌓 Змінити тему</div>
     </div>
 </div>
