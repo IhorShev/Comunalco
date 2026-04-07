@@ -6519,6 +6519,8 @@ window.showChatList = function() {
     if(chatBody) chatBody.classList.remove('chat-active');
     const header = document.getElementById('chat-modal-header');
     if(header) header.classList.remove('chat-active-header');
+	// 🔥 ДОДАЄМО МАГІЧНИЙ РЯДОК ПЕРЕКЛАДУ ОСЬ ТУТ:
+    if (typeof app !== 'undefined' && app._applyUILang) app._applyUILang();
 };
     // 📱 РОЗУМНЕ ПОЛЕ ВВОДУ: Авторозширення як у Telegram
 const adminInput = document.getElementById('admin-msg-text');
@@ -6556,7 +6558,9 @@ window.switchAdminChatMode = function(mode) {
         mainArea.style.removeProperty('display');
         
         window.currentChatAptId = null; 
-        document.getElementById('admin-chat-messages').innerHTML = '<div style="margin:auto; color:var(--text-sec); text-align:center;"><span style="font-size:40px;">💬</span><br>Оберіть квартиру зліва</div>';
+        
+        // 🔥 Додано data-i18n, щоб цей текст теж перекладався при кліку!
+        document.getElementById('admin-chat-messages').innerHTML = '<div data-i18n="chat_main_placeholder" style="margin:auto; color:var(--text-sec); text-align:center;"><span style="font-size:40px;">💬</span><br>Оберіть квартиру зліва</div>';
         document.getElementById('admin-chat-input-area').style.display = 'none';
         
         if (typeof loadAdminChats === 'function') loadAdminChats();
@@ -6578,6 +6582,9 @@ window.switchAdminChatMode = function(mode) {
         
         window.loadAdminCommunityMessages();
     }
+
+    // 🔥 А ОСЬ І НАШ МАГІЧНИЙ РЯДОК ПЕРЕКЛАДУ (в самому кінці функції)
+    if (typeof app !== 'undefined' && app._applyUILang) app._applyUILang();
 };
 
 // 🌍 ЗАВАНТАЖЕННЯ ЗАГАЛЬНОГО ЧАТУ
