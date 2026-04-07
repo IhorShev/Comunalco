@@ -936,7 +936,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '12.1';
+    const APP_VERSION = '12.2';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -6781,7 +6781,7 @@ setInterval(checkAdminCommBadge, 15000); // І потім кожні 15 секу
 
         <div class="setup-select-group">
             <label>Currency / Валюта</label>
-            <select id="setup-currency">
+            <select id="setup-currency" onchange="localStorage.setItem('currency', this.value); window.location.reload();">
                 <option value="UAH">UAH (₴)</option>
                 <option value="USD">USD ($)</option>
                 <option value="EUR">EUR (€)</option>
