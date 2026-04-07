@@ -2539,15 +2539,19 @@ updateSubscriptionCalc() {
 
         // 🚀 АБСОЛЮТНИЙ ЗАХИСТ ВІД ЗБОЇВ (Гарантує завантаження квартир)
         try {
-    // 🌍 РОЗУМНЕ ВИЗНАЧЕННЯ МОВИ (спочатку з бази, потім з браузера)
+    // 🌍 РОЗУМНЕ ВИЗНАЧЕННЯ МОВИ
     let lang = 'uk';
     if (this && this.state && this.state.settings && this.state.settings.lang) {
         lang = this.state.settings.lang;
     } else {
         lang = window.currentLang || localStorage.getItem('lang') || 'uk';
     }
-    // Отримуємо поточний словник
-    let tr = (window.translations && window.translations[lang]) ? window.translations[lang] : window.translations['uk'];
+    
+    // 🛡️ БЕЗПЕЧНЕ отримання словника (без помилок!)
+    let tr = {};
+    if (window.translations) {
+        tr = window.translations[lang] || window.translations['uk'] || {};
+    }
 
     if (isGlobalPro) {
         if (expireDisplay) {
