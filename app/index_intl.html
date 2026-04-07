@@ -934,7 +934,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '11.4';
+    const APP_VERSION = '11.5';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -3303,6 +3303,8 @@ renderAll() {
                 });
             }
         }, 100);
+		
+		if (typeof window._applyUILang === 'function') window._applyUILang();
         
     }
     
