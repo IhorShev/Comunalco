@@ -545,7 +545,7 @@
     <input type="text" 
         id="object-title" 
         class="object-title" 
-        value="Мій Об'єкт" 
+        value="" 
         onchange="app.updateObjectName(this.value)" 
         data-i18n="obj_placeholder"
         placeholder="НАЗВА ОБ'ЄКТУ" 
@@ -934,7 +934,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '11.5';
+    const APP_VERSION = '11.6';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -2223,7 +2223,7 @@ class App {
     createDefaultObject(name) {
         return {
             id: Date.now(), 
-            name: name || ((window.translations && window.currentLang && window.translations[window.currentLang]) ? window.translations[window.currentLang].myObject : "Мій Об'єкт"),
+            name: name || (window.translations[window.currentLang || localStorage.getItem('lang') || 'uk']?.myObject || "Мій об'єкт").toUpperCase(),
             tariffs: { el_d: 4.32, el_n: 2.16, w: 30.0, g: 8.0 }, 
             extra_tariffs: [], 
             requisites: [{ id: 1, name: "Картка", val: "" }],
