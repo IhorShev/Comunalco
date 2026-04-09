@@ -1,4 +1,4 @@
-const APP_VERSION = '6.0';
+const APP_VERSION = '6.1';
 const CACHE_NAME = 'comunalco-cache-v' + APP_VERSION;
 
 // 1. Список файлів для швидкого доступу та офлайн-роботи
@@ -33,8 +33,11 @@ self.addEventListener('activate', (event) => {
                     }
                 })
             );
-        }).then(() => self.clients.claim())
+        })
     );
+    
+    // Беремо контроль над сторінкою безпечно
+    event.waitUntil(self.clients.claim());
 });
 
 // 4. Робота з запитами: якщо файл є в кеші — беремо його звідти (це миттєво)
