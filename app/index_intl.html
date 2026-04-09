@@ -617,48 +617,8 @@
             <h3 style="margin-top:0; text-align:center;" id="menu-title" data-i18n="menu_title">Меню</h3>
             
             <div id="menu-content-info" style="display:none" class="info-block">
-    <h3 style="text-align: center; margin-bottom: 15px; color: var(--text);" data-i18n="info_header">🚀 Comunalco: Керівництво</h3>
-    <div style="text-align: left; font-size: 14px; line-height: 1.6; color: var(--text-sec); padding-right: 10px;">
-        
-        <h4 style="color: #3b82f6; margin-bottom: 5px; margin-top: 0;" data-i18n="info_pwa_title">📲 1. Встановлення як Додаток (PWA)</h4>
-        <p style="margin-top: 0; margin-bottom: 15px;">
-            <span data-i18n="info_pwa_desc">Для максимальної зручності встановіть систему на смартфон як звичайний додаток:</span><br>
-            <span data-i18n="info_pwa_ios"><b>🍎 iOS (iPhone):</b> Відкрийте сайт у Safari, натисніть "Поділитися" (квадрат зі стрілочкою) та оберіть <b>"На початковий екран"</b>.</span><br>
-            <span data-i18n="info_pwa_android"><b>🤖 Android:</b> Відкрийте сайт у Chrome, натисніть меню (три крапки) та оберіть <b>"Додати на головний екран"</b>.</span>
-        </p>
-
-        <h4 style="color: #3b82f6; margin-bottom: 5px; margin-top: 15px;" data-i18n="info_cloud_title">☁️ 2. Хмара та Ролі Доступу</h4>
-        <p style="margin-top: 0; margin-bottom: 15px;">
-            <span data-i18n="info_cloud_desc">Ваші дані у безпеці і синхронізуються з хмарою <b>Supabase</b>. У меню <b>"Доступ"</b> ви можете надати доступ помічникам:</span>
-            <br><span data-i18n="info_role_manager">👑 <b>Керуючий:</b> Повний доступ до фінансів, налаштувань та аналітики.</span>
-            <br><span data-i18n="info_role_accountant">📝 <b>Обліковець:</b> Доступ ТІЛЬКИ для внесення показників лічильників (фінанси та архів приховані).</span>
-        </p>
-
-        <h4 style="color: #3b82f6; margin-bottom: 5px;" data-i18n="info_tariffs_title">💎 3. Тарифи та Втрати (МЗК)</h4>
-        <p style="margin-top: 0; margin-bottom: 15px;" data-i18n="info_tariffs_desc">
-            У розділі <b>"Тарифи"</b> налаштуйте актуальні ціни на ресурси. <br>
-            Для розрахунку загальнобудинкових витрат (освітлення, прибирання, втрати води), введіть суми у "Додаткові витрати" — система справедливо розділить їх між усіма квартирами як <b>МЗК</b>.
-        </p>
-
-        <h4 style="color: #3b82f6; margin-bottom: 5px;" data-i18n="info_bot_title">🤖 4. Збір показників (Телеграм-Бот)</h4>
-        <p style="margin-top: 0; margin-bottom: 15px;" data-i18n="info_bot_desc">
-            Ви можете вносити показники вручну, або автоматизувати процес. Натисніть 🔗 <b>Підключити Телеграм-Бот</b> у картці квартири і надішліть посилання мешканцю. Ви контролюєте цей процес перемикачем "Дозвіл боту".
-        </p>
-
-        <h4 style="color: #3b82f6; margin-bottom: 5px;" data-i18n="info_analytics_title">📊 5. Аналітика об'єкта</h4>
-        <p style="margin-top: 0; margin-bottom: 15px;" data-i18n="info_analytics_desc">
-            У меню <b>"Аналітика"</b> доступні графіки для контролю:<br>
-            • <b>Чистий МЗК:</b> Показує реальні втрати будинку (головний лічильник мінус усі квартири). Ідеально для пошуку крадіжок.<br>
-            • <b>Фінанси:</b> Порівняння виставлених рахунків із реально отриманими коштами.
-        </p>
-
-        <h4 style="color: #3b82f6; margin-bottom: 5px;" data-i18n="info_archive_title">💾 6. Закриття місяця та Архів</h4>
-        <p style="margin-top: 0; margin-bottom: 15px;" data-i18n="info_archive_desc">
-            Коли всі розрахунки завершені, натисніть <b>"Закрити місяць"</b>. Система:<br>
-            1. Зробить безповоротний зліпок даних і відправить його в <b>Архів</b>.<br>
-            2. Перенесе поточні показники у графу "Попередні".<br>
-            У меню "Архів" ви завжди зможете відкрити детальний чек по кожній квартирі за будь-який період.
-        </p>
+    <h3 id="info-modal-title" style="text-align: center; margin-bottom: 15px; color: var(--text);">🚀 Comunalco: Керівництво</h3>
+<div id="info-modal-body" style="text-align: left; font-size: 14px; line-height: 1.6; color: var(--text-sec); padding-right: 10px;">
     </div>
 </div>
 
@@ -936,7 +896,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '12.9';
+    const APP_VERSION = '13.0';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -1060,7 +1020,16 @@ days_short: "дн.", chart_archive: "Архів", chart_billed: "💰 Виста
 		// uk
 menu_title: "Меню",
 		// --- ДОДАТИ ДО uk ---
-access_empty: "Поки що тільки ви маєте доступ.<br>Додайте менеджера або мешканця.", role_manager: "🛠 Менеджер", role_tenant: "🏠 Мешканець", role_viewer: "👀 Гість", role_operator: "📝 Обліковець", access_all_obj: "Весь об'єкт"
+access_empty: "Поки що тільки ви маєте доступ.<br>Додайте менеджера або мешканця.", role_manager: "🛠 Менеджер", role_tenant: "🏠 Мешканець", role_viewer: "👀 Гість", role_operator: "📝 Обліковець", access_all_obj: "Весь об'єкт",
+		// --- ДОДАТИ ДО uk ---
+info_title: "🚀 Comunalco: Посібник Користувача",
+info_sec1: "<b>📱 1. Встановлення як Додаток (PWA)</b><br>Для зручності встановіть систему на смартфон:<br>🍎 <b>iOS:</b> Відкрийте сайт у Safari, натисніть «Поділитися» (квадрат зі стрілкою) та «На екран».<br>🤖 <b>Android:</b> У Chrome натисніть меню (три крапки) та «Додати на головний екран».",
+info_sec2: "<b>☁️ 2. Хмара та Ролі Доступу</b><br>Ваші дані у безпеці в хмарі. У меню «Доступ» ви можете додати помічників:<br>👑 <b>Менеджер:</b> Повний доступ.<br>🏠 <b>Мешканець:</b> Бачить лише свої рахунки та чат.<br>👀 <b>Гість:</b> Тільки перегляд.<br>📝 <b>Обліковець:</b> Тільки введення показників.",
+info_sec3: "<b>💎 3. Тарифи та Втрати (МЗК)</b><br>Встановіть ціни на ресурси в меню «Тарифи». Якщо ввести суми в «Додаткові витрати», система автоматично та справедливо розділить їх між усіма квартирами.",
+info_sec4: "<b>🤖 4. Telegram-Бот</b><br>Автоматизуйте збір показників! Натисніть 🔗 <b>Підключити Telegram</b> у картці квартири та надішліть посилання мешканцю.",
+info_sec5: "<b>💬 5. Чат та Опитування</b><br>У меню «Чат Будинку» ви можете спілкуватися з мешканцями. Використовуйте кнопку <b>Опитування</b> для створення голосувань за важливі ініціативи.",
+info_sec6: "<b>📊 6. Аналітика</b><br>Графіки допоможуть знайти крадіжки ресурсів (різниця між головним лічильником та квартирами) та контролювати фінанси.",
+info_sec7: "<b>📦 7. Закриття місяця та Архів</b><br>Коли всі дані введені, натисніть <b>Закрити місяць</b>. Система створить квитанції, перенесе показники в «Попередні» та збереже все в Архів."
 	},
     en: {
         receipt: "INVOICE",
@@ -1167,7 +1136,16 @@ days_short: "days", chart_archive: "Archive", chart_billed: "💰 Billed", chart
 		// en
 menu_title: "Menu",
 		// --- ДОДАТИ ДО en ---
-access_empty: "Only you have access so far.<br>Add a manager or a resident.", role_manager: "🛠 Manager", role_tenant: "🏠 Resident", role_viewer: "👀 Guest", role_operator: "📝 Meter Reader", access_all_obj: "Whole Object"
+access_empty: "Only you have access so far.<br>Add a manager or a resident.", role_manager: "🛠 Manager", role_tenant: "🏠 Resident", role_viewer: "👀 Guest", role_operator: "📝 Meter Reader", access_all_obj: "Whole Object",
+		// --- ДОДАТИ ДО en ---
+info_title: "🚀 Comunalco: User Guide",
+info_sec1: "<b>📱 1. Installation (PWA)</b><br>For maximum convenience, install the app on your phone:<br>🍎 <b>iOS:</b> Open in Safari, tap 'Share' and 'Add to Home Screen'.<br>🤖 <b>Android:</b> In Chrome, tap menu (three dots) and 'Add to Home screen'.",
+info_sec2: "<b>☁️ 2. Cloud & Access Roles</b><br>Your data is safely synced to the cloud. Add assistants in the 'Access' menu:<br>👑 <b>Manager:</b> Full access.<br>🏠 <b>Resident:</b> Sees only their bills and chat.<br>👀 <b>Guest:</b> View only.<br>📝 <b>Meter Reader:</b> Only enters readings.",
+info_sec3: "<b>💎 3. Tariffs & Losses (HOA)</b><br>Set resource prices in the 'Tariffs' menu. Enter amounts in 'Additional Expenses' and the system will fairly divide them among all apartments.",
+info_sec4: "<b>🤖 4. Telegram Bot</b><br>Automate data collection! Click 🔗 <b>Connect Telegram</b> in the apartment card and send the link to the resident.",
+info_sec5: "<b>💬 5. Chat & Polls</b><br>Communicate with residents in the 'Building Chat' menu. Use the <b>Polls</b> button to vote on important initiatives.",
+info_sec6: "<b>📊 6. Object Analytics</b><br>Graphs help you find resource theft (difference between main meter and apartments) and track finances.",
+info_sec7: "<b>📦 7. Closing the Month & Archive</b><br>When all calculations are done, click <b>Close Month</b>. The system will create receipts, move current readings to 'Previous', and save everything to the Archive."
     },
     pl: {
         receipt: "RACHUNEK",
@@ -1274,7 +1252,16 @@ days_short: "dni", chart_archive: "Archiwum", chart_billed: "💰 Wystawiono rac
 		// pl
 menu_title: "Menu",
 		// --- ДОДАТИ ДО pl ---
-access_empty: "Na razie tylko Ty masz dostęp.<br>Dodaj menedżera lub mieszkańca.", role_manager: "🛠 Menedżer", role_tenant: "🏠 Mieszkaniec", role_viewer: "👀 Gość", role_operator: "📝 Inkasent", access_all_obj: "Cały obiekt"
+access_empty: "Na razie tylko Ty masz dostęp.<br>Dodaj menedżera lub mieszkańca.", role_manager: "🛠 Menedżer", role_tenant: "🏠 Mieszkaniec", role_viewer: "👀 Gość", role_operator: "📝 Inkasent", access_all_obj: "Cały obiekt",
+		// --- ДОДАТИ ДО pl ---
+info_title: "🚀 Comunalco: Przewodnik",
+info_sec1: "<b>📱 1. Instalacja (PWA)</b><br>Dla wygody zainstaluj aplikację na telefonie:<br>🍎 <b>iOS:</b> Otwórz w Safari, kliknij 'Udostępnij' i 'Do ekranu pocz.'.<br>🤖 <b>Android:</b> W Chrome kliknij menu (trzy kropki) i 'Dodaj do ekranu gł.'.",
+info_sec2: "<b>☁️ 2. Chmura i Role Dostępu</b><br>Twoje dane są bezpieczne w chmurze. Dodaj asystentów w menu 'Dostęp':<br>👑 <b>Menedżer:</b> Pełny dostęp.<br>🏠 <b>Mieszkaniec:</b> Widzi tylko swoje rachunki i czat.<br>👀 <b>Gość:</b> Tylko podgląd.<br>📝 <b>Inkasent:</b> Tylko wprowadzanie odczytów.",
+info_sec3: "<b>💎 3. Taryfy i Straty (Admin)</b><br>Ustaw ceny w menu 'Taryfy'. Wpisz kwoty w 'Koszty dodatkowe', a system sprawiedliwie podzieli je między wszystkie mieszkania.",
+info_sec4: "<b>🤖 4. Bot Telegram</b><br>Zautomatyzuj zbieranie odczytów! Kliknij 🔗 <b>Połącz Telegram</b> na karcie mieszkania i wyślij link mieszkańcowi.",
+info_sec5: "<b>💬 5. Czat i Ankiety</b><br>Komunikuj się z mieszkańcami w menu 'Czat Budynku'. Użyj przycisku <b>Ankiety</b>, aby głosować nad ważnymi inicjatywami.",
+info_sec6: "<b>📊 6. Analityka</b><br>Wykresy pomagają znaleźć kradzieże (różnica między licznikiem głównym a mieszkaniami) i kontrolować finanse.",
+info_sec7: "<b>📦 7. Zamknięcie Miesiąca i Archiwum</b><br>Gdy wszystko jest gotowe, kliknij <b>Zamknij Miesiąc</b>. System wygeneruje rachunki i zapisze je w Archiwum."
     },
     de: {
         receipt: "RECHNUNG",
@@ -1381,7 +1368,15 @@ days_short: "Tage", chart_archive: "Archiv", chart_billed: "💰 In Rechnung ges
 		// de
 menu_title: "Menü",
 		// --- ДОДАТИ ДО de ---
-access_empty: "Bisher haben nur Sie Zugriff.<br>Fügen Sie einen Manager oder Bewohner hinzu.", role_manager: "🛠 Manager", role_tenant: "🏠 Bewohner", role_viewer: "👀 Gast", role_operator: "📝 Ableser", access_all_obj: "Ganzes Objekt"
+access_empty: "Bisher haben nur Sie Zugriff.<br>Fügen Sie einen Manager oder Bewohner hinzu.", role_manager: "🛠 Manager", role_tenant: "🏠 Bewohner", role_viewer: "👀 Gast", role_operator: "📝 Ableser", access_all_obj: "Ganzes Objekt",
+		// --- ДОДАТИ ДО de --- info_title: "🚀 Comunalco: Benutzerhandbuch",
+info_sec1: "<b>📱 1. Installation (PWA)</b><br>Installieren Sie die App auf Ihrem Telefon:<br>🍎 <b>iOS:</b> In Safari öffnen, auf 'Teilen' und 'Zum Home-Bildschirm' tippen.<br>🤖 <b>Android:</b> In Chrome auf das Menü tippen und 'Zum Startbildschirm hinzufügen'.",
+info_sec2: "<b>☁️ 2. Cloud & Zugriffsrollen</b><br>Ihre Daten sind sicher. Fügen Sie Assistenten im Menü 'Zugriff' hinzu:<br>👑 <b>Manager:</b> Voller Zugriff.<br>🏠 <b>Bewohner:</b> Sieht nur eigene Rechnungen und Chat.<br>👀 <b>Gast:</b> Nur Ansicht.<br>📝 <b>Ableser:</b> Trägt nur Zählerstände ein.",
+info_sec3: "<b>💎 3. Tarife & Verluste (Hausverw.)</b><br>Legen Sie Preise unter 'Tarife' fest. Tragen Sie 'Zusätzliche Ausgaben' ein, das System teilt diese fair auf.",
+info_sec4: "<b>🤖 4. Telegram-Bot</b><br>Automatisieren Sie Ablesungen! Klicken Sie auf 🔗 <b>Telegram verbinden</b> und senden Sie den Link an den Bewohner.",
+info_sec5: "<b>💬 5. Chat & Umfragen</b><br>Kommunizieren Sie im 'Gebäude-Chat'. Nutzen Sie <b>Umfragen</b> für wichtige Abstimmungen.",
+info_sec6: "<b>📊 6. Analytik</b><br>Diagramme helfen, Diebstahl zu finden und Finanzen zu kontrollieren.",
+info_sec7: "<b>📦 7. Monat abschließen & Archiv</b><br>Klicken Sie auf <b>Monat abschließen</b>. Das System erstellt Quittungen und speichert alles im Archiv."
     },
     es: {
         receipt: "FACTURA",
@@ -1488,7 +1483,16 @@ days_short: "días", chart_archive: "Archivo", chart_billed: "💰 Facturado", c
 		// es
 menu_title: "Menú",
 		// --- ДОДАТИ ДО es ---
-access_empty: "Hasta ahora solo tú tienes acceso.<br>Añade un gerente o un residente.", role_manager: "🛠 Gerente", role_tenant: "🏠 Residente", role_viewer: "👀 Invitado", role_operator: "📝 Lector", access_all_obj: "Todo el objeto"
+access_empty: "Hasta ahora solo tú tienes acceso.<br>Añade un gerente o un residente.", role_manager: "🛠 Gerente", role_tenant: "🏠 Residente", role_viewer: "👀 Invitado", role_operator: "📝 Lector", access_all_obj: "Todo el objeto",
+		// --- ДОДАТИ ДО es ---
+info_title: "🚀 Comunalco: Guía del Usuario",
+info_sec1: "<b>📱 1. Instalación (PWA)</b><br>Instale la app en su teléfono:<br>🍎 <b>iOS:</b> Abra en Safari, toque 'Compartir' y 'Añadir a inicio'.<br>🤖 <b>Android:</b> En Chrome, toque el menú y 'Añadir a pantalla principal'.",
+info_sec2: "<b>☁️ 2. Nube y Roles</b><br>Sus datos están seguros. Añada asistentes en 'Acceso':<br>👑 <b>Gerente:</b> Acceso total.<br>🏠 <b>Residente:</b> Solo ve sus facturas y chat.<br>👀 <b>Invitado:</b> Solo lectura.<br>📝 <b>Lector:</b> Solo introduce lecturas.",
+info_sec3: "<b>💎 3. Tarifas y Pérdidas</b><br>Configure precios en 'Tarifas'. Introduzca 'Gastos adicionales' y el sistema los dividirá equitativamente.",
+info_sec4: "<b>🤖 4. Bot de Telegram</b><br>¡Automatice lecturas! Haga clic en 🔗 <b>Conectar Telegram</b> y envíe el enlace al residente.",
+info_sec5: "<b>💬 5. Chat y Encuestas</b><br>Comuníquese en el 'Chat del Edificio'. Use <b>Encuestas</b> para votar iniciativas.",
+info_sec6: "<b>📊 6. Analítica</b><br>Los gráficos ayudan a encontrar robos y controlar las finanzas.",
+info_sec7: "<b>📦 7. Cierre de Mes y Archivo</b><br>Haga clic en <b>Cerrar mes</b>. El sistema creará recibos y guardará todo en el Archivo."
     },
     fr: {
         receipt: "FACTURE",
@@ -1595,7 +1599,16 @@ days_short: "jours", chart_archive: "Archive", chart_billed: "💰 Facturé", ch
 		// fr
 menu_title: "Menu",
 		// --- ДОДАТИ ДО fr ---
-access_empty: "Seul vous avez accès pour le moment.<br>Ajoutez un gestionnaire ou un résident.", role_manager: "🛠 Gestionnaire", role_tenant: "🏠 Résident", role_viewer: "👀 Invité", role_operator: "📝 Releveur", access_all_obj: "Objet entier"
+access_empty: "Seul vous avez accès pour le moment.<br>Ajoutez un gestionnaire ou un résident.", role_manager: "🛠 Gestionnaire", role_tenant: "🏠 Résident", role_viewer: "👀 Invité", role_operator: "📝 Releveur", access_all_obj: "Objet entier",
+		// --- ДОДАТИ ДО fr ---
+info_title: "🚀 Comunalco: Guide de l'utilisateur",
+info_sec1: "<b>📱 1. Installation (PWA)</b><br>Installez l'application sur votre téléphone :<br>🍎 <b>iOS :</b> Ouvrez dans Safari, touchez 'Partager' puis 'Sur l'écran d'accueil'.<br>🤖 <b>Android :</b> Dans Chrome, touchez le menu et 'Ajouter à l'écran d'accueil'.",
+info_sec2: "<b>☁️ 2. Cloud et Rôles</b><br>Ajoutez des assistants dans le menu 'Accès' :<br>👑 <b>Gestionnaire :</b> Accès complet.<br>🏠 <b>Résident :</b> Voit seulement ses factures et le chat.<br>👀 <b>Invité :</b> Lecture seule.<br>📝 <b>Releveur :</b> Saisit uniquement les relevés.",
+info_sec3: "<b>💎 3. Tarifs et Pertes</b><br>Définissez les prix dans 'Tarifs'. Saisissez les 'Dépenses supplémentaires', le système les répartira équitablement.",
+info_sec4: "<b>🤖 4. Bot Telegram</b><br>Automatisez les relevés ! Cliquez sur 🔗 <b>Connecter Telegram</b> et envoyez le lien au résident.",
+info_sec5: "<b>💬 5. Chat et Sondages</b><br>Communiquez dans le 'Chat du bâtiment'. Utilisez <b>Sondages</b> pour voter.",
+info_sec6: "<b>📊 6. Analytique</b><br>Les graphiques aident à détecter les vols et à contrôler les finances.",
+info_sec7: "<b>📦 7. Clôture du mois et Archive</b><br>Cliquez sur <b>Clôturer le mois</b>. Le système créera les reçus et tout sauvegardera dans l'Archive."
     }
 };
 	window.translations = translations;
@@ -6916,7 +6929,34 @@ setInterval(checkAdminCommBadge, 15000); // І потім кожні 15 секу
         
         if (langSelect) langSelect.value = savedLang;
         if (curSelect) curSelect.value = savedCur.toUpperCase();
-    });
+
+		if (typeof window.renderInfoGuide === 'function') window.renderInfoGuide();
+});
+    
+	window.renderInfoGuide = function() {
+    let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+    let tr = {};
+    if (window.translations) {
+        tr = window.translations[lang] || window.translations['uk'] || {};
+    }
+
+    let titleEl = document.getElementById('info-modal-title');
+    if (titleEl) titleEl.innerHTML = tr.info_title || "🚀 Comunalco: Посібник Користувача";
+    
+    // Збираємо всі 7 блоків до купи
+    let content = `
+        <div style="margin-bottom: 15px;">${tr.info_sec1 || ""}</div>
+        <div style="margin-bottom: 15px;">${tr.info_sec2 || ""}</div>
+        <div style="margin-bottom: 15px;">${tr.info_sec3 || ""}</div>
+        <div style="margin-bottom: 15px;">${tr.info_sec4 || ""}</div>
+        <div style="margin-bottom: 15px;">${tr.info_sec5 || ""}</div>
+        <div style="margin-bottom: 15px;">${tr.info_sec6 || ""}</div>
+        <div style="margin-bottom: 15px;">${tr.info_sec7 || ""}</div>
+    `;
+    
+    let bodyEl = document.getElementById('info-modal-body');
+    if (bodyEl) bodyEl.innerHTML = content;
+};
     
     </script>
 
