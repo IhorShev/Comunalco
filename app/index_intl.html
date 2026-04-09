@@ -4710,6 +4710,8 @@ openHistory() {
         tr = window.translations[lang] || window.translations['uk'] || {};
     }
     let txtEmptyHistory = tr.archive_empty_history || "Історія порожня 🤷‍♂️";
+	// 👇 ДОДАЙ ЦЕЙ РЯДОК 👇
+    console.log("🕵️ Шпигун архіву:", "Мова=", lang, "| Текст=", txtEmptyHistory);
 
     if (!this.currentData.history || this.currentData.history.length === 0) {
         // Тепер текст 100% підтягнеться потрібною мовою!
