@@ -936,7 +936,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '12.5';
+    const APP_VERSION = '12.6';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -1052,7 +1052,9 @@ menu_setup_region: "Мова та Валюта",
 		// uk
 per_apt_mo: "/ об'єкт / міс", guest_id: "ГІСТЬ",
 		// uk
-archive_empty_history: "Історія порожня 🤷‍♂️", archive_empty_apts: "(Квартири в архіві не знайдені)"
+archive_empty_history: "Історія порожня 🤷‍♂️", archive_empty_apts: "(Квартири в архіві не знайдені)",
+		// --- ДОДАТИ ДО uk ---
+days_short: "дн."
 	},
     en: {
         receipt: "INVOICE",
@@ -1151,7 +1153,9 @@ menu_setup_region: "Language & Currency",
 		// en
 per_apt_mo: "/ unit / mo", guest_id: "GUEST",
 		// en
-archive_empty_history: "History is empty 🤷‍♂️", archive_empty_apts: "(No apartments found in archive)"
+archive_empty_history: "History is empty 🤷‍♂️", archive_empty_apts: "(No apartments found in archive)",
+		// --- ДОДАТИ ДО en ---
+days_short: "days"
     },
     pl: {
         receipt: "RACHUNEK",
@@ -1250,7 +1254,9 @@ menu_setup_region: "Język i Waluta",
 		// pl
 per_apt_mo: "/ lokal / mc", guest_id: "GOŚĆ",
 		// pl
-archive_empty_history: "Historia jest pusta 🤷‍♂️", archive_empty_apts: "(Brak mieszkań w archiwum)"
+archive_empty_history: "Historia jest pusta 🤷‍♂️", archive_empty_apts: "(Brak mieszkań w archiwum)",
+		// --- ДОДАТИ ДО pl ---
+days_short: "dni"
     },
     de: {
         receipt: "RECHNUNG",
@@ -1349,7 +1355,9 @@ menu_setup_region: "Sprache & Währung",
 		// de
 per_apt_mo: "/ einh. / mon", guest_id: "GAST",
 		// de
-archive_empty_history: "Verlauf ist leer 🤷‍♂️", archive_empty_apts: "(Keine Wohnungen im Archiv gefunden)"
+archive_empty_history: "Verlauf ist leer 🤷‍♂️", archive_empty_apts: "(Keine Wohnungen im Archiv gefunden)",
+		// --- ДОДАТИ ДО de ---
+days_short: "Tage"
     },
     es: {
         receipt: "FACTURA",
@@ -1448,7 +1456,9 @@ menu_setup_region: "Idioma y Moneda",
 		// es
 per_apt_mo: "/ unid. / mes", guest_id: "INVITADO",
 		// es
-archive_empty_history: "El historial está vacío 🤷‍♂️", archive_empty_apts: "(No se encontraron apartamentos en el archivo)"
+archive_empty_history: "El historial está vacío 🤷‍♂️", archive_empty_apts: "(No se encontraron apartamentos en el archivo)",
+		// --- ДОДАТИ ДО es ---
+days_short: "días"
     },
     fr: {
         receipt: "FACTURE",
@@ -1547,9 +1557,12 @@ menu_setup_region: "Langue et Devise",
 		// fr
 per_apt_mo: "/ unité / mois", guest_id: "INVITÉ",
 		// fr
-archive_empty_history: "L'historique est vide 🤷‍♂️", archive_empty_apts: "(Aucun appartement trouvé dans l'archive)"
+archive_empty_history: "L'historique est vide 🤷‍♂️", archive_empty_apts: "(Aucun appartement trouvé dans l'archive)",
+		// --- ДОДАТИ ДО fr ---
+days_short: "jours"
     }
 };
+	window.translations = translations;
 class App {
     constructor() {
         this.LIMITS = { free: 2, standard: 10, pro: 9999, vip: 9999 };
@@ -5739,6 +5752,17 @@ console.log('🌍 Lang:', APP_LANG, '| 💰 Currency:', APP_CURRENCY, window.APP
           window.app.save();
           window.app.renderAll();
           console.log("✅ Успішно відновлено з хмари!");
+		  // 1. Оновлюємо статус ліцензії (щоб блискавично з'явилися 35 днів)
+        if (this && typeof this.updateStatus === 'function') {
+            this.updateStatus();
+        } else if (window.app && typeof window.app.updateStatus === 'function') {
+            window.app.updateStatus();
+        }
+        
+        // 2. Примусово перекладаємо інтерфейс ще раз, щоб нові дані були потрібною мовою
+        if (typeof window._applyUILang === 'function') {
+            window._applyUILang();
+        }
           if(btn) { btn.innerText = "✅ Готово"; setTimeout(()=>btn.innerText=oldText, 2000); }
       } else {
           if(btn) btn.innerText = oldText;
