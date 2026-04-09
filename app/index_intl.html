@@ -936,7 +936,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '12.2';
+    const APP_VERSION = '12.3';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -6746,6 +6746,34 @@ async function checkAdminCommBadge() {
 }
 setTimeout(checkAdminCommBadge, 2000); // Перевіряємо при запуску сторінки
 setInterval(checkAdminCommBadge, 15000); // І потім кожні 15 секунд
+
+	// Збереження глобальних налаштувань (Мова + Валюта)
+    window.saveGlobalSettings = function() {
+        const newLang = document.getElementById('setup-lang').value;
+        const newCur = document.getElementById('setup-currency').value;
+
+        localStorage.setItem('lang', newLang);
+        localStorage.setItem('currency', newCur);
+
+        if (window.app && window.app.state && window.app.state.settings) {
+            window.app.state.settings.lang = newLang;
+            window.app.save(); // Відправляємо в базу
+        }
+
+        window.location.reload();
+    };
+
+    // Автоматично виставляємо правильні значення у списках при відкритті сторінки
+    document.addEventListener("DOMContentLoaded", function() {
+        const savedLang = localStorage.getItem('lang') || 'uk';
+        const savedCur = localStorage.getItem('currency') || 'uah';
+        
+        const langSelect = document.getElementById('setup-lang');
+        const curSelect = document.getElementById('setup-currency');
+        
+        if (langSelect) langSelect.value = savedLang;
+        if (curSelect) curSelect.value = savedCur.toUpperCase();
+    });
     
     </script>
 
@@ -6762,7 +6790,7 @@ setInterval(checkAdminCommBadge, 15000); // І потім кожні 15 секу
         
         <div class="setup-select-group">
             <label>Language / Мова</label>
-            <select id="setup-lang" onchange="app.previewSetupLang(this.value)">
+            <select id="setup-lang">
                 <option value="uk">Українська</option>
                 <option value="en">English</option>
                 <option value="pl">Polski</option>
@@ -6774,7 +6802,7 @@ setInterval(checkAdminCommBadge, 15000); // І потім кожні 15 секу
 
         <div class="setup-select-group">
             <label>Currency / Валюта</label>
-            <select id="setup-currency" onchange="localStorage.setItem('currency', this.value); window.location.reload();">
+            <select id="setup-currency">
                 <option value="UAH">UAH (₴)</option>
                 <option value="USD">USD ($)</option>
                 <option value="EUR">EUR (€)</option>
@@ -6783,7 +6811,7 @@ setInterval(checkAdminCommBadge, 15000); // І потім кожні 15 секу
             </select>
         </div>
 
-        <button id="setup-save-btn" class="btn btn-primary" style="margin-top:10px; padding:15px;" onclick="app.completeSetup()">
+        <button id="setup-save-btn" class="btn btn-primary" style="margin-top:10px; padding:15px;" onclick="window.saveGlobalSettings()">
             Save & Continue ➔
         </button>
     </div>
