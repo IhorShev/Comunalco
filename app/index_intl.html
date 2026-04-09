@@ -5355,7 +5355,18 @@ if (foundAny) {
 
         let inlineBtn = document.createElement('button');
         inlineBtn.id = 'inline-lobby-btn';
-        inlineBtn.innerHTML = '🔄 Змінити об\'єкт';
+        
+        // 🌍 1. Додаємо атрибут для глобального перекладача
+        inlineBtn.setAttribute('data-i18n', 'btn_change_obj');
+        
+        // 🌍 2. Одразу беремо правильну мову зі словника при створенні
+        let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+        let tr = {};
+        if (window.translations) {
+            tr = window.translations[lang] || window.translations['uk'] || {};
+        }
+        inlineBtn.innerHTML = tr.btn_change_obj || "🔄 Змінити об'єкт";
+
         inlineBtn.setAttribute('onclick', 'app.goToLobby();');
         inlineBtn.setAttribute('style', 'background: #3b82f6; color: white; border: none; padding: 5px 14px; border-radius: 12px; font-size: 12px; font-weight: bold; cursor: pointer; margin: 0 10px; box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4); transition: 0.2s; vertical-align: middle; display: inline-block;');
 
