@@ -936,7 +936,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '12.8';
+    const APP_VERSION = '12.9';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -1058,7 +1058,9 @@ days_short: "дн.",
 		// --- ДОДАТИ ДО uk ---
 days_short: "дн.", chart_archive: "Архів", chart_billed: "💰 Виставлено рахунків", chart_paid: "✅ Реально сплачено", chart_total_month: "Всього за місяць: ", chart_sum: "Сума", chart_electro: "Електрика ⚡", chart_water: "Вода 💧", chart_gas: "Газ 🔥", chart_services: "Послуги / МЗК 🏢",
 		// uk
-menu_title: "Меню"
+menu_title: "Меню",
+		// --- ДОДАТИ ДО uk ---
+access_empty: "Поки що тільки ви маєте доступ.<br>Додайте менеджера або мешканця.", role_manager: "🛠 Менеджер", role_tenant: "🏠 Мешканець", role_viewer: "👀 Гість", role_operator: "📝 Обліковець", access_all_obj: "Весь об'єкт"
 	},
     en: {
         receipt: "INVOICE",
@@ -1163,7 +1165,9 @@ days_short: "days",
 		// --- ДОДАТИ ДО en ---
 days_short: "days", chart_archive: "Archive", chart_billed: "💰 Billed", chart_paid: "✅ Actually paid", chart_total_month: "Total for month: ", chart_sum: "Amount", chart_electro: "Electricity ⚡", chart_water: "Water 💧", chart_gas: "Gas 🔥", chart_services: "Services / HOA 🏢",
 		// en
-menu_title: "Menu"
+menu_title: "Menu",
+		// --- ДОДАТИ ДО en ---
+access_empty: "Only you have access so far.<br>Add a manager or a resident.", role_manager: "🛠 Manager", role_tenant: "🏠 Resident", role_viewer: "👀 Guest", role_operator: "📝 Meter Reader", access_all_obj: "Whole Object"
     },
     pl: {
         receipt: "RACHUNEK",
@@ -1268,7 +1272,9 @@ days_short: "dni",
 		// --- ДОДАТИ ДО pl ---
 days_short: "dni", chart_archive: "Archiwum", chart_billed: "💰 Wystawiono rachunki", chart_paid: "✅ Faktycznie zapłacono", chart_total_month: "Suma za miesiąc: ", chart_sum: "Kwota", chart_electro: "Prąd ⚡", chart_water: "Woda 💧", chart_gas: "Gaz 🔥", chart_services: "Usługi / Admin. 🏢",
 		// pl
-menu_title: "Menu"
+menu_title: "Menu",
+		// --- ДОДАТИ ДО pl ---
+access_empty: "Na razie tylko Ty masz dostęp.<br>Dodaj menedżera lub mieszkańca.", role_manager: "🛠 Menedżer", role_tenant: "🏠 Mieszkaniec", role_viewer: "👀 Gość", role_operator: "📝 Inkasent", access_all_obj: "Cały obiekt"
     },
     de: {
         receipt: "RECHNUNG",
@@ -1373,7 +1379,9 @@ days_short: "Tage",
 		// --- ДОДАТИ ДО de ---
 days_short: "Tage", chart_archive: "Archiv", chart_billed: "💰 In Rechnung gestellt", chart_paid: "✅ Tatsächlich bezahlt", chart_total_month: "Gesamt für Monat: ", chart_sum: "Betrag", chart_electro: "Strom ⚡", chart_water: "Wasser 💧", chart_gas: "Gas 🔥", chart_services: "Dienste / Hausverw. 🏢",
 		// de
-menu_title: "Menü"
+menu_title: "Menü",
+		// --- ДОДАТИ ДО de ---
+access_empty: "Bisher haben nur Sie Zugriff.<br>Fügen Sie einen Manager oder Bewohner hinzu.", role_manager: "🛠 Manager", role_tenant: "🏠 Bewohner", role_viewer: "👀 Gast", role_operator: "📝 Ableser", access_all_obj: "Ganzes Objekt"
     },
     es: {
         receipt: "FACTURA",
@@ -1478,7 +1486,9 @@ days_short: "días",
 		// --- ДОДАТИ ДО es ---
 days_short: "días", chart_archive: "Archivo", chart_billed: "💰 Facturado", chart_paid: "✅ Realmente pagado", chart_total_month: "Total del mes: ", chart_sum: "Importe", chart_electro: "Electricidad ⚡", chart_water: "Agua 💧", chart_gas: "Gas 🔥", chart_services: "Servicios / Com. 🏢",
 		// es
-menu_title: "Menú"
+menu_title: "Menú",
+		// --- ДОДАТИ ДО es ---
+access_empty: "Hasta ahora solo tú tienes acceso.<br>Añade un gerente o un residente.", role_manager: "🛠 Gerente", role_tenant: "🏠 Residente", role_viewer: "👀 Invitado", role_operator: "📝 Lector", access_all_obj: "Todo el objeto"
     },
     fr: {
         receipt: "FACTURE",
@@ -1583,7 +1593,9 @@ days_short: "jours",
 		// --- ДОДАТИ ДО fr ---
 days_short: "jours", chart_archive: "Archive", chart_billed: "💰 Facturé", chart_paid: "✅ Réellement payé", chart_total_month: "Total du mois : ", chart_sum: "Montant", chart_electro: "Électricité ⚡", chart_water: "Eau 💧", chart_gas: "Gaz 🔥", chart_services: "Services / Coprop. 🏢",
 		// fr
-menu_title: "Menu"
+menu_title: "Menu",
+		// --- ДОДАТИ ДО fr ---
+access_empty: "Seul vous avez accès pour le moment.<br>Ajoutez un gestionnaire ou un résident.", role_manager: "🛠 Gestionnaire", role_tenant: "🏠 Résident", role_viewer: "👀 Invité", role_operator: "📝 Releveur", access_all_obj: "Objet entier"
     }
 };
 	window.translations = translations;
@@ -3186,14 +3198,31 @@ updateChart() {
     renderUserList() {
         const list = document.getElementById('users-list-container');
         if(!list) return;
-        
+
+        // 🌍 ПІДТЯГУЄМО МОВУ ТА СЛОВНИК
+        let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+        let tr = {};
+        if (window.translations) {
+            tr = window.translations[lang] || window.translations['uk'] || {};
+        }
+
+        const txtAccessEmpty = tr.access_empty || "Поки що тільки ви маєте доступ.<br>Додайте менеджера або мешканця.";
+        const txtAllObj = tr.access_all_obj || "Весь об'єкт";
+
         const users = this.currentData.users || [];
         if (users.length === 0) {
-            list.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-sec); font-size:13px;">Поки що тільки ви маєте доступ.<br>Додайте менеджера або мешканця.</div>`;
+            // Динамічний текст порожнього списку
+            list.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-sec); font-size:13px;">${txtAccessEmpty}</div>`;
             return;
         }
 
-        const roleNames = { 'manager': '🛠 Менеджер', 'tenant': '🏠 Мешканець', 'viewer': '👀 Гість', 'operator': '📝 Обліковець' };
+        // Динамічний переклад бейджів з ролями
+        const roleNames = { 
+            'manager': tr.role_manager || '🛠 Менеджер', 
+            'tenant': tr.role_tenant || '🏠 Мешканець', 
+            'viewer': tr.role_viewer || '👀 Гість', 
+            'operator': tr.role_operator || '📝 Обліковець' 
+        };
         const roleClasses = { 'manager': 'role-manager', 'tenant': 'role-tenant', 'viewer': 'role-viewer', 'operator': 'role-manager' };
 
         list.innerHTML = users.map(u => `
@@ -3202,7 +3231,7 @@ updateChart() {
                     <div class="user-avatar">${u.email[0].toUpperCase()}</div>
                     <div>
                         <div style="font-weight:bold; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:150px;">${u.email}</div>
-                        <div style="font-size:10px; color:var(--text-sec);">${u.accessLabel || 'Весь об\'єкт'}</div>
+                        <div style="font-size:10px; color:var(--text-sec);">${u.accessLabel || txtAllObj}</div>
                     </div>
                 </div>
                 <div style="display:flex; align-items:center;">
@@ -3211,7 +3240,7 @@ updateChart() {
                 </div>
             </div>
         `).join('');
-    } // <-- КОМА ТУТ!
+    }
 
     renderExtraTariffs() { 
         const container = document.getElementById('extra-tariffs-container');
