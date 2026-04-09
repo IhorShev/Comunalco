@@ -1,4 +1,4 @@
-const APP_VERSION = '6.3';
+const APP_VERSION = '6.4';
 const CACHE_NAME = 'comunalco-cache-v' + APP_VERSION;
 
 // 1. Список файлів для швидкого доступу та офлайн-роботи
