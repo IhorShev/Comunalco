@@ -936,7 +936,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '12.6';
+    const APP_VERSION = '12.7';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -1054,7 +1054,9 @@ per_apt_mo: "/ об'єкт / міс", guest_id: "ГІСТЬ",
 		// uk
 archive_empty_history: "Історія порожня 🤷‍♂️", archive_empty_apts: "(Квартири в архіві не знайдені)",
 		// --- ДОДАТИ ДО uk ---
-days_short: "дн."
+days_short: "дн.",
+		// --- ДОДАТИ ДО uk ---
+days_short: "дн.", chart_archive: "Архів", chart_billed: "💰 Виставлено рахунків", chart_paid: "✅ Реально сплачено", chart_total_month: "Всього за місяць: ", chart_sum: "Сума", chart_electro: "Електрика ⚡", chart_water: "Вода 💧", chart_gas: "Газ 🔥", chart_services: "Послуги / МЗК 🏢"
 	},
     en: {
         receipt: "INVOICE",
@@ -1155,7 +1157,9 @@ per_apt_mo: "/ unit / mo", guest_id: "GUEST",
 		// en
 archive_empty_history: "History is empty 🤷‍♂️", archive_empty_apts: "(No apartments found in archive)",
 		// --- ДОДАТИ ДО en ---
-days_short: "days"
+days_short: "days",
+		// --- ДОДАТИ ДО en ---
+days_short: "days", chart_archive: "Archive", chart_billed: "💰 Billed", chart_paid: "✅ Actually paid", chart_total_month: "Total for month: ", chart_sum: "Amount", chart_electro: "Electricity ⚡", chart_water: "Water 💧", chart_gas: "Gas 🔥", chart_services: "Services / HOA 🏢"
     },
     pl: {
         receipt: "RACHUNEK",
@@ -1256,7 +1260,9 @@ per_apt_mo: "/ lokal / mc", guest_id: "GOŚĆ",
 		// pl
 archive_empty_history: "Historia jest pusta 🤷‍♂️", archive_empty_apts: "(Brak mieszkań w archiwum)",
 		// --- ДОДАТИ ДО pl ---
-days_short: "dni"
+days_short: "dni",
+		// --- ДОДАТИ ДО pl ---
+days_short: "dni", chart_archive: "Archiwum", chart_billed: "💰 Wystawiono rachunki", chart_paid: "✅ Faktycznie zapłacono", chart_total_month: "Suma za miesiąc: ", chart_sum: "Kwota", chart_electro: "Prąd ⚡", chart_water: "Woda 💧", chart_gas: "Gaz 🔥", chart_services: "Usługi / Admin. 🏢"
     },
     de: {
         receipt: "RECHNUNG",
@@ -1357,7 +1363,9 @@ per_apt_mo: "/ einh. / mon", guest_id: "GAST",
 		// de
 archive_empty_history: "Verlauf ist leer 🤷‍♂️", archive_empty_apts: "(Keine Wohnungen im Archiv gefunden)",
 		// --- ДОДАТИ ДО de ---
-days_short: "Tage"
+days_short: "Tage",
+		// --- ДОДАТИ ДО de ---
+days_short: "Tage", chart_archive: "Archiv", chart_billed: "💰 In Rechnung gestellt", chart_paid: "✅ Tatsächlich bezahlt", chart_total_month: "Gesamt für Monat: ", chart_sum: "Betrag", chart_electro: "Strom ⚡", chart_water: "Wasser 💧", chart_gas: "Gas 🔥", chart_services: "Dienste / Hausverw. 🏢"
     },
     es: {
         receipt: "FACTURA",
@@ -1458,7 +1466,9 @@ per_apt_mo: "/ unid. / mes", guest_id: "INVITADO",
 		// es
 archive_empty_history: "El historial está vacío 🤷‍♂️", archive_empty_apts: "(No se encontraron apartamentos en el archivo)",
 		// --- ДОДАТИ ДО es ---
-days_short: "días"
+days_short: "días",
+		// --- ДОДАТИ ДО es ---
+days_short: "días", chart_archive: "Archivo", chart_billed: "💰 Facturado", chart_paid: "✅ Realmente pagado", chart_total_month: "Total del mes: ", chart_sum: "Importe", chart_electro: "Electricidad ⚡", chart_water: "Agua 💧", chart_gas: "Gas 🔥", chart_services: "Servicios / Com. 🏢"
     },
     fr: {
         receipt: "FACTURE",
@@ -1559,7 +1569,9 @@ per_apt_mo: "/ unité / mois", guest_id: "INVITÉ",
 		// fr
 archive_empty_history: "L'historique est vide 🤷‍♂️", archive_empty_apts: "(Aucun appartement trouvé dans l'archive)",
 		// --- ДОДАТИ ДО fr ---
-days_short: "jours"
+days_short: "jours",
+		// --- ДОДАТИ ДО fr ---
+days_short: "jours", chart_archive: "Archive", chart_billed: "💰 Facturé", chart_paid: "✅ Réellement payé", chart_total_month: "Total du mois : ", chart_sum: "Montant", chart_electro: "Électricité ⚡", chart_water: "Eau 💧", chart_gas: "Gaz 🔥", chart_services: "Services / Coprop. 🏢"
     }
 };
 	window.translations = translations;
@@ -2812,230 +2824,259 @@ renderAll() {
     }
 
     // --- МАЛЮВАННЯ ГРАФІКІВ (АНАЛІТИКА) ---
-    updateChart() {
-        const selector = document.getElementById('chart-selector');
-        const periodSelect = document.getElementById('chart-period');
-        if (!selector || !periodSelect) return;
+updateChart() {
+    const selector = document.getElementById('chart-selector');
+    const periodSelect = document.getElementById('chart-period');
+    if (!selector || !periodSelect) return;
 
-        const targetId = selector.value;
-        const period = periodSelect.value;
+    const targetId = selector.value;
+    const period = periodSelect.value;
 
-        const ctx = document.getElementById('analyticsChart').getContext('2d');
-        if (this.myChartInstance) this.myChartInstance.destroy();
+    const ctx = document.getElementById('analyticsChart').getContext('2d');
+    if (this.myChartInstance) this.myChartInstance.destroy();
 
-        // 1. Фільтруємо історію по вибраному періоду
-        let history = this.currentData.history || [];
-        let limit = history.length;
-        if (period === '1') limit = 2; // для порівняння двох останніх
-        else if (period === '3') limit = 3;
-        else if (period === '6') limit = 6;
-        else if (period === '12') limit = 12;
+    // 🌍 1. ПІДТЯГУЄМО МОВУ, СЛОВНИК ТА ВАЛЮТУ
+    let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+    let tr = {};
+    if (window.translations) {
+        tr = window.translations[lang] || window.translations['uk'] || {};
+    }
+    
+    // Визначаємо символ валюти для графіка
+    let appCurrency = (localStorage.getItem('currency') || 'uah').toLowerCase();
+    let curSym = "грн";
+    if (appCurrency === 'usd') curSym = "$";
+    else if (appCurrency === 'eur') curSym = "€";
+    else if (appCurrency === 'pln') curSym = "zł";
+    else if (appCurrency === 'gbp') curSym = "£";
 
-        // 🚀 Сортуємо жорстко від старого до нового і беремо тільки останні "limit" штук
-        let sortedHistory = [...history].sort((a, b) => a.id - b.id);
-        let historyData = sortedHistory.slice(-limit);
-        
-        // Малюємо дати з часом, щоб не плутатися під час тестів в один день
-        const labels = historyData.map(h => {
-            let d = h.date ? new Date(h.date) : new Date(h.id);
-            if (!isNaN(d.getTime())) {
-                let dateStr = d.toLocaleDateString('uk-UA', { month: 'short', year: 'numeric' }).toUpperCase();
-                let timeStr = d.toLocaleTimeString('uk-UA', {hour: '2-digit', minute:'2-digit'});
-                return `${dateStr} (${timeStr})`;
-            }
-            return "Архів";
-        });
+    // Беремо слова зі словника
+    let txtArchive = tr.chart_archive || "Архів";
+    let txtBilled = tr.chart_billed || "💰 Виставлено рахунків";
+    let txtPaid = tr.chart_paid || "✅ Реально сплачено";
+    let txtEl = tr.chart_electro || "Електрика ⚡";
+    let txtW = tr.chart_water || "Вода 💧";
+    let txtG = tr.chart_gas || "Газ 🔥";
+    let txtServ = tr.chart_services || "Послуги / МЗК 🏢";
+    let txtSum = tr.chart_sum || "Сума";
+    let txtTotalMonth = tr.chart_total_month || "Всього за місяць: ";
 
-        // 2. Готуємо масиви для даних
-        let dEl = [], dW = [], dG = [], dServ = [];
-        let dBilled = [], dPaid = []; // Для фінансів
+    // 2. Фільтруємо історію по вибраному періоду
+    let history = this.currentData.history || [];
+    let limit = history.length;
+    if (period === '1') limit = 2; // для порівняння двох останніх
+    else if (period === '3') limit = 3;
+    else if (period === '6') limit = 6;
+    else if (period === '12') limit = 12;
 
-        // Агресивний пошук тарифів
-        const getTariff = (obj1, obj2, ...keys) => {
-            for (let obj of [obj1, obj2]) {
-                if (!obj) continue;
-                if (Array.isArray(obj)) {
-                    for (let item of obj) {
-                        let name = String(item.service_name || item.name || item.id).toLowerCase();
-                        if (keys.some(k => name === k.toLowerCase())) {
-                            let val = parseFloat(String(item.price_per_unit || item.price || item.val || item.value).replace(',', '.'));
-                            if (!isNaN(val) && val > 0) return val;
-                        }
+    // 🚀 Сортуємо жорстко від старого до нового і беремо тільки останні "limit" штук
+    let sortedHistory = [...history].sort((a, b) => a.id - b.id);
+    let historyData = sortedHistory.slice(-limit);
+    
+    // Малюємо дати з часом, щоб не плутатися під час тестів в один день
+    const labels = historyData.map(h => {
+        let d = h.date ? new Date(h.date) : new Date(h.id);
+        if (!isNaN(d.getTime())) {
+            // Використовуємо lang для перекладу назви місяця!
+            let dateStr = d.toLocaleDateString(lang, { month: 'short', year: 'numeric' }).toUpperCase();
+            let timeStr = d.toLocaleTimeString(lang, {hour: '2-digit', minute:'2-digit'});
+            return `${dateStr} (${timeStr})`;
+        }
+        return txtArchive; // Перекладене слово "Архів"
+    });
+
+    // 3. Готуємо масиви для даних
+    let dEl = [], dW = [], dG = [], dServ = [];
+    let dBilled = [], dPaid = []; // Для фінансів
+
+    // Агресивний пошук тарифів
+    const getTariff = (obj1, obj2, ...keys) => {
+        for (let obj of [obj1, obj2]) {
+            if (!obj) continue;
+            if (Array.isArray(obj)) {
+                for (let item of obj) {
+                    let name = String(item.service_name || item.name || item.id).toLowerCase();
+                    if (keys.some(k => name === k.toLowerCase())) {
+                        let val = parseFloat(String(item.price_per_unit || item.price || item.val || item.value).replace(',', '.'));
+                        if (!isNaN(val) && val > 0) return val;
                     }
-                } else {
-                    for (let k of keys) {
-                        if (obj[k] !== undefined && obj[k] !== null && obj[k] !== '') {
-                            let val = parseFloat(String(obj[k]).replace(',', '.'));
-                            if (!isNaN(val) && val > 0) return val;
-                        }
+                }
+            } else {
+                for (let k of keys) {
+                    if (obj[k] !== undefined && obj[k] !== null && obj[k] !== '') {
+                        let val = parseFloat(String(obj[k]).replace(',', '.'));
+                        if (!isNaN(val) && val > 0) return val;
                     }
-                    for (let fullKey of Object.keys(obj)) {
-                        let fk = fullKey.toLowerCase();
-                        if (keys.some(k => fk.includes(k.toLowerCase()))) {
-                             let val = parseFloat(String(obj[fullKey]).replace(',', '.'));
-                             if (!isNaN(val) && val > 0) return val;
-                        }
+                }
+                for (let fullKey of Object.keys(obj)) {
+                    let fk = fullKey.toLowerCase();
+                    if (keys.some(k => fk.includes(k.toLowerCase()))) {
+                         let val = parseFloat(String(obj[fullKey]).replace(',', '.'));
+                         if (!isNaN(val) && val > 0) return val;
                     }
                 }
             }
-            return 0;
-        };
+        }
+        return 0;
+    };
 
-        historyData.forEach(h => {
-            const tArchive = h.tariffs || {};
-            const tLive = this.currentData.tariffs || {}; 
-            const t_ed = getTariff(tArchive, tLive, 'el_d', 'day', 'ed');
-            const t_en = getTariff(tArchive, tLive, 'el_n', 'night', 'en');
-            const t_w  = getTariff(tArchive, tLive, 'w', 'water');
-            const t_g  = getTariff(tArchive, tLive, 'g', 'gas');
+    historyData.forEach(h => {
+        const tArchive = h.tariffs || {};
+        const tLive = this.currentData.tariffs || {}; 
+        const t_ed = getTariff(tArchive, tLive, 'el_d', 'day', 'ed');
+        const t_en = getTariff(tArchive, tLive, 'el_n', 'night', 'en');
+        const t_w  = getTariff(tArchive, tLive, 'w', 'water');
+        const t_g  = getTariff(tArchive, tLive, 'g', 'gas');
 
-            let cost = { el: 0, w: 0, g: 0, serv: 0, billed: 0, paid: 0 };
-            let apts = Array.isArray(h.apartments) ? h.apartments : Object.values(h.apartments || {});
+        let cost = { el: 0, w: 0, g: 0, serv: 0, billed: 0, paid: 0 };
+        let apts = Array.isArray(h.apartments) ? h.apartments : Object.values(h.apartments || {});
 
-            if (targetId === 'finance') {
-                // ФІНАНСИ БУДИНКУ
-                apts.forEach(apt => {
-                    if(!apt) return;
-                    let paid = parseFloat(String(apt.paid).replace(',', '.')) || 0;
-                    let bill = parseFloat(String(apt.bill || apt.total || apt.sum || 0).replace(',', '.')) || 0;
-                    
-                    // Якщо сума рахунку не збереглась, вираховуємо грубо по лічильниках
-                    if (bill === 0) {
-                        let c_ed = Math.max(0, (apt.curr?.ed||0) - (apt.prev?.ed||0));
-                        let c_en = Math.max(0, (apt.curr?.en||0) - (apt.prev?.en||0));
-                        let c_w = Math.max(0, (apt.curr?.w||0) - (apt.prev?.w||0));
-                        bill = (c_ed * t_ed) + (c_en * t_en) + (c_w * t_w);
-                    }
-                    cost.billed += bill;
-                    cost.paid += paid;
-                });
-            } 
-            else if (targetId === 'group') {
-                // ЧИСТИЙ МЗК (ВТРАТИ: Будинок мінус Квартири)
-                let houseEd = 0, houseEn = 0, houseW = 0, houseG = 0;
-                (h.groups || []).forEach(g => {
-                    houseEd += Math.max(0, (g.curr?.ed||0) - (g.prev?.ed||0));
-                    houseEn += Math.max(0, (g.curr?.en||0) - (g.prev?.en||0));
-                    houseW  += Math.max(0, (g.curr?.w||0) - (g.prev?.w||0));
-                    houseG  += Math.max(0, (g.curr?.g||0) - (g.prev?.g||0));
-                });
-
-                let aptsEd = 0, aptsEn = 0, aptsW = 0, aptsG = 0;
-                apts.forEach(apt => {
-                    if(!apt) return;
-                    aptsEd += Math.max(0, (apt.curr?.ed||0) - (apt.prev?.ed||0));
-                    aptsEn += Math.max(0, (apt.curr?.en||0) - (apt.prev?.en||0));
-                    aptsW  += Math.max(0, (apt.curr?.w||0) - (apt.prev?.w||0));
-                    aptsG  += Math.max(0, (apt.curr?.g||0) - (apt.prev?.g||0));
-                });
-
-                let netEd = Math.max(0, houseEd - aptsEd);
-                let netEn = Math.max(0, houseEn - aptsEn);
-                let netW  = Math.max(0, houseW - aptsW);
-                let netG  = Math.max(0, houseG - aptsG);
-
-                cost.el = (netEd * t_ed) + (netEn * t_en);
-                cost.w = netW * t_w;
-                cost.g = netG * t_g;
-            } 
-            else {
-                // КОНКРЕТНА КВАРТИРА
-                let apt = apts.find((a, idx) => a && (String(a.id) === String(targetId) || String(idx) === String(targetId)));
-                if (apt) {
+        if (targetId === 'finance') {
+            // ФІНАНСИ БУДИНКУ
+            apts.forEach(apt => {
+                if(!apt) return;
+                let paid = parseFloat(String(apt.paid).replace(',', '.')) || 0;
+                let bill = parseFloat(String(apt.bill || apt.total || apt.sum || 0).replace(',', '.')) || 0;
+                
+                // Якщо сума рахунку не збереглась, вираховуємо грубо по лічильниках
+                if (bill === 0) {
                     let c_ed = Math.max(0, (apt.curr?.ed||0) - (apt.prev?.ed||0));
                     let c_en = Math.max(0, (apt.curr?.en||0) - (apt.prev?.en||0));
                     let c_w = Math.max(0, (apt.curr?.w||0) - (apt.prev?.w||0));
-                    let c_g = Math.max(0, (apt.curr?.g||0) - (apt.prev?.g||0));
-                    
-                    cost.el = (c_ed * t_ed) + (c_en * t_en);
-                    cost.w = c_w * t_w;
-                    cost.g = c_g * t_g;
-
-                    let sTotal = 0;
-                    if (apt.services) apt.services.forEach(s => sTotal += parseFloat(String(s.val).replace(',', '.')) || 0);
-                    if (apt.customCosts) apt.customCosts.forEach(cc => {
-                        let diff = Math.max(0, (cc.curr||0) - (cc.prev||0));
-                        sTotal += diff * (parseFloat(String(cc.price).replace(',', '.')) || 0);
-                    });
-                    
-                    let mzkVal = 0;
-                    for (let k of Object.keys(apt)) {
-                        if (k.toLowerCase().includes('mzk') || k.toLowerCase().includes('мзк')) {
-                            let val = parseFloat(String(apt[k]).replace(',', '.'));
-                            if (!isNaN(val) && val > 0) mzkVal = val;
-                        }
-                    }
-                    cost.serv = sTotal + mzkVal;
+                    bill = (c_ed * t_ed) + (c_en * t_en) + (c_w * t_w);
                 }
+                cost.billed += bill;
+                cost.paid += paid;
+            });
+        } 
+        else if (targetId === 'group') {
+            // ЧИСТИЙ МЗК (ВТРАТИ: Будинок мінус Квартири)
+            let houseEd = 0, houseEn = 0, houseW = 0, houseG = 0;
+            (h.groups || []).forEach(g => {
+                houseEd += Math.max(0, (g.curr?.ed||0) - (g.prev?.ed||0));
+                houseEn += Math.max(0, (g.curr?.en||0) - (g.prev?.en||0));
+                houseW  += Math.max(0, (g.curr?.w||0) - (g.prev?.w||0));
+                houseG  += Math.max(0, (g.curr?.g||0) - (g.prev?.g||0));
+            });
+
+            let aptsEd = 0, aptsEn = 0, aptsW = 0, aptsG = 0;
+            apts.forEach(apt => {
+                if(!apt) return;
+                aptsEd += Math.max(0, (apt.curr?.ed||0) - (apt.prev?.ed||0));
+                aptsEn += Math.max(0, (apt.curr?.en||0) - (apt.prev?.en||0));
+                aptsW  += Math.max(0, (apt.curr?.w||0) - (apt.prev?.w||0));
+                aptsG  += Math.max(0, (apt.curr?.g||0) - (apt.prev?.g||0));
+            });
+
+            let netEd = Math.max(0, houseEd - aptsEd);
+            let netEn = Math.max(0, houseEn - aptsEn);
+            let netW  = Math.max(0, houseW - aptsW);
+            let netG  = Math.max(0, houseG - aptsG);
+
+            cost.el = (netEd * t_ed) + (netEn * t_en);
+            cost.w = netW * t_w;
+            cost.g = netG * t_g;
+        } 
+        else {
+            // КОНКРЕТНА КВАРТИРА
+            let apt = apts.find((a, idx) => a && (String(a.id) === String(targetId) || String(idx) === String(targetId)));
+            if (apt) {
+                let c_ed = Math.max(0, (apt.curr?.ed||0) - (apt.prev?.ed||0));
+                let c_en = Math.max(0, (apt.curr?.en||0) - (apt.prev?.en||0));
+                let c_w = Math.max(0, (apt.curr?.w||0) - (apt.prev?.w||0));
+                let c_g = Math.max(0, (apt.curr?.g||0) - (apt.prev?.g||0));
+                
+                cost.el = (c_ed * t_ed) + (c_en * t_en);
+                cost.w = c_w * t_w;
+                cost.g = c_g * t_g;
+
+                let sTotal = 0;
+                if (apt.services) apt.services.forEach(s => sTotal += parseFloat(String(s.val).replace(',', '.')) || 0);
+                if (apt.customCosts) apt.customCosts.forEach(cc => {
+                    let diff = Math.max(0, (cc.curr||0) - (cc.prev||0));
+                    sTotal += diff * (parseFloat(String(cc.price).replace(',', '.')) || 0);
+                });
+                
+                let mzkVal = 0;
+                for (let k of Object.keys(apt)) {
+                    if (k.toLowerCase().includes('mzk') || k.toLowerCase().includes('мзк')) {
+                        let val = parseFloat(String(apt[k]).replace(',', '.'));
+                        if (!isNaN(val) && val > 0) mzkVal = val;
+                    }
+                }
+                cost.serv = sTotal + mzkVal;
             }
-
-            dEl.push(cost.el);
-            dW.push(cost.w);
-            dG.push(cost.g);
-            dServ.push(cost.serv);
-            dBilled.push(cost.billed);
-            dPaid.push(cost.paid);
-        });
-
-        // 3. Формуємо масиви для графіка
-        const isDark = document.body.classList.contains('dark-mode') || getComputedStyle(document.body).backgroundColor === 'rgb(15, 23, 42)';
-        const textColor = isDark ? '#e2e8f0' : '#1e293b';
-        const gridColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
-
-        let datasets = [];
-
-        if (targetId === 'finance') {
-            datasets = [
-                { label: '💰 Виставлено рахунків', data: dBilled, backgroundColor: '#3b82f6', borderRadius: 4 },
-                { label: '✅ Реально сплачено', data: dPaid, backgroundColor: '#10b981', borderRadius: 4 }
-            ];
-        } else {
-            datasets = [
-                { label: 'Електрика ⚡', data: dEl, backgroundColor: '#f59e0b', borderRadius: 4 },
-                { label: 'Вода 💧', data: dW, backgroundColor: '#3b82f6', borderRadius: 4 },
-                { label: 'Газ 🔥', data: dG, backgroundColor: '#ef4444', borderRadius: 4 },
-                { label: 'Послуги / МЗК 🏢', data: dServ, backgroundColor: '#64748b', borderRadius: 4 }
-            ];
         }
 
-        this.myChartInstance = new Chart(ctx, {
-            type: 'bar',
-            data: { labels: labels, datasets: datasets },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                interaction: { mode: 'index', intersect: false },
-                plugins: {
-                    legend: { position: 'bottom', labels: { color: textColor, usePointStyle: true, font: {size: 11} } },
-                    tooltip: {
-                        backgroundColor: isDark ? 'rgba(15,23,42,0.95)' : 'rgba(255,255,255,0.95)',
-                        titleColor: isDark ? '#fff' : '#000',
-                        bodyColor: isDark ? '#cbd5e1' : '#334155',
-                        borderColor: isDark ? '#334155' : '#e2e8f0',
-                        borderWidth: 1,
-                        padding: 12,
-                        cornerRadius: 8,
-                        callbacks: {
-                            label: function(c) { return c.dataset.label + ': ' + c.raw.toFixed(2) + ' грн'; },
-                            footer: (items) => {
-                                let sum = items.reduce((a, b) => a + b.raw, 0);
-                                return '\nВсього за місяць: ' + sum.toFixed(2) + ' грн';
-                            }
+        dEl.push(cost.el);
+        dW.push(cost.w);
+        dG.push(cost.g);
+        dServ.push(cost.serv);
+        dBilled.push(cost.billed);
+        dPaid.push(cost.paid);
+    });
+
+    // 4. Формуємо масиви для графіка
+    const isDark = document.body.classList.contains('dark-mode') || getComputedStyle(document.body).backgroundColor === 'rgb(15, 23, 42)';
+    const textColor = isDark ? '#e2e8f0' : '#1e293b';
+    const gridColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+
+    let datasets = [];
+
+    if (targetId === 'finance') {
+        datasets = [
+            { label: txtBilled, data: dBilled, backgroundColor: '#3b82f6', borderRadius: 4 },
+            { label: txtPaid, data: dPaid, backgroundColor: '#10b981', borderRadius: 4 }
+        ];
+    } else {
+        datasets = [
+            { label: txtEl, data: dEl, backgroundColor: '#f59e0b', borderRadius: 4 },
+            { label: txtW, data: dW, backgroundColor: '#3b82f6', borderRadius: 4 },
+            { label: txtG, data: dG, backgroundColor: '#ef4444', borderRadius: 4 },
+            { label: txtServ, data: dServ, backgroundColor: '#64748b', borderRadius: 4 }
+        ];
+    }
+
+    this.myChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: { labels: labels, datasets: datasets },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: { position: 'bottom', labels: { color: textColor, usePointStyle: true, font: {size: 11} } },
+                tooltip: {
+                    backgroundColor: isDark ? 'rgba(15,23,42,0.95)' : 'rgba(255,255,255,0.95)',
+                    titleColor: isDark ? '#fff' : '#000',
+                    bodyColor: isDark ? '#cbd5e1' : '#334155',
+                    borderColor: isDark ? '#334155' : '#e2e8f0',
+                    borderWidth: 1,
+                    padding: 12,
+                    cornerRadius: 8,
+                    callbacks: {
+                        // Перекладена підказка з валютою!
+                        label: function(c) { return c.dataset.label + ': ' + c.raw.toFixed(2) + ' ' + curSym; },
+                        footer: (items) => {
+                            let sum = items.reduce((a, b) => a + b.raw, 0);
+                            return '\n' + txtTotalMonth + sum.toFixed(2) + ' ' + curSym;
                         }
                     }
-                },
-                scales: {
-                    x: { ticks: { color: textColor, font: {weight: 'bold'} }, grid: { color: gridColor, drawBorder: false } },
-                    y: { 
-                        beginAtZero: true, 
-                        ticks: { color: textColor }, 
-                        grid: { color: gridColor, drawBorder: false },
-                        title: { display: true, text: 'Сума (грн)', color: textColor, font: {size: 11} }
-                    }
+                }
+            },
+            scales: {
+                x: { ticks: { color: textColor, font: {weight: 'bold'} }, grid: { color: gridColor, drawBorder: false } },
+                y: { 
+                    beginAtZero: true, 
+                    ticks: { color: textColor }, 
+                    grid: { color: gridColor, drawBorder: false },
+                    // Перекладена вісь Y з валютою!
+                    title: { display: true, text: `${txtSum} (${curSym})`, color: textColor, font: {size: 11} }
                 }
             }
-        });
-    }
+        }
+    });
+}
     // --- КІНЕЦЬ ГРАФІКІВ ---
     // --- CRM СИСТЕМА (ДОСТУП) ---
     openAccessMenu() {
