@@ -896,7 +896,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '13.2';
+    const APP_VERSION = '13.3';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -1031,7 +1031,9 @@ info_sec5: "<b>💬 5. Чат та Опитування</b><br>У меню «Ч�
 info_sec6: "<b>📊 6. Аналітика</b><br>Графіки допоможуть знайти крадіжки ресурсів (різниця між головним лічильником та квартирами) та контролювати фінанси.",
 info_sec7: "<b>📦 7. Закриття місяця та Архів</b><br>Коли всі дані введені, натисніть <b>Закрити місяць</b>. Система створить квитанції, перенесе показники в «Попередні» та збереже все в Архів.",
 btn_change_obj: "🔄 Змінити об'єкт", btn_add_mzk: "+ Загальнобудинкові (МЗК)", logo_sub: "КомуналкОблік",
-ph_card: "Картка", ph_bank: "Банк", lbl_meter: "Лічильник"		
+ph_card: "Картка", ph_bank: "Банк", lbl_meter: "Лічильник",
+def_service: "Послуга", def_counter: "Лічильник",
+ph_price: "Ціна", confirm_del_counter: "Видалити лічильник?"		
 	},
     en: {
         receipt: "INVOICE",
@@ -1149,7 +1151,9 @@ info_sec5: "<b>💬 5. Chat & Polls</b><br>Communicate with residents in the 'Bu
 info_sec6: "<b>📊 6. Object Analytics</b><br>Graphs help you find resource theft (difference between main meter and apartments) and track finances.",
 info_sec7: "<b>📦 7. Closing the Month & Archive</b><br>When all calculations are done, click <b>Close Month</b>. The system will create receipts, move current readings to 'Previous', and save everything to the Archive.",
 btn_change_obj: "🔄 Change Object", btn_add_mzk: "+ Common Area (HOA)", logo_sub: "Utility Accounting",
-ph_card: "Card", ph_bank: "Bank", lbl_meter: "Meter"		
+ph_card: "Card", ph_bank: "Bank", lbl_meter: "Meter",
+def_service: "Service", def_counter: "Counter",
+ph_price: "Price", confirm_del_counter: "Delete counter?"		
     },
     pl: {
         receipt: "RACHUNEK",
@@ -1267,7 +1271,9 @@ info_sec5: "<b>💬 5. Czat i Ankiety</b><br>Komunikuj się z mieszkańcami w me
 info_sec6: "<b>📊 6. Analityka</b><br>Wykresy pomagają znaleźć kradzieże (różnica między licznikiem głównym a mieszkaniami) i kontrolować finanse.",
 info_sec7: "<b>📦 7. Zamknięcie Miesiąca i Archiwum</b><br>Gdy wszystko jest gotowe, kliknij <b>Zamknij Miesiąc</b>. System wygeneruje rachunki i zapisze je w Archiwum.",
 btn_change_obj: "🔄 Zmień obiekt", btn_add_mzk: "+ Część wspólna (Admin)", logo_sub: "Rozliczenia Komunalne",
-ph_card: "Karta", ph_bank: "Bank", lbl_meter: "Licznik"		
+ph_card: "Karta", ph_bank: "Bank", lbl_meter: "Licznik",
+def_service: "Usługa", def_counter: "Licznik",
+ph_price: "Cena", confirm_del_counter: "Usunąć licznik?"		
     },
     de: {
         receipt: "RECHNUNG",
@@ -1384,7 +1390,9 @@ info_sec5: "<b>💬 5. Chat & Umfragen</b><br>Kommunizieren Sie im 'Gebäude-Cha
 info_sec6: "<b>📊 6. Analytik</b><br>Diagramme helfen, Diebstahl zu finden und Finanzen zu kontrollieren.",
 info_sec7: "<b>📦 7. Monat abschließen & Archiv</b><br>Klicken Sie auf <b>Monat abschließen</b>. Das System erstellt Quittungen und speichert alles im Archiv.",
 btn_change_obj: "🔄 Objekt ändern", btn_add_mzk: "+ Allgemeinbereich", logo_sub: "Nebenkostenabrechnung",
-ph_card: "Karte", ph_bank: "Bank", lbl_meter: "Zähler"		
+ph_card: "Karte", ph_bank: "Bank", lbl_meter: "Zähler",
+def_service: "Dienstleistung", def_counter: "Zähler",
+ph_price: "Preis", confirm_del_counter: "Zähler löschen?"		
     },
     es: {
         receipt: "FACTURA",
@@ -1502,7 +1510,9 @@ info_sec5: "<b>💬 5. Chat y Encuestas</b><br>Comuníquese en el 'Chat del Edif
 info_sec6: "<b>📊 6. Analítica</b><br>Los gráficos ayudan a encontrar robos y controlar las finanzas.",
 info_sec7: "<b>📦 7. Cierre de Mes y Archivo</b><br>Haga clic en <b>Cerrar mes</b>. El sistema creará recibos y guardará todo en el Archivo.",
 btn_change_obj: "🔄 Cambiar objeto", btn_add_mzk: "+ Área común (HOA)", logo_sub: "Contabilidad de Servicios",
-ph_card: "Tarjeta", ph_bank: "Banco", lbl_meter: "Medidor"		
+ph_card: "Tarjeta", ph_bank: "Banco", lbl_meter: "Medidor",
+def_service: "Servicio", def_counter: "Medidor",
+ph_price: "Precio", confirm_del_counter: "¿Eliminar contador?"		
     },
     fr: {
         receipt: "FACTURE",
@@ -1620,7 +1630,9 @@ info_sec5: "<b>💬 5. Chat et Sondages</b><br>Communiquez dans le 'Chat du bât
 info_sec6: "<b>📊 6. Analytique</b><br>Les graphiques aident à détecter les vols et à contrôler les finances.",
 info_sec7: "<b>📦 7. Clôture du mois et Archive</b><br>Cliquez sur <b>Clôturer le mois</b>. Le système créera les reçus et tout sauvegardera dans l'Archive.",
 btn_change_obj: "🔄 Changer d'objet", btn_add_mzk: "+ Espace commun (Coprop.)", logo_sub: "Comptabilité des Charges",
-ph_card: "Carte", ph_bank: "Banque", lbl_meter: "Compteur"		
+ph_card: "Carte", ph_bank: "Banque", lbl_meter: "Compteur",
+def_service: "Service", def_counter: "Compteur",
+ph_price: "Prix", confirm_del_counter: "Supprimer le compteur ?"		
     }
 };
 	window.translations = translations;
@@ -3272,10 +3284,15 @@ updateChart() {
     renderExtraTariffs() { 
         const container = document.getElementById('extra-tariffs-container');
         if(!container) return;
+
+        // 🌍 Підтягуємо мову
+        let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+        let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
+
         container.innerHTML = (this.currentData.extra_tariffs || []).map((t, i) => 
-            `<div class="custom-row"><input type="text" value="${t.name}" placeholder="Послуга" onchange="app.updateExtraTariff(${i}, 'name', this.value)"><input type="number" value="${t.val}" placeholder="Ціна" onchange="app.updateExtraTariff(${i}, 'val', this.value)"><span class="del-icon" onclick="app.delExtraTariff(${i})">&times;</span></div>`
+            `<div class="custom-row"><input type="text" value="${t.name}" placeholder="${tr.def_service || 'Послуга'}" onchange="app.updateExtraTariff(${i}, 'name', this.value)"><input type="number" value="${t.val}" placeholder="${tr.ph_price || 'Ціна'}" onchange="app.updateExtraTariff(${i}, 'val', this.value)"><span class="del-icon" onclick="app.delExtraTariff(${i})">&times;</span></div>`
         ).join('');
-    } // <-- КОМА ТУТ!
+    }
 
     renderRequisites() { 
         const container = document.getElementById('requisites-container');
@@ -3612,7 +3629,12 @@ updateChart() {
     }
 
     addCustomCounter(type, parentIdx) {
-        const newCounter = { id: Date.now(), name: "Лічильник", price: 0, prev: 0, curr: 0 };
+        // 🌍 Підтягуємо мову для назви лічильника
+        let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+        let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
+        let defName = tr.def_counter || "Лічильник";
+
+        const newCounter = { id: Date.now(), name: defName, price: 0, prev: 0, curr: 0 };
         if (type === 'group') {
             if(!this.currentData.groups[parentIdx].custom_counters) this.currentData.groups[parentIdx].custom_counters = [];
             this.currentData.groups[parentIdx].custom_counters.push(newCounter);
@@ -3633,7 +3655,12 @@ updateChart() {
     }
 
     delCustomCounter(type, pIdx, cIdx) {
-        if(!confirm("Видалити лічильник?")) return;
+        // 🌍 Підтягуємо мову для діалогового вікна
+        let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+        let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
+        let confirmText = tr.confirm_del_counter || "Видалити лічильник?";
+
+        if(!confirm(confirmText)) return;
         const target = type === 'group' ? this.currentData.groups[pIdx] : this.currentData.apartments[pIdx];
         target.custom_counters.splice(cIdx, 1);
         this.save();
