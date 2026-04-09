@@ -614,7 +614,7 @@
     <div id="menuModal" class="modal">
         <div class="modal-content">
             <span class="modal-close" onclick="document.getElementById('menuModal').style.display='none'">&times;</span>
-            <h3 style="margin-top:0; text-align:center;" id="menu-title">Меню</h3>
+            <h3 style="margin-top:0; text-align:center;" id="menu-title" data-i18n="menu_title">Меню</h3>
             
             <div id="menu-content-info" style="display:none" class="info-block">
     <h3 style="text-align: center; margin-bottom: 15px; color: var(--text);" data-i18n="info_header">🚀 Comunalco: Керівництво</h3>
@@ -936,7 +936,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '12.7';
+    const APP_VERSION = '12.8';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -1056,7 +1056,9 @@ archive_empty_history: "Історія порожня 🤷‍♂️", archive_em
 		// --- ДОДАТИ ДО uk ---
 days_short: "дн.",
 		// --- ДОДАТИ ДО uk ---
-days_short: "дн.", chart_archive: "Архів", chart_billed: "💰 Виставлено рахунків", chart_paid: "✅ Реально сплачено", chart_total_month: "Всього за місяць: ", chart_sum: "Сума", chart_electro: "Електрика ⚡", chart_water: "Вода 💧", chart_gas: "Газ 🔥", chart_services: "Послуги / МЗК 🏢"
+days_short: "дн.", chart_archive: "Архів", chart_billed: "💰 Виставлено рахунків", chart_paid: "✅ Реально сплачено", chart_total_month: "Всього за місяць: ", chart_sum: "Сума", chart_electro: "Електрика ⚡", chart_water: "Вода 💧", chart_gas: "Газ 🔥", chart_services: "Послуги / МЗК 🏢",
+		// uk
+menu_title: "Меню"
 	},
     en: {
         receipt: "INVOICE",
@@ -1159,7 +1161,9 @@ archive_empty_history: "History is empty 🤷‍♂️", archive_empty_apts: "(N
 		// --- ДОДАТИ ДО en ---
 days_short: "days",
 		// --- ДОДАТИ ДО en ---
-days_short: "days", chart_archive: "Archive", chart_billed: "💰 Billed", chart_paid: "✅ Actually paid", chart_total_month: "Total for month: ", chart_sum: "Amount", chart_electro: "Electricity ⚡", chart_water: "Water 💧", chart_gas: "Gas 🔥", chart_services: "Services / HOA 🏢"
+days_short: "days", chart_archive: "Archive", chart_billed: "💰 Billed", chart_paid: "✅ Actually paid", chart_total_month: "Total for month: ", chart_sum: "Amount", chart_electro: "Electricity ⚡", chart_water: "Water 💧", chart_gas: "Gas 🔥", chart_services: "Services / HOA 🏢",
+		// en
+menu_title: "Menu"
     },
     pl: {
         receipt: "RACHUNEK",
@@ -1262,7 +1266,9 @@ archive_empty_history: "Historia jest pusta 🤷‍♂️", archive_empty_apts: 
 		// --- ДОДАТИ ДО pl ---
 days_short: "dni",
 		// --- ДОДАТИ ДО pl ---
-days_short: "dni", chart_archive: "Archiwum", chart_billed: "💰 Wystawiono rachunki", chart_paid: "✅ Faktycznie zapłacono", chart_total_month: "Suma za miesiąc: ", chart_sum: "Kwota", chart_electro: "Prąd ⚡", chart_water: "Woda 💧", chart_gas: "Gaz 🔥", chart_services: "Usługi / Admin. 🏢"
+days_short: "dni", chart_archive: "Archiwum", chart_billed: "💰 Wystawiono rachunki", chart_paid: "✅ Faktycznie zapłacono", chart_total_month: "Suma za miesiąc: ", chart_sum: "Kwota", chart_electro: "Prąd ⚡", chart_water: "Woda 💧", chart_gas: "Gaz 🔥", chart_services: "Usługi / Admin. 🏢",
+		// pl
+menu_title: "Menu"
     },
     de: {
         receipt: "RECHNUNG",
@@ -1365,7 +1371,9 @@ archive_empty_history: "Verlauf ist leer 🤷‍♂️", archive_empty_apts: "(K
 		// --- ДОДАТИ ДО de ---
 days_short: "Tage",
 		// --- ДОДАТИ ДО de ---
-days_short: "Tage", chart_archive: "Archiv", chart_billed: "💰 In Rechnung gestellt", chart_paid: "✅ Tatsächlich bezahlt", chart_total_month: "Gesamt für Monat: ", chart_sum: "Betrag", chart_electro: "Strom ⚡", chart_water: "Wasser 💧", chart_gas: "Gas 🔥", chart_services: "Dienste / Hausverw. 🏢"
+days_short: "Tage", chart_archive: "Archiv", chart_billed: "💰 In Rechnung gestellt", chart_paid: "✅ Tatsächlich bezahlt", chart_total_month: "Gesamt für Monat: ", chart_sum: "Betrag", chart_electro: "Strom ⚡", chart_water: "Wasser 💧", chart_gas: "Gas 🔥", chart_services: "Dienste / Hausverw. 🏢",
+		// de
+menu_title: "Menü"
     },
     es: {
         receipt: "FACTURA",
@@ -1468,7 +1476,9 @@ archive_empty_history: "El historial está vacío 🤷‍♂️", archive_empty_
 		// --- ДОДАТИ ДО es ---
 days_short: "días",
 		// --- ДОДАТИ ДО es ---
-days_short: "días", chart_archive: "Archivo", chart_billed: "💰 Facturado", chart_paid: "✅ Realmente pagado", chart_total_month: "Total del mes: ", chart_sum: "Importe", chart_electro: "Electricidad ⚡", chart_water: "Agua 💧", chart_gas: "Gas 🔥", chart_services: "Servicios / Com. 🏢"
+days_short: "días", chart_archive: "Archivo", chart_billed: "💰 Facturado", chart_paid: "✅ Realmente pagado", chart_total_month: "Total del mes: ", chart_sum: "Importe", chart_electro: "Electricidad ⚡", chart_water: "Agua 💧", chart_gas: "Gas 🔥", chart_services: "Servicios / Com. 🏢",
+		// es
+menu_title: "Menú"
     },
     fr: {
         receipt: "FACTURE",
@@ -1571,7 +1581,9 @@ archive_empty_history: "L'historique est vide 🤷‍♂️", archive_empty_apts
 		// --- ДОДАТИ ДО fr ---
 days_short: "jours",
 		// --- ДОДАТИ ДО fr ---
-days_short: "jours", chart_archive: "Archive", chart_billed: "💰 Facturé", chart_paid: "✅ Réellement payé", chart_total_month: "Total du mois : ", chart_sum: "Montant", chart_electro: "Électricité ⚡", chart_water: "Eau 💧", chart_gas: "Gaz 🔥", chart_services: "Services / Coprop. 🏢"
+days_short: "jours", chart_archive: "Archive", chart_billed: "💰 Facturé", chart_paid: "✅ Réellement payé", chart_total_month: "Total du mois : ", chart_sum: "Montant", chart_electro: "Électricité ⚡", chart_water: "Eau 💧", chart_gas: "Gaz 🔥", chart_services: "Services / Coprop. 🏢",
+		// fr
+menu_title: "Menu"
     }
 };
 	window.translations = translations;
@@ -4947,14 +4959,7 @@ if (foundAny) {
     // Вставляємо нашу динамічну змінну
     select.innerHTML = `<option value="">${txtEmptyApts}</option>`;
 }
-
-        if (foundAny) {
-            Object.keys(aptsMap).sort((a,b) => a.localeCompare(b, undefined, {numeric: true})).forEach(aptId => {
-                select.innerHTML += `<option value="${aptId}">${aptsMap[aptId]}</option>`;
-            });
-        } else {
-            select.innerHTML = '<option value="">(Квартири в архіві не знайдені)</option>';
-        }
+      
     }
 
     // --- ПОКАЗ ІСТОРІЇ (ЧЕКІВ) ДЛЯ ОДНІЄЇ КВАРТИРИ (Жорстке сортування і час) ---
