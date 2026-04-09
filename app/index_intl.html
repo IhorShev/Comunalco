@@ -936,7 +936,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '12.3';
+    const APP_VERSION = '12.4';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -1050,7 +1050,9 @@ status_unlimited: "Безліміт", status_units: "Одиниці:", status_pr
 		// uk
 menu_setup_region: "Мова та Валюта",
 		// uk
-per_apt_mo: "/ об'єкт / міс", guest_id: "ГІСТЬ"
+per_apt_mo: "/ об'єкт / міс", guest_id: "ГІСТЬ",
+		// uk
+archive_empty_history: "Історія порожня 🤷‍♂️", archive_empty_apts: "(Квартири в архіві не знайдені)"
 	},
     en: {
         receipt: "INVOICE",
@@ -1147,7 +1149,9 @@ status_unlimited: "Unlimited", status_units: "Units:", status_pro_active: "PRO A
 		// en
 menu_setup_region: "Language & Currency",
 		// en
-per_apt_mo: "/ unit / mo", guest_id: "GUEST"
+per_apt_mo: "/ unit / mo", guest_id: "GUEST",
+		// en
+archive_empty_history: "History is empty 🤷‍♂️", archive_empty_apts: "(No apartments found in archive)"
     },
     pl: {
         receipt: "RACHUNEK",
@@ -1244,7 +1248,9 @@ status_unlimited: "Bez limitu", status_units: "Jednostki:", status_pro_active: "
 		// pl
 menu_setup_region: "Język i Waluta",
 		// pl
-per_apt_mo: "/ lokal / mc", guest_id: "GOŚĆ"
+per_apt_mo: "/ lokal / mc", guest_id: "GOŚĆ",
+		// pl
+archive_empty_history: "Historia jest pusta 🤷‍♂️", archive_empty_apts: "(Brak mieszkań w archiwum)"
     },
     de: {
         receipt: "RECHNUNG",
@@ -1341,7 +1347,9 @@ status_unlimited: "Unbegrenzt", status_units: "Einheiten:", status_pro_active: "
 		// de
 menu_setup_region: "Sprache & Währung",
 		// de
-per_apt_mo: "/ einh. / mon", guest_id: "GAST"
+per_apt_mo: "/ einh. / mon", guest_id: "GAST",
+		// de
+archive_empty_history: "Verlauf ist leer 🤷‍♂️", archive_empty_apts: "(Keine Wohnungen im Archiv gefunden)"
     },
     es: {
         receipt: "FACTURA",
@@ -1438,7 +1446,9 @@ status_unlimited: "Ilimitado", status_units: "Unidades:", status_pro_active: "PR
 		// es
 menu_setup_region: "Idioma y Moneda",
 		// es
-per_apt_mo: "/ unid. / mes", guest_id: "INVITADO"
+per_apt_mo: "/ unid. / mes", guest_id: "INVITADO",
+		// es
+archive_empty_history: "El historial está vacío 🤷‍♂️", archive_empty_apts: "(No se encontraron apartamentos en el archivo)"
     },
     fr: {
         receipt: "FACTURE",
@@ -1535,7 +1545,9 @@ status_unlimited: "Illimité", status_units: "Unités :", status_pro_active: "PR
 		// fr
 menu_setup_region: "Langue et Devise",
 		// fr
-per_apt_mo: "/ unité / mois", guest_id: "INVITÉ"
+per_apt_mo: "/ unité / mois", guest_id: "INVITÉ",
+		// fr
+archive_empty_history: "L'historique est vide 🤷‍♂️", archive_empty_apts: "(Aucun appartement trouvé dans l'archive)"
     }
 };
 class App {
@@ -4672,31 +4684,39 @@ renderAll() {
         }
     }
    // --- ФУНКЦІЯ ІСТОРІЇ (Оновлено для Табів та різних Ролей) ---
-    openHistory() {
-        const modal = document.getElementById('historyModal');
-        const listDiv = document.getElementById('history-list');
-        
-        // Скидаємо вікно на першу вкладку (Місяці) при відкритті
-        if(this.switchArchiveTab) this.switchArchiveTab('months');
-        
-        // Створюємо контейнер, якщо його немає
-        let content = modal.querySelector('.history-list');
+openHistory() {
+    const modal = document.getElementById('historyModal');
+    const listDiv = document.getElementById('history-list');
+    
+    // Скидаємо вікно на першу вкладку (Місяці) при відкритті
+    if(this.switchArchiveTab) this.switchArchiveTab('months');
+    
+    // Створюємо контейнер, якщо його немає
+    let content = modal.querySelector('.history-list');
+    if (!content) {
+        content = modal.querySelector('#history-tab-months div'); // Шукаємо новий контейнер
         if (!content) {
-            content = modal.querySelector('#history-tab-months div'); // Шукаємо новий контейнер
-            if (!content) {
-                const c = document.createElement('div');
-                c.className = 'history-list';
-                modal.querySelector('#history-tab-months').appendChild(c);
-                content = c;
-            }
+            const c = document.createElement('div');
+            c.className = 'history-list';
+            modal.querySelector('#history-tab-months').appendChild(c);
+            content = c;
         }
+    }
 
-        if (!this.currentData.history || this.currentData.history.length === 0) {
-    content.innerHTML = '<p style="text-align:center; color:var(--text-sec); padding:20px;" data-i18n="arch_empty">Історія порожня 🤷‍♂️</p>';
-    modal.style.display = 'flex';
-    if (window._applyUILang) window._applyUILang(); // Смикаємо наш глобальний перекладач
-    return;
-}
+    // 🌍 БЕЗПЕЧНО ПІДТЯГУЄМО МОВУ ТА СЛОВНИК
+    let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+    let tr = (window.translations && window.translations[lang]) ? window.translations[lang] : window.translations['uk'] || {};
+    let txtEmptyHistory = tr.archive_empty_history || "Історія порожня 🤷‍♂️";
+
+    if (!this.currentData.history || this.currentData.history.length === 0) {
+        // Тепер текст 100% підтягнеться потрібною мовою!
+        content.innerHTML = `<p style="text-align:center; color:var(--text-sec); padding:20px;">${txtEmptyHistory}</p>`;
+        modal.style.display = 'flex';
+        
+        // Оновлюємо інші статичні елементи вікна
+        if (typeof app !== 'undefined' && app._applyUILang) app._applyUILang(); 
+        return;
+    }
 
         let html = '<div style="display:flex; flex-direction:column; gap:10px; max-height:60vh; overflow-y:auto;">';
 
@@ -4852,6 +4872,19 @@ renderAll() {
                 }
             });
         }
+		// 🌍 ПІДТЯГУЄМО МОВУ ТА СЛОВНИК ДЛЯ СПИСКУ КВАРТИР
+let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+let tr = (window.translations && window.translations[lang]) ? window.translations[lang] : window.translations['uk'] || {};
+let txtEmptyApts = tr.archive_empty_apts || "(Квартири в архіві не знайдені)";
+
+if (foundAny) {
+    Object.keys(aptsMap).sort((a,b) => a.localeCompare(b, undefined, {numeric: true})).forEach(aptId => {
+        select.innerHTML += `<option value="${aptId}">${aptsMap[aptId]}</option>`;
+    });
+} else {
+    // Вставляємо нашу динамічну змінну
+    select.innerHTML = `<option value="">${txtEmptyApts}</option>`;
+}
 
         if (foundAny) {
             Object.keys(aptsMap).sort((a,b) => a.localeCompare(b, undefined, {numeric: true})).forEach(aptId => {
