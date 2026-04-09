@@ -2298,13 +2298,20 @@ updateSubscriptionCalc() {
     openAnnouncementModal(indices) {
         document.getElementById('tgActionModal').style.display = 'none';
         this.announcementTargets = indices; // Запам'ятовуємо, кому слати
-        
+
         const countEl = document.getElementById('announcement-target-count');
         if(countEl) countEl.innerText = indices.length;
-        
+
         const textEl = document.getElementById('announcement-text');
-        if(textEl) textEl.value = '';
-        
+        if(textEl) {
+            textEl.value = ''; // Очищаємо поле
+            
+            // 🌍 Наші 3 рядки для перекладу плейсхолдера:
+            let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+            let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
+            textEl.placeholder = tr.ann_placeholder || "Шановні мешканці, завтра буде відключення води...\n(Натискайте Enter для абзаців)";
+        }
+
         document.getElementById('announcementModal').style.display = 'flex';
     }
 
@@ -2327,7 +2334,15 @@ updateSubscriptionCalc() {
         const textEl = document.getElementById('announcement-text');
         const text = textEl ? textEl.value.trim() : '';
 
-        if(!text) return alert("⚠️ Введіть текст повідомлення!");
+        if(!text) {
+            // 🌍 Підтягуємо мову для алерту
+            let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+            let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
+            return alert(tr.alert_empty_msg || "⚠️ Введіть текст повідомлення!");
+        }
+
+        const indices = this.announcementTargets || [];
+        // ... далі код без змін
 
         const indices = this.announcementTargets || [];
         if(indices.length === 0) return;
