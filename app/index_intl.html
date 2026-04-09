@@ -936,7 +936,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '12.4';
+    const APP_VERSION = '12.5';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -4705,7 +4705,10 @@ openHistory() {
 
     // 🌍 БЕЗПЕЧНО ПІДТЯГУЄМО МОВУ ТА СЛОВНИК
     let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
-    let tr = (window.translations && window.translations[lang]) ? window.translations[lang] : window.translations['uk'] || {};
+    let tr = {};
+    if (window.translations) {
+        tr = window.translations[lang] || window.translations['uk'] || {};
+    }
     let txtEmptyHistory = tr.archive_empty_history || "Історія порожня 🤷‍♂️";
 
     if (!this.currentData.history || this.currentData.history.length === 0) {
@@ -4873,9 +4876,12 @@ openHistory() {
             });
         }
 		// 🌍 ПІДТЯГУЄМО МОВУ ТА СЛОВНИК ДЛЯ СПИСКУ КВАРТИР
-let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
-let tr = (window.translations && window.translations[lang]) ? window.translations[lang] : window.translations['uk'] || {};
-let txtEmptyApts = tr.archive_empty_apts || "(Квартири в архіві не знайдені)";
+    let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+    let tr = {};
+    if (window.translations) {
+        tr = window.translations[lang] || window.translations['uk'] || {};
+    }
+    let txtEmptyApts = tr.archive_empty_apts || "(Квартири в архіві не знайдені)";
 
 if (foundAny) {
     Object.keys(aptsMap).sort((a,b) => a.localeCompare(b, undefined, {numeric: true})).forEach(aptId => {
@@ -6454,7 +6460,10 @@ async function loadAdminPolls() {
     
     // Підтягуємо мову і словник
     let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
-    let tr = (window.translations && window.translations[lang]) ? window.translations[lang] : window.translations['uk'];
+    let tr = {};
+    if (window.translations) {
+        tr = window.translations[lang] || window.translations['uk'] || {};
+    }
     
     let txtLoading = tr.poll_loading || "Завантаження...";
     let txtEmpty = tr.poll_empty || "Немає опитувань";
