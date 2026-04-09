@@ -2346,10 +2346,7 @@ updateSubscriptionCalc() {
             let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
             return alert(tr.alert_empty_msg || "⚠️ Введіть текст повідомлення!");
         }
-
-        const indices = this.announcementTargets || [];
-        // ... далі код без змін
-
+           
         const indices = this.announcementTargets || [];
         if(indices.length === 0) return;
 
