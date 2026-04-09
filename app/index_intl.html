@@ -5419,14 +5419,7 @@ window.addEventListener('load', () => {
         });
     }
 
-    // Трекінг
-    if(!localStorage.getItem('install_tracked')) {
-        const TRACK_URL = "https://script.google.com/macros/s/AKfycbyfjf7vStURsAu2Ef_9LADFQoNlTycadgCmtaZzwIF7Y5iNA8IZE8KGnlmzsBSY_QKK/exec";
-        fetch(TRACK_URL + '?action=install', { mode: 'no-cors' })
-            .then(() => localStorage.setItem('install_tracked', 'true'))
-            .catch(e => console.log('Track err'));
-    }
-});
+   });
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
