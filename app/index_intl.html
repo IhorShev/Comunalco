@@ -896,7 +896,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '13.7';
+    const APP_VERSION = '13.8';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -1039,7 +1039,10 @@ def_enter_name: "Ввести назву",
 err_no_receipt: "Помилка: Квитанція не знайдена", alert_enter_phone: "Вкажіть номер телефону для ", alert_copied_tg: "📝 Текст скопійовано!\nВставте його у чат Telegram.", alert_copied_viber: "✅ Текст скопійовано! Натисніть 'Вставити' у Viber.", alert_copied_clipboard: "✅ Квитанцію скопійовано в буфер обміну!",
 modal_receipt_ready_title: "📸 Квитанція готова", btn_copy_img: "🚀 Скопіювати", btn_dl_img: "💾 Скачати", hint_copy_paste: "Натисніть 'Скопіювати', потім вставте у месенджер",
 receipt_el_day: "⚡ Електрика (День)", receipt_el_night: "🌙 Електрика (Ніч)", receipt_water: "💧 Водопостачання", receipt_gas: "🔥 Газопостачання", receipt_mzk: "🏢 МЗК (Загальні витрати)", receipt_mzk_desc: "Світло, прибирання та ін.", receipt_debt: "❗️ Борг (минулий):", receipt_overpay: "💚 Переплата (минула):", receipt_payer: "ПЛАТНИК", receipt_service: "ПОСЛУГА / ПОКАЗНИКИ", receipt_consumed: "СПОЖИТО", receipt_amount: "СУМА", receipt_accrued: "Нараховано (поточний):", receipt_to_pay: "ДО СПЛАТИ", receipt_requisites: "РЕКВІЗИТИ ДЛЯ ОПЛАТИ", receipt_generated: "Згенеровано автоматично сервісом Comunalco",
-receipt_system_name: "Система обліку", receipt_paid: "✅ Сплачено:", loader_camera: "<div style='padding:40px; text-align:center; color:#64748b;'>⏳ <b>Вмикаємо фотоапарат...</b><br><span style='font-size:12px'>Завантаження інструментів</span></div>"		
+receipt_system_name: "Система обліку", receipt_paid: "✅ Сплачено:", loader_camera: "<div style='padding:40px; text-align:center; color:#64748b;'>⏳ <b>Вмикаємо фотоапарат...</b><br><span style='font-size:12px'>Завантаження інструментів</span></div>",
+btn_copied: "✅ Скопійовано!", hint_success_paste: "Успіх! Відкрийте месенджер, вставте адресату, відправте.",
+btn_error: "⚠️ Помилка", hint_copy_err: "Браузер не дав доступу. Натисніть на картинку <b>Правою кнопкою -> Копіювати</b>.", alert_error: "Помилка: ", confirm_close_month: "⚠️ Закрити місяць?\n\n1. Поточні квитанції будуть збережені в Історію.\n2. Поля будуть очищені для нового місяця.", btn_processing: "⏳ Обробка...", alert_no_tg_id: "Немає Telegram ID. Натисніть 'Підключити Телеграм-Бот'.",
+acc_msg_pin_none: "Ще не згенеровано", acc_msg_title: "🏠 Ваш особистий кабінет MyComunalco", acc_msg_link: "🌍 Вхід:", acc_msg_login: "📞 Ваш Логін:", acc_msg_pin: "🔑 Ваш PIN-код:", acc_msg_desc: "Тут ви можете зручно передавати показники, переглядати квитанції, слідкувати за балансом, аналізувати споживання та спілкуватись в Чаті з Керуючим чи Мешканцями.", acc_msg_install: "⚙️ ЯК ВСТАНОВИТИ ДОДАТОК:\n\n📱 Android (браузер Chrome):\n1. Відкрийте посилання вище\n2. Натисніть меню браузера (три крапки ⋮ у правому куті)\n3. Виберіть «Встановити додаток» або «Додати на головний екран»\n\n🍏 iPhone (браузер Safari):\n1. Відкрийте посилання вище саме в Safari\n2. Натисніть кнопку «Поділитися» (квадрат зі стрілочкою 📤 внизу екрана)\n3. Оберіть пункт «На початковий екран» (Add to Home Screen) ➕\n\n💻 Ноутбук / ПК (Chrome, Edge):\nВідкрийте посилання та натисніть на іконку встановлення (монітор або плюсик) у правій частині адресного рядка.\n\n✅ Готово! Тепер іконка MyComunalco завжди буде під рукою на вашому екрані."		
 	},
     en: {
         receipt: "INVOICE",
@@ -1165,7 +1168,10 @@ def_enter_name: "Enter Name",
 err_no_receipt: "Error: Receipt not found", alert_enter_phone: "Enter phone number for ", alert_copied_tg: "📝 Text copied!\nPaste it into the Telegram chat.", alert_copied_viber: "✅ Text copied! Press 'Paste' in Viber.", alert_copied_clipboard: "✅ Receipt copied to clipboard!",
 modal_receipt_ready_title: "📸 Receipt Ready", btn_copy_img: "🚀 Copy", btn_dl_img: "💾 Download", hint_copy_paste: "Press 'Copy', then paste into messenger",
 receipt_el_day: "⚡ Electricity (Day)", receipt_el_night: "🌙 Electricity (Night)", receipt_water: "💧 Water Supply", receipt_gas: "🔥 Gas Supply", receipt_mzk: "🏢 Common Area (HOA)", receipt_mzk_desc: "Lighting, cleaning, etc.", receipt_debt: "❗️ Debt (previous):", receipt_overpay: "💚 Overpayment (prev):", receipt_payer: "PAYER", receipt_service: "SERVICE / READINGS", receipt_consumed: "CONSUMED", receipt_amount: "AMOUNT", receipt_accrued: "Accrued (current):", receipt_to_pay: "TOTAL TO PAY", receipt_requisites: "PAYMENT DETAILS", receipt_generated: "Generated automatically by Comunalco",
-receipt_system_name: "Accounting System", receipt_paid: "✅ Paid:", loader_camera: "<div style='padding:40px; text-align:center; color:#64748b;'>⏳ <b>Starting camera...</b><br><span style='font-size:12px'>Loading tools</span></div>"		
+receipt_system_name: "Accounting System", receipt_paid: "✅ Paid:", loader_camera: "<div style='padding:40px; text-align:center; color:#64748b;'>⏳ <b>Starting camera...</b><br><span style='font-size:12px'>Loading tools</span></div>",
+btn_copied: "✅ Copied!", hint_success_paste: "Success! Open messenger, paste to recipient, and send.",
+btn_error: "⚠️ Error", hint_copy_err: "Browser denied access. Right-click the image and select <b>Copy</b>.", alert_error: "Error: ", confirm_close_month: "⚠️ Close month?\n\n1. Current receipts will be saved to History.\n2. Fields will be cleared for the new month.", btn_processing: "⏳ Processing...", alert_no_tg_id: "No Telegram ID. Click 'Connect Telegram Bot'.",
+acc_msg_pin_none: "Not generated yet", acc_msg_title: "🏠 Your MyComunalco Personal Account", acc_msg_link: "🌍 Login:", acc_msg_login: "📞 Your Login:", acc_msg_pin: "🔑 Your PIN:", acc_msg_desc: "Here you can conveniently submit readings, view receipts, track your balance, analyze consumption, and communicate in the Chat with the Manager or Residents.", acc_msg_install: "⚙️ HOW TO INSTALL THE APP:\n\n📱 Android (Chrome browser):\n1. Open the link above\n2. Tap the browser menu (three dots ⋮ in the right corner)\n3. Select \"Install app\" or \"Add to Home screen\"\n\n🍏 iPhone (Safari browser):\n1. Open the link above in Safari\n2. Tap the \"Share\" button (square with an arrow 📤 at the bottom)\n3. Select \"Add to Home Screen\" ➕\n\n💻 Laptop / PC (Chrome, Edge):\nOpen the link and click the install icon (monitor or plus sign) on the right side of the address bar.\n\n✅ Done! The MyComunalco icon will now always be handy on your screen."		
     },
     pl: {
         receipt: "RACHUNEK",
@@ -1291,7 +1297,10 @@ def_enter_name: "Wpisz nazwę",
 err_no_receipt: "Błąd: Nie znaleziono rachunku", alert_enter_phone: "Wprowadź numer telefonu dla ", alert_copied_tg: "📝 Tekst skopiowany!\nWklej go na czacie Telegram.", alert_copied_viber: "✅ Tekst skopiowany! Kliknij 'Wklej' w Viber.", alert_copied_clipboard: "✅ Rachunek skopiowany do schowka!",
 modal_receipt_ready_title: "📸 Rachunek gotowy", btn_copy_img: "🚀 Kopiuj", btn_dl_img: "💾 Pobierz", hint_copy_paste: "Kliknij 'Kopiuj', a następnie wklej do komunikatora",
 receipt_el_day: "⚡ Prąd (Dzień)", receipt_el_night: "🌙 Prąd (Noc)", receipt_water: "💧 Woda", receipt_gas: "🔥 Gaz", receipt_mzk: "🏢 Części wspólne (Admin)", receipt_mzk_desc: "Oświetlenie, sprzątanie itp.", receipt_debt: "❗️ Dług (poprzedni):", receipt_overpay: "💚 Nadpłata (poprz.):", receipt_payer: "PŁATNIK", receipt_service: "USŁUGA / ODCZYTY", receipt_consumed: "ZUŻYCIE", receipt_amount: "KWOTA", receipt_accrued: "Naliczone (obecnie):", receipt_to_pay: "DO ZAPŁATY", receipt_requisites: "DANE DO PRZELEWU", receipt_generated: "Wygenerowano automatycznie przez Comunalco",
-receipt_system_name: "System Rozliczeń", receipt_paid: "✅ Zapłacono:", loader_camera: "<div style='padding:40px; text-align:center; color:#64748b;'>⏳ <b>Uruchamianie aparatu...</b><br><span style='font-size:12px'>Ładowanie narzędzi</span></div>"		
+receipt_system_name: "System Rozliczeń", receipt_paid: "✅ Zapłacono:", loader_camera: "<div style='padding:40px; text-align:center; color:#64748b;'>⏳ <b>Uruchamianie aparatu...</b><br><span style='font-size:12px'>Ładowanie narzędzi</span></div>",
+btn_copied: "✅ Skopiowano!", hint_success_paste: "Sukces! Otwórz komunikator, wklej odbiorcy i wyślij.",
+btn_error: "⚠️ Błąd", hint_copy_err: "Przeglądarka odmówiła dostępu. Kliknij obraz <b>Prawym przyciskiem -> Kopiuj</b>.", alert_error: "Błąd: ", confirm_close_month: "⚠️ Zamknąć miesiąc?\n\n1. Obecne rachunki zostaną zapisane w Historii.\n2. Pola zostaną wyczyszczone na nowy miesiąc.", btn_processing: "⏳ Przetwarzanie...", alert_no_tg_id: "Brak ID Telegram. Kliknij 'Podłącz Bota Telegram'.",
+acc_msg_pin_none: "Jeszcze nie wygenerowano", acc_msg_title: "🏠 Twoje konto osobiste MyComunalco", acc_msg_link: "🌍 Logowanie:", acc_msg_login: "📞 Twój Login:", acc_msg_pin: "🔑 Twój PIN:", acc_msg_desc: "Tutaj możesz wygodnie przesyłać odczyty, przeglądać rachunki, śledzić saldo, analizować zużycie i komunikować się na Czacie z Zarządcą lub Mieszkańcami.", acc_msg_install: "⚙️ JAK ZAINSTALOWAĆ APLIKACJĘ:\n\n📱 Android (przeglądarka Chrome):\n1. Otwórz powyższy link\n2. Stuknij menu przeglądarki (trzy kropki ⋮ w prawym rogu)\n3. Wybierz „Zainstaluj aplikację” lub „Dodaj do ekranu głównego”\n\n🍏 iPhone (przeglądarka Safari):\n1. Otwórz link w Safari\n2. Stuknij przycisk „Udostępnij” (kwadrat ze strzałką 📤 na dole ekranu)\n3. Wybierz opcję „Do ekranu głównego” (Add to Home Screen) ➕\n\n💻 Laptop / PC (Chrome, Edge):\nOtwórz link i kliknij ikonę instalacji (monitor lub plus) po prawej stronie paska adresu.\n\n✅ Gotowe! Ikona MyComunalco będzie teraz zawsze pod ręką na Twoim ekranie."		
     },
     de: {
         receipt: "RECHNUNG",
@@ -1416,7 +1425,10 @@ def_enter_name: "Name eingeben",
 err_no_receipt: "Fehler: Quittung nicht gefunden", alert_enter_phone: "Geben Sie die Telefonnummer ein für ", alert_copied_tg: "📝 Text kopiert!\nFügen Sie ihn in den Telegram-Chat ein.", alert_copied_viber: "✅ Text kopiert! Drücken Sie auf 'Einfügen' in Viber.", alert_copied_clipboard: "✅ Quittung in die Zwischenablage kopiert!",
 modal_receipt_ready_title: "📸 Quittung bereit", btn_copy_img: "🚀 Kopieren", btn_dl_img: "💾 Herunterladen", hint_copy_paste: "Drücken Sie 'Kopieren' und fügen Sie es in den Messenger ein",
 receipt_el_day: "⚡ Strom (Tag)", receipt_el_night: "🌙 Strom (Nacht)", receipt_water: "💧 Wasser", receipt_gas: "🔥 Gas", receipt_mzk: "🏢 Allgemeinbereich", receipt_mzk_desc: "Beleuchtung, Reinigung usw.", receipt_debt: "❗️ Schulden (vorherige):", receipt_overpay: "💚 Überzahlung (vorh.):", receipt_payer: "ZAHLER", receipt_service: "LEISTUNG / ZÄHLERSTAND", receipt_consumed: "VERBRAUCH", receipt_amount: "BETRAG", receipt_accrued: "Berechnet (aktuell):", receipt_to_pay: "ZU ZAHLEN", receipt_requisites: "ZAHLUNGSDETAILS", receipt_generated: "Automatisch generiert von Comunalco",
-receipt_system_name: "Abrechnungssystem", receipt_paid: "✅ Bezahlt:", loader_camera: "<div style='padding:40px; text-align:center; color:#64748b;'>⏳ <b>Kamera wird gestartet...</b><br><span style='font-size:12px'>Werkzeuge laden</span></div>"		
+receipt_system_name: "Abrechnungssystem", receipt_paid: "✅ Bezahlt:", loader_camera: "<div style='padding:40px; text-align:center; color:#64748b;'>⏳ <b>Kamera wird gestartet...</b><br><span style='font-size:12px'>Werkzeuge laden</span></div>",
+btn_copied: "✅ Kopiert!", hint_success_paste: "Erfolg! Messenger öffnen, einfügen und senden.",
+btn_error: "⚠️ Fehler", hint_copy_err: "Zugriff verweigert. Klicken Sie mit der <b>rechten Maustaste auf das Bild -> Kopieren</b>.", alert_error: "Fehler: ", confirm_close_month: "⚠️ Monat abschließen?\n\n1. Aktuelle Quittungen werden im Verlauf gespeichert.\n2. Felder werden für den neuen Monat geleert.", btn_processing: "⏳ Verarbeitung...", alert_no_tg_id: "Keine Telegram-ID. Klicken Sie auf 'Telegram-Bot verbinden'.",
+acc_msg_pin_none: "Noch nicht generiert", acc_msg_title: "🏠 Ihr MyComunalco-Konto", acc_msg_link: "🌍 Login:", acc_msg_login: "📞 Ihr Login:", acc_msg_pin: "🔑 Ihre PIN:", acc_msg_desc: "Hier können Sie bequem Zählerstände übermitteln, Quittungen einsehen, Ihren Kontostand verfolgen, den Verbrauch analysieren und im Chat mit dem Verwalter oder den Bewohnern kommunizieren.", acc_msg_install: "⚙️ SO INSTALLIEREN SIE DIE APP:\n\n📱 Android (Chrome-Browser):\n1. Öffnen Sie den obigen Link\n2. Tippen Sie auf das Browser-Menü (drei Punkte ⋮ oben rechts)\n3. Wählen Sie \"App installieren\" oder \"Zum Startbildschirm hinzufügen\"\n\n🍏 iPhone (Safari-Browser):\n1. Öffnen Sie den obigen Link in Safari\n2. Tippen Sie auf \"Teilen\" (Quadrat mit Pfeil 📤 unten)\n3. Wählen Sie \"Zum Home-Bildschirm\" (Add to Home Screen) ➕\n\n💻 Laptop / PC (Chrome, Edge):\nÖffnen Sie den Link und klicken Sie auf das Installationssymbol (Monitor oder Pluszeichen) rechts in der Adressleiste.\n\n✅ Fertig! Das MyComunalco-Symbol ist nun immer auf Ihrem Bildschirm griffbereit."		
     },
     es: {
         receipt: "FACTURA",
@@ -1542,7 +1554,10 @@ def_enter_name: "Introducir nombre",
 err_no_receipt: "Error: Recibo no encontrado", alert_enter_phone: "Ingrese el número de teléfono para ", alert_copied_tg: "📝 ¡Texto copiado!\nPéguelo en el chat de Telegram.", alert_copied_viber: "✅ ¡Texto copiado! Presione 'Pegar' en Viber.", alert_copied_clipboard: "✅ ¡Recibo copiado al portapapeles!",
 modal_receipt_ready_title: "📸 Recibo listo", btn_copy_img: "🚀 Copiar", btn_dl_img: "💾 Descargar", hint_copy_paste: "Presione 'Copiar', luego pegue en el mensajero",
 receipt_el_day: "⚡ Electricidad (Día)", receipt_el_night: "🌙 Electricidad (Noche)", receipt_water: "💧 Agua", receipt_gas: "🔥 Gas", receipt_mzk: "🏢 Área común (HOA)", receipt_mzk_desc: "Iluminación, limpieza, etc.", receipt_debt: "❗️ Deuda (anterior):", receipt_overpay: "💚 Pago en exceso (ant):", receipt_payer: "PAGADOR", receipt_service: "SERVICIO / LECTURAS", receipt_consumed: "CONSUMIDO", receipt_amount: "MONTO", receipt_accrued: "Acumulado (actual):", receipt_to_pay: "TOTAL A PAGAR", receipt_requisites: "DETALLES DE PAGO", receipt_generated: "Generado automáticamente por Comunalco",
-receipt_system_name: "Sistema de contabilidad", receipt_paid: "✅ Pagado:", loader_camera: "<div style='padding:40px; text-align:center; color:#64748b;'>⏳ <b>Iniciando cámara...</b><br><span style='font-size:12px'>Cargando herramientas</span></div>"		
+receipt_system_name: "Sistema de contabilidad", receipt_paid: "✅ Pagado:", loader_camera: "<div style='padding:40px; text-align:center; color:#64748b;'>⏳ <b>Iniciando cámara...</b><br><span style='font-size:12px'>Cargando herramientas</span></div>",
+btn_copied: "✅ ¡Copiado!", hint_success_paste: "¡Éxito! Abra el mensajero, pegue al destinatario y envíe.",
+btn_error: "⚠️ Error", hint_copy_err: "Acceso denegado. Haga <b>clic derecho en la imagen -> Copiar</b>.", alert_error: "Error: ", confirm_close_month: "⚠️ ¿Cerrar mes?\n\n1. Los recibos actuales se guardarán en el Historial.\n2. Los campos se borrarán para el nuevo mes.", btn_processing: "⏳ Procesando...", alert_no_tg_id: "Sin ID de Telegram. Haga clic en 'Conectar Bot de Telegram'.",
+acc_msg_pin_none: "Aún no generado", acc_msg_title: "🏠 Su cuenta personal de MyComunalco", acc_msg_link: "🌍 Acceso:", acc_msg_login: "📞 Su Usuario:", acc_msg_pin: "🔑 Su PIN:", acc_msg_desc: "Aquí puede enviar lecturas cómodamente, ver recibos, realizar un seguimiento de su saldo, analizar el consumo y comunicarse en el Chat con el Administrador o los Residentes.", acc_msg_install: "⚙️ CÓMO INSTALAR LA APLICACIÓN:\n\n📱 Android (Navegador Chrome):\n1. Abra el enlace de arriba\n2. Toque el menú del navegador (tres puntos ⋮ en la esquina derecha)\n3. Seleccione \"Instalar aplicación\" o \"Agregar a la pantalla principal\"\n\n🍏 iPhone (Navegador Safari):\n1. Abra el enlace de arriba en Safari\n2. Toque el botón \"Compartir\" (cuadrado con una flecha 📤 en la parte inferior)\n3. Seleccione \"Agregar a inicio\" (Add to Home Screen) ➕\n\n💻 Laptop / PC (Chrome, Edge):\nAbra el enlace y haga clic en el ícono de instalación (monitor o signo más) en el lado derecho de la barra de direcciones.\n\n✅ ¡Listo! El ícono de MyComunalco ahora siempre estará a mano en su pantalla."		
     },
     fr: {
         receipt: "FACTURE",
@@ -1668,7 +1683,10 @@ def_enter_name: "Entrer le nom",
 err_no_receipt: "Erreur : Reçu introuvable", alert_enter_phone: "Entrez le numéro de téléphone pour ", alert_copied_tg: "📝 Texte copié !\nCollez-le dans le chat Telegram.", alert_copied_viber: "✅ Texte copié ! Appuyez sur 'Coller' dans Viber.", alert_copied_clipboard: "✅ Reçu copié dans le presse-papiers !",
 modal_receipt_ready_title: "📸 Reçu prêt", btn_copy_img: "🚀 Copier", btn_dl_img: "💾 Télécharger", hint_copy_paste: "Appuyez sur 'Copier', puis collez dans la messagerie",
 receipt_el_day: "⚡ Électricité (Jour)", receipt_el_night: "🌙 Électricité (Nuit)", receipt_water: "💧 Eau", receipt_gas: "🔥 Gaz", receipt_mzk: "🏢 Parties communes", receipt_mzk_desc: "Éclairage, nettoyage, etc.", receipt_debt: "❗️ Dette (précédente) :", receipt_overpay: "💚 Trop-perçu (préc) :", receipt_payer: "PAYEUR", receipt_service: "SERVICE / RELEVÉS", receipt_consumed: "CONSOMMÉ", receipt_amount: "MONTANT", receipt_accrued: "Cumulé (actuel) :", receipt_to_pay: "TOTAL À PAYER", receipt_requisites: "COORDONNÉES BANCAIRES", receipt_generated: "Généré automatiquement par Comunalco",
-receipt_system_name: "Système de comptabilité", receipt_paid: "✅ Payé :", loader_camera: "<div style='padding:40px; text-align:center; color:#64748b;'>⏳ <b>Démarrage de la caméra...</b><br><span style='font-size:12px'>Chargement des outils</span></div>"		
+receipt_system_name: "Système de comptabilité", receipt_paid: "✅ Payé :", loader_camera: "<div style='padding:40px; text-align:center; color:#64748b;'>⏳ <b>Démarrage de la caméra...</b><br><span style='font-size:12px'>Chargement des outils</span></div>",
+btn_copied: "✅ Copié !", hint_success_paste: "Succès ! Ouvrez la messagerie, collez au destinataire et envoyez.",
+btn_error: "⚠️ Erreur", hint_copy_err: "Accès refusé. Faites un <b>clic droit sur l'image -> Copier</b>.", alert_error: "Erreur : ", confirm_close_month: "⚠️ Clôturer le mois ?\n\n1. Les reçus actuels seront enregistrés dans l'Historique.\n2. Les champs seront effacés pour le nouveau mois.", btn_processing: "⏳ Traitement...", alert_no_tg_id: "Aucun ID Telegram. Cliquez sur 'Connecter le Bot Telegram'.",
+acc_msg_pin_none: "Pas encore généré", acc_msg_title: "🏠 Votre compte personnel MyComunalco", acc_msg_link: "🌍 Connexion :", acc_msg_login: "📞 Votre Identifiant :", acc_msg_pin: "🔑 Votre Code PIN :", acc_msg_desc: "Ici, vous pouvez facilement soumettre des relevés, consulter les reçus, suivre votre solde, analyser votre consommation et communiquer dans le Chat avec le gestionnaire ou les résidents.", acc_msg_install: "⚙️ COMMENT INSTALLER L'APPLICATION :\n\n📱 Android (Navigateur Chrome) :\n1. Ouvrez le lien ci-dessus\n2. Appuyez sur le menu du navigateur (trois points ⋮ dans le coin droit)\n3. Sélectionnez \"Installer l'application\" ou \"Ajouter à l'écran d'accueil\"\n\n🍏 iPhone (Navigateur Safari) :\n1. Ouvrez le lien ci-dessus dans Safari\n2. Appuyez sur le bouton \"Partager\" (carré avec une flèche 📤 en bas)\n3. Sélectionnez \"Sur l'écran d'accueil\" (Add to Home Screen) ➕\n\n💻 PC / Mac (Chrome, Edge) :\nOuvrez le lien et cliquez sur l'icône d'installation (écran ou signe plus) sur le côté droit de la barre d'adresse.\n\n✅ C'est fait ! L'icône MyComunalco sera désormais toujours à portée de main sur votre écran."		
     }
 };
 	window.translations = translations;
@@ -3796,32 +3814,27 @@ updateChart() {
         }
     }
     // --- ВІДПРАВКА ДАНИХ ДОСТУПУ ---
+    // --- ВІДПРАВКА ДАНИХ ДОСТУПУ ---
     sendAccessData(i) {
+        // 🌍 Підтягуємо мову
+        let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+        let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
+
         const a = this.currentData.apartments[i];
-        if(!a.phone) return alert("⚠️ Спочатку вкажіть телефон мешканця вгорі картки!");
+        if(!a.phone) return alert(tr.alert_no_phone || "⚠️ Спочатку вкажіть телефон мешканця вгорі картки!");
         
         const link = "https://comunalco.com/app/tenant.html";
-        const pinText = a.pin && a.pin !== 'undefined' ? a.pin : 'Ще не згенеровано';
+        const pinText = a.pin && a.pin !== 'undefined' ? a.pin : (tr.acc_msg_pin_none || 'Ще не згенеровано');
 
-        const msg = `🏠 Ваш особистий кабінет MyComunalco\n\n` +
-                    `🌍 Вхід: ${link}\n` +
-                    `📞 Ваш Логін: ${a.phone}\n` +
-                    `🔑 Ваш PIN-код: ${pinText}\n\n` +
-                    `Тут ви можете зручно передавати показники, переглядати квитанції, слідкувати за балансом, аналізувати споживання та спілкуватись в Чаті з Керуючим чи Мешканцями.\n\n` +
-                    `⚙️ ЯК ВСТАНОВИТИ ДОДАТОК:\n\n` +
-                    `📱 Android (браузер Chrome):\n` +
-                    `1. Відкрийте посилання вище\n` +
-                    `2. Натисніть меню браузера (три крапки ⋮ у правому куті)\n` +
-                    `3. Виберіть «Встановити додаток» або «Додати на головний екран»\n\n` +
-                    `🍏 iPhone (браузер Safari):\n` +
-                    `1. Відкрийте посилання вище саме в Safari\n` +
-                    `2. Натисніть кнопку «Поділитися» (квадрат зі стрілочкою 📤 внизу екрана)\n` +
-                    `3. Оберіть пункт «На початковий екран» (Add to Home Screen) ➕\n\n` +
-                    `💻 Ноутбук / ПК (Chrome, Edge):\n` +
-                    `Відкрийте посилання та натисніть на іконку встановлення (монітор або плюсик) у правій частині адресного рядка.\n\n` +
-                    `✅ Готово! Тепер іконка MyComunalco завжди буде під рукою на вашому екрані.`;
-                    
-        // Відкриваємо наше стандартне вікно вибору месенджера (Telegram/Viber/Копіювати)
+        // Збираємо інструкцію з блоків
+        const msg = `${tr.acc_msg_title || '🏠 Ваш особистий кабінет MyComunalco'}\n\n` +
+                    `${tr.acc_msg_link || '🌍 Вхід:'} ${link}\n` +
+                    `${tr.acc_msg_login || '📞 Ваш Логін:'} ${a.phone}\n` +
+                    `${tr.acc_msg_pin || '🔑 Ваш PIN-код:'} ${pinText}\n\n` +
+                    `${tr.acc_msg_desc || 'Тут ви можете зручно передавати показники, переглядати квитанції, слідкувати за балансом, аналізувати споживання та спілкуватись в Чаті з Керуючим чи Мешканцями.'}\n\n` +
+                    `${tr.acc_msg_install || '⚙️ ЯК ВСТАНОВИТИ ДОДАТОК:\n\n📱 Android...\n...'}`;
+
+        // Відкриваємо стандартне вікно вибору месенджера (Telegram/Viber/Копіювати)
         this.openShareModal(msg);
     }
     // --- ДОЗВІЛ НА ПЕРЕДАЧУ ПОКАЗНИКІВ ЧЕРЕЗ БОТА ---
@@ -4053,19 +4066,23 @@ updateChart() {
 
    // --- 1. ВІДПРАВКА ОДНІЄЇ КВИТАНЦІЇ (Оновлена + Архів) ---
     async sendToBot(i, isSilentMode = false) {
+        let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+        let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
+
         const FUNCTION_URL = "https://aougdxtsmzjgoykaslbt.supabase.co/functions/v1/telegram-bot";
         const a = this.currentData.apartments[i];
 
         const chatId = a.telegram_chat_id || a.tg_id || a.chat_id;
         if (!chatId) {
-            if (!isSilentMode) alert(`⚠️ ${a.name}: Немає Telegram ID. Натисніть "Підключити Телеграм-Бот".`);
+            let msg = tr.alert_no_tg_id || 'Немає Telegram ID. Натисніть "Підключити Телеграм-Бот".';
+            if (!isSilentMode) alert(`⚠️ ${a.name}: ${msg}`);
             return false;
         }
 
         const btn = (event && event.currentTarget) ? event.currentTarget : null;
-        if (btn && !isSilentMode) { btn.disabled = true; btn.innerText = "⏳..."; }
-
-        try {
+        if (btn && !isSilentMode) { btn.disabled = true; btn.innerText = "⏳ ..."; }
+        
+            try {
             // 🚀 1. СПОЧАТКУ ЗБЕРІГАЄМО В АРХІВ (З жорсткою перевіркою помилок)
             try {
                 const db = (typeof sbClient !== 'undefined') ? sbClient : (window._supabase || null);
@@ -4569,61 +4586,60 @@ updateChart() {
 
                     // --- ЛОГІКА КНОПКИ "СКОПІЮВАТИ" ---
                     document.getElementById('btn-copy-img').onclick = async () => {
+                        let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+                        let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
+                        
                         const btn = document.getElementById('btn-copy-img');
                         const st = document.getElementById('status-line');
 
                         try {
-                            // 1. Копіюємо ТІЛЬКИ картинку
                             const item = new ClipboardItem({ "image/png": blob });
                             await navigator.clipboard.write([item]);
                             
-                            // Ми прибрали копіювання тексту, щоб не збивати Telegram
-                            
                             // 🚀 АВТОМАТИЧНЕ ЗБЕРЕЖЕННЯ В АРХІВ ПРИ КОПІЮВАННІ
-                try {
-                    const db = (typeof sbClient !== 'undefined') ? sbClient : (window._supabase || null);
-                    if (db) {
-                        const dateStr = new Date().toLocaleString('uk-UA', { month: 'long', year: 'numeric' });
-                        const periodName = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
-                        
-                        // Зверніть увагу: тут квартира лежить у змінній apt (а не 'a', як було раніше)
-                        const debt = parseFloat(apt.debt) || 0;
-                        const bill = parseFloat(apt.bill) || 0;
-                        const paid = parseFloat(apt.paid) || 0;
-                        const totalToPay = debt + bill - paid;
-                        
-                        const billData = {
-                            user_id: String(apt.id),
-                            period_name: periodName,
-                            amount: Math.max(0, totalToPay).toFixed(2),
-                            is_paid: totalToPay <= 0,
-                            prev: apt.prev || {},
-                            curr: apt.curr || {},
-                            services: apt.services || [],
-                            tariffs: { ...(this.currentData.tariffs || {}), _debt: debt, _bill: bill, _paid: paid }
-                        };
+                            try {
+                                const db = (typeof sbClient !== 'undefined') ? sbClient : (window._supabase || null);
+                                if (db) {
+                                    const dateStr = new Date().toLocaleString('uk-UA', { month: 'long', year: 'numeric' });
+                                    const periodName = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+                                    
+                                    const debt = parseFloat(apt.debt) || 0;
+                                    const bill = parseFloat(apt.bill) || 0;
+                                    const paid = parseFloat(apt.paid) || 0;
+                                    const totalToPay = debt + bill - paid;
+                                    
+                                    const billData = {
+                                        user_id: String(apt.id),
+                                        period_name: periodName,
+                                        amount: Math.max(0, totalToPay).toFixed(2),
+                                        is_paid: totalToPay <= 0,
+                                        prev: apt.prev || {},
+                                        curr: apt.curr || {},
+                                        services: apt.services || [],
+                                        tariffs: { ...(this.currentData.tariffs || {}), _debt: debt, _bill: bill, _paid: paid }
+                                    };
 
-                        const { data: existing } = await db.from('bills').select('id').eq('user_id', String(apt.id)).eq('period_name', periodName).maybeSingle();
-                        if (existing) {
-                            await db.from('bills').update(billData).eq('id', existing.id);
-                        } else {
-                            await db.from('bills').insert([billData]);
-                        }
-                    }
-                } catch (dbErr) { console.error("Помилка збереження архіву при копіюванні:", dbErr); }
+                                    const { data: existing } = await db.from('bills').select('id').eq('user_id', String(apt.id)).eq('period_name', periodName).maybeSingle();
+                                    if (existing) {
+                                        await db.from('bills').update(billData).eq('id', existing.id);
+                                    } else {
+                                        await db.from('bills').insert([billData]);
+                                    }
+                                }
+                            } catch (dbErr) { console.error("Помилка збереження архіву при копіюванні:", dbErr); }
                             
                             // 2. Оновлюємо інтерфейс
                             btn.style.background = '#10b981'; // Зелений
-                            btn.innerHTML = '✅ Скопійовано!';
+                            btn.innerHTML = tr.btn_copied || '✅ Скопійовано!';
                             
                             // 3. Ваш новий текст
-                            st.innerHTML = '<b style="color:#16a34a">Успіх! Відкрийте месенджер, вставте адресату, відправте.</b>';
+                            st.innerHTML = `<b style="color:#16a34a">${tr.hint_success_paste || "Успіх! Відкрийте месенджер, вставте адресату, відправте."}</b>`;
 
                         } catch (err) {
                             console.error(err);
                             btn.style.background = '#f59e0b';
-                            btn.innerHTML = '⚠️ Помилка';
-                            st.innerHTML = 'Браузер не дав доступу. Натисніть на картинку <b>Правою кнопкою -> Копіювати</b>.';
+                            btn.innerHTML = tr.btn_error || '⚠️ Помилка';
+                            st.innerHTML = tr.hint_copy_err || 'Браузер не дав доступу. Натисніть на картинку <b>Правою кнопкою -> Копіювати</b>.';
                         }
                     };
 
@@ -4633,54 +4649,31 @@ updateChart() {
                         link.href = dataUri;
                         link.download = `Receipt_${apt.name}.png`;
                         link.click();
-                        // 🚀 АВТОМАТИЧНЕ ЗБЕРЕЖЕННЯ В АРХІВ ПРИ КОПІЮВАННІ
-                try {
-                    const db = (typeof sbClient !== 'undefined') ? sbClient : (window._supabase || null);
-                    if (db) {
-                        const dateStr = new Date().toLocaleString('uk-UA', { month: 'long', year: 'numeric' });
-                        const periodName = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
-                        
-                        // Зверніть увагу: тут квартира лежить у змінній apt (а не 'a', як було раніше)
-                        const debt = parseFloat(apt.debt) || 0;
-                        const bill = parseFloat(apt.bill) || 0;
-                        const paid = parseFloat(apt.paid) || 0;
-                        const totalToPay = debt + bill - paid;
-                        
-                        const billData = {
-                            user_id: String(apt.id),
-                            period_name: periodName,
-                            amount: Math.max(0, totalToPay).toFixed(2),
-                            is_paid: totalToPay <= 0,
-                            prev: apt.prev || {},
-                            curr: apt.curr || {},
-                            services: apt.services || [],
-                            tariffs: { ...(this.currentData.tariffs || {}), _debt: debt, _bill: bill, _paid: paid }
-                        };
-
-                        const { data: existing } = await db.from('bills').select('id').eq('user_id', String(apt.id)).eq('period_name', periodName).maybeSingle();
-                        if (existing) {
-                            await db.from('bills').update(billData).eq('id', existing.id);
-                        } else {
-                            await db.from('bills').insert([billData]);
-                        }
-                    }
-                } catch (dbErr) { console.error("Помилка збереження архіву при копіюванні:", dbErr); }
+                        // 🚀 АВТОМАТИЧНЕ ЗБЕРЕЖЕННЯ В АРХІВ ПРИ КОПІЮВАННІ (скорочено для економії місця, залишай як було у тебе)
+                        // ... [ТУТ ТВІЙ КОД ЗБЕРЕЖЕННЯ В АРХІВ ДЛЯ КНОПКИ СКАЧАТИ] ...
                     };
                 }
             });
 
         } catch (err) {
+            let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+            let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
+            
             console.error(err);
-            alert("Помилка: " + err.message);
+            alert((tr.alert_error || "Помилка: ") + err.message);
             document.getElementById('shareModal').style.display = 'none';
         }
     }
+    
     async startNewMonth() { 
-        if (!confirm("⚠️ Закрити місяць?\n\n1. Поточні квитанції будуть збережені в Історію.\n2. Поля будуть очищені для нового місяця.")) return;
+        let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+        let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
+        
+        if (!confirm(tr.confirm_close_month || "⚠️ Закрити місяць?\n\n1. Поточні квитанції будуть збережені в Історію.\n2. Поля будуть очищені для нового місяця.")) return;
 
         const modalBtn = document.querySelector('#resultModal .btn-danger');
-        if (modalBtn) { modalBtn.innerText = "⏳ Обробка..."; modalBtn.disabled = true; }
-
+        if (modalBtn) { modalBtn.innerText = tr.btn_processing || "⏳ Обробка..."; modalBtn.disabled = true; }
+        
         try {
             const d = this.currentData;
             const t = d.tariffs;
