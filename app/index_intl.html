@@ -896,7 +896,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '13.6';
+    const APP_VERSION = '13.7';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -1037,7 +1037,9 @@ ph_price: "Ціна", confirm_del_counter: "Видалити лічильник?
 modal_receipts_title: "Квитанції", modal_close_month: "🗓 Закрити місяць", format_title: "Формат квитанції", format_text: "💬 Текстове повідомлення", format_image: "📸 Картинка (Чек)", tg_action_title: "Телеграм Розсилка", tg_step1: "1. Оберіть отримувачів:", tg_all: "Всі", tg_debtors_only: "🚨 Борг > 100", tg_step2: "2. Що відправити обраним?", tg_send_receipts: "📨 Відправити квитанції", tg_write_message: "📢 Написати повідомлення", tg_remind_debt: "🔔 Нагадати про борг", ann_title: "📢 Нове повідомлення", ann_subtitle_1: "Текст буде надіслано", ann_subtitle_2: "обраним квартирам:", ann_placeholder: "Шановні мешканці, завтра буде відключення води...\n(Натискайте Enter для абзаців)", ann_cancel: "Скасувати", ann_send: "🚀 Надіслати", alert_empty_msg: "⚠️ Введіть текст повідомлення!",
 def_enter_name: "Ввести назву",
 err_no_receipt: "Помилка: Квитанція не знайдена", alert_enter_phone: "Вкажіть номер телефону для ", alert_copied_tg: "📝 Текст скопійовано!\nВставте його у чат Telegram.", alert_copied_viber: "✅ Текст скопійовано! Натисніть 'Вставити' у Viber.", alert_copied_clipboard: "✅ Квитанцію скопійовано в буфер обміну!",
-modal_receipt_ready_title: "📸 Квитанція готова", btn_copy_img: "🚀 Скопіювати", btn_dl_img: "💾 Скачати", hint_copy_paste: "Натисніть 'Скопіювати', потім вставте у месенджер"		
+modal_receipt_ready_title: "📸 Квитанція готова", btn_copy_img: "🚀 Скопіювати", btn_dl_img: "💾 Скачати", hint_copy_paste: "Натисніть 'Скопіювати', потім вставте у месенджер",
+receipt_el_day: "⚡ Електрика (День)", receipt_el_night: "🌙 Електрика (Ніч)", receipt_water: "💧 Водопостачання", receipt_gas: "🔥 Газопостачання", receipt_mzk: "🏢 МЗК (Загальні витрати)", receipt_mzk_desc: "Світло, прибирання та ін.", receipt_debt: "❗️ Борг (минулий):", receipt_overpay: "💚 Переплата (минула):", receipt_payer: "ПЛАТНИК", receipt_service: "ПОСЛУГА / ПОКАЗНИКИ", receipt_consumed: "СПОЖИТО", receipt_amount: "СУМА", receipt_accrued: "Нараховано (поточний):", receipt_to_pay: "ДО СПЛАТИ", receipt_requisites: "РЕКВІЗИТИ ДЛЯ ОПЛАТИ", receipt_generated: "Згенеровано автоматично сервісом Comunalco",
+receipt_system_name: "Система обліку", receipt_paid: "✅ Сплачено:", loader_camera: "<div style='padding:40px; text-align:center; color:#64748b;'>⏳ <b>Вмикаємо фотоапарат...</b><br><span style='font-size:12px'>Завантаження інструментів</span></div>"		
 	},
     en: {
         receipt: "INVOICE",
@@ -1161,7 +1163,9 @@ ph_price: "Price", confirm_del_counter: "Delete counter?",
 modal_receipts_title: "Receipts", modal_close_month: "🗓 Close Month", format_title: "Receipt Format", format_text: "💬 Text Message", format_image: "📸 Image (Receipt)", tg_action_title: "Telegram Broadcast", tg_step1: "1. Select recipients:", tg_all: "All", tg_debtors_only: "🚨 Debt > 100", tg_step2: "2. What to send to selected?", tg_send_receipts: "📨 Send Receipts", tg_write_message: "📢 Write Message", tg_remind_debt: "🔔 Remind of Debt", ann_title: "📢 New Message", ann_subtitle_1: "The text will be sent to", ann_subtitle_2: "selected apartments:", ann_placeholder: "Dear residents, tomorrow there will be a water shutoff...\n(Press Enter for paragraphs)", ann_cancel: "Cancel", ann_send: "🚀 Send", alert_empty_msg: "⚠️ Enter message text!",
 def_enter_name: "Enter Name",
 err_no_receipt: "Error: Receipt not found", alert_enter_phone: "Enter phone number for ", alert_copied_tg: "📝 Text copied!\nPaste it into the Telegram chat.", alert_copied_viber: "✅ Text copied! Press 'Paste' in Viber.", alert_copied_clipboard: "✅ Receipt copied to clipboard!",
-modal_receipt_ready_title: "📸 Receipt Ready", btn_copy_img: "🚀 Copy", btn_dl_img: "💾 Download", hint_copy_paste: "Press 'Copy', then paste into messenger"		
+modal_receipt_ready_title: "📸 Receipt Ready", btn_copy_img: "🚀 Copy", btn_dl_img: "💾 Download", hint_copy_paste: "Press 'Copy', then paste into messenger",
+receipt_el_day: "⚡ Electricity (Day)", receipt_el_night: "🌙 Electricity (Night)", receipt_water: "💧 Water Supply", receipt_gas: "🔥 Gas Supply", receipt_mzk: "🏢 Common Area (HOA)", receipt_mzk_desc: "Lighting, cleaning, etc.", receipt_debt: "❗️ Debt (previous):", receipt_overpay: "💚 Overpayment (prev):", receipt_payer: "PAYER", receipt_service: "SERVICE / READINGS", receipt_consumed: "CONSUMED", receipt_amount: "AMOUNT", receipt_accrued: "Accrued (current):", receipt_to_pay: "TOTAL TO PAY", receipt_requisites: "PAYMENT DETAILS", receipt_generated: "Generated automatically by Comunalco",
+receipt_system_name: "Accounting System", receipt_paid: "✅ Paid:", loader_camera: "<div style='padding:40px; text-align:center; color:#64748b;'>⏳ <b>Starting camera...</b><br><span style='font-size:12px'>Loading tools</span></div>"		
     },
     pl: {
         receipt: "RACHUNEK",
@@ -1285,7 +1289,9 @@ ph_price: "Cena", confirm_del_counter: "Usunąć licznik?",
 modal_receipts_title: "Rachunki", modal_close_month: "🗓 Zamknij miesiąc", format_title: "Format rachunku", format_text: "💬 Wiadomość tekstowa", format_image: "📸 Obraz (Paragon)", tg_action_title: "Wiadomości Telegram", tg_step1: "1. Wybierz odbiorców:", tg_all: "Wszyscy", tg_debtors_only: "🚨 Dług > 100", tg_step2: "2. Co wysłać wybranym?", tg_send_receipts: "📨 Wyślij rachunki", tg_write_message: "📢 Napisz wiadomość", tg_remind_debt: "🔔 Przypomnij o długu", ann_title: "📢 Nowa wiadomość", ann_subtitle_1: "Tekst zostanie wysłany do", ann_subtitle_2: "wybranych mieszkań:", ann_placeholder: "Drodzy mieszkańcy, jutro nastąpi przerwa w dostawie wody...\n(Naciśnij Enter, aby utworzyć akapit)", ann_cancel: "Anuluj", ann_send: "🚀 Wyślij", alert_empty_msg: "⚠️ Wprowadź tekst wiadomości!",
 def_enter_name: "Wpisz nazwę",
 err_no_receipt: "Błąd: Nie znaleziono rachunku", alert_enter_phone: "Wprowadź numer telefonu dla ", alert_copied_tg: "📝 Tekst skopiowany!\nWklej go na czacie Telegram.", alert_copied_viber: "✅ Tekst skopiowany! Kliknij 'Wklej' w Viber.", alert_copied_clipboard: "✅ Rachunek skopiowany do schowka!",
-modal_receipt_ready_title: "📸 Rachunek gotowy", btn_copy_img: "🚀 Kopiuj", btn_dl_img: "💾 Pobierz", hint_copy_paste: "Kliknij 'Kopiuj', a następnie wklej do komunikatora"		
+modal_receipt_ready_title: "📸 Rachunek gotowy", btn_copy_img: "🚀 Kopiuj", btn_dl_img: "💾 Pobierz", hint_copy_paste: "Kliknij 'Kopiuj', a następnie wklej do komunikatora",
+receipt_el_day: "⚡ Prąd (Dzień)", receipt_el_night: "🌙 Prąd (Noc)", receipt_water: "💧 Woda", receipt_gas: "🔥 Gaz", receipt_mzk: "🏢 Części wspólne (Admin)", receipt_mzk_desc: "Oświetlenie, sprzątanie itp.", receipt_debt: "❗️ Dług (poprzedni):", receipt_overpay: "💚 Nadpłata (poprz.):", receipt_payer: "PŁATNIK", receipt_service: "USŁUGA / ODCZYTY", receipt_consumed: "ZUŻYCIE", receipt_amount: "KWOTA", receipt_accrued: "Naliczone (obecnie):", receipt_to_pay: "DO ZAPŁATY", receipt_requisites: "DANE DO PRZELEWU", receipt_generated: "Wygenerowano automatycznie przez Comunalco",
+receipt_system_name: "System Rozliczeń", receipt_paid: "✅ Zapłacono:", loader_camera: "<div style='padding:40px; text-align:center; color:#64748b;'>⏳ <b>Uruchamianie aparatu...</b><br><span style='font-size:12px'>Ładowanie narzędzi</span></div>"		
     },
     de: {
         receipt: "RECHNUNG",
@@ -1408,7 +1414,9 @@ ph_price: "Preis", confirm_del_counter: "Zähler löschen?",
 modal_receipts_title: "Quittungen", modal_close_month: "🗓 Monat abschließen", format_title: "Quittungsformat", format_text: "💬 Textnachricht", format_image: "📸 Bild (Beleg)", tg_action_title: "Telegram-Rundsendung", tg_step1: "1. Empfänger auswählen:", tg_all: "Alle", tg_debtors_only: "🚨 Schulden > 100", tg_step2: "2. Was soll gesendet werden?", tg_send_receipts: "📨 Quittungen senden", tg_write_message: "📢 Nachricht schreiben", tg_remind_debt: "🔔 An Schulden erinnern", ann_title: "📢 Neue Nachricht", ann_subtitle_1: "Der Text wird gesendet an", ann_subtitle_2: "ausgewählte Wohnungen:", ann_placeholder: "Liebe Bewohner, morgen wird das Wasser abgestellt...\n(Drücken Sie Enter für Absätze)", ann_cancel: "Abbrechen", ann_send: "🚀 Senden", alert_empty_msg: "⚠️ Geben Sie den Nachrichtentext ein!",
 def_enter_name: "Name eingeben",
 err_no_receipt: "Fehler: Quittung nicht gefunden", alert_enter_phone: "Geben Sie die Telefonnummer ein für ", alert_copied_tg: "📝 Text kopiert!\nFügen Sie ihn in den Telegram-Chat ein.", alert_copied_viber: "✅ Text kopiert! Drücken Sie auf 'Einfügen' in Viber.", alert_copied_clipboard: "✅ Quittung in die Zwischenablage kopiert!",
-modal_receipt_ready_title: "📸 Quittung bereit", btn_copy_img: "🚀 Kopieren", btn_dl_img: "💾 Herunterladen", hint_copy_paste: "Drücken Sie 'Kopieren' und fügen Sie es in den Messenger ein"		
+modal_receipt_ready_title: "📸 Quittung bereit", btn_copy_img: "🚀 Kopieren", btn_dl_img: "💾 Herunterladen", hint_copy_paste: "Drücken Sie 'Kopieren' und fügen Sie es in den Messenger ein",
+receipt_el_day: "⚡ Strom (Tag)", receipt_el_night: "🌙 Strom (Nacht)", receipt_water: "💧 Wasser", receipt_gas: "🔥 Gas", receipt_mzk: "🏢 Allgemeinbereich", receipt_mzk_desc: "Beleuchtung, Reinigung usw.", receipt_debt: "❗️ Schulden (vorherige):", receipt_overpay: "💚 Überzahlung (vorh.):", receipt_payer: "ZAHLER", receipt_service: "LEISTUNG / ZÄHLERSTAND", receipt_consumed: "VERBRAUCH", receipt_amount: "BETRAG", receipt_accrued: "Berechnet (aktuell):", receipt_to_pay: "ZU ZAHLEN", receipt_requisites: "ZAHLUNGSDETAILS", receipt_generated: "Automatisch generiert von Comunalco",
+receipt_system_name: "Abrechnungssystem", receipt_paid: "✅ Bezahlt:", loader_camera: "<div style='padding:40px; text-align:center; color:#64748b;'>⏳ <b>Kamera wird gestartet...</b><br><span style='font-size:12px'>Werkzeuge laden</span></div>"		
     },
     es: {
         receipt: "FACTURA",
@@ -1532,7 +1540,9 @@ ph_price: "Precio", confirm_del_counter: "¿Eliminar contador?",
 modal_receipts_title: "Recibos", modal_close_month: "🗓 Cerrar mes", format_title: "Formato de recibo", format_text: "💬 Mensaje de texto", format_image: "📸 Imagen (Recibo)", tg_action_title: "Difusión por Telegram", tg_step1: "1. Seleccione destinatarios:", tg_all: "Todos", tg_debtors_only: "🚨 Deuda > 100", tg_step2: "2. ¿Qué enviar a los seleccionados?", tg_send_receipts: "📨 Enviar Recibos", tg_write_message: "📢 Escribir Mensaje", tg_remind_debt: "🔔 Recordar Deuda", ann_title: "📢 Nuevo Mensaje", ann_subtitle_1: "El texto se enviará a", ann_subtitle_2: "apartamentos seleccionados:", ann_placeholder: "Estimados residentes, mañana habrá un corte de agua...\n(Presione Enter para párrafos)", ann_cancel: "Cancelar", ann_send: "🚀 Enviar", alert_empty_msg: "⚠️ ¡Ingrese el texto del mensaje!",
 def_enter_name: "Introducir nombre",
 err_no_receipt: "Error: Recibo no encontrado", alert_enter_phone: "Ingrese el número de teléfono para ", alert_copied_tg: "📝 ¡Texto copiado!\nPéguelo en el chat de Telegram.", alert_copied_viber: "✅ ¡Texto copiado! Presione 'Pegar' en Viber.", alert_copied_clipboard: "✅ ¡Recibo copiado al portapapeles!",
-modal_receipt_ready_title: "📸 Recibo listo", btn_copy_img: "🚀 Copiar", btn_dl_img: "💾 Descargar", hint_copy_paste: "Presione 'Copiar', luego pegue en el mensajero"		
+modal_receipt_ready_title: "📸 Recibo listo", btn_copy_img: "🚀 Copiar", btn_dl_img: "💾 Descargar", hint_copy_paste: "Presione 'Copiar', luego pegue en el mensajero",
+receipt_el_day: "⚡ Electricidad (Día)", receipt_el_night: "🌙 Electricidad (Noche)", receipt_water: "💧 Agua", receipt_gas: "🔥 Gas", receipt_mzk: "🏢 Área común (HOA)", receipt_mzk_desc: "Iluminación, limpieza, etc.", receipt_debt: "❗️ Deuda (anterior):", receipt_overpay: "💚 Pago en exceso (ant):", receipt_payer: "PAGADOR", receipt_service: "SERVICIO / LECTURAS", receipt_consumed: "CONSUMIDO", receipt_amount: "MONTO", receipt_accrued: "Acumulado (actual):", receipt_to_pay: "TOTAL A PAGAR", receipt_requisites: "DETALLES DE PAGO", receipt_generated: "Generado automáticamente por Comunalco",
+receipt_system_name: "Sistema de contabilidad", receipt_paid: "✅ Pagado:", loader_camera: "<div style='padding:40px; text-align:center; color:#64748b;'>⏳ <b>Iniciando cámara...</b><br><span style='font-size:12px'>Cargando herramientas</span></div>"		
     },
     fr: {
         receipt: "FACTURE",
@@ -1656,7 +1666,9 @@ ph_price: "Prix", confirm_del_counter: "Supprimer le compteur ?",
 modal_receipts_title: "Reçus", modal_close_month: "🗓 Clôturer le mois", format_title: "Format du reçu", format_text: "💬 Message texte", format_image: "📸 Image (Reçu)", tg_action_title: "Diffusion Telegram", tg_step1: "1. Sélectionnez les destinataires :", tg_all: "Tous", tg_debtors_only: "🚨 Dette > 100", tg_step2: "2. Que faire pour la sélection ?", tg_send_receipts: "📨 Envoyer les Reçus", tg_write_message: "📢 Écrire un Message", tg_remind_debt: "🔔 Rappeler la Dette", ann_title: "📢 Nouveau Message", ann_subtitle_1: "Le texte sera envoyé à", ann_subtitle_2: "appartements sélectionnés :", ann_placeholder: "Chers résidents, demain il y aura une coupure d'eau...\n(Appuyez sur Entrée pour les paragraphes)", ann_cancel: "Annuler", ann_send: "🚀 Envoyer", alert_empty_msg: "⚠️ Entrez le texte du message !",
 def_enter_name: "Entrer le nom",
 err_no_receipt: "Erreur : Reçu introuvable", alert_enter_phone: "Entrez le numéro de téléphone pour ", alert_copied_tg: "📝 Texte copié !\nCollez-le dans le chat Telegram.", alert_copied_viber: "✅ Texte copié ! Appuyez sur 'Coller' dans Viber.", alert_copied_clipboard: "✅ Reçu copié dans le presse-papiers !",
-modal_receipt_ready_title: "📸 Reçu prêt", btn_copy_img: "🚀 Copier", btn_dl_img: "💾 Télécharger", hint_copy_paste: "Appuyez sur 'Copier', puis collez dans la messagerie"		
+modal_receipt_ready_title: "📸 Reçu prêt", btn_copy_img: "🚀 Copier", btn_dl_img: "💾 Télécharger", hint_copy_paste: "Appuyez sur 'Copier', puis collez dans la messagerie",
+receipt_el_day: "⚡ Électricité (Jour)", receipt_el_night: "🌙 Électricité (Nuit)", receipt_water: "💧 Eau", receipt_gas: "🔥 Gaz", receipt_mzk: "🏢 Parties communes", receipt_mzk_desc: "Éclairage, nettoyage, etc.", receipt_debt: "❗️ Dette (précédente) :", receipt_overpay: "💚 Trop-perçu (préc) :", receipt_payer: "PAYEUR", receipt_service: "SERVICE / RELEVÉS", receipt_consumed: "CONSOMMÉ", receipt_amount: "MONTANT", receipt_accrued: "Cumulé (actuel) :", receipt_to_pay: "TOTAL À PAYER", receipt_requisites: "COORDONNÉES BANCAIRES", receipt_generated: "Généré automatiquement par Comunalco",
+receipt_system_name: "Système de comptabilité", receipt_paid: "✅ Payé :", loader_camera: "<div style='padding:40px; text-align:center; color:#64748b;'>⏳ <b>Démarrage de la caméra...</b><br><span style='font-size:12px'>Chargement des outils</span></div>"		
     }
 };
 	window.translations = translations;
@@ -4337,10 +4349,16 @@ updateChart() {
 
     // --- ГЕНЕРАЦІЯ HTML КВИТАНЦІЇ ---
     renderReceiptHTML(i) {
+        // 🌍 Підтягуємо мову
+        let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+        let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
+
         const a = this.currentData.apartments[i];
         const d = this.currentData;
         const t = d.tariffs;
-        const dStr = new Date().toLocaleDateString('uk-UA', { month: 'long', year: 'numeric' }).toUpperCase();
+        
+        // 🌍 Місяць і рік автоматично правильною мовою! (Наприклад: April 2026)
+        const dStr = new Date().toLocaleDateString(lang, { month: 'long', year: 'numeric' }).toUpperCase();
         
         // --- 1. ПОВТОРЮЄМО РОЗРАХУНКИ ---
         
@@ -4388,10 +4406,10 @@ updateChart() {
         // --- 2. ГЕНЕРУЄМО ТАБЛИЦЮ ---
         let rowsHTML = '';
 
-        if (c.ed > 0 || a.curr.ed > 0) rowsHTML += `<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:12px 8px;"><div style="font-weight:bold; color:#334155;">⚡ Електрика (День)</div><div style="font-size:11px; color:#64748b;">${a.prev.ed} ➔ <b>${a.curr.ed}</b></div></td><td style="padding:12px 8px; text-align:center;">${c.ed} кВт</td><td style="padding:12px 8px; text-align:right;">${cost.ed.toFixed(2)}</td></tr>`;
-        if (c.en > 0 || a.curr.en > 0) rowsHTML += `<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:12px 8px;"><div style="font-weight:bold; color:#334155;">🌙 Електрика (Ніч)</div><div style="font-size:11px; color:#64748b;">${a.prev.en} ➔ <b>${a.curr.en}</b></div></td><td style="padding:12px 8px; text-align:center;">${c.en} кВт</td><td style="padding:12px 8px; text-align:right;">${cost.en.toFixed(2)}</td></tr>`;
-        if (c.w > 0 || a.curr.w > 0) rowsHTML += `<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:12px 8px;"><div style="font-weight:bold; color:#334155;">💧 Водопостачання</div><div style="font-size:11px; color:#64748b;">${a.prev.w} ➔ <b>${a.curr.w}</b></div></td><td style="padding:12px 8px; text-align:center;">${c.w} м³</td><td style="padding:12px 8px; text-align:right;">${cost.w.toFixed(2)}</td></tr>`;
-        if (c.g > 0 || a.curr.g > 0) rowsHTML += `<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:12px 8px;"><div style="font-weight:bold; color:#334155;">🔥 Газопостачання</div><div style="font-size:11px; color:#64748b;">${a.prev.g} ➔ <b>${a.curr.g}</b></div></td><td style="padding:12px 8px; text-align:center;">${c.g} м³</td><td style="padding:12px 8px; text-align:right;">${cost.g.toFixed(2)}</td></tr>`;
+        if (c.ed > 0 || a.curr.ed > 0) rowsHTML += `<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:12px 8px;"><div style="font-weight:bold; color:#334155;">${tr.receipt_el_day || '⚡ Електрика (День)'}</div><div style="font-size:11px; color:#64748b;">${a.prev.ed} ➔ <b>${a.curr.ed}</b></div></td><td style="padding:12px 8px; text-align:center;">${c.ed}</td><td style="padding:12px 8px; text-align:right;">${cost.ed.toFixed(2)}</td></tr>`;
+        if (c.en > 0 || a.curr.en > 0) rowsHTML += `<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:12px 8px;"><div style="font-weight:bold; color:#334155;">${tr.receipt_el_night || '🌙 Електрика (Ніч)'}</div><div style="font-size:11px; color:#64748b;">${a.prev.en} ➔ <b>${a.curr.en}</b></div></td><td style="padding:12px 8px; text-align:center;">${c.en}</td><td style="padding:12px 8px; text-align:right;">${cost.en.toFixed(2)}</td></tr>`;
+        if (c.w > 0 || a.curr.w > 0) rowsHTML += `<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:12px 8px;"><div style="font-weight:bold; color:#334155;">${tr.receipt_water || '💧 Водопостачання'}</div><div style="font-size:11px; color:#64748b;">${a.prev.w} ➔ <b>${a.curr.w}</b></div></td><td style="padding:12px 8px; text-align:center;">${c.w}</td><td style="padding:12px 8px; text-align:right;">${cost.w.toFixed(2)}</td></tr>`;
+        if (c.g > 0 || a.curr.g > 0) rowsHTML += `<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:12px 8px;"><div style="font-weight:bold; color:#334155;">${tr.receipt_gas || '🔥 Газопостачання'}</div><div style="font-size:11px; color:#64748b;">${a.prev.g} ➔ <b>${a.curr.g}</b></div></td><td style="padding:12px 8px; text-align:center;">${c.g}</td><td style="padding:12px 8px; text-align:right;">${cost.g.toFixed(2)}</td></tr>`;
 
         let custCost = 0;
         (a.custom_counters || []).forEach(cc => {
@@ -4401,7 +4419,7 @@ updateChart() {
             if(diff > 0 || cc.curr > 0) rowsHTML += `<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:12px 8px;"><div style="color:#334155;">${cc.name}</div><div style="font-size:11px; color:#64748b;">${cc.prev} ➔ <b>${cc.curr}</b></div></td><td style="padding:12px 8px; text-align:center;">${diff}</td><td style="padding:12px 8px; text-align:right;">${val.toFixed(2)}</td></tr>`;
         });
 
-        rowsHTML += `<tr style="border-bottom:1px solid #e2e8f0; background-color:#f8fafc;"><td style="padding:12px 8px;" colspan="2"><div style="font-weight:bold; color:#475569;">🏢 МЗК (Загальні витрати)</div><div style="font-size:10px; color:#94a3b8;">Світло, прибирання та ін.</div></td><td style="padding:12px 8px; text-align:right; font-weight:bold; color:#475569;">${mzkPerApt.toFixed(2)}</td></tr>`;
+        rowsHTML += `<tr style="border-bottom:1px solid #e2e8f0; background-color:#f8fafc;"><td style="padding:12px 8px;" colspan="2"><div style="font-weight:bold; color:#475569;">${tr.receipt_mzk || '🏢 МЗК (Загальні витрати)'}</div><div style="font-size:10px; color:#94a3b8;">${tr.receipt_mzk_desc || 'Світло, прибирання та ін.'}</div></td><td style="padding:12px 8px; text-align:right; font-weight:bold; color:#475569;">${mzkPerApt.toFixed(2)}</td></tr>`;
 
         let sCost = 0;
         (a.services||[]).forEach(s => {
@@ -4412,24 +4430,22 @@ updateChart() {
 
         // --- 3. ПІДСУМКИ ТА БАЛАНС ---
         const currentTotal = cost.ed + cost.en + cost.w + cost.g + custCost + sCost + mzkPerApt;
-        const debt = parseFloat(a.debt)||0; // Може бути мінусовим
+        const debt = parseFloat(a.debt)||0;
         const paid = parseFloat(a.paid)||0;
         const totalToPay = currentTotal + debt - paid;
 
         // 🔥 ЛОГІКА ДЛЯ БОРГУ/ПЕРЕПЛАТИ
         let debtRowHTML = '';
         if (debt > 0.01) {
-            // Якщо більше нуля — це БОРГ (Червоний)
             debtRowHTML = `
             <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:13px; color:#ef4444;">
-                <span>❗️ Борг (минулий):</span>
+                <span>${tr.receipt_debt || '❗️ Борг (минулий):'}</span>
                 <span style="font-weight:bold;">${debt.toFixed(2)}</span>
             </div>`;
         } else if (debt < -0.01) {
-            // Якщо менше нуля — це ПЕРЕПЛАТА (Зелений)
             debtRowHTML = `
             <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:13px; color:#22c55e;">
-                <span>💚 Переплата (минула):</span>
+                <span>${tr.receipt_overpay || '💚 Переплата (минула):'}</span>
                 <span style="font-weight:bold;">${Math.abs(debt).toFixed(2)}</span>
             </div>`;
         }
@@ -4437,35 +4453,35 @@ updateChart() {
         return `
         <div style="font-family:'Inter',sans-serif; color:#1e293b; background:#fff; padding:40px; box-sizing:border-box; width:100%">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px; border-bottom:3px solid #0099ff; padding-bottom:20px">
-                <div><div style="font-weight:900; font-size:26px; text-transform:uppercase; color:#0f172a">Comunalco</div><div style="font-size:12px; color:#64748b; margin-top:5px;">Система обліку</div></div>
+                <div><div style="font-weight:900; font-size:26px; text-transform:uppercase; color:#0f172a">Comunalco</div><div style="font-size:12px; color:#64748b; margin-top:5px;">${tr.receipt_system_name || 'Система обліку'}</div></div>
                 <div style="text-align:right"><div style="font-size:18px; font-weight:bold; color:#0f172a">${d.name}</div><div style="font-size:13px; color:#0099ff; font-weight:bold; margin-top:2px;">${dStr}</div></div>
             </div>
             
             <div style="background:#f1f5f9; padding:15px 20px; border-radius:12px; margin-bottom:25px; display:flex; justify-content:space-between; align-items:center; border:1px solid #e2e8f0;">
-                <div><div style="font-size:10px; color:#64748b; text-transform:uppercase; font-weight:bold; letter-spacing:1px;">Платник</div><div style="font-size:20px; font-weight:800; color:#0f172a; margin-top:2px;">${a.name}</div></div>
+                <div><div style="font-size:10px; color:#64748b; text-transform:uppercase; font-weight:bold; letter-spacing:1px;">${tr.receipt_payer || 'ПЛАТНИК'}</div><div style="font-size:20px; font-weight:800; color:#0f172a; margin-top:2px;">${a.name}</div></div>
                 ${a.phone ? `<div style="font-size:14px; color:#64748b;">${a.phone}</div>` : ''}
             </div>
 
             <table style="width:100%; border-collapse:collapse; font-size:13px; margin-bottom:30px">
-                <thead><tr style="text-transform:uppercase; font-size:10px; color:#64748b; border-bottom:2px solid #e2e8f0;"><th style="padding:10px 8px; text-align:left; width:50%">Послуга / Показники</th><th style="padding:10px 8px; text-align:center; width:25%">Спожито</th><th style="padding:10px 8px; text-align:right; width:25%">Сума (грн)</th></tr></thead>
+                <thead><tr style="text-transform:uppercase; font-size:10px; color:#64748b; border-bottom:2px solid #e2e8f0;"><th style="padding:10px 8px; text-align:left; width:50%">${tr.receipt_service || 'ПОСЛУГА / ПОКАЗНИКИ'}</th><th style="padding:10px 8px; text-align:center; width:25%">${tr.receipt_consumed || 'СПОЖИТО'}</th><th style="padding:10px 8px; text-align:right; width:25%">${tr.receipt_amount || 'СУМА'}</th></tr></thead>
                 <tbody>${rowsHTML}</tbody>
             </table>
 
             <div style="display:flex; justify-content:flex-end; margin-bottom:30px;">
                 <div style="width:250px;">
                     <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:13px;">
-                        <span style="color:#64748b;">Нараховано (поточний):</span>
+                        <span style="color:#64748b;">${tr.receipt_accrued || 'Нараховано (поточний):'}</span>
                         <span style="font-weight:bold;">${currentTotal.toFixed(2)}</span>
                     </div>
                     
                     ${debtRowHTML} ${paid > 0 ? `
                     <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:13px; color:#22c55e;">
-                        <span>✅ Сплачено:</span>
+                        <span>${tr.receipt_paid || '✅ Сплачено:'}</span>
                         <span style="font-weight:bold;">-${paid.toFixed(2)}</span>
                     </div>` : ''}
                     
                     <div style="border-top:2px solid #0f172a; margin-top:10px; padding-top:10px; display:flex; justify-content:space-between; align-items:center;">
-                        <span style="font-size:12px; font-weight:bold; text-transform:uppercase;">До сплати</span>
+                        <span style="font-size:12px; font-weight:bold; text-transform:uppercase;">${tr.receipt_to_pay || 'ДО СПЛАТИ'}</span>
                         <span style="font-size:22px; font-weight:900; color:#0f172a;">${totalToPay.toFixed(2)}</span>
                     </div>
                 </div>
@@ -4473,21 +4489,26 @@ updateChart() {
             
             ${(d.requisites && d.requisites.length > 0) ? `
             <div style="background:#0f172a; color:white; padding:20px; border-radius:12px; font-size:12px;">
-                <div style="text-transform:uppercase; font-weight:bold; opacity:0.6; margin-bottom:10px; letter-spacing:1px;">Реквізити для оплати</div>
+                <div style="text-transform:uppercase; font-weight:bold; opacity:0.6; margin-bottom:10px; letter-spacing:1px;">${tr.receipt_requisites || 'РЕКВІЗИТИ ДЛЯ ОПЛАТИ'}</div>
                 <div style="display:grid; gap:10px;">
                     ${d.requisites.map(r => `<div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:5px;"><span>${r.name}:</span><span style="font-family:monospace; font-size:13px; letter-spacing:0.5px;">${r.val}</span></div>`).join('')}
                 </div>
             </div>` : ''}
             
-            <div style="margin-top:20px; text-align:center; font-size:10px; color:#cbd5e1;">Згенеровано автоматично сервісом Comunalco</div>
+            <div style="margin-top:20px; text-align:center; font-size:10px; color:#cbd5e1;">${tr.receipt_generated || 'Згенеровано автоматично сервісом Comunalco'}</div>
         </div>`;
     }
    // --- ФІНАЛ: ВИПРАВЛЕННЯ КОПІЮВАННЯ (Тільки Картинка) ---
     async sharePDF(i) {
         const apt = this.currentData.apartments[i];
         
+        // 🌍 Підтягуємо мову для лоадера
+        let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+        let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
+        let loaderText = tr.loader_camera || '<div style="padding:40px; text-align:center; color:#64748b;">⏳ <b>Вмикаємо фотоапарат...</b><br><span style="font-size:12px">Завантаження інструментів</span></div>';
+
         // 1. ВІДКРИВАЄМО ВІКНО З ЛОАДЕРОМ
-        this.openShareModal('<div style="padding:40px; text-align:center; color:#64748b;">⏳ <b>Вмикаємо фотоапарат...</b><br><span style="font-size:12px">Завантаження інструментів</span></div>');
+        this.openShareModal(loaderText);
 
         try {
             // 2. АВТО-ЗАВАНТАЖЕННЯ html2canvas
