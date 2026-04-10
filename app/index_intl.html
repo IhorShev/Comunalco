@@ -896,7 +896,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '13.5';
+    const APP_VERSION = '13.6';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -1035,7 +1035,8 @@ ph_card: "Картка", ph_bank: "Банк", lbl_meter: "Лічильник",
 def_service: "Послуга", def_counter: "Лічильник",
 ph_price: "Ціна", confirm_del_counter: "Видалити лічильник?",
 modal_receipts_title: "Квитанції", modal_close_month: "🗓 Закрити місяць", format_title: "Формат квитанції", format_text: "💬 Текстове повідомлення", format_image: "📸 Картинка (Чек)", tg_action_title: "Телеграм Розсилка", tg_step1: "1. Оберіть отримувачів:", tg_all: "Всі", tg_debtors_only: "🚨 Борг > 100", tg_step2: "2. Що відправити обраним?", tg_send_receipts: "📨 Відправити квитанції", tg_write_message: "📢 Написати повідомлення", tg_remind_debt: "🔔 Нагадати про борг", ann_title: "📢 Нове повідомлення", ann_subtitle_1: "Текст буде надіслано", ann_subtitle_2: "обраним квартирам:", ann_placeholder: "Шановні мешканці, завтра буде відключення води...\n(Натискайте Enter для абзаців)", ann_cancel: "Скасувати", ann_send: "🚀 Надіслати", alert_empty_msg: "⚠️ Введіть текст повідомлення!",
-def_enter_name: "Ввести назву"
+def_enter_name: "Ввести назву",
+err_no_receipt: "Помилка: Квитанція не знайдена", alert_enter_phone: "Вкажіть номер телефону для ", alert_copied_tg: "📝 Текст скопійовано!\nВставте його у чат Telegram.", alert_copied_viber: "✅ Текст скопійовано! Натисніть 'Вставити' у Viber.", alert_copied_clipboard: "✅ Квитанцію скопійовано в буфер обміну!"		
 	},
     en: {
         receipt: "INVOICE",
@@ -1157,7 +1158,8 @@ ph_card: "Card", ph_bank: "Bank", lbl_meter: "Meter",
 def_service: "Service", def_counter: "Counter",
 ph_price: "Price", confirm_del_counter: "Delete counter?",
 modal_receipts_title: "Receipts", modal_close_month: "🗓 Close Month", format_title: "Receipt Format", format_text: "💬 Text Message", format_image: "📸 Image (Receipt)", tg_action_title: "Telegram Broadcast", tg_step1: "1. Select recipients:", tg_all: "All", tg_debtors_only: "🚨 Debt > 100", tg_step2: "2. What to send to selected?", tg_send_receipts: "📨 Send Receipts", tg_write_message: "📢 Write Message", tg_remind_debt: "🔔 Remind of Debt", ann_title: "📢 New Message", ann_subtitle_1: "The text will be sent to", ann_subtitle_2: "selected apartments:", ann_placeholder: "Dear residents, tomorrow there will be a water shutoff...\n(Press Enter for paragraphs)", ann_cancel: "Cancel", ann_send: "🚀 Send", alert_empty_msg: "⚠️ Enter message text!",
-def_enter_name: "Enter Name"
+def_enter_name: "Enter Name",
+err_no_receipt: "Error: Receipt not found", alert_enter_phone: "Enter phone number for ", alert_copied_tg: "📝 Text copied!\nPaste it into the Telegram chat.", alert_copied_viber: "✅ Text copied! Press 'Paste' in Viber.", alert_copied_clipboard: "✅ Receipt copied to clipboard!"		
     },
     pl: {
         receipt: "RACHUNEK",
@@ -1279,7 +1281,8 @@ ph_card: "Karta", ph_bank: "Bank", lbl_meter: "Licznik",
 def_service: "Usługa", def_counter: "Licznik",
 ph_price: "Cena", confirm_del_counter: "Usunąć licznik?",
 modal_receipts_title: "Rachunki", modal_close_month: "🗓 Zamknij miesiąc", format_title: "Format rachunku", format_text: "💬 Wiadomość tekstowa", format_image: "📸 Obraz (Paragon)", tg_action_title: "Wiadomości Telegram", tg_step1: "1. Wybierz odbiorców:", tg_all: "Wszyscy", tg_debtors_only: "🚨 Dług > 100", tg_step2: "2. Co wysłać wybranym?", tg_send_receipts: "📨 Wyślij rachunki", tg_write_message: "📢 Napisz wiadomość", tg_remind_debt: "🔔 Przypomnij o długu", ann_title: "📢 Nowa wiadomość", ann_subtitle_1: "Tekst zostanie wysłany do", ann_subtitle_2: "wybranych mieszkań:", ann_placeholder: "Drodzy mieszkańcy, jutro nastąpi przerwa w dostawie wody...\n(Naciśnij Enter, aby utworzyć akapit)", ann_cancel: "Anuluj", ann_send: "🚀 Wyślij", alert_empty_msg: "⚠️ Wprowadź tekst wiadomości!",
-def_enter_name: "Wpisz nazwę"
+def_enter_name: "Wpisz nazwę",
+err_no_receipt: "Błąd: Nie znaleziono rachunku", alert_enter_phone: "Wprowadź numer telefonu dla ", alert_copied_tg: "📝 Tekst skopiowany!\nWklej go na czacie Telegram.", alert_copied_viber: "✅ Tekst skopiowany! Kliknij 'Wklej' w Viber.", alert_copied_clipboard: "✅ Rachunek skopiowany do schowka!"		
     },
     de: {
         receipt: "RECHNUNG",
@@ -1400,7 +1403,8 @@ ph_card: "Karte", ph_bank: "Bank", lbl_meter: "Zähler",
 def_service: "Dienstleistung", def_counter: "Zähler",
 ph_price: "Preis", confirm_del_counter: "Zähler löschen?",
 modal_receipts_title: "Quittungen", modal_close_month: "🗓 Monat abschließen", format_title: "Quittungsformat", format_text: "💬 Textnachricht", format_image: "📸 Bild (Beleg)", tg_action_title: "Telegram-Rundsendung", tg_step1: "1. Empfänger auswählen:", tg_all: "Alle", tg_debtors_only: "🚨 Schulden > 100", tg_step2: "2. Was soll gesendet werden?", tg_send_receipts: "📨 Quittungen senden", tg_write_message: "📢 Nachricht schreiben", tg_remind_debt: "🔔 An Schulden erinnern", ann_title: "📢 Neue Nachricht", ann_subtitle_1: "Der Text wird gesendet an", ann_subtitle_2: "ausgewählte Wohnungen:", ann_placeholder: "Liebe Bewohner, morgen wird das Wasser abgestellt...\n(Drücken Sie Enter für Absätze)", ann_cancel: "Abbrechen", ann_send: "🚀 Senden", alert_empty_msg: "⚠️ Geben Sie den Nachrichtentext ein!",
-def_enter_name: "Name eingeben"
+def_enter_name: "Name eingeben",
+err_no_receipt: "Fehler: Quittung nicht gefunden", alert_enter_phone: "Geben Sie die Telefonnummer ein für ", alert_copied_tg: "📝 Text kopiert!\nFügen Sie ihn in den Telegram-Chat ein.", alert_copied_viber: "✅ Text kopiert! Drücken Sie auf 'Einfügen' in Viber.", alert_copied_clipboard: "✅ Quittung in die Zwischenablage kopiert!"		
     },
     es: {
         receipt: "FACTURA",
@@ -1522,7 +1526,8 @@ ph_card: "Tarjeta", ph_bank: "Banco", lbl_meter: "Medidor",
 def_service: "Servicio", def_counter: "Medidor",
 ph_price: "Precio", confirm_del_counter: "¿Eliminar contador?",
 modal_receipts_title: "Recibos", modal_close_month: "🗓 Cerrar mes", format_title: "Formato de recibo", format_text: "💬 Mensaje de texto", format_image: "📸 Imagen (Recibo)", tg_action_title: "Difusión por Telegram", tg_step1: "1. Seleccione destinatarios:", tg_all: "Todos", tg_debtors_only: "🚨 Deuda > 100", tg_step2: "2. ¿Qué enviar a los seleccionados?", tg_send_receipts: "📨 Enviar Recibos", tg_write_message: "📢 Escribir Mensaje", tg_remind_debt: "🔔 Recordar Deuda", ann_title: "📢 Nuevo Mensaje", ann_subtitle_1: "El texto se enviará a", ann_subtitle_2: "apartamentos seleccionados:", ann_placeholder: "Estimados residentes, mañana habrá un corte de agua...\n(Presione Enter para párrafos)", ann_cancel: "Cancelar", ann_send: "🚀 Enviar", alert_empty_msg: "⚠️ ¡Ingrese el texto del mensaje!",
-def_enter_name: "Introducir nombre"
+def_enter_name: "Introducir nombre",
+err_no_receipt: "Error: Recibo no encontrado", alert_enter_phone: "Ingrese el número de teléfono para ", alert_copied_tg: "📝 ¡Texto copiado!\nPéguelo en el chat de Telegram.", alert_copied_viber: "✅ ¡Texto copiado! Presione 'Pegar' en Viber.", alert_copied_clipboard: "✅ ¡Recibo copiado al portapapeles!"		
     },
     fr: {
         receipt: "FACTURE",
@@ -1644,7 +1649,8 @@ ph_card: "Carte", ph_bank: "Banque", lbl_meter: "Compteur",
 def_service: "Service", def_counter: "Compteur",
 ph_price: "Prix", confirm_del_counter: "Supprimer le compteur ?",
 modal_receipts_title: "Reçus", modal_close_month: "🗓 Clôturer le mois", format_title: "Format du reçu", format_text: "💬 Message texte", format_image: "📸 Image (Reçu)", tg_action_title: "Diffusion Telegram", tg_step1: "1. Sélectionnez les destinataires :", tg_all: "Tous", tg_debtors_only: "🚨 Dette > 100", tg_step2: "2. Que faire pour la sélection ?", tg_send_receipts: "📨 Envoyer les Reçus", tg_write_message: "📢 Écrire un Message", tg_remind_debt: "🔔 Rappeler la Dette", ann_title: "📢 Nouveau Message", ann_subtitle_1: "Le texte sera envoyé à", ann_subtitle_2: "appartements sélectionnés :", ann_placeholder: "Chers résidents, demain il y aura une coupure d'eau...\n(Appuyez sur Entrée pour les paragraphes)", ann_cancel: "Annuler", ann_send: "🚀 Envoyer", alert_empty_msg: "⚠️ Entrez le texte du message !",
-def_enter_name: "Entrer le nom"
+def_enter_name: "Entrer le nom",
+err_no_receipt: "Erreur : Reçu introuvable", alert_enter_phone: "Entrez le numéro de téléphone pour ", alert_copied_tg: "📝 Texte copié !\nCollez-le dans le chat Telegram.", alert_copied_viber: "✅ Texte copié ! Appuyez sur 'Coller' dans Viber.", alert_copied_clipboard: "✅ Reçu copié dans le presse-papiers !"		
     }
 };
 	window.translations = translations;
@@ -3974,8 +3980,12 @@ updateChart() {
         }
     }
     async sendCheck(i, forceMethod = null) {
+        // 🌍 Підтягуємо мову для всіх алертів у цій функції
+        let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+        let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
+
         const txt = this.checks[i];
-        if (!txt) { alert("Помилка: Квитанція не знайдена"); return; }
+        if (!txt) { alert(tr.err_no_receipt || "Помилка: Квитанція не знайдена"); return; }
         
         const a = this.currentData.apartments[i];
         let phone = (a.phone || "").replace(/\D/g,'');
@@ -3985,41 +3995,32 @@ updateChart() {
         const messenger = forceMethod || a.messenger || 'copy';
         const encTxt = encodeURIComponent(txt);
 
-        // 1. WhatsApp (Працює добре з довгим текстом)
+        // 1. WhatsApp
         if (messenger === 'whatsapp') {
-            if(!phone) return alert("Вкажіть номер телефону для WhatsApp!");
+            if(!phone) return alert((tr.alert_enter_phone || "Вкажіть номер телефону для ") + "WhatsApp!");
             window.location.href = `https://wa.me/${phone}?text=${encTxt}`;
         }
         
-        // 2. Telegram (Використовуємо універсальний Share, він надійніший за tg://msg)
+        // 2. Telegram
         else if (messenger === 'telegram') {
-            // Спробуємо відкрити прямий чат, якщо є номер, або меню "Поділитися"
             if(phone) {
                 window.location.href = `https://t.me/+${phone}`; 
-                // Telegram не дозволяє передати текст прямо контакту через API без бота.
-                // Тому ми копіюємо текст і відкриваємо чат.
                 await this.copyTextToClipboard(txt);
-                alert("📝 Текст скопійовано!\nВставте його у чат Telegram.");
+                alert(tr.alert_copied_tg || "📝 Текст скопійовано!\nВставте його у чат Telegram.");
             } else {
-                // Якщо номера немає - відкриваємо меню "Share"
                 window.location.href = `https://t.me/share/url?url=${encodeURIComponent(' ')}&text=${encTxt}`;
             }
         }
         
-        // 3. Viber (ХІД КОНЕМ: Копіюємо + Відкриваємо)
+        // 3. Viber
         else if (messenger === 'viber') {
-            if(!phone) return alert("Вкажіть номер телефону для Viber!");
+            if(!phone) return alert((tr.alert_enter_phone || "Вкажіть номер телефону для ") + "Viber!");
             
-            // Копіюємо текст у буфер обміну
             await this.copyTextToClipboard(txt);
-            
-            // Відкриваємо Viber
-            // viber://chat працює краще на мобільних
             window.location.href = `viber://chat?number=%2B${phone}`;
             
-            // Показуємо підказку (зникає сама)
             const notification = document.createElement('div');
-            notification.innerText = "✅ Текст скопійовано! Натисніть 'Вставити' у Viber.";
+            notification.innerText = tr.alert_copied_viber || "✅ Текст скопійовано! Натисніть 'Вставити' у Viber.";
             notification.style.cssText = "position:fixed; top:20px; left:50%; transform:translateX(-50%); background:#7360f2; color:white; padding:15px; border-radius:30px; z-index:99999; box-shadow: 0 5px 15px rgba(0,0,0,0.3); font-size:14px;";
             document.body.appendChild(notification);
             setTimeout(() => document.body.removeChild(notification), 4000);
@@ -4028,7 +4029,7 @@ updateChart() {
         // 4. Просто копіювання
         else {
             await this.copyTextToClipboard(txt);
-            alert("✅ Квитанцію скопійовано в буфер обміну!");
+            alert(tr.alert_copied_clipboard || "✅ Квитанцію скопійовано в буфер обміну!");
         }
     } 
 
