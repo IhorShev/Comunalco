@@ -896,7 +896,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '14.0';
+    const APP_VERSION = '14.1';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -1045,7 +1045,8 @@ btn_error: "⚠️ Помилка", hint_copy_err: "Браузер не дав �
 acc_msg_pin_none: "Ще не згенеровано", acc_msg_title: "🏠 Ваш особистий кабінет MyComunalco", acc_msg_link: "🌍 Вхід:", acc_msg_login: "📞 Ваш Логін:", acc_msg_pin: "🔑 Ваш PIN-код:", acc_msg_desc: "Тут ви можете зручно передавати показники, переглядати квитанції, слідкувати за балансом, аналізувати споживання та спілкуватись в Чаті з Керуючим чи Мешканцями.", acc_msg_install: "⚙️ ЯК ВСТАНОВИТИ ДОДАТОК:\n\n📱 Android (браузер Chrome):\n1. Відкрийте посилання вище\n2. Натисніть меню браузера (три крапки ⋮ у правому куті)\n3. Виберіть «Встановити додаток» або «Додати на головний екран»\n\n🍏 iPhone (браузер Safari):\n1. Відкрийте посилання вище саме в Safari\n2. Натисніть кнопку «Поділитися» (квадрат зі стрілочкою 📤 внизу екрана)\n3. Оберіть пункт «На початковий екран» (Add to Home Screen) ➕\n\n💻 Ноутбук / ПК (Chrome, Edge):\nВідкрийте посилання та натисніть на іконку встановлення (монітор або плюсик) у правій частині адресного рядка.\n\n✅ Готово! Тепер іконка MyComunalco завжди буде під рукою на вашому екрані.",
 tg_no_connected: "🤷‍♂️ Жодна квартира ще не підключила бота.",
 bot_msg_p1: "👋 Вітаю! Це система Comunalco для обліку комунальних послуг вашої квартири (", bot_msg_p2: ").\n\nЩоб отримувати квитанції та зручно передавати показники лічильників, будь ласка, підключіть нашого Телеграм-бота.\n\n👉 Натисніть на посилання нижче, а потім кнопку «Розпочати» (або Start) у самому низу екрана:\n",
-alert_no_phone: "⚠️ Спочатку вкажіть телефон мешканця вгорі картки!", alert_copied: "✅ Інструкцію з посиланням скопійовано!\nПросто вставте цей текст у чат мешканцю."		
+alert_no_phone: "⚠️ Спочатку вкажіть телефон мешканця вгорі картки!", alert_copied: "✅ Інструкцію з посиланням скопійовано!\nПросто вставте цей текст у чат мешканцю.",
+ws_tenant: "🏠 Мешканець", ws_submanager: "💼 Менеджер", ws_accountant: "📊 Обліковець"		
 	},
     en: {
         receipt: "INVOICE",
@@ -1177,7 +1178,8 @@ btn_error: "⚠️ Error", hint_copy_err: "Browser denied access. Right-click th
 acc_msg_pin_none: "Not generated yet", acc_msg_title: "🏠 Your MyComunalco Personal Account", acc_msg_link: "🌍 Login:", acc_msg_login: "📞 Your Login:", acc_msg_pin: "🔑 Your PIN:", acc_msg_desc: "Here you can conveniently submit readings, view receipts, track your balance, analyze consumption, and communicate in the Chat with the Manager or Residents.", acc_msg_install: "⚙️ HOW TO INSTALL THE APP:\n\n📱 Android (Chrome browser):\n1. Open the link above\n2. Tap the browser menu (three dots ⋮ in the right corner)\n3. Select \"Install app\" or \"Add to Home screen\"\n\n🍏 iPhone (Safari browser):\n1. Open the link above in Safari\n2. Tap the \"Share\" button (square with an arrow 📤 at the bottom)\n3. Select \"Add to Home Screen\" ➕\n\n💻 Laptop / PC (Chrome, Edge):\nOpen the link and click the install icon (monitor or plus sign) on the right side of the address bar.\n\n✅ Done! The MyComunalco icon will now always be handy on your screen.",
 tg_no_connected: "🤷‍♂️ No apartments have connected the bot yet.",
 bot_msg_p1: "👋 Hello! This is the Comunalco utility accounting system for your apartment (", bot_msg_p2: ").\n\nTo receive receipts and easily submit meter readings, please connect our Telegram bot.\n\n👉 Click the link below, and then press the «Start» button at the very bottom of the screen:\n",
-alert_no_phone: "⚠️ First, enter the resident's phone number at the top of the card!", alert_copied: "✅ Instructions and link copied!\nJust paste this text into the resident's chat."		
+alert_no_phone: "⚠️ First, enter the resident's phone number at the top of the card!", alert_copied: "✅ Instructions and link copied!\nJust paste this text into the resident's chat.",
+ws_tenant: "🏠 Resident", ws_submanager: "💼 Manager", ws_accountant: "📊 Accountant"		
     },
     pl: {
         receipt: "RACHUNEK",
@@ -1309,7 +1311,8 @@ btn_error: "⚠️ Błąd", hint_copy_err: "Przeglądarka odmówiła dostępu. K
 acc_msg_pin_none: "Jeszcze nie wygenerowano", acc_msg_title: "🏠 Twoje konto osobiste MyComunalco", acc_msg_link: "🌍 Logowanie:", acc_msg_login: "📞 Twój Login:", acc_msg_pin: "🔑 Twój PIN:", acc_msg_desc: "Tutaj możesz wygodnie przesyłać odczyty, przeglądać rachunki, śledzić saldo, analizować zużycie i komunikować się na Czacie z Zarządcą lub Mieszkańcami.", acc_msg_install: "⚙️ JAK ZAINSTALOWAĆ APLIKACJĘ:\n\n📱 Android (przeglądarka Chrome):\n1. Otwórz powyższy link\n2. Stuknij menu przeglądarki (trzy kropki ⋮ w prawym rogu)\n3. Wybierz „Zainstaluj aplikację” lub „Dodaj do ekranu głównego”\n\n🍏 iPhone (przeglądarka Safari):\n1. Otwórz link w Safari\n2. Stuknij przycisk „Udostępnij” (kwadrat ze strzałką 📤 na dole ekranu)\n3. Wybierz opcję „Do ekranu głównego” (Add to Home Screen) ➕\n\n💻 Laptop / PC (Chrome, Edge):\nOtwórz link i kliknij ikonę instalacji (monitor lub plus) po prawej stronie paska adresu.\n\n✅ Gotowe! Ikona MyComunalco będzie teraz zawsze pod ręką na Twoim ekranie.",
 tg_no_connected: "🤷‍♂️ Żadne mieszkanie nie podłączyło jeszcze bota.",
 bot_msg_p1: "👋 Witam! To jest system rozliczeń Comunalco dla Twojego mieszkania (", bot_msg_p2: ").\n\nAby otrzymywać rachunki i wygodnie przesyłać odczyty liczników, podłącz naszego bota Telegram.\n\n👉 Kliknij poniższy link, a następnie naciśnij przycisk «Start» na samym dole ekranu:\n",
-alert_no_phone: "⚠️ Najpierw wpisz numer telefonu mieszkańca na górze karty!", alert_copied: "✅ Instrukcje i link skopiowane!\nPo prostu wklej ten tekst na czat mieszkańca."		
+alert_no_phone: "⚠️ Najpierw wpisz numer telefonu mieszkańca na górze karty!", alert_copied: "✅ Instrukcje i link skopiowane!\nPo prostu wklej ten tekst na czat mieszkańca.",
+ws_tenant: "🏠 Mieszkaniec", ws_submanager: "💼 Menedżer", ws_accountant: "📊 Księgowy"		
     },
     de: {
         receipt: "RECHNUNG",
@@ -1440,7 +1443,8 @@ btn_error: "⚠️ Fehler", hint_copy_err: "Zugriff verweigert. Klicken Sie mit 
 acc_msg_pin_none: "Noch nicht generiert", acc_msg_title: "🏠 Ihr MyComunalco-Konto", acc_msg_link: "🌍 Login:", acc_msg_login: "📞 Ihr Login:", acc_msg_pin: "🔑 Ihre PIN:", acc_msg_desc: "Hier können Sie bequem Zählerstände übermitteln, Quittungen einsehen, Ihren Kontostand verfolgen, den Verbrauch analysieren und im Chat mit dem Verwalter oder den Bewohnern kommunizieren.", acc_msg_install: "⚙️ SO INSTALLIEREN SIE DIE APP:\n\n📱 Android (Chrome-Browser):\n1. Öffnen Sie den obigen Link\n2. Tippen Sie auf das Browser-Menü (drei Punkte ⋮ oben rechts)\n3. Wählen Sie \"App installieren\" oder \"Zum Startbildschirm hinzufügen\"\n\n🍏 iPhone (Safari-Browser):\n1. Öffnen Sie den obigen Link in Safari\n2. Tippen Sie auf \"Teilen\" (Quadrat mit Pfeil 📤 unten)\n3. Wählen Sie \"Zum Home-Bildschirm\" (Add to Home Screen) ➕\n\n💻 Laptop / PC (Chrome, Edge):\nÖffnen Sie den Link und klicken Sie auf das Installationssymbol (Monitor oder Pluszeichen) rechts in der Adressleiste.\n\n✅ Fertig! Das MyComunalco-Symbol ist nun immer auf Ihrem Bildschirm griffbereit.",
 tg_no_connected: "🤷‍♂️ Noch keine Wohnung hat den Bot verbunden.",
 bot_msg_p1: "👋 Hallo! Dies ist das Comunalco-Abrechnungssystem für Ihre Wohnung (", bot_msg_p2: ").\n\nUm Quittungen zu erhalten und Zählerstände einfach zu übermitteln, verbinden Sie bitte unseren Telegram-Bot.\n\n👉 Klicken Sie auf den untenstehenden Link und drücken Sie dann auf die Schaltfläche «Start» ganz unten auf dem Bildschirm:\n",
-alert_no_phone: "⚠️ Geben Sie zuerst die Telefonnummer des Bewohners oben auf der Karte ein!", alert_copied: "✅ Anleitung und Link kopiert!\nFügen Sie diesen Text einfach in den Chat des Bewohners ein."		
+alert_no_phone: "⚠️ Geben Sie zuerst die Telefonnummer des Bewohners oben auf der Karte ein!", alert_copied: "✅ Anleitung und Link kopiert!\nFügen Sie diesen Text einfach in den Chat des Bewohners ein.",
+ws_tenant: "🏠 Bewohner", ws_submanager: "💼 Manager", ws_accountant: "📊 Buchhalter"		
     },
     es: {
         receipt: "FACTURA",
@@ -1572,7 +1576,8 @@ btn_error: "⚠️ Error", hint_copy_err: "Acceso denegado. Haga <b>clic derecho
 acc_msg_pin_none: "Aún no generado", acc_msg_title: "🏠 Su cuenta personal de MyComunalco", acc_msg_link: "🌍 Acceso:", acc_msg_login: "📞 Su Usuario:", acc_msg_pin: "🔑 Su PIN:", acc_msg_desc: "Aquí puede enviar lecturas cómodamente, ver recibos, realizar un seguimiento de su saldo, analizar el consumo y comunicarse en el Chat con el Administrador o los Residentes.", acc_msg_install: "⚙️ CÓMO INSTALAR LA APLICACIÓN:\n\n📱 Android (Navegador Chrome):\n1. Abra el enlace de arriba\n2. Toque el menú del navegador (tres puntos ⋮ en la esquina derecha)\n3. Seleccione \"Instalar aplicación\" o \"Agregar a la pantalla principal\"\n\n🍏 iPhone (Navegador Safari):\n1. Abra el enlace de arriba en Safari\n2. Toque el botón \"Compartir\" (cuadrado con una flecha 📤 en la parte inferior)\n3. Seleccione \"Agregar a inicio\" (Add to Home Screen) ➕\n\n💻 Laptop / PC (Chrome, Edge):\nAbra el enlace y haga clic en el ícono de instalación (monitor o signo más) en el lado derecho de la barra de direcciones.\n\n✅ ¡Listo! El ícono de MyComunalco ahora siempre estará a mano en su pantalla.",
 tg_no_connected: "🤷‍♂️ Ningún apartamento ha conectado el bot aún.",
 bot_msg_p1: "👋 ¡Hola! Este es el sistema de contabilidad de servicios de Comunalco para su apartamento (", bot_msg_p2: ").\n\nPara recibir recibos y enviar lecturas de medidores fácilmente, conecte nuestro bot de Telegram.\n\n👉 Haga clic en el enlace a continuación y luego presione el botón «Iniciar» (o Start) en la parte inferior de la pantalla:\n",
-alert_no_phone: "⚠️ ¡Primero, ingrese el teléfono del residente en la parte superior de la tarjeta!", alert_copied: "✅ ¡Instrucciones y enlace copiados!\nSimplemente pegue este texto en el chat del residente."		
+alert_no_phone: "⚠️ ¡Primero, ingrese el teléfono del residente en la parte superior de la tarjeta!", alert_copied: "✅ ¡Instrucciones y enlace copiados!\nSimplemente pegue este texto en el chat del residente.",
+ws_tenant: "🏠 Residente", ws_submanager: "💼 Gerente", ws_accountant: "📊 Contador"		
     },
     fr: {
         receipt: "FACTURE",
@@ -1704,7 +1709,8 @@ btn_error: "⚠️ Erreur", hint_copy_err: "Accès refusé. Faites un <b>clic dr
 acc_msg_pin_none: "Pas encore généré", acc_msg_title: "🏠 Votre compte personnel MyComunalco", acc_msg_link: "🌍 Connexion :", acc_msg_login: "📞 Votre Identifiant :", acc_msg_pin: "🔑 Votre Code PIN :", acc_msg_desc: "Ici, vous pouvez facilement soumettre des relevés, consulter les reçus, suivre votre solde, analyser votre consommation et communiquer dans le Chat avec le gestionnaire ou les résidents.", acc_msg_install: "⚙️ COMMENT INSTALLER L'APPLICATION :\n\n📱 Android (Navigateur Chrome) :\n1. Ouvrez le lien ci-dessus\n2. Appuyez sur le menu du navigateur (trois points ⋮ dans le coin droit)\n3. Sélectionnez \"Installer l'application\" ou \"Ajouter à l'écran d'accueil\"\n\n🍏 iPhone (Navigateur Safari) :\n1. Ouvrez le lien ci-dessus dans Safari\n2. Appuyez sur le bouton \"Partager\" (carré avec une flèche 📤 en bas)\n3. Sélectionnez \"Sur l'écran d'accueil\" (Add to Home Screen) ➕\n\n💻 PC / Mac (Chrome, Edge) :\nOuvrez le lien et cliquez sur l'icône d'installation (écran ou signe plus) sur le côté droit de la barre d'adresse.\n\n✅ C'est fait ! L'icône MyComunalco sera désormais toujours à portée de main sur votre écran.",
 tg_no_connected: "🤷‍♂️ Aucun appartement n'a encore connecté le bot.",
 bot_msg_p1: "👋 Bonjour ! Ceci est le système de comptabilité Comunalco pour votre appartement (", bot_msg_p2: ").\n\nPour recevoir des reçus et soumettre facilement les relevés de compteurs, veuillez connecter notre bot Telegram.\n\n👉 Cliquez sur le lien ci-dessous, puis appuyez sur le bouton «Démarrer» (ou Start) tout en bas de l'écran :\n",
-alert_no_phone: "⚠️ Tout d'abord, entrez le téléphone du résident en haut de la carte !", alert_copied: "✅ Instructions et lien copiés !\nCollez simplement ce texte dans le chat du résident."		
+alert_no_phone: "⚠️ Tout d'abord, entrez le téléphone du résident en haut de la carte !", alert_copied: "✅ Instructions et lien copiés !\nCollez simplement ce texte dans le chat du résident.",
+ws_tenant: "🏠 Résident", ws_submanager: "💼 Gestionnaire", ws_accountant: "📊 Comptable"		
     }
 };
 	window.translations = translations;
@@ -5422,32 +5428,40 @@ if (foundAny) {
             .lobby-card:hover .lobby-arrow { color: #60a5fa; }
         `;
 
-        let html = `
-            <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
-                <div style="text-align: center; margin-bottom: 40px;">
-                    <h2 style="color: #60a5fa; font-size: 28px; font-weight: 800; letter-spacing: 1px; margin: 0 0 8px 0;">COMUNALCO</h2>
-                    <p style="color: #9ca3af; font-size: 15px; margin: 0;">Оберіть робочий простір</p>
-                </div>
-                <div style="display: flex; flex-direction: column; gap: 16px;">
-        `;
+        // 🌍 Підтягуємо мову для лобі
+    let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+    let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
 
-        this.state.objects.forEach((obj, index) => { 
-            let role = 'admin'; let roleName = '👑 Керуючий';
-            let roleBg = 'rgba(59, 130, 246, 0.2)'; let roleColor = '#93c5fd';
+    let html = `
+        <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+            <div style="text-align: center; margin-bottom: 40px;">
+                <h2 style="color: #60a5fa; font-size: 28px; font-weight: 800; letter-spacing: 1px; margin: 0 0 8px 0;">COMUNALCO</h2>
+                <p style="color: #9ca3af; font-size: 15px; margin: 0;">${tr.ws_choose || 'Оберіть робочий простір'}</p>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+    `;
 
-            if (window.currentUser) {
-                const myEmail = (window.currentUser.email || '').toLowerCase().trim();
-                if (String(obj.owner_id) !== String(window.currentUser.id)) {
-                    role = 'tenant'; roleName = '🏠 Мешканець'; roleBg = 'rgba(107, 114, 128, 0.2)'; roleColor = '#d1d5db';
-                    if (obj.users && Array.isArray(obj.users)) {
-                        const profile = obj.users.find(u => (u.email || '').toLowerCase().trim() === myEmail);
-                        if (profile) {
-                            if (profile.role === 'manager') { roleName = '💼 Менеджер'; roleBg = 'rgba(139, 92, 246, 0.2)'; roleColor = '#c4b5fd'; }
-                            if (profile.role === 'operator') { roleName = '📝 Обліковець'; roleBg = 'rgba(245, 158, 11, 0.2)'; roleColor = '#fcd34d'; }
-                        }
+    this.state.objects.forEach((obj, index) => {
+        let role = 'admin'; 
+        let roleName = tr.ws_manager || '👑 Керуючий';
+        let roleBg = 'rgba(59, 130, 246, 0.2)'; let roleColor = '#93c5fd';
+
+        if (window.currentUser) {
+            const myEmail = (window.currentUser.email || '').toLowerCase().trim();
+            if (String(obj.owner_id) !== String(window.currentUser.id)) {
+                role = 'tenant'; 
+                roleName = tr.ws_tenant || '🏠 Мешканець'; 
+                roleBg = 'rgba(107, 114, 128, 0.2)'; roleColor = '#d1d5db';
+                
+                if (obj.users && Array.isArray(obj.users)) {
+                    const profile = obj.users.find(u => (u.email || '').toLowerCase().trim() === myEmail);
+                    if (profile) {
+                        if (profile.role === 'manager') { roleName = tr.ws_submanager || '💼 Менеджер'; roleBg = 'rgba(139, 92, 246, 0.2)'; roleColor = '#c4b5fd'; }
+                        if (profile.role === 'operator') { roleName = tr.ws_accountant || '📊 Обліковець'; roleBg = 'rgba(245, 158, 11, 0.2)'; roleColor = '#fcd34d'; }
                     }
                 }
             }
+        }
 
             // ПРАЦЮЮЧИЙ КЛІК НА КАРТКУ!
             html += `
@@ -5465,7 +5479,7 @@ if (foundAny) {
                 </div>
                 <div style="text-align: center; margin-top: 50px;">
                     <button onclick="try{ if(typeof window.logout==='function') window.logout(); else if(window.app && typeof window.app.logout==='function') window.app.logout(); else { localStorage.clear(); window.location.href='/'; } }catch(e){ localStorage.clear(); window.location.reload(); }" style="background: none; border: none; color: #f87171; font-size: 15px; text-decoration: underline; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='#ef4444';" onmouseout="this.style.color='#f87171';">
-                        🚪 Вийти з акаунту
+                        ${tr.ws_logout || '🚪 Вийти з акаунту'}
                     </button>
                 </div>
             </div>
