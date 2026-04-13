@@ -930,7 +930,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '15.0';
+    const APP_VERSION = '15.1';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -1091,7 +1091,8 @@ confirm_delete_apt: "Видалити квартиру?",
 confirm_new_pin: "Згенерувати новий ПІН-код для цієї квартири?",
 alert_enter_code: "Введіть код!",
 alert_login_required: "Будь ласка, увійдіть в акаунт!",
-alert_calc_error: "Помилка: сума не розрахована"		
+alert_calc_error: "Помилка: сума не розрахована",
+alert_promo_success: "✅ Ура! Ваш тариф успішно активовано!", alert_promo_error: "❌ Недійсний формат ключа. Перевірте правильність вводу."		
 	},
     en: {
         receipt: "INVOICE",
@@ -1235,7 +1236,8 @@ confirm_delete_apt: "Delete apartment?",
 confirm_new_pin: "Generate a new PIN for this apartment?",
 alert_enter_code: "Enter the code!",
 alert_login_required: "Please log in to your account!",
-alert_calc_error: "Error: amount not calculated"		
+alert_calc_error: "Error: amount not calculated",
+alert_promo_success: "✅ Yay! Your plan has been successfully activated!", alert_promo_error: "❌ Invalid key format. Please check your input."		
     },
     pl: {
         receipt: "RACHUNEK",
@@ -1379,7 +1381,8 @@ confirm_delete_apt: "Usunąć mieszkanie?",
 confirm_new_pin: "Wygenerować nowy PIN dla tego mieszkania?",
 alert_enter_code: "Wprowadź kod!",
 alert_login_required: "Zaloguj się na swoje konto!",
-alert_calc_error: "Błąd: kwota nie została obliczona"		
+alert_calc_error: "Błąd: kwota nie została obliczona",
+alert_promo_success: "✅ Hurra! Twój plan został pomyślnie aktywowany!", alert_promo_error: "❌ Nieprawidłowy format klucza. Sprawdź poprawność."		
     },
     de: {
         receipt: "RECHNUNG",
@@ -1522,7 +1525,8 @@ confirm_delete_apt: "Wohnung löschen?",
 confirm_new_pin: "Neue PIN für diese Wohnung generieren?",
 alert_enter_code: "Code eingeben!",
 alert_login_required: "Bitte loggen Sie sich in Ihr Konto ein!",
-alert_calc_error: "Fehler: Betrag nicht berechnet"		
+alert_calc_error: "Fehler: Betrag nicht berechnet",
+alert_promo_success: "✅ Juhu! Ihr Tarif wurde erfolgreich aktiviert!", alert_promo_error: "❌ Ungültiges Schlüsselformat. Bitte überprüfen Sie Ihre Eingabe."		
     },
     es: {
         receipt: "FACTURA",
@@ -1666,7 +1670,8 @@ confirm_delete_apt: "¿Eliminar apartamento?",
 confirm_new_pin: "¿Generar un nuevo PIN para este apartamento?",
 alert_enter_code: "¡Ingrese el código!",
 alert_login_required: "¡Por favor, inicie sesión en su cuenta!",
-alert_calc_error: "Error: importe no calculado"		
+alert_calc_error: "Error: importe no calculado",
+alert_promo_success: "✅ ¡Genial! ¡Su plan se ha activado con éxito!", alert_promo_error: "❌ Formato de clave no válido. Verifique su entrada."		
     },
     fr: {
         receipt: "FACTURE",
@@ -1810,7 +1815,8 @@ confirm_delete_apt: "Supprimer l'appartement ?",
 confirm_new_pin: "Générer un nouveau code PIN pour cet appartement ?",
 alert_enter_code: "Entrez le code !",
 alert_login_required: "Veuillez vous connecter à votre compte !",
-alert_calc_error: "Erreur : montant non calculé"		
+alert_calc_error: "Erreur : montant non calculé",
+alert_promo_success: "✅ Youpi ! Votre forfait a été activé avec succès !", alert_promo_error: "❌ Format de clé invalide. Veuillez vérifier votre saisie."		
     }
 };
 	window.translations = translations;
@@ -2157,21 +2163,27 @@ updateSubscriptionCalc() {
                 this.state.sub_expire = currentExpire + (days * 24 * 60 * 60 * 1000);
                 this.state.userStatus = code.startsWith('TEST') ? 'TRIAL' : 'PRO';
                 
-                if (this.state.licenseDate === '2140-03-28') this.state.licenseDate = '';
-            } else {
-                throw new Error("Невірний формат ключа");
+                if (this.state.licenseDate === '2140-03-28') {
+                this.state.licenseDate = '';
             }
 
             // Зберігаємо ваші нові права в хмару
             this.save();
             this.updateStatus();
-            
-            alert("✅ Ура! Ваш тариф успішно активовано!");
-            codeInput.value = ''; 
+
+            let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+            let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
+
+            alert(tr.alert_promo_success || "✅ Ура! Ваш тариф успішно активовано!");
+            codeInput.value = '';
 
         } catch (error) {
             console.error("Помилка активації:", error);
-            alert("❌ Недійсний формат ключа. Перевірте правильність вводу.");
+
+            let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+            let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
+
+            alert(tr.alert_promo_error || "❌ Недійсний формат ключа. Перевірте правильність вводу.");
         } finally {
             // Кнопка ЗАВЖДИ повертається в норму
             btn.disabled = false;
