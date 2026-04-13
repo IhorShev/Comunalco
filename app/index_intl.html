@@ -896,7 +896,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '14.5';
+    const APP_VERSION = '14.6';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -2842,16 +2842,17 @@ updateSubscriptionCalc() {
                 expireDisplay.innerHTML = `⏳ <b>${daysLeft}</b> ${dTxt}`;
             }
 
-            // Блок тарифу під текстом (ЯКИЙ ВИПАДКОВО ВИДАЛИВСЯ)
+            // Блок тарифу під текстом
             if (lim) {
                 const p6m = typeof price6m !== 'undefined' ? price6m : '...';
                 
-                // 🌍 Беремо валюту з глобальної змінної (або ставимо ₴ за замовчуванням)
+                // 🌍 Беремо валюту з глобальної змінної
                 const sym = window.APP_CURRENCY_SYMBOL || '₴';
                 // 🌍 Беремо слово "міс" з нашого словника
                 const mo = tr.lbl_months || "міс";
                 
-                lim.innerHTML = `<span onclick="app.openMenu('premium')" style="cursor:pointer">💎 ${tr.lbl_tariff || "Тариф:"} <b>${p6m}</b> ${sym} / 6 ${mo}</span>`;
+                // Вставляємо цифру ${totalUnits} перед тарифом і робимо гарний відступ
+                lim.innerHTML = `<b style="color: var(--text);">${totalUnits}</b> &nbsp;&nbsp;&nbsp; <span onclick="app.openMenu('premium')" style="cursor:pointer; opacity: 0.9;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.9'">💎 ${tr.lbl_tariff || "Тариф:"} <b style="color: #60a5fa;">${p6m}</b> ${sym} / 6 ${mo}</span>`;
             }
         }
     }
