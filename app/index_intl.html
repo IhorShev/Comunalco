@@ -930,7 +930,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '14.8';
+    const APP_VERSION = '14.9';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -1086,7 +1086,9 @@ limit_text: "Ліміт:", lbl_tariff: "Тариф:", lbl_months: "міс",
 alert_limit_reached: "⏳ Ваш тестовий період завершився.\nНа безкоштовному тарифі доступно лише 2 квартири.\nПерейдіть у меню '💎 Тарифи' для продовження.",
 toast_saved: "ЗБЕРЕЖЕНО", toast_error: "ПОМИЛКА ПРИ ЗБЕРЕЖЕННІ", toast_saving: "ЗБЕРЕЖЕННЯ...",
 confirm_delete_object: "Видалити об'єкт '{objName}' та всі його дані?",
-alert_last_object: "Не можна видалити останній об'єкт!"		
+alert_last_object: "Не можна видалити останній об'єкт!",
+confirm_delete_apt: "Видалити квартиру?",
+confirm_new_pin: "Згенерувати новий ПІН-код для цієї квартири?"		
 	},
     en: {
         receipt: "INVOICE",
@@ -1225,7 +1227,9 @@ limit_text: "Limit:", lbl_tariff: "Tariff:", lbl_months: "mo",
 alert_limit_reached: "⏳ Your trial period has ended.\nOnly 2 apartments are available on the free plan.\nGo to the '💎 Tariffs' menu to upgrade.",
 toast_saved: "SAVED", toast_error: "SAVE ERROR", toast_saving: "SAVING...",
 confirm_delete_object: "Delete object '{objName}' and all its data?",
-alert_last_object: "Cannot delete the last object!"		
+alert_last_object: "Cannot delete the last object!",
+confirm_delete_apt: "Delete apartment?",
+confirm_new_pin: "Generate a new PIN for this apartment?"		
     },
     pl: {
         receipt: "RACHUNEK",
@@ -1364,7 +1368,9 @@ limit_text: "Limit:", lbl_tariff: "Taryfa:", lbl_months: "mies",
 alert_limit_reached: "⏳ Twój okres próbny dobiegł końca.\nW darmowym planie dostępne są tylko 2 mieszkania.\nPrzejdź do menu '💎 Taryfy', aby przedłużyć.",
 toast_saved: "ZAPISANO", toast_error: "BŁĄD ZAPISU", toast_saving: "ZAPISYWANIE...",
 confirm_delete_object: "Usunąć obiekt '{objName}' i wszystkie jego dane?",
-alert_last_object: "Nie można usunąć ostatniego obiektu!"		
+alert_last_object: "Nie można usunąć ostatniego obiektu!",
+confirm_delete_apt: "Usunąć mieszkanie?",
+confirm_new_pin: "Wygenerować nowy PIN dla tego mieszkania?"		
     },
     de: {
         receipt: "RECHNUNG",
@@ -1502,7 +1508,9 @@ limit_text: "Limit:", lbl_tariff: "Tarif:", lbl_months: "Mon",
 alert_limit_reached: "⏳ Ihre Testphase ist abgelaufen.\nIm kostenlosen Tarif sind nur 2 Wohnungen verfügbar.\nGehen Sie zum Menü '💎 Tarife', um zu verlängern.",
 toast_saved: "GESPEICHERT", toast_error: "SPEICHERFEHLER", toast_saving: "SPEICHERN...",
 confirm_delete_object: "Objekt '{objName}' und alle seine Daten löschen?",
-alert_last_object: "Das letzte Objekt kann nicht gelöscht werden!"		
+alert_last_object: "Das letzte Objekt kann nicht gelöscht werden!",
+confirm_delete_apt: "Wohnung löschen?",
+confirm_new_pin: "Neue PIN für diese Wohnung generieren?"		
     },
     es: {
         receipt: "FACTURA",
@@ -1641,7 +1649,9 @@ limit_text: "Límite:", lbl_tariff: "Tarifa:", lbl_months: "mes",
 alert_limit_reached: "⏳ Su período de prueba ha terminado.\nSolo hay 2 apartamentos disponibles en el plan gratuito.\nVaya al menú '💎 Tarifas' para actualizar.",
 toast_saved: "GUARDADO", toast_error: "ERROR AL GUARDAR", toast_saving: "GUARDANDO...",
 confirm_delete_object: "¿Eliminar el objeto '{objName}' y todos sus datos?",
-alert_last_object: "¡No se puede eliminar el último objeto!"		
+alert_last_object: "¡No se puede eliminar el último objeto!",
+confirm_delete_apt: "¿Eliminar apartamento?",
+confirm_new_pin: "¿Generar un nuevo PIN para este apartamento?"		
     },
     fr: {
         receipt: "FACTURE",
@@ -1780,7 +1790,9 @@ limit_text: "Limite :", lbl_tariff: "Tarif :", lbl_months: "mois",
 alert_limit_reached: "⏳ Votre période d'essai est terminée.\nSeuls 2 appartements sont disponibles sur le plan gratuit.\nAllez dans le menu '💎 Tarifs' pour prolonger.",
 toast_saved: "ENREGISTRÉ", toast_error: "ERREUR D'ENREGISTREMENT", toast_saving: "ENREGISTREMENT...",
 confirm_delete_object: "Supprimer l'objet '{objName}' et toutes ses données ?",
-alert_last_object: "Impossible de supprimer le dernier objet !"		
+alert_last_object: "Impossible de supprimer le dernier objet !",
+confirm_delete_apt: "Supprimer l'appartement ?",
+confirm_new_pin: "Générer un nouveau code PIN pour cet appartement ?"		
     }
 };
 	window.translations = translations;
@@ -3954,18 +3966,33 @@ updateChart() {
     addAS(i){this.currentData.apartments[i].services.push({name:"",val:0});this.save();this.renderApartments(); this.calculate();}
     updateAS(ai,si,k,v){this.currentData.apartments[ai].services[si][k]=k==='val'?parseFloat(v):v;this.save(); this.calculate();}
     delAS(ai,si){this.currentData.apartments[ai].services.splice(si,1);this.save();this.renderApartments(); this.calculate();}
-    delApt(i){if(confirm("Видалити квартиру?")){this.currentData.apartments.splice(i,1);this.save();this.renderApartments(); this.updateStatus(); this.calculate();}}
+    delApt(i) {
+        let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+        let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
+        
+        if(confirm(tr.confirm_delete_apt || "Видалити квартиру?")) {
+            this.currentData.apartments.splice(i,1);
+            this.save();
+            this.renderApartments(); 
+            this.updateStatus(); 
+            this.calculate();
+        }
+    }
+
     // --- ГЕНЕРАЦІЯ НОВОГО ПІН-КОДУ ---
     generateNewPin(i) {
-        if (confirm("Згенерувати новий ПІН-код для цієї квартири?")) {
+        let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+        let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
+
+        if (confirm(tr.confirm_new_pin || "Згенерувати новий ПІН-код для цієї квартири?")) {
             // 1. Створюємо новий ПІН
             this.currentData.apartments[i].pin = Math.floor(1000 + Math.random() * 9000).toString();
             
             // 2. Оновлюємо картинку на екрані
             this.renderApartments();
             
-            // 3. Зберігаємо НАШИМ надійним методом (він сам усе запакує і відправить)
-            this.save(); 
+            // 3. Зберігаємо
+            this.save();
         }
     }
         // --- ВІДПРАВКА ДАНИХ ДОСТУПУ ---
