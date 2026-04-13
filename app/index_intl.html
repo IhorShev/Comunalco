@@ -930,7 +930,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '15.1';
+    const APP_VERSION = '15.2';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -2137,14 +2137,23 @@ updateSubscriptionCalc() {
         if (!window.currentUser) return alert(tr.alert_login_required || "Будь ласка, увійдіть в акаунт!");
         
         const codeInput = document.getElementById('promo-code-input');
+        const btn = document.getElementById('btn-activate-promo');
+        let originalText = btn ? btn.innerText : "Активувати";
 
         // Очищаємо від пробілів та переводимо у верхній регістр
-        let code = codeInput.value.trim().toUpperCase();
+        let code = codeInput ? codeInput.value.trim().toUpperCase() : "";
         code = code.replace(/O/g, '0');
 
         // Перевірка 2: Чи введено код
         if (!code) return alert(tr.alert_enter_code || "Введіть код!");
-            
+
+        // 🔄 Блокуємо кнопку на час обробки
+        if (btn) {
+            btn.disabled = true;
+            btn.innerText = "⏳...";
+        }
+
+        try {
             // 🧠 МАГІЯ: Програма сама розуміє ключ без запитів до бази!
             if (code.startsWith('VIP')) {
                 // Якщо VIP - даємо статус до 2140 року
@@ -2164,30 +2173,29 @@ updateSubscriptionCalc() {
                 this.state.userStatus = code.startsWith('TEST') ? 'TRIAL' : 'PRO';
                 
                 if (this.state.licenseDate === '2140-03-28') {
-                this.state.licenseDate = '';
+                    this.state.licenseDate = '';
+                }
+            } else {
+                // Якщо ключ не починається з VIP, PRO- або TEST-
+                throw new Error("Invalid key format");
             }
 
             // Зберігаємо ваші нові права в хмару
             this.save();
             this.updateStatus();
 
-            let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
-            let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
-
             alert(tr.alert_promo_success || "✅ Ура! Ваш тариф успішно активовано!");
-            codeInput.value = '';
+            if (codeInput) codeInput.value = '';
 
         } catch (error) {
             console.error("Помилка активації:", error);
-
-            let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
-            let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
-
             alert(tr.alert_promo_error || "❌ Недійсний формат ключа. Перевірте правильність вводу.");
         } finally {
             // Кнопка ЗАВЖДИ повертається в норму
-            btn.disabled = false;
-            btn.innerText = originalText;
+            if (btn) {
+                btn.disabled = false;
+                btn.innerText = originalText;
+            }
         }
     }
     // --- UI & THEME ---
