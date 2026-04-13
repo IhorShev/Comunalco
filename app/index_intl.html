@@ -1088,7 +1088,9 @@ toast_saved: "ЗБЕРЕЖЕНО", toast_error: "ПОМИЛКА ПРИ ЗБЕР�
 confirm_delete_object: "Видалити об'єкт '{objName}' та всі його дані?",
 alert_last_object: "Не можна видалити останній об'єкт!",
 confirm_delete_apt: "Видалити квартиру?",
-confirm_new_pin: "Згенерувати новий ПІН-код для цієї квартири?"		
+confirm_new_pin: "Згенерувати новий ПІН-код для цієї квартири?",
+alert_enter_code: "Введіть код!",
+alert_login_required: "Будь ласка, увійдіть в акаунт!"		
 	},
     en: {
         receipt: "INVOICE",
@@ -1229,7 +1231,9 @@ toast_saved: "SAVED", toast_error: "SAVE ERROR", toast_saving: "SAVING...",
 confirm_delete_object: "Delete object '{objName}' and all its data?",
 alert_last_object: "Cannot delete the last object!",
 confirm_delete_apt: "Delete apartment?",
-confirm_new_pin: "Generate a new PIN for this apartment?"		
+confirm_new_pin: "Generate a new PIN for this apartment?",
+alert_enter_code: "Enter the code!",
+alert_login_required: "Please log in to your account!"		
     },
     pl: {
         receipt: "RACHUNEK",
@@ -1370,7 +1374,9 @@ toast_saved: "ZAPISANO", toast_error: "BŁĄD ZAPISU", toast_saving: "ZAPISYWANI
 confirm_delete_object: "Usunąć obiekt '{objName}' i wszystkie jego dane?",
 alert_last_object: "Nie można usunąć ostatniego obiektu!",
 confirm_delete_apt: "Usunąć mieszkanie?",
-confirm_new_pin: "Wygenerować nowy PIN dla tego mieszkania?"		
+confirm_new_pin: "Wygenerować nowy PIN dla tego mieszkania?",
+alert_enter_code: "Wprowadź kod!",
+alert_login_required: "Zaloguj się na swoje konto!"		
     },
     de: {
         receipt: "RECHNUNG",
@@ -1510,7 +1516,9 @@ toast_saved: "GESPEICHERT", toast_error: "SPEICHERFEHLER", toast_saving: "SPEICH
 confirm_delete_object: "Objekt '{objName}' und alle seine Daten löschen?",
 alert_last_object: "Das letzte Objekt kann nicht gelöscht werden!",
 confirm_delete_apt: "Wohnung löschen?",
-confirm_new_pin: "Neue PIN für diese Wohnung generieren?"		
+confirm_new_pin: "Neue PIN für diese Wohnung generieren?",
+alert_enter_code: "Code eingeben!",
+alert_login_required: "Bitte loggen Sie sich in Ihr Konto ein!"		
     },
     es: {
         receipt: "FACTURA",
@@ -1651,7 +1659,9 @@ toast_saved: "GUARDADO", toast_error: "ERROR AL GUARDAR", toast_saving: "GUARDAN
 confirm_delete_object: "¿Eliminar el objeto '{objName}' y todos sus datos?",
 alert_last_object: "¡No se puede eliminar el último objeto!",
 confirm_delete_apt: "¿Eliminar apartamento?",
-confirm_new_pin: "¿Generar un nuevo PIN para este apartamento?"		
+confirm_new_pin: "¿Generar un nuevo PIN para este apartamento?",
+alert_enter_code: "¡Ingrese el código!",
+alert_login_required: "¡Por favor, inicie sesión en su cuenta!"		
     },
     fr: {
         receipt: "FACTURE",
@@ -1792,7 +1802,9 @@ toast_saved: "ENREGISTRÉ", toast_error: "ERREUR D'ENREGISTREMENT", toast_saving
 confirm_delete_object: "Supprimer l'objet '{objName}' et toutes ses données ?",
 alert_last_object: "Impossible de supprimer le dernier objet !",
 confirm_delete_apt: "Supprimer l'appartement ?",
-confirm_new_pin: "Générer un nouveau code PIN pour cet appartement ?"		
+confirm_new_pin: "Générer un nouveau code PIN pour cet appartement ?",
+alert_enter_code: "Entrez le code !",
+alert_login_required: "Veuillez vous connecter à votre compte !"		
     }
 };
 	window.translations = translations;
@@ -2095,22 +2107,21 @@ updateSubscriptionCalc() {
     
     // --- АКТИВАЦІЯ ПРОМОКОДУ (ВЕРСІЯ 2.0) ---
     async activatePromoCode() {
-        if (!window.currentUser) return alert("Будь ласка, увійдіть в акаунт!");
-        const codeInput = document.getElementById('promo-code-input');
+        // 🌍 Підтягуємо мову та словник
+        let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+        let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
+
+        // Перевірка 1: Чи користувач авторизований
+        if (!window.currentUser) return alert(tr.alert_login_required || "Будь ласка, увійдіть в акаунт!");
         
+        const codeInput = document.getElementById('promo-code-input');
+
         // Очищаємо від пробілів та переводимо у верхній регістр
         let code = codeInput.value.trim().toUpperCase();
-        code = code.replace(/О/g, 'O'); 
+        code = code.replace(/O/g, '0');
 
-        if (!code) return alert("Введіть код!");
-
-        const btn = document.getElementById('btn-activate-promo');
-        const originalText = btn.innerText;
-        btn.disabled = true;
-        btn.innerText = "⏳...";
-
-        try {
-            console.log("Спроба активації ключа:", code);
+        // Перевірка 2: Чи введено код
+        if (!code) return alert(tr.alert_enter_code || "Введіть код!");
             
             // 🧠 МАГІЯ: Програма сама розуміє ключ без запитів до бази!
             if (code.startsWith('VIP')) {
