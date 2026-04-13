@@ -930,7 +930,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '15.2';
+    const APP_VERSION = '15.3';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -2014,17 +2014,20 @@ updateSubscriptionCalc() {
             lastName = nameParts.slice(1).join(' ') || '';
         }
 
-        // 💱 МАГІЯ ВАЛЮТ: Визначаємо поточну валюту і передаємо її в PayPro
+        // 💱 МАГІЯ ВАЛЮТ: Визначаємо поточну валюту
         let appCurrency = (this.state && this.state.settings && this.state.settings.currency) 
             ? this.state.settings.currency 
             : (localStorage.getItem('currency') || 'uah');
         
-        let payproCurrency = appCurrency.toUpperCase(); // Робить з 'usd' -> 'USD', з 'pln' -> 'PLN'
+        let payproCurrency = appCurrency.toUpperCase(); // 'USD', 'EUR', 'PLN', 'UAH'
 
         const baseUrl = "https://store.payproglobal.com/checkout?products[1][id]=128709";
         
-        // 🛑 ОСЬ ВАЖЛИВИЙ ФІКС: Замість жорсткого [UAH] тепер стоїть динамічний [${payproCurrency}]
+        // Передаємо суму у вибраній валюті
         let finalUrl = `${baseUrl}&products[1][price][${payproCurrency}][amount]=${amount}&custom_field1=${encodeURIComponent(userId)}`;
+
+        // 🛑 ЖОРСТКО ЗМУШУЄМО PAYPRO ПОКАЗУВАТИ САМЕ ЦЮ ВАЛЮТУ (ІГНОРУВАТИ IP КЛІЄНТА)
+        finalUrl += `&currency=${payproCurrency}`;
 
         // Додаємо контакти в URL
         if (userEmail) finalUrl += `&billing-email=${encodeURIComponent(userEmail)}`;
