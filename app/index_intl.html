@@ -896,7 +896,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '14.1';
+    const APP_VERSION = '14.2';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -5428,36 +5428,44 @@ if (foundAny) {
             .lobby-card:hover .lobby-arrow { color: #60a5fa; }
         `;
 
-        // 🌍 Підтягуємо мову для лобі
+        // 🌍 Створюємо локальний словник спеціально для Лобі (миттєвий переклад)
     let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
-    let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
+    const lobbyTr = {
+        choose: { uk: "Оберіть робочий простір", en: "Choose workspace", pl: "Wybierz przestrzeń roboczą", de: "Arbeitsbereich auswählen", es: "Elegir espacio de trabajo", fr: "Choisissez l'espace de travail" },
+        manager: { uk: "👑 Керуючий", en: "👑 Manager", pl: "👑 Menedżer", de: "👑 Manager", es: "👑 Administrador", fr: "👑 Gestionnaire" },
+        tenant: { uk: "🏠 Мешканець", en: "🏠 Resident", pl: "🏠 Mieszkaniec", de: "🏠 Bewohner", es: "🏠 Residente", fr: "🏠 Résident" },
+        submanager: { uk: "💼 Менеджер", en: "💼 Manager", pl: "💼 Menedżer", de: "💼 Manager", es: "💼 Gerente", fr: "💼 Gestionnaire" },
+        accountant: { uk: "📊 Обліковець", en: "📊 Accountant", pl: "📊 Księgowy", de: "📊 Buchhalter", es: "📊 Contador", fr: "📊 Comptable" },
+        logout: { uk: "🚪 Вийти з акаунту", en: "🚪 Log out", pl: "🚪 Wyloguj się", de: "🚪 Abmelden", es: "🚪 Cerrar sesión", fr: "🚪 Se déconnecter" }
+    };
+    const t = (key) => lobbyTr[key] ? (lobbyTr[key][lang] || lobbyTr[key]['uk']) : key;
 
     let html = `
         <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
             <div style="text-align: center; margin-bottom: 40px;">
                 <h2 style="color: #60a5fa; font-size: 28px; font-weight: 800; letter-spacing: 1px; margin: 0 0 8px 0;">COMUNALCO</h2>
-                <p style="color: #9ca3af; font-size: 15px; margin: 0;">${tr.ws_choose || 'Оберіть робочий простір'}</p>
+                <p style="color: #9ca3af; font-size: 15px; margin: 0;">${t('choose')}</p>
             </div>
             <div style="display: flex; flex-direction: column; gap: 16px;">
     `;
 
     this.state.objects.forEach((obj, index) => {
         let role = 'admin'; 
-        let roleName = tr.ws_manager || '👑 Керуючий';
+        let roleName = t('manager');
         let roleBg = 'rgba(59, 130, 246, 0.2)'; let roleColor = '#93c5fd';
 
         if (window.currentUser) {
             const myEmail = (window.currentUser.email || '').toLowerCase().trim();
             if (String(obj.owner_id) !== String(window.currentUser.id)) {
                 role = 'tenant'; 
-                roleName = tr.ws_tenant || '🏠 Мешканець'; 
+                roleName = t('tenant'); 
                 roleBg = 'rgba(107, 114, 128, 0.2)'; roleColor = '#d1d5db';
                 
                 if (obj.users && Array.isArray(obj.users)) {
                     const profile = obj.users.find(u => (u.email || '').toLowerCase().trim() === myEmail);
                     if (profile) {
-                        if (profile.role === 'manager') { roleName = tr.ws_submanager || '💼 Менеджер'; roleBg = 'rgba(139, 92, 246, 0.2)'; roleColor = '#c4b5fd'; }
-                        if (profile.role === 'operator') { roleName = tr.ws_accountant || '📊 Обліковець'; roleBg = 'rgba(245, 158, 11, 0.2)'; roleColor = '#fcd34d'; }
+                        if (profile.role === 'manager') { roleName = t('submanager'); roleBg = 'rgba(139, 92, 246, 0.2)'; roleColor = '#c4b5fd'; }
+                        if (profile.role === 'operator') { roleName = t('accountant'); roleBg = 'rgba(245, 158, 11, 0.2)'; roleColor = '#fcd34d'; }
                     }
                 }
             }
@@ -5479,7 +5487,7 @@ if (foundAny) {
                 </div>
                 <div style="text-align: center; margin-top: 50px;">
                     <button onclick="try{ if(typeof window.logout==='function') window.logout(); else if(window.app && typeof window.app.logout==='function') window.app.logout(); else { localStorage.clear(); window.location.href='/'; } }catch(e){ localStorage.clear(); window.location.reload(); }" style="background: none; border: none; color: #f87171; font-size: 15px; text-decoration: underline; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='#ef4444';" onmouseout="this.style.color='#f87171';">
-                        ${tr.ws_logout || '🚪 Вийти з акаунту'}
+                        ${t('logout')}
                     </button>
                 </div>
             </div>
