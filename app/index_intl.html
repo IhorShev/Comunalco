@@ -930,7 +930,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '15.8';
+    const APP_VERSION = '15.9';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -2116,7 +2116,6 @@ updateSubscriptionCalc() {
     async payViaCrypto(method) {
         console.log("🚀 Запуск крипто-оплати:", method);
 
-        // 🌍 Підтягуємо мову та словник
         let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
         let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
 
@@ -2125,47 +2124,55 @@ updateSubscriptionCalc() {
         const amount = this.lastCalcAmount;
         if (!amount || amount <= 0) return alert(tr.alert_calc_error || "Помилка: сума не розрахована");
 
+        // 💱 Отримуємо поточну валюту (щоб передати її на сервер)
+        let appCurrency = (this.state && this.state.settings && this.state.settings.currency) 
+            ? this.state.settings.currency.toUpperCase() 
+            : 'UAH';
+
         const userId = window.currentUser.id;
-        
-        // Захист полів
         const aptsInput = document.getElementById('calc-apts');
         const apts = aptsInput ? aptsInput.value : 0; 
         const period = this.subPeriod || 6;
 
-        // 🛑 ТРЮК ПРОТИ БЛОКУВАННЯ ВІКОН: Відкриваємо порожню вкладку ОДРАЗУ під час кліку
+        // Відкриваємо вкладку і зберігаємо на неї "пульт керування"
         const newWindow = window.open('about:blank', '_blank');
         if (newWindow) {
-            newWindow.document.write(`<h2 style="font-family:sans-serif; text-align:center; margin-top:20%;">⏳ З'єднуємось з Telegram... / Connecting to Telegram...</h2>`);
+            newWindow.document.write(`<h2 style="font-family:sans-serif; text-align:center; margin-top:20%; color:#fff; background:#1e1e1e; padding:20px; border-radius:10px;">⏳ З'єднуємось з Telegram... / Connecting...</h2>`);
+            newWindow.document.body.style.backgroundColor = '#121212'; // Темний фон
         } else {
-            alert("Ваш браузер заблокував спливаюче вікно! Будь ласка, дозвольте їх для цього сайту в адресному рядку зверху.");
-            return;
+            return alert("Браузер заблокував вікно! Дозвольте спливаючі вікна.");
         }
 
         try {
             const client = window.__sbClient || window.supabase;
             if (!client) throw new Error("Supabase client is not initialized");
 
-            // Викликаємо твою Edge Function
+            // 🛑 ДОДАНО currency: appCurrency у body
             const { data, error } = await client.functions.invoke('create-crypto-invoice', {
-                body: { method, amount, userId, apts, period }
+                body: { method, amount, currency: appCurrency, userId, apts, period }
             });
 
-            if (error) {
-                throw new Error(error.message || "Помилка виклику функції на сервері");
-            }
+            if (error) throw new Error(error.message || "Помилка сервера Supabase");
 
-            // Якщо бекенд повернув посилання - перенаправляємо нашу ВЖЕ відкриту вкладку!
             if (data && data.payUrl) {
+                // Все супер, летимо в Telegram!
                 newWindow.location.href = data.payUrl;
             } else {
-                newWindow.close(); // Закриваємо вкладку, якщо щось пішло не так
-                alert("Помилка від " + method + " API: " + JSON.stringify(data));
+                // ВИВОДИМО ПОМИЛКУ ВІД API ПРЯМО В НОВЕ ВІКНО
+                newWindow.document.body.innerHTML = `<h3 style="color:#ff4d4d; font-family:sans-serif; text-align:center; margin-top:20%;">❌ Помилка API:<br><br>${JSON.stringify(data)}</h3>`;
             }
 
         } catch (e) {
             console.error("Crypto API Error:", e);
-            newWindow.close(); // Закриваємо вкладку при помилці
-            alert("Деталі помилки: " + (e.message || JSON.stringify(e)));
+            // ВИВОДИМО КРИТИЧНУ ПОМИЛКУ ПРЯМО В НОВЕ ВІКНО
+            newWindow.document.body.innerHTML = `
+                <div style="font-family:sans-serif; text-align:center; margin-top:15%; color:#fff;">
+                    <h2 style="color:#ff4d4d;">❌ Сталася помилка</h2>
+                    <p style="font-size:18px; color:#aaa;">${e.message || JSON.stringify(e)}</p>
+                    <p style="margin-top:30px; color:#888;">💡 Підказка: Можливо, ви вже створили такий самий рахунок хвилину тому. Telegram-боти блокують дублікати. Змініть кількість квартир на 1 або зачекайте пару хвилин.</p>
+                </div>
+            `;
+            newWindow.document.body.style.backgroundColor = '#121212';
         }
     }
     
