@@ -930,7 +930,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '14.9';
+    const APP_VERSION = '15.0';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -1090,7 +1090,8 @@ alert_last_object: "Не можна видалити останній об'єк�
 confirm_delete_apt: "Видалити квартиру?",
 confirm_new_pin: "Згенерувати новий ПІН-код для цієї квартири?",
 alert_enter_code: "Введіть код!",
-alert_login_required: "Будь ласка, увійдіть в акаунт!"		
+alert_login_required: "Будь ласка, увійдіть в акаунт!",
+alert_calc_error: "Помилка: сума не розрахована"		
 	},
     en: {
         receipt: "INVOICE",
@@ -1233,7 +1234,8 @@ alert_last_object: "Cannot delete the last object!",
 confirm_delete_apt: "Delete apartment?",
 confirm_new_pin: "Generate a new PIN for this apartment?",
 alert_enter_code: "Enter the code!",
-alert_login_required: "Please log in to your account!"		
+alert_login_required: "Please log in to your account!",
+alert_calc_error: "Error: amount not calculated"		
     },
     pl: {
         receipt: "RACHUNEK",
@@ -1376,7 +1378,8 @@ alert_last_object: "Nie można usunąć ostatniego obiektu!",
 confirm_delete_apt: "Usunąć mieszkanie?",
 confirm_new_pin: "Wygenerować nowy PIN dla tego mieszkania?",
 alert_enter_code: "Wprowadź kod!",
-alert_login_required: "Zaloguj się na swoje konto!"		
+alert_login_required: "Zaloguj się na swoje konto!",
+alert_calc_error: "Błąd: kwota nie została obliczona"		
     },
     de: {
         receipt: "RECHNUNG",
@@ -1518,7 +1521,8 @@ alert_last_object: "Das letzte Objekt kann nicht gelöscht werden!",
 confirm_delete_apt: "Wohnung löschen?",
 confirm_new_pin: "Neue PIN für diese Wohnung generieren?",
 alert_enter_code: "Code eingeben!",
-alert_login_required: "Bitte loggen Sie sich in Ihr Konto ein!"		
+alert_login_required: "Bitte loggen Sie sich in Ihr Konto ein!",
+alert_calc_error: "Fehler: Betrag nicht berechnet"		
     },
     es: {
         receipt: "FACTURA",
@@ -1661,7 +1665,8 @@ alert_last_object: "¡No se puede eliminar el último objeto!",
 confirm_delete_apt: "¿Eliminar apartamento?",
 confirm_new_pin: "¿Generar un nuevo PIN para este apartamento?",
 alert_enter_code: "¡Ingrese el código!",
-alert_login_required: "¡Por favor, inicie sesión en su cuenta!"		
+alert_login_required: "¡Por favor, inicie sesión en su cuenta!",
+alert_calc_error: "Error: importe no calculado"		
     },
     fr: {
         receipt: "FACTURE",
@@ -1804,7 +1809,8 @@ alert_last_object: "Impossible de supprimer le dernier objet !",
 confirm_delete_apt: "Supprimer l'appartement ?",
 confirm_new_pin: "Générer un nouveau code PIN pour cet appartement ?",
 alert_enter_code: "Entrez le code !",
-alert_login_required: "Veuillez vous connecter à votre compte !"		
+alert_login_required: "Veuillez vous connecter à votre compte !",
+alert_calc_error: "Erreur : montant non calculé"		
     }
 };
 	window.translations = translations;
@@ -1981,8 +1987,12 @@ updateSubscriptionCalc() {
 }
     
     payViaPayPro() {
+        // 🌍 Підтягуємо мову для алерта
+        let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+        let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
+
         const amount = this.lastCalcAmount;
-        if (!amount || amount <= 0) return alert("Помилка: сума не розрахована");
+        if (!amount || amount <= 0) return alert(tr.alert_calc_error || "Помилка: сума не розрахована");
 
         const user = window.currentUser || {};
         const userId = user.id || 'unknown';
@@ -1992,15 +2002,23 @@ updateSubscriptionCalc() {
         let firstName = '';
         let lastName = '';
         if (user.user_metadata) {
-            // Беремо повне ім'я з Google і розбиваємо на два слова
             const fullName = user.user_metadata.full_name || user.user_metadata.name || '';
             const nameParts = fullName.trim().split(' ');
             firstName = nameParts[0] || '';
-            lastName = nameParts.slice(1).join(' ') || ''; // Все інше йде в прізвище
+            lastName = nameParts.slice(1).join(' ') || '';
         }
 
+        // 💱 МАГІЯ ВАЛЮТ: Визначаємо поточну валюту і передаємо її в PayPro
+        let appCurrency = (this.state && this.state.settings && this.state.settings.currency) 
+            ? this.state.settings.currency 
+            : (localStorage.getItem('currency') || 'uah');
+        
+        let payproCurrency = appCurrency.toUpperCase(); // Робить з 'usd' -> 'USD', з 'pln' -> 'PLN'
+
         const baseUrl = "https://store.payproglobal.com/checkout?products[1][id]=128709";
-        let finalUrl = `${baseUrl}&products[1][price][UAH][amount]=${amount}&custom_field1=${encodeURIComponent(userId)}`;
+        
+        // 🛑 ОСЬ ВАЖЛИВИЙ ФІКС: Замість жорсткого [UAH] тепер стоїть динамічний [${payproCurrency}]
+        let finalUrl = `${baseUrl}&products[1][price][${payproCurrency}][amount]=${amount}&custom_field1=${encodeURIComponent(userId)}`;
 
         // Додаємо контакти в URL
         if (userEmail) finalUrl += `&billing-email=${encodeURIComponent(userEmail)}`;
@@ -2008,11 +2026,9 @@ updateSubscriptionCalc() {
         if (lastName) finalUrl += `&billing-last-name=${encodeURIComponent(lastName)}`;
 
         // --- 2. РОЗУМНИЙ ВИБІР GOOGLE PAY / APPLE PAY ---
-        // Якщо клієнт з пристрою Apple (iPhone, iPad, Mac) - показуємо Apple Pay (96), інакше Google Pay (97)
         const isApple = /Mac|iPod|iPhone|iPad/i.test(navigator.userAgent);
         const paymentMethodId = isApple ? 96 : 97; 
 
-        // Додаємо Дизайн (21413), Pop-up (742), Домен та Метод оплати
         finalUrl += `&page-template=21413&exfo=742&parent-domain=comunalco.com&payment-method=${paymentMethodId}`;
 
         console.log("Відкриваємо оплату PayPro:", finalUrl);
