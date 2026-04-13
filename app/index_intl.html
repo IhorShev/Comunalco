@@ -896,7 +896,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '14.2';
+    const APP_VERSION = '14.3';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -1046,7 +1046,10 @@ acc_msg_pin_none: "Ще не згенеровано", acc_msg_title: "🏠 Ва�
 tg_no_connected: "🤷‍♂️ Жодна квартира ще не підключила бота.",
 bot_msg_p1: "👋 Вітаю! Це система Comunalco для обліку комунальних послуг вашої квартири (", bot_msg_p2: ").\n\nЩоб отримувати квитанції та зручно передавати показники лічильників, будь ласка, підключіть нашого Телеграм-бота.\n\n👉 Натисніть на посилання нижче, а потім кнопку «Розпочати» (або Start) у самому низу екрана:\n",
 alert_no_phone: "⚠️ Спочатку вкажіть телефон мешканця вгорі картки!", alert_copied: "✅ Інструкцію з посиланням скопійовано!\nПросто вставте цей текст у чат мешканцю.",
-ws_tenant: "🏠 Мешканець", ws_submanager: "💼 Менеджер", ws_accountant: "📊 Обліковець"		
+ws_tenant: "🏠 Мешканець", ws_submanager: "💼 Менеджер", ws_accountant: "📊 Обліковець",
+btn_add_apt: "+ Додати Квартиру", lbl_limit: "Ліміт:", lbl_tariff: "Тариф:", lbl_months: "міс",
+limit_text: "Ліміт:", lbl_tariff: "Тариф:", lbl_months: "міс",
+alert_limit_reached: "⏳ Ваш тестовий період завершився.\nНа безкоштовному тарифі доступно лише 2 квартири.\nПерейдіть у меню '💎 Тарифи' для продовження."		
 	},
     en: {
         receipt: "INVOICE",
@@ -1179,7 +1182,10 @@ acc_msg_pin_none: "Not generated yet", acc_msg_title: "🏠 Your MyComunalco Per
 tg_no_connected: "🤷‍♂️ No apartments have connected the bot yet.",
 bot_msg_p1: "👋 Hello! This is the Comunalco utility accounting system for your apartment (", bot_msg_p2: ").\n\nTo receive receipts and easily submit meter readings, please connect our Telegram bot.\n\n👉 Click the link below, and then press the «Start» button at the very bottom of the screen:\n",
 alert_no_phone: "⚠️ First, enter the resident's phone number at the top of the card!", alert_copied: "✅ Instructions and link copied!\nJust paste this text into the resident's chat.",
-ws_tenant: "🏠 Resident", ws_submanager: "💼 Manager", ws_accountant: "📊 Accountant"		
+ws_tenant: "🏠 Resident", ws_submanager: "💼 Manager", ws_accountant: "📊 Accountant",
+btn_add_apt: "+ Add Apartment", lbl_limit: "Limit:", lbl_tariff: "Tariff:", lbl_months: "mo",
+limit_text: "Limit:", lbl_tariff: "Tariff:", lbl_months: "mo",
+alert_limit_reached: "⏳ Your trial period has ended.\nOnly 2 apartments are available on the free plan.\nGo to the '💎 Tariffs' menu to upgrade."		
     },
     pl: {
         receipt: "RACHUNEK",
@@ -1312,7 +1318,10 @@ acc_msg_pin_none: "Jeszcze nie wygenerowano", acc_msg_title: "🏠 Twoje konto o
 tg_no_connected: "🤷‍♂️ Żadne mieszkanie nie podłączyło jeszcze bota.",
 bot_msg_p1: "👋 Witam! To jest system rozliczeń Comunalco dla Twojego mieszkania (", bot_msg_p2: ").\n\nAby otrzymywać rachunki i wygodnie przesyłać odczyty liczników, podłącz naszego bota Telegram.\n\n👉 Kliknij poniższy link, a następnie naciśnij przycisk «Start» na samym dole ekranu:\n",
 alert_no_phone: "⚠️ Najpierw wpisz numer telefonu mieszkańca na górze karty!", alert_copied: "✅ Instrukcje i link skopiowane!\nPo prostu wklej ten tekst na czat mieszkańca.",
-ws_tenant: "🏠 Mieszkaniec", ws_submanager: "💼 Menedżer", ws_accountant: "📊 Księgowy"		
+ws_tenant: "🏠 Mieszkaniec", ws_submanager: "💼 Menedżer", ws_accountant: "📊 Księgowy",
+btn_add_apt: "+ Dodaj Mieszkanie", lbl_limit: "Limit:", lbl_tariff: "Taryfa:", lbl_months: "mies",
+limit_text: "Limit:", lbl_tariff: "Taryfa:", lbl_months: "mies",
+alert_limit_reached: "⏳ Twój okres próbny dobiegł końca.\nW darmowym planie dostępne są tylko 2 mieszkania.\nPrzejdź do menu '💎 Taryfy', aby przedłużyć."		
     },
     de: {
         receipt: "RECHNUNG",
@@ -1444,7 +1453,10 @@ acc_msg_pin_none: "Noch nicht generiert", acc_msg_title: "🏠 Ihr MyComunalco-K
 tg_no_connected: "🤷‍♂️ Noch keine Wohnung hat den Bot verbunden.",
 bot_msg_p1: "👋 Hallo! Dies ist das Comunalco-Abrechnungssystem für Ihre Wohnung (", bot_msg_p2: ").\n\nUm Quittungen zu erhalten und Zählerstände einfach zu übermitteln, verbinden Sie bitte unseren Telegram-Bot.\n\n👉 Klicken Sie auf den untenstehenden Link und drücken Sie dann auf die Schaltfläche «Start» ganz unten auf dem Bildschirm:\n",
 alert_no_phone: "⚠️ Geben Sie zuerst die Telefonnummer des Bewohners oben auf der Karte ein!", alert_copied: "✅ Anleitung und Link kopiert!\nFügen Sie diesen Text einfach in den Chat des Bewohners ein.",
-ws_tenant: "🏠 Bewohner", ws_submanager: "💼 Manager", ws_accountant: "📊 Buchhalter"		
+ws_tenant: "🏠 Bewohner", ws_submanager: "💼 Manager", ws_accountant: "📊 Buchhalter",
+btn_add_apt: "+ Wohnung hinzufügen", lbl_limit: "Limit:", lbl_tariff: "Tarif:", lbl_months: "Mon",
+limit_text: "Limit:", lbl_tariff: "Tarif:", lbl_months: "Mon",
+alert_limit_reached: "⏳ Ihre Testphase ist abgelaufen.\nIm kostenlosen Tarif sind nur 2 Wohnungen verfügbar.\nGehen Sie zum Menü '💎 Tarife', um zu verlängern."		
     },
     es: {
         receipt: "FACTURA",
@@ -1577,7 +1589,10 @@ acc_msg_pin_none: "Aún no generado", acc_msg_title: "🏠 Su cuenta personal de
 tg_no_connected: "🤷‍♂️ Ningún apartamento ha conectado el bot aún.",
 bot_msg_p1: "👋 ¡Hola! Este es el sistema de contabilidad de servicios de Comunalco para su apartamento (", bot_msg_p2: ").\n\nPara recibir recibos y enviar lecturas de medidores fácilmente, conecte nuestro bot de Telegram.\n\n👉 Haga clic en el enlace a continuación y luego presione el botón «Iniciar» (o Start) en la parte inferior de la pantalla:\n",
 alert_no_phone: "⚠️ ¡Primero, ingrese el teléfono del residente en la parte superior de la tarjeta!", alert_copied: "✅ ¡Instrucciones y enlace copiados!\nSimplemente pegue este texto en el chat del residente.",
-ws_tenant: "🏠 Residente", ws_submanager: "💼 Gerente", ws_accountant: "📊 Contador"		
+ws_tenant: "🏠 Residente", ws_submanager: "💼 Gerente", ws_accountant: "📊 Contador",
+btn_add_apt: "+ Añadir Apart.", lbl_limit: "Límite:", lbl_tariff: "Tarifa:", lbl_months: "mes",
+limit_text: "Límite:", lbl_tariff: "Tarifa:", lbl_months: "mes",
+alert_limit_reached: "⏳ Su período de prueba ha terminado.\nSolo hay 2 apartamentos disponibles en el plan gratuito.\nVaya al menú '💎 Tarifas' para actualizar."		
     },
     fr: {
         receipt: "FACTURE",
@@ -1710,7 +1725,10 @@ acc_msg_pin_none: "Pas encore généré", acc_msg_title: "🏠 Votre compte pers
 tg_no_connected: "🤷‍♂️ Aucun appartement n'a encore connecté le bot.",
 bot_msg_p1: "👋 Bonjour ! Ceci est le système de comptabilité Comunalco pour votre appartement (", bot_msg_p2: ").\n\nPour recevoir des reçus et soumettre facilement les relevés de compteurs, veuillez connecter notre bot Telegram.\n\n👉 Cliquez sur le lien ci-dessous, puis appuyez sur le bouton «Démarrer» (ou Start) tout en bas de l'écran :\n",
 alert_no_phone: "⚠️ Tout d'abord, entrez le téléphone du résident en haut de la carte !", alert_copied: "✅ Instructions et lien copiés !\nCollez simplement ce texte dans le chat du résident.",
-ws_tenant: "🏠 Résident", ws_submanager: "💼 Gestionnaire", ws_accountant: "📊 Comptable"		
+ws_tenant: "🏠 Résident", ws_submanager: "💼 Gestionnaire", ws_accountant: "📊 Comptable",
+btn_add_apt: "+ Ajouter App.", lbl_limit: "Limite :", lbl_tariff: "Tarif :", lbl_months: "mois",
+limit_text: "Limite :", lbl_tariff: "Tarif :", lbl_months: "mois",
+alert_limit_reached: "⏳ Votre période d'essai est terminée.\nSeuls 2 appartements sont disponibles sur le plan gratuit.\nAllez dans le menu '💎 Tarifs' pour prolonger."		
     }
 };
 	window.translations = translations;
@@ -2798,18 +2816,28 @@ updateSubscriptionCalc() {
                 expireDisplay.innerHTML = `⏳ <b>${daysLeft}</b> ${dTxt}`;
             }
 
-            // Блок тарифу під текстом
-            if (lim) {
-                const p6m = typeof price6m !== 'undefined' ? price6m : '...';
-                lim.innerHTML = `<span onclick="app.openMenu('premium')" style="cursor:pointer">💎 ${tr.status_tariff || "Тариф:"} <b>${p6m}</b> ${tr.status_currency_6m || "грн / 6 міс"}</span>`;
+            // --- БЛОКУВАННЯ, ЯКЩО ТАРИФ ЗАКІНЧИВСЯ ---
+checkLimit() {
+        this.updateStatus();
+        // Якщо ви PRO — жодних обмежень на створення!
+        if (this.state.licenseDate === '2140-03-28') return true;
+
+        const now = Date.now();
+        const cnt = this.state.objects.reduce((s, o) => s + (o.apartments ? o.apartments.length : 0), 0);
+        
+        if (this.state.sub_expire && now > this.state.sub_expire) {
+            if (cnt >= 2) {
+                // 🌍 Підтягуємо мову для алерта
+                let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+                let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
+                
+                alert(tr.alert_limit_reached || "⏳ Ваш тестовий період завершився.\nНа безкоштовному тарифі доступно лише 2 квартири.\nПерейдіть у меню '💎 Тарифи' для продовження.");
+                return false;
             }
         }
+        return true;
     }
-            
-} catch (err) { 
-    console.error("Помилка завантаження статусу:", err);
-}
-} // А ЦЯ ДУЖКА нарешті закриває саму функцію updateStatus() з рядка 1511!
+}			
 
 // --- БЛОКУВАННЯ, ЯКЩО ТАРИФ ЗАКІНЧИВСЯ ---
 checkLimit() {
@@ -2822,7 +2850,11 @@ checkLimit() {
         
         if (this.state.sub_expire && now > this.state.sub_expire) {
             if (cnt >= 2) {
-                alert("⏳ Ваш тестовий період завершився.\nНа безкоштовному тарифі доступно лише 2 квартири.\nПерейдіть у меню '💎 Тарифи' для продовження.");
+                // 🌍 Підтягуємо мову для алерта
+                let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+                let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
+                
+                alert(tr.alert_limit_reached || "⏳ Ваш тестовий період завершився.\nНа безкоштовному тарифі доступно лише 2 квартири.\nПерейдіть у меню '💎 Тарифи' для продовження.");
                 return false;
             }
         }
