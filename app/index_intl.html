@@ -896,7 +896,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '14.4';
+    const APP_VERSION = '14.5';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -2750,7 +2750,33 @@ updateSubscriptionCalc() {
         const objCount = this.state.objects.length;
         
         const totalUnits = objCount + aptCount; 
-        const price6m = totalUnits * 36; 
+        
+        // 💎 РОЗУМНИЙ КАЛЬКУЛЯТОР ТАРИФУ (Синхронізовано з платіжним меню)
+        let appCurrency = (this.state && this.state.settings && this.state.settings.currency) ? this.state.settings.currency : (localStorage.getItem('currency') || 'uah');
+        let pricePerMonth = 1.50; // Базова ціна USD/EUR/GBP
+        
+        if (appCurrency === 'uah') {
+            pricePerMonth = 25;
+            if (totalUnits >= 6) pricePerMonth = 20;
+            if (totalUnits >= 21) pricePerMonth = 15;
+            if (totalUnits >= 51) pricePerMonth = 10;
+        } else if (appCurrency === 'pln') {
+            pricePerMonth = 4;
+            if (totalUnits >= 6) pricePerMonth = 3;
+            if (totalUnits >= 21) pricePerMonth = 2.5;
+            if (totalUnits >= 51) pricePerMonth = 2;
+        } else {
+            // USD, EUR, GBP мають однакову сітку знижок
+            pricePerMonth = 1.50;
+            if (totalUnits >= 6) pricePerMonth = 1.20;
+            if (totalUnits >= 21) pricePerMonth = 0.90;
+            if (totalUnits >= 51) pricePerMonth = 0.60;
+        }
+
+        // Рахуємо суму за 6 місяців
+        let total6m = totalUnits * pricePerMonth * 6;
+        // Округлюємо (UAH/PLN до цілих, валюту залишаємо з копійками)
+        const price6m = (appCurrency === 'uah' || appCurrency === 'pln') ? Math.ceil(total6m) : parseFloat(total6m.toFixed(2));
 
         const expireDisplay = document.getElementById('sub-expire-display');
         const badge = document.getElementById('status-badge');
@@ -2758,7 +2784,7 @@ updateSubscriptionCalc() {
 
         // 🚀 АБСОЛЮТНИЙ ЗАХИСТ ВІД ЗБОЇВ (Гарантує завантаження квартир)
         try {
-    // 🌍 РОЗУМНЕ ВИЗНАЧЕННЯ МОВИ
+        // 🌍 РОЗУМНЕ ВИЗНАЧЕННЯ МОВИ
     let lang = 'uk';
     if (this && this.state && this.state.settings && this.state.settings.lang) {
         lang = this.state.settings.lang;
