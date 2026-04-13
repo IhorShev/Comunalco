@@ -930,7 +930,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '15.4';
+    const APP_VERSION = '15.5';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -2028,8 +2028,18 @@ updateSubscriptionCalc() {
         // 🛑 ЖОРСТКО ЗМУШУЄМО PAYPRO ПОКАЗУВАТИ САМЕ ЦЮ ВАЛЮТУ
         finalUrl += `&currency=${payproCurrency}`;
         
-        // 🌍 ЖОРСТКО ЗМУШУЄМО PAYPRO ПОКАЗУВАТИ ІНТЕРФЕЙС ОБРАНОЮ МОВОЮ
-        finalUrl += `&use-language=${lang}`;
+        // 🌍 МАГІЯ МОВИ ДЛЯ PAYPRO: Гарантовано передаємо правильний 2-літерний код
+        let rawLang = (window.currentLang || localStorage.getItem('lang') || 'uk').toLowerCase();
+        let ppLang = 'en'; // За замовчуванням англійська для іноземців
+
+        if (rawLang.includes('uk') || rawLang.includes('ua')) ppLang = 'uk';
+        else if (rawLang.includes('pl')) ppLang = 'pl';
+        else if (rawLang.includes('de')) ppLang = 'de';
+        else if (rawLang.includes('es')) ppLang = 'es';
+        else if (rawLang.includes('fr')) ppLang = 'fr';
+
+        // Передаємо суворий параметр мови
+        finalUrl += `&use-language=${ppLang}`;
 
         // Додаємо контакти в URL
         if (userEmail) finalUrl += `&billing-email=${encodeURIComponent(userEmail)}`;
