@@ -442,6 +442,40 @@
         .desktop-only-save { display: none !important; }  /* Ховаємо на телефоні */
         .mobile-only-save { display: inline !important; } /* Показуємо на телефоні */
     }
+	/* --- 3D МОНЕТКА ДЛЯ ЗБЕРЕЖЕННЯ --- */
+.coin-3d {
+  width: 18px;
+  height: 18px;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 8px;
+  transform-style: preserve-3d;
+  animation: coin-spin 2s linear infinite;
+  position: relative;
+}
+.coin-3d::before, .coin-3d::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  backface-visibility: hidden; /* Ховає задню частину при обертанні */
+}
+/* ЛИЦЬОВА СТОРОНА (заміни шлях до файлу на свій) */
+.coin-3d::before {
+  background-image: url('coin-front.png'); 
+}
+/* ЗВОРОТНЯ СТОРОНА (заміни шлях до файлу на свій) */
+.coin-3d::after {
+  background-image: url('coin-back.png'); 
+  transform: rotateY(180deg);
+}
+@keyframes coin-spin {
+  0% { transform: rotateY(0deg); }
+  100% { transform: rotateY(360deg); }
+}	
 </style>
 
 <div class="top-menu-bar" style="position:fixed; top:0; left:0; right:0; width:100%; background:#0f172a; z-index:1000; padding:8px 12px; border-bottom:1px solid #1e293b; margin:0; box-sizing:border-box; display:flex; align-items:center; justify-content:space-between; gap:8px; min-height:56px; max-height:56px;">
@@ -896,7 +930,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '14.6';
+    const APP_VERSION = '14.7';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -1049,7 +1083,8 @@ alert_no_phone: "⚠️ Спочатку вкажіть телефон мешк�
 ws_tenant: "🏠 Мешканець", ws_submanager: "💼 Менеджер", ws_accountant: "📊 Обліковець",
 btn_add_apt: "+ Додати Квартиру", lbl_limit: "Ліміт:", lbl_tariff: "Тариф:", lbl_months: "міс",
 limit_text: "Ліміт:", lbl_tariff: "Тариф:", lbl_months: "міс",
-alert_limit_reached: "⏳ Ваш тестовий період завершився.\nНа безкоштовному тарифі доступно лише 2 квартири.\nПерейдіть у меню '💎 Тарифи' для продовження."		
+alert_limit_reached: "⏳ Ваш тестовий період завершився.\nНа безкоштовному тарифі доступно лише 2 квартири.\nПерейдіть у меню '💎 Тарифи' для продовження.",
+toast_saved: "ЗБЕРЕЖЕНО", toast_error: "ПОМИЛКА ПРИ ЗБЕРЕЖЕННІ", toast_saving: "ЗБЕРЕЖЕННЯ..."		
 	},
     en: {
         receipt: "INVOICE",
@@ -1185,7 +1220,8 @@ alert_no_phone: "⚠️ First, enter the resident's phone number at the top of t
 ws_tenant: "🏠 Resident", ws_submanager: "💼 Manager", ws_accountant: "📊 Accountant",
 btn_add_apt: "+ Add Apartment", lbl_limit: "Limit:", lbl_tariff: "Tariff:", lbl_months: "mo",
 limit_text: "Limit:", lbl_tariff: "Tariff:", lbl_months: "mo",
-alert_limit_reached: "⏳ Your trial period has ended.\nOnly 2 apartments are available on the free plan.\nGo to the '💎 Tariffs' menu to upgrade."		
+alert_limit_reached: "⏳ Your trial period has ended.\nOnly 2 apartments are available on the free plan.\nGo to the '💎 Tariffs' menu to upgrade.",
+toast_saved: "SAVED", toast_error: "SAVE ERROR", toast_saving: "SAVING..."		
     },
     pl: {
         receipt: "RACHUNEK",
@@ -1321,7 +1357,8 @@ alert_no_phone: "⚠️ Najpierw wpisz numer telefonu mieszkańca na górze kart
 ws_tenant: "🏠 Mieszkaniec", ws_submanager: "💼 Menedżer", ws_accountant: "📊 Księgowy",
 btn_add_apt: "+ Dodaj Mieszkanie", lbl_limit: "Limit:", lbl_tariff: "Taryfa:", lbl_months: "mies",
 limit_text: "Limit:", lbl_tariff: "Taryfa:", lbl_months: "mies",
-alert_limit_reached: "⏳ Twój okres próbny dobiegł końca.\nW darmowym planie dostępne są tylko 2 mieszkania.\nPrzejdź do menu '💎 Taryfy', aby przedłużyć."		
+alert_limit_reached: "⏳ Twój okres próbny dobiegł końca.\nW darmowym planie dostępne są tylko 2 mieszkania.\nPrzejdź do menu '💎 Taryfy', aby przedłużyć.",
+toast_saved: "ZAPISANO", toast_error: "BŁĄD ZAPISU", toast_saving: "ZAPISYWANIE..."		
     },
     de: {
         receipt: "RECHNUNG",
@@ -1456,7 +1493,8 @@ alert_no_phone: "⚠️ Geben Sie zuerst die Telefonnummer des Bewohners oben au
 ws_tenant: "🏠 Bewohner", ws_submanager: "💼 Manager", ws_accountant: "📊 Buchhalter",
 btn_add_apt: "+ Wohnung hinzufügen", lbl_limit: "Limit:", lbl_tariff: "Tarif:", lbl_months: "Mon",
 limit_text: "Limit:", lbl_tariff: "Tarif:", lbl_months: "Mon",
-alert_limit_reached: "⏳ Ihre Testphase ist abgelaufen.\nIm kostenlosen Tarif sind nur 2 Wohnungen verfügbar.\nGehen Sie zum Menü '💎 Tarife', um zu verlängern."		
+alert_limit_reached: "⏳ Ihre Testphase ist abgelaufen.\nIm kostenlosen Tarif sind nur 2 Wohnungen verfügbar.\nGehen Sie zum Menü '💎 Tarife', um zu verlängern.",
+toast_saved: "GESPEICHERT", toast_error: "SPEICHERFEHLER", toast_saving: "SPEICHERN..."		
     },
     es: {
         receipt: "FACTURA",
@@ -1592,7 +1630,8 @@ alert_no_phone: "⚠️ ¡Primero, ingrese el teléfono del residente en la part
 ws_tenant: "🏠 Residente", ws_submanager: "💼 Gerente", ws_accountant: "📊 Contador",
 btn_add_apt: "+ Añadir Apart.", lbl_limit: "Límite:", lbl_tariff: "Tarifa:", lbl_months: "mes",
 limit_text: "Límite:", lbl_tariff: "Tarifa:", lbl_months: "mes",
-alert_limit_reached: "⏳ Su período de prueba ha terminado.\nSolo hay 2 apartamentos disponibles en el plan gratuito.\nVaya al menú '💎 Tarifas' para actualizar."		
+alert_limit_reached: "⏳ Su período de prueba ha terminado.\nSolo hay 2 apartamentos disponibles en el plan gratuito.\nVaya al menú '💎 Tarifas' para actualizar.",
+toast_saved: "GUARDADO", toast_error: "ERROR AL GUARDAR", toast_saving: "GUARDANDO..."		
     },
     fr: {
         receipt: "FACTURE",
@@ -1728,7 +1767,8 @@ alert_no_phone: "⚠️ Tout d'abord, entrez le téléphone du résident en haut
 ws_tenant: "🏠 Résident", ws_submanager: "💼 Gestionnaire", ws_accountant: "📊 Comptable",
 btn_add_apt: "+ Ajouter App.", lbl_limit: "Limite :", lbl_tariff: "Tarif :", lbl_months: "mois",
 limit_text: "Limite :", lbl_tariff: "Tarif :", lbl_months: "mois",
-alert_limit_reached: "⏳ Votre période d'essai est terminée.\nSeuls 2 appartements sont disponibles sur le plan gratuit.\nAllez dans le menu '💎 Tarifs' pour prolonger."		
+alert_limit_reached: "⏳ Votre période d'essai est terminée.\nSeuls 2 appartements sont disponibles sur le plan gratuit.\nAllez dans le menu '💎 Tarifs' pour prolonger.",
+toast_saved: "ENREGISTRÉ", toast_error: "ERREUR D'ENREGISTREMENT", toast_saving: "ENREGISTREMENT..."		
     }
 };
 	window.translations = translations;
@@ -2635,8 +2675,11 @@ updateSubscriptionCalc() {
             await window.cloudSave(this.state);
 
             if (toast) {
-                const successTxt = (window.translations && window.currentLang && window.translations[window.currentLang]) ? window.translations[window.currentLang].toast_saved : "✅ Збережено";
-                toast.innerHTML = successTxt;
+                let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+        let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
+        
+        toast.innerHTML = `<div class="coin-3d"></div>` + (tr.toast_saved || "ЗБЕРЕЖЕНО");
+        toast.style.backgroundColor = "var(--success)";
                 toast.style.backgroundColor = "var(--success)";
                 
                 setTimeout(() => {
@@ -2647,7 +2690,10 @@ updateSubscriptionCalc() {
 
         } catch (e) {
             console.error("Помилка:", e);
-            const errorMsg = (window.translations && window.currentLang && window.translations[window.currentLang]) ? window.translations[window.currentLang].alert_sync_error : "❌ Втрачено зв'язок з сервером (або час сесії вийшов). Сторінка буде оновлена.";
+            let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+        let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
+        
+        const errorMsg = `❌ ` + (tr.toast_error || "ПОМИЛКА ПРИ ЗБЕРЕЖЕННІ");
             alert(errorMsg);
             window.location.reload();
             
@@ -2656,8 +2702,10 @@ updateSubscriptionCalc() {
         // СЦЕНАРІЙ Б: Зберігаємо локально
         const toast = document.getElementById('header-toast');
         if (toast) {
-            const localMsg = (window.translations && window.currentLang && window.translations[window.currentLang]) ? window.translations[window.currentLang].toast_local : "✅ Збережено локально";
-            toast.innerHTML = localMsg;
+            let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+        let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
+        
+        toast.innerHTML = `<div class="coin-3d"></div>` + (tr.toast_saved || "ЗБЕРЕЖЕНО") + " (Local)";
             toast.style.backgroundColor = "var(--text-sec)";
             toast.style.display = "block";
             setTimeout(() => { toast.style.opacity = "1"; }, 10);
