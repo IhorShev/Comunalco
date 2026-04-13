@@ -930,7 +930,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '14.7';
+    const APP_VERSION = '14.8';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -1084,7 +1084,9 @@ ws_tenant: "🏠 Мешканець", ws_submanager: "💼 Менеджер", ws
 btn_add_apt: "+ Додати Квартиру", lbl_limit: "Ліміт:", lbl_tariff: "Тариф:", lbl_months: "міс",
 limit_text: "Ліміт:", lbl_tariff: "Тариф:", lbl_months: "міс",
 alert_limit_reached: "⏳ Ваш тестовий період завершився.\nНа безкоштовному тарифі доступно лише 2 квартири.\nПерейдіть у меню '💎 Тарифи' для продовження.",
-toast_saved: "ЗБЕРЕЖЕНО", toast_error: "ПОМИЛКА ПРИ ЗБЕРЕЖЕННІ", toast_saving: "ЗБЕРЕЖЕННЯ..."		
+toast_saved: "ЗБЕРЕЖЕНО", toast_error: "ПОМИЛКА ПРИ ЗБЕРЕЖЕННІ", toast_saving: "ЗБЕРЕЖЕННЯ...",
+confirm_delete_object: "Видалити об'єкт '{objName}' та всі його дані?",
+alert_last_object: "Не можна видалити останній об'єкт!"		
 	},
     en: {
         receipt: "INVOICE",
@@ -1221,7 +1223,9 @@ ws_tenant: "🏠 Resident", ws_submanager: "💼 Manager", ws_accountant: "📊 
 btn_add_apt: "+ Add Apartment", lbl_limit: "Limit:", lbl_tariff: "Tariff:", lbl_months: "mo",
 limit_text: "Limit:", lbl_tariff: "Tariff:", lbl_months: "mo",
 alert_limit_reached: "⏳ Your trial period has ended.\nOnly 2 apartments are available on the free plan.\nGo to the '💎 Tariffs' menu to upgrade.",
-toast_saved: "SAVED", toast_error: "SAVE ERROR", toast_saving: "SAVING..."		
+toast_saved: "SAVED", toast_error: "SAVE ERROR", toast_saving: "SAVING...",
+confirm_delete_object: "Delete object '{objName}' and all its data?",
+alert_last_object: "Cannot delete the last object!"		
     },
     pl: {
         receipt: "RACHUNEK",
@@ -1358,7 +1362,9 @@ ws_tenant: "🏠 Mieszkaniec", ws_submanager: "💼 Menedżer", ws_accountant: "
 btn_add_apt: "+ Dodaj Mieszkanie", lbl_limit: "Limit:", lbl_tariff: "Taryfa:", lbl_months: "mies",
 limit_text: "Limit:", lbl_tariff: "Taryfa:", lbl_months: "mies",
 alert_limit_reached: "⏳ Twój okres próbny dobiegł końca.\nW darmowym planie dostępne są tylko 2 mieszkania.\nPrzejdź do menu '💎 Taryfy', aby przedłużyć.",
-toast_saved: "ZAPISANO", toast_error: "BŁĄD ZAPISU", toast_saving: "ZAPISYWANIE..."		
+toast_saved: "ZAPISANO", toast_error: "BŁĄD ZAPISU", toast_saving: "ZAPISYWANIE...",
+confirm_delete_object: "Usunąć obiekt '{objName}' i wszystkie jego dane?",
+alert_last_object: "Nie można usunąć ostatniego obiektu!"		
     },
     de: {
         receipt: "RECHNUNG",
@@ -1494,11 +1500,13 @@ ws_tenant: "🏠 Bewohner", ws_submanager: "💼 Manager", ws_accountant: "📊 
 btn_add_apt: "+ Wohnung hinzufügen", lbl_limit: "Limit:", lbl_tariff: "Tarif:", lbl_months: "Mon",
 limit_text: "Limit:", lbl_tariff: "Tarif:", lbl_months: "Mon",
 alert_limit_reached: "⏳ Ihre Testphase ist abgelaufen.\nIm kostenlosen Tarif sind nur 2 Wohnungen verfügbar.\nGehen Sie zum Menü '💎 Tarife', um zu verlängern.",
-toast_saved: "GESPEICHERT", toast_error: "SPEICHERFEHLER", toast_saving: "SPEICHERN..."		
+toast_saved: "GESPEICHERT", toast_error: "SPEICHERFEHLER", toast_saving: "SPEICHERN...",
+confirm_delete_object: "Objekt '{objName}' und alle seine Daten löschen?",
+alert_last_object: "Das letzte Objekt kann nicht gelöscht werden!"		
     },
     es: {
         receipt: "FACTURA",
-        month: "Mes",
+        month: "Mes",		
         prev: "Anterior",
         curr: "Actual",
         total: "TOTAL",
@@ -1631,7 +1639,9 @@ ws_tenant: "🏠 Residente", ws_submanager: "💼 Gerente", ws_accountant: "📊
 btn_add_apt: "+ Añadir Apart.", lbl_limit: "Límite:", lbl_tariff: "Tarifa:", lbl_months: "mes",
 limit_text: "Límite:", lbl_tariff: "Tarifa:", lbl_months: "mes",
 alert_limit_reached: "⏳ Su período de prueba ha terminado.\nSolo hay 2 apartamentos disponibles en el plan gratuito.\nVaya al menú '💎 Tarifas' para actualizar.",
-toast_saved: "GUARDADO", toast_error: "ERROR AL GUARDAR", toast_saving: "GUARDANDO..."		
+toast_saved: "GUARDADO", toast_error: "ERROR AL GUARDAR", toast_saving: "GUARDANDO...",
+confirm_delete_object: "¿Eliminar el objeto '{objName}' y todos sus datos?",
+alert_last_object: "¡No se puede eliminar el último objeto!"		
     },
     fr: {
         receipt: "FACTURE",
@@ -1768,7 +1778,9 @@ ws_tenant: "🏠 Résident", ws_submanager: "💼 Gestionnaire", ws_accountant: 
 btn_add_apt: "+ Ajouter App.", lbl_limit: "Limite :", lbl_tariff: "Tarif :", lbl_months: "mois",
 limit_text: "Limite :", lbl_tariff: "Tarif :", lbl_months: "mois",
 alert_limit_reached: "⏳ Votre période d'essai est terminée.\nSeuls 2 appartements sont disponibles sur le plan gratuit.\nAllez dans le menu '💎 Tarifs' pour prolonger.",
-toast_saved: "ENREGISTRÉ", toast_error: "ERREUR D'ENREGISTREMENT", toast_saving: "ENREGISTREMENT..."		
+toast_saved: "ENREGISTRÉ", toast_error: "ERREUR D'ENREGISTREMENT", toast_saving: "ENREGISTREMENT...",
+confirm_delete_object: "Supprimer l'objet '{objName}' et toutes ses données ?",
+alert_last_object: "Impossible de supprimer le dernier objet !"		
     }
 };
 	window.translations = translations;
@@ -2730,12 +2742,24 @@ updateSubscriptionCalc() {
     }
 
     async deleteObject() {
-        if(this.state.objects.length <= 1) { alert("Не можна видалити останній об'єкт!"); return; }
-        if(confirm(`Видалити об'єкт "${this.currentData.name}" та всі його дані?`)) {
-            
+        // 🌍 Підтягуємо мову
+        let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+        let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
+
+        // 1. Перевірка на останній об'єкт
+        if(this.state.objects.length <= 1) { 
+            alert(tr.alert_last_object || "Не можна видалити останній об'єкт!"); 
+            return; 
+        }
+
+        // 2. Формуємо повідомлення для підтвердження, підставляючи назву
+        let msgTemplate = tr.confirm_delete_object || "Видалити об'єкт '{objName}' та всі його дані?";
+        let msg = msgTemplate.replace('{objName}', this.currentData.name);
+
+        if(confirm(msg)) {
             const houseIdToDelete = this.currentData.id; // Запам'ятовуємо ID перед видаленням
             
-            // 1. Спочатку фізично знищуємо об'єкт у базі Supabase (через нашу нову функцію)
+            // 1. Спочатку фізично знищуємо об'єкт у базі Supabase
             if (window.__sbClient) {
                 await window.__sbClient.rpc('delete_house_as_admin', { target_house_id: String(houseIdToDelete) });
             }
@@ -2743,7 +2767,7 @@ updateSubscriptionCalc() {
             // 2. Тепер прибираємо його з екрана
             this.state.objects.splice(this.state.currentObjIdx, 1);
             this.state.currentObjIdx = 0;
-            this.save(); 
+            this.save();
             this.renderAll();
         }
     }
