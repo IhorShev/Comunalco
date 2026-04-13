@@ -896,7 +896,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '14.3';
+    const APP_VERSION = '14.4';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -2816,27 +2816,46 @@ updateSubscriptionCalc() {
                 expireDisplay.innerHTML = `⏳ <b>${daysLeft}</b> ${dTxt}`;
             }
 
-           // --- БЛОКУВАННЯ, ЯКЩО ТАРИФ ЗАКІНЧИВСЯ ---
-    checkLimit() {
-        this.updateStatus();
-        // Якщо ви PRO — жодних обмежень на створення!
-        if (this.state.licenseDate === '2140-03-28') return true;
-
-        const now = Date.now();
-        const cnt = this.state.objects.reduce((s, o) => s + (o.apartments ? o.apartments.length : 0), 0);
-        
-        if (this.state.sub_expire && now > this.state.sub_expire) {
-            if (cnt >= 2) {
-                // 🌍 Підтягуємо мову для алерта
-                let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
-                let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
+            // Блок тарифу під текстом (ЯКИЙ ВИПАДКОВО ВИДАЛИВСЯ)
+            if (lim) {
+                const p6m = typeof price6m !== 'undefined' ? price6m : '...';
                 
-                alert(tr.alert_limit_reached || "⏳ Ваш тестовий період завершився.\nНа безкоштовному тарифі доступно лише 2 квартири.\nПерейдіть у меню '💎 Тарифи' для продовження.");
-                return false;
+                // 🌍 Беремо валюту з глобальної змінної (або ставимо ₴ за замовчуванням)
+                const sym = window.APP_CURRENCY_SYMBOL || '₴';
+                // 🌍 Беремо слово "міс" з нашого словника
+                const mo = tr.lbl_months || "міс";
+                
+                lim.innerHTML = `<span onclick="app.openMenu('premium')" style="cursor:pointer">💎 ${tr.lbl_tariff || "Тариф:"} <b>${p6m}</b> ${sym} / 6 ${mo}</span>`;
             }
         }
-        return true;
-    } 
+    }
+            
+} catch (err) { 
+    console.error("Помилка завантаження статусу:", err);
+}
+} // 👈 ОЦЯ ВАЖЛИВА ДУЖКА ЗАКРИВАЄ updateStatus()!
+
+// --- БЛОКУВАННЯ, ЯКЩО ТАРИФ ЗАКІНЧИВСЯ ---
+checkLimit() {
+    this.updateStatus();
+    // Якщо ви PRO — жодних обмежень на створення!
+    if (this.state.licenseDate === '2140-03-28') return true;
+
+    const now = Date.now();
+    const cnt = this.state.objects.reduce((s, o) => s + (o.apartments ? o.apartments.length : 0), 0);
+    
+    if (this.state.sub_expire && now > this.state.sub_expire) {
+        if (cnt >= 2) {
+            // 🌍 Підтягуємо мову для алерта
+            let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+            let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
+            
+            alert(tr.alert_limit_reached || "⏳ Ваш тестовий період завершився.\nНа безкоштовному тарифі доступно лише 2 квартири.\nПерейдіть у меню '💎 Тарифи' для продовження.");
+            return false;
+        }
+    }
+    return true;
+} 
 
 	_applyUILang() {
     // 1. Визначаємо мову
