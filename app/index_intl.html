@@ -930,7 +930,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '15.5';
+    const APP_VERSION = '15.6';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -2038,8 +2038,8 @@ updateSubscriptionCalc() {
         else if (rawLang.includes('es')) ppLang = 'es';
         else if (rawLang.includes('fr')) ppLang = 'fr';
 
-        // Передаємо суворий параметр мови
-        finalUrl += `&use-language=${ppLang}`;
+        // 🛑 ОСЬ ПРАВИЛЬНИЙ ПАРАМЕТР: language замість use-language
+        finalUrl += `&language=${ppLang}`;
 
         // Додаємо контакти в URL
         if (userEmail) finalUrl += `&billing-email=${encodeURIComponent(userEmail)}`;
