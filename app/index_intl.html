@@ -930,7 +930,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '15.6';
+    const APP_VERSION = '15.7';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -2114,30 +2114,46 @@ updateSubscriptionCalc() {
 
            // 2. Оплата Crypto (Вибір методу)
     async payViaCrypto(method) {
-        if (!window.currentUser) return alert("Будь ласка, увійдіть в акаунт!");
-        
+        // 🌍 Підтягуємо мову та словник
+        let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+        let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
+
+        if (!window.currentUser) return alert(tr.alert_login_required || "Будь ласка, увійдіть в акаунт!");
+
         const amount = this.lastCalcAmount;
+        if (!amount || amount <= 0) return alert(tr.alert_calc_error || "Помилка: сума не розрахована");
+
         const userId = window.currentUser.id;
-        const apts = document.getElementById('calc-apts').value;
-        const period = this.subPeriod;
+        
+        // Захист: якщо поле 'calc-apts' не знайдено, беремо 0, щоб не впасти з помилкою
+        const aptsInput = document.getElementById('calc-apts');
+        const apts = aptsInput ? aptsInput.value : 0; 
+        
+        const period = this.subPeriod || 6;
 
         try {
-            const { data, error } = await sbClient.functions.invoke('create-crypto-invoice', {
+            // 🛑 ОСЬ ГОЛОВНЕ ВИПРАВЛЕННЯ: використовуємо правильний глобальний клієнт Supabase
+            const client = window.__sbClient || window.supabase;
+            if (!client) throw new Error("Supabase client is not initialized");
+
+            // Викликаємо твою Edge Function
+            const { data, error } = await client.functions.invoke('create-crypto-invoice', {
                 body: { method, amount, userId, apts, period }
             });
 
             if (error) {
-                throw new Error(error.message || "Помилка виклику функції");
+                throw new Error(error.message || "Помилка виклику функції на сервері");
             }
 
-            if (data?.payUrl) {
+            // Якщо бекенд повернув посилання - відкриваємо його
+            if (data && data.payUrl) {
                 window.open(data.payUrl, '_blank');
             } else {
-                // ПОКАЖЕМО СПРАВЖНЮ ВІДПОВІДЬ БОТА
-                alert("Помилка від " + method + ": " + JSON.stringify(data));
+                alert("Помилка від " + method + " API: " + JSON.stringify(data));
             }
+
         } catch (e) {
-            // ПОКАЖЕМО СПРАВЖНЮ ПОМИЛКУ КОДУ
+            console.error("Crypto API Error:", e);
             alert("Деталі помилки: " + (e.message || JSON.stringify(e)));
         }
     }
