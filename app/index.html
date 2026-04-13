@@ -953,7 +953,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '10.2';
+    const APP_VERSION = '18.3';
     if (localStorage.getItem('app_version') !== APP_VERSION) {
         localStorage.setItem('app_version', APP_VERSION);
         if (navigator.serviceWorker) {
@@ -1234,27 +1234,38 @@ class App {
                 this.state.sub_expire = currentExpire + (days * 24 * 60 * 60 * 1000);
                 this.state.userStatus = code.startsWith('TEST') ? 'TRIAL' : 'PRO';
                 
-                if (this.state.licenseDate === '2140-03-28') this.state.licenseDate = '';
-            } else {
-                throw new Error("Невірний формат ключа");
+                if (this.state.licenseDate === '2140-03-28') {
+                this.state.licenseDate = '';
             }
+        } else {
+            throw new Error("Невірний формат ключа");
+        } // 👈 ОСЬ ВОНА! Дужка, яку ми випадково загубили!
 
-            // Зберігаємо ваші нові права в хмару
-            this.save();
-            this.updateStatus();
-            
-            alert("✅ Ура! Ваш тариф успішно активовано!");
-            codeInput.value = ''; 
+        // Зберігаємо ваші нові права в хмару
+        this.save();
+        this.updateStatus();
 
-        } catch (error) {
-            console.error("Помилка активації:", error);
-            alert("❌ Недійсний формат ключа. Перевірте правильність вводу.");
-        } finally {
-            // Кнопка ЗАВЖДИ повертається в норму
+        let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+        let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
+
+        alert(tr.alert_promo_success || "✅ Ура! Ваш тариф успішно активовано!");
+        if (typeof codeInput !== 'undefined') codeInput.value = '';
+
+    } catch (error) {
+        console.error("Помилка активації:", error);
+
+        let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+        let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
+
+        alert(tr.alert_promo_error || "❌ Недійсний формат ключа. Перевірте правильність вводу.");
+    } finally {
+        // Кнопка ЗАВЖДИ повертається в норму
+        if (typeof btn !== 'undefined') {
             btn.disabled = false;
-            btn.innerText = originalText;
+            btn.innerText = typeof originalText !== 'undefined' ? originalText : "Активувати";
         }
     }
+} // 👈 ЗАКРИВАЄ activatePromoCode
     // --- UI & THEME ---
     initTheme() { 
         const isDark = localStorage.getItem('theme')==='dark';
