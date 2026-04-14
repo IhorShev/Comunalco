@@ -429,10 +429,20 @@
     </div>
   </div>
   <h3 id="loader-text" style="color: #fff; font-family: sans-serif; margin-top: 30px; font-weight: normal; font-size: 16px;">
-    Завантаження...
+    Loading...
   </h3>
 </div>
-	
+<script>
+  // ЗАПОБІЖНИК: Знімаємо екран через 6 секунд за будь-яких обставин
+  setTimeout(() => {
+      const p = document.getElementById('coin-preloader');
+      if (p && !p.classList.contains('hidden')) {
+          p.classList.add('hidden');
+          setTimeout(() => p.remove(), 500);
+          console.log("Прелоадер вимкнено примусово (запобіжник)");
+      }
+  }, 6000);
+</script>
     <style>
 		/* --- СТИЛІ ПРЕЛОАДЕРА (ВЕЛИКА 3D МОНЕТА) --- */
 .preloader-overlay {
@@ -443,7 +453,7 @@
 }
 .preloader-overlay.hidden { opacity: 0; pointer-events: none; }
 
-.coin-container { width: 120px; height: 120px; perspective: 1000px; }
+.coin-container { width: 200px; height: 200px; perspective: 1000px; }
 .coin-inner {
   width: 100%; height: 100%; position: relative;
   transform-style: preserve-3d;
@@ -967,7 +977,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '16.3';
+    const APP_VERSION = '16.4';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -6204,7 +6214,7 @@ console.log('🌍 Lang:', APP_LANG, '| 💰 Currency:', APP_CURRENCY, window.APP
 			// Даємо користувачу подивитися на монету 2.5 сек, а потім ховаємо екран
         setTimeout(() => {
             if (window.hidePreloader) window.hidePreloader();
-        }, 5000);	
+        }, 3000);	
         }
 
 			// Перевірка налаштувань для Global версії
