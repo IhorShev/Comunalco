@@ -930,7 +930,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '16.0';
+    const APP_VERSION = '16.1';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -1092,7 +1092,8 @@ confirm_new_pin: "Згенерувати новий ПІН-код для ціє�
 alert_enter_code: "Введіть код!",
 alert_login_required: "Будь ласка, увійдіть в акаунт!",
 alert_calc_error: "Помилка: сума не розрахована",
-alert_promo_success: "✅ Ура! Ваш тариф успішно активовано!", alert_promo_error: "❌ Недійсний формат ключа. Перевірте правильність вводу."		
+alert_promo_success: "✅ Ура! Ваш тариф успішно активовано!", alert_promo_error: "❌ Недійсний формат ключа. Перевірте правильність вводу.",
+confirm_logout: "Вийти з акаунта?"		
 	},
     en: {
         receipt: "INVOICE",
@@ -1237,7 +1238,8 @@ confirm_new_pin: "Generate a new PIN for this apartment?",
 alert_enter_code: "Enter the code!",
 alert_login_required: "Please log in to your account!",
 alert_calc_error: "Error: amount not calculated",
-alert_promo_success: "✅ Yay! Your plan has been successfully activated!", alert_promo_error: "❌ Invalid key format. Please check your input."		
+alert_promo_success: "✅ Yay! Your plan has been successfully activated!", alert_promo_error: "❌ Invalid key format. Please check your input.",
+confirm_logout: "Log out of your account?"		
     },
     pl: {
         receipt: "RACHUNEK",
@@ -1382,7 +1384,8 @@ confirm_new_pin: "Wygenerować nowy PIN dla tego mieszkania?",
 alert_enter_code: "Wprowadź kod!",
 alert_login_required: "Zaloguj się na swoje konto!",
 alert_calc_error: "Błąd: kwota nie została obliczona",
-alert_promo_success: "✅ Hurra! Twój plan został pomyślnie aktywowany!", alert_promo_error: "❌ Nieprawidłowy format klucza. Sprawdź poprawność."		
+alert_promo_success: "✅ Hurra! Twój plan został pomyślnie aktywowany!", alert_promo_error: "❌ Nieprawidłowy format klucza. Sprawdź poprawność.",
+confirm_logout: "Wylogować się z konta?"		
     },
     de: {
         receipt: "RECHNUNG",
@@ -1526,7 +1529,8 @@ confirm_new_pin: "Neue PIN für diese Wohnung generieren?",
 alert_enter_code: "Code eingeben!",
 alert_login_required: "Bitte loggen Sie sich in Ihr Konto ein!",
 alert_calc_error: "Fehler: Betrag nicht berechnet",
-alert_promo_success: "✅ Juhu! Ihr Tarif wurde erfolgreich aktiviert!", alert_promo_error: "❌ Ungültiges Schlüsselformat. Bitte überprüfen Sie Ihre Eingabe."		
+alert_promo_success: "✅ Juhu! Ihr Tarif wurde erfolgreich aktiviert!", alert_promo_error: "❌ Ungültiges Schlüsselformat. Bitte überprüfen Sie Ihre Eingabe.",
+confirm_logout: "Von Ihrem Konto abmelden?"		
     },
     es: {
         receipt: "FACTURA",
@@ -1671,7 +1675,8 @@ confirm_new_pin: "¿Generar un nuevo PIN para este apartamento?",
 alert_enter_code: "¡Ingrese el código!",
 alert_login_required: "¡Por favor, inicie sesión en su cuenta!",
 alert_calc_error: "Error: importe no calculado",
-alert_promo_success: "✅ ¡Genial! ¡Su plan se ha activado con éxito!", alert_promo_error: "❌ Formato de clave no válido. Verifique su entrada."		
+alert_promo_success: "✅ ¡Genial! ¡Su plan se ha activado con éxito!", alert_promo_error: "❌ Formato de clave no válido. Verifique su entrada.",
+confirm_logout: "¿Cerrar sesión en su cuenta?"		
     },
     fr: {
         receipt: "FACTURE",
@@ -1816,7 +1821,8 @@ confirm_new_pin: "Générer un nouveau code PIN pour cet appartement ?",
 alert_enter_code: "Entrez le code !",
 alert_login_required: "Veuillez vous connecter à votre compte !",
 alert_calc_error: "Erreur : montant non calculé",
-alert_promo_success: "✅ Youpi ! Votre forfait a été activé avec succès !", alert_promo_error: "❌ Format de clé invalide. Veuillez vérifier votre saisie."		
+alert_promo_success: "✅ Youpi ! Votre forfait a été activé avec succès !", alert_promo_error: "❌ Format de clé invalide. Veuillez vérifier votre saisie.",
+confirm_logout: "Vous déconnecter de votre compte ?"		
     }
 };
 	window.translations = translations;
@@ -6038,7 +6044,11 @@ console.log('🌍 Lang:', APP_LANG, '| 💰 Currency:', APP_CURRENCY, window.APP
   // 3. ФУНКЦІЯ ВИХОДУ (БРОНЕБІЙНА)
   window.googleLogout = async (e) => {
     if (e) e.stopPropagation();
-    if (confirm("Вийти з акаунту?")) {
+    // 🌍 Підтягуємо мову для вікна виходу
+    let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+    let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
+
+    if (confirm(tr.confirm_logout || "Вийти з акаунту?")) {
         
         // 1. Примусово видаляємо всі ключі авторизації Supabase з пам'яті браузера
         Object.keys(localStorage).forEach(key => {
