@@ -930,7 +930,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '16.1';
+    const APP_VERSION = '16.2';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -6007,6 +6007,14 @@ window.addEventListener('load', () => {
         window.__sbClient = sbClient;
 	window._supabase = sbClient;
   window.currentUser = null;
+	// --- ФУНКЦІЯ ПРИХОВУВАННЯ ПРЕЛОАДЕРА ---
+window.hidePreloader = function() {
+  const preloader = document.getElementById('coin-preloader');
+  if (preloader) {
+    preloader.classList.add('hidden'); // плавне розчинення
+    setTimeout(() => { preloader.remove(); }, 500);
+  }
+};
 	
 	// === МОВА ТА ВАЛЮТА З ЛЕНДІНГУ === (додати сюди, рядок ~4792)
 const APP_LANG = localStorage.getItem('lang') || 'en';
@@ -6156,6 +6164,10 @@ console.log('🌍 Lang:', APP_LANG, '| 💰 Currency:', APP_CURRENCY, window.APP
             // 🔥 ОСЬ ГОЛОВНА МАГІЯ: Змушуємо екран оновитися новими даними!
             if (typeof window.app.renderAll === 'function') window.app.renderAll();
             if (typeof window.app.updateStatus === 'function') window.app.updateStatus();
+			// Даємо користувачу подивитися на монету 2.5 сек, а потім ховаємо екран
+        setTimeout(() => {
+            if (window.hidePreloader) window.hidePreloader();
+        }, 3000);	
         }
 
 			// Перевірка налаштувань для Global версії
@@ -6172,6 +6184,7 @@ console.log('🌍 Lang:', APP_LANG, '| 💰 Currency:', APP_CURRENCY, window.APP
 
     } else {
         // --- ЯКЩО ЮЗЕР НЕ ЗАЛОГІНЕНИЙ ---
+		if (window.hidePreloader) window.hidePreloader();
         window.currentUser = null;
         if (btn && nameSpan) {
             nameSpan.innerText = "Вхід";
