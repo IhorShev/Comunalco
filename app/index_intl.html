@@ -930,7 +930,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '15.9';
+    const APP_VERSION = '16.0';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -2144,13 +2144,17 @@ updateSubscriptionCalc() {
         }
 
         try {
-            const client = window.__sbClient || window.supabase;
-            if (!client) throw new Error("Supabase client is not initialized");
+            // 🛑 ПОВЕРТАЄМО ТВОЮ ОРИГІНАЛЬНУ ЗМІННУ: sbClient
+            if (typeof sbClient === 'undefined') throw new Error("Клієнт sbClient не знайдено");
 
-            // 🛑 ДОДАНО currency: appCurrency у body
-            const { data, error } = await client.functions.invoke('create-crypto-invoice', {
+            console.log("📡 Відправляємо запит на сервер...");
+
+            // Викликаємо твою Edge Function
+            const { data, error } = await sbClient.functions.invoke('create-crypto-invoice', {
                 body: { method, amount, currency: appCurrency, userId, apts, period }
             });
+
+            console.log("✅ Відповідь від сервера отримана!", data, error);
 
             if (error) throw new Error(error.message || "Помилка сервера Supabase");
 
@@ -2169,7 +2173,6 @@ updateSubscriptionCalc() {
                 <div style="font-family:sans-serif; text-align:center; margin-top:15%; color:#fff;">
                     <h2 style="color:#ff4d4d;">❌ Сталася помилка</h2>
                     <p style="font-size:18px; color:#aaa;">${e.message || JSON.stringify(e)}</p>
-                    <p style="margin-top:30px; color:#888;">💡 Підказка: Можливо, ви вже створили такий самий рахунок хвилину тому. Telegram-боти блокують дублікати. Змініть кількість квартир на 1 або зачекайте пару хвилин.</p>
                 </div>
             `;
             newWindow.document.body.style.backgroundColor = '#121212';
