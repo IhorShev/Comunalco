@@ -415,8 +415,57 @@
 	<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>	
 </head>
 <body>
+	<div id="coin-preloader" class="preloader-overlay">
+  <div class="coin-container">
+    <img src="твоя_монета.png" alt="Loading..." class="spinning-coin">
+  </div>
+  <h3 id="loader-text" style="color: #fff; font-family: sans-serif; margin-top: 20px; font-weight: normal; font-size: 16px;">
+    Завантаження...
+  </h3>
+</div>
 
     <style>
+		/* --- СТИЛІ ПРЕЛОАДЕРА --- */
+.preloader-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #0f172a; /* Темний преміальний фон, можеш замінити на #000 (повністю чорний) */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 999999; /* Поверх АБСОЛЮТНО всього */
+  opacity: 1;
+  transition: opacity 0.5s ease-out; /* Плавне зникнення екрану */
+}
+
+.coin-container {
+  width: 120px; /* Розмір монети, зміни, якщо треба більшу/меншу */
+  height: 120px;
+  perspective: 1000px; /* Додає глибину для 3D ефекту */
+}
+
+.spinning-coin {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  animation: spin3D 2s linear infinite; /* 2 секунди на один оберт */
+}
+
+/* Сама анімація обертання */
+@keyframes spin3D {
+  from { transform: rotateY(0deg); }
+  to { transform: rotateY(360deg); }
+}
+
+/* Клас, який ми будемо додавати через JS, щоб приховати екран */
+.preloader-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
     /* Магія для мобільного фен-шую (з текстом) */
     .mobile-text-chat { display: none !important; } /* ЗАВЖДИ ховаємо коротке слово на ПК */
     
@@ -953,7 +1002,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '18.3';
+    const APP_VERSION = '18.4';
     if (localStorage.getItem('app_version') !== APP_VERSION) {
         localStorage.setItem('app_version', APP_VERSION);
         if (navigator.serviceWorker) {
@@ -4669,6 +4718,67 @@ window.addEventListener('load', () => {
 	window._supabase = sbClient; // один клієнт для всього
 	window._supabase = sbClient; // <--- ДОДАТИ ЦЕЙ РЯДОК, щоб інші функції не падали
   window.currentUser = null;
+	// ==========================================
+// 🟢 КРОК 3: ФУНКЦІЯ ПРИХОВУВАННЯ ПРЕЛОАДЕРА
+// ==========================================
+function hidePreloader() {
+  const preloader = document.getElementById('coin-preloader');
+  if (preloader) {
+    preloader.classList.add('hidden');
+    setTimeout(() => { preloader.remove(); }, 500); 
+  }
+}
+
+// ==========================================
+// 🟢 КРОК 4: СЕНЬЙОРСЬКИЙ КОНТРОЛЕР ЗАПУСКУ
+// ==========================================
+let isAppReady = false; 
+
+sbClient.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN') {
+        if (session) {
+            window.currentUser = session.user;
+            
+            // Переклад слова "Завантаження..."
+            let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+            let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
+            let loaderTextEl = document.getElementById('loader-text');
+            if (loaderTextEl) loaderTextEl.innerText = tr.loading || "Завантаження даних...";
+
+            // ⬇️ === ТУТ ТВОЯ ЛОГІКА ЗАВАНТАЖЕННЯ === ⬇️
+            
+            // Якщо у тебе є функція, яка завантажує дані користувача, 
+            // розкоментуй/додай її сюди. Наприклад:
+            // if (window.app && window.app.loadData) {
+            //     await window.app.loadData(); 
+            // }
+            
+            // ⬆️ ===================================== ⬆️
+            
+            // Знімаємо чорний екран, коли все готово
+            if (!isAppReady) {
+                hidePreloader(); 
+                isAppReady = true;
+            }
+
+        } else {
+            // Юзер не залогінений - ховаємо лоадер і кидаємо на лендінг
+            hidePreloader();
+            if (window.location.protocol !== 'file:') {
+                 window.location.replace('https://comunalco.com/');
+            }
+        }
+    } 
+    else if (event === 'SIGNED_OUT') {
+        Object.keys(localStorage).forEach(key => {
+            if (!key.startsWith('sb-') && key !== 'lang') localStorage.removeItem(key);
+        });
+        if (window.location.protocol !== 'file:') {
+            window.location.replace('https://comunalco.com/');
+        }
+    }
+});
+// ==========================================
 
   // 2. ВХІД
   window.googleLogin = async () => {
