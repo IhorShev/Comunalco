@@ -1002,7 +1002,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '18.4';
+    const APP_VERSION = '18.5';
     if (localStorage.getItem('app_version') !== APP_VERSION) {
         localStorage.setItem('app_version', APP_VERSION);
         if (navigator.serviceWorker) {
@@ -1467,6 +1467,9 @@ class App {
     // --- 1. ВІДКРИТТЯ МЕНЮ ТА СПИСКУ КВАРТИР ---
     // =======================================================
     openTelegramMenu() {
+        // Оновлюємо розрахунки, щоб підтягнути свіжі суми поточного місяця
+        this.calculate();
+
         const list = document.getElementById('tg-recipients-list');
         const selectAll = document.getElementById('tg-select-all');
         if (!list) return;
@@ -1477,31 +1480,45 @@ class App {
         const currentApts = this.currentData.apartments;
         let connectedCount = 0;
 
-        // Перебираємо квартири і малюємо галочки ТІЛЬКИ для підключених
+        // Підтягуємо мову для бейджів
+        let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+        let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
+
+        // Перебираємо квартири
         currentApts.forEach((apt, i) => {
             const isConnected = !!(apt.telegram_chat_id || apt.tg_id || apt.chat_id);
             if (isConnected) {
                 connectedCount++;
-                const debt = parseFloat(apt.debt || 0);
-                const isDebtor = debt > 100; // Умова: борг більше 100 грн
                 
-                // Якщо є борг > 100, підсвічуємо червоним бейджем
+                // Рахуємо АКТУАЛЬНИЙ баланс: Старий борг + Поточне нарахування - Оплати
+                const currentBill = parseFloat(apt.bill || 0);
+                const oldDebt = parseFloat(apt.debt || 0);
+                const paid = parseFloat(apt.paid || 0);
+                const liveBalance = (oldDebt + currentBill) - paid;
+                
+                const isDebtor = liveBalance > 0.01;
+                
+                const txtToPay = tr.toPay || tr.to_pay || "До сплати";
+                const txtPaid = tr.paid || "Оплачено";
+
+                // Бейджик: якщо є борг — червоний, якщо ні — зелений
                 const debtHtml = isDebtor 
-                    ? `<span style="color:var(--danger); font-size:12px; font-weight:bold; margin-left:auto; background:rgba(239,68,68,0.1); padding:3px 8px; border-radius:6px;">Борг: ${debt.toFixed(0)} грн</span>` 
-                    : '';
+                    ? `<span style="color:var(--danger); font-size:11px; font-weight:bold; margin-left:auto; background:rgba(239,68,68,0.1); padding:3px 8px; border-radius:6px;">${txtToPay}: ${liveBalance.toFixed(2)}</span>` 
+                    : `<span style="color:var(--success); font-size:11px; font-weight:bold; margin-left:auto;">${txtPaid}</span>`;
                 
                 list.innerHTML += `
                 <label style="display:flex; align-items:center; gap:10px; padding:10px; cursor:pointer; border-radius:8px; transition:0.2s; border: 1px solid transparent;" onmouseover="this.style.background='var(--card)'; this.style.borderColor='var(--border)'" onmouseout="this.style.background='transparent'; this.style.borderColor='transparent'">
-                    <input type="checkbox" class="modal-tg-chk" value="${i}" data-debt="${debt}" style="width:20px; height:20px; cursor:pointer; accent-color:var(--primary);">
+                    <input type="checkbox" class="modal-tg-chk" value="${i}" data-debt="${liveBalance}" style="width:20px; height:20px; cursor:pointer; accent-color:var(--primary);">
                     <span style="font-size:15px; font-weight:600; color:var(--text);">🚪 ${apt.name}</span>
                     ${debtHtml}
                 </label>`;
             }
         });
 
-        // Якщо ніхто не підключений
         if (connectedCount === 0) {
-            list.innerHTML = '<div style="text-align:center; padding:15px; color:var(--text-sec); font-size:13px;">🤷‍♂️ Жодна квартира ще не підключила бота.</div>';
+            let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+            let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
+            list.innerHTML = `<div style="text-align:center; padding:15px; color:var(--text-sec); font-size:13px;">${tr.tg_no_connected || '🤷‍♂️ Жодна квартира ще не підключила бота.'}</div>`;
             if(selectAll) selectAll.disabled = true;
         } else {
             if(selectAll) selectAll.disabled = false;
@@ -1554,34 +1571,38 @@ class App {
 
     // --- А) ВІДПРАВКА КВИТАНЦІЙ (Виправлена) ---
     async sendBatchModal(indices) {
-        if(!confirm(`🧾 Відправити квитанції обраним квартирам (${indices.length} шт.)?`)) return;
+        let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+        let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
         
-        // Ховаємо модалку
+        let confirmTxt = tr.tg_send_receipts || "Відправити квитанції";
+        if(!confirm(`🧾 ${confirmTxt} (${indices.length} шт.)?`)) return;
+        
+        // Ховаємо модалку одразу, щоб вона не заважала
         const modal = document.getElementById('tgActionModal');
         if (modal) modal.style.display = 'none';
 
         let successCount = 0;
 
-        // Тепер ми перебираємо ТІЛЬКИ ті квартири, які ви обрали в модалці!
         for (let index of indices) {
-            // Відправляємо через існуючу функцію (true = тихий режим без зайвих alert)
+            // Відправляємо через існуючу функцію (true = тихий режим)
             const result = await this.sendToBot(index, true);
 
             if (result) {
                 successCount++;
-                // 🚀 Одразу зберігаємо повний текст квитанції в Чат
+                // Зберігаємо повний текст квитанції в Чат
                 const a = this.currentData.apartments[index];
                 if (a) {
                     const receiptText = this.checks[index] || "🧾 Надіслано квитанцію за поточний місяць.";
                     this.saveToChatHistory(a.id, `🧾 Квитанція відправлена:\n\n${receiptText}`);
                 }
             }
-            // Пауза 300мс, щоб Телеграм не подумав, що ми спамери
-            await new Promise(r => setTimeout(r, 300));
+            // Пауза 400мс, щоб Телеграм не заблокував за спам
+            await new Promise(r => setTimeout(r, 400));
         }
 
         // Показуємо фінальний звіт
-        alert(`✅ Звіт розсилки:\nВибрано квартир: ${indices.length}\nУспішно доставлено: ${successCount}`);
+        let doneTxt = (lang === 'en') ? 'Successfully delivered' : (lang === 'pl' ? 'Pomyślnie dostarczono' : 'Успішно доставлено');
+        alert(`✅ ${confirmTxt}:\n${doneTxt}: ${successCount} / ${indices.length}`);
     }
 
     // --- Б) ВЕЛИКЕ ВІКНО ДЛЯ ПОВІДОМЛЕНЬ ---
@@ -3113,24 +3134,37 @@ checkLimit() {
 
    // --- 1. ВІДПРАВКА ОДНІЄЇ КВИТАНЦІЇ (Оновлена + Архів) ---
     async sendToBot(i, isSilentMode = false) {
+        let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+        let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
+
         const FUNCTION_URL = "https://aougdxtsmzjgoykaslbt.supabase.co/functions/v1/telegram-bot";
         const a = this.currentData.apartments[i];
 
         const chatId = a.telegram_chat_id || a.tg_id || a.chat_id;
         if (!chatId) {
-            if (!isSilentMode) alert(`⚠️ ${a.name}: Немає Telegram ID. Натисніть "Підключити Телеграм-Бот".`);
+            let msg = tr.alert_no_tg_id || 'Немає Telegram ID. Натисніть "Підключити Телеграм-Бот".';
+            if (!isSilentMode) alert(`⚠️ ${a.name}: ${msg}`);
             return false;
         }
 
-        const btn = (event && event.currentTarget) ? event.currentTarget : null;
-        if (btn && !isSilentMode) { btn.disabled = true; btn.innerText = "⏳..."; }
+        // БЕЗПЕЧНЕ отримання кнопки (щоб не падало в циклах)
+        let btn = null;
+        if (!isSilentMode) {
+            try { 
+                if (window.event && window.event.currentTarget) {
+                    btn = window.event.currentTarget; 
+                }
+            } catch(e) {}
+        }
 
+        if (btn) { btn.disabled = true; btn.innerText = "⏳ ..."; }
+        
         try {
-            // 🚀 1. СПОЧАТКУ ЗБЕРІГАЄМО В АРХІВ (З жорсткою перевіркою помилок)
+            // 1. ЗБЕРІГАЄМО В АРХІВ СУПАБЕЙЗ (Формуємо дані)
             try {
                 const db = (typeof sbClient !== 'undefined') ? sbClient : (window._supabase || null);
                 if (db) {
-                    const dateStr = new Date().toLocaleString('uk-UA', { month: 'long', year: 'numeric' });
+                    const dateStr = new Date().toLocaleString(lang === 'uk' ? 'uk-UA' : 'en-US', { month: 'long', year: 'numeric' });
                     const periodName = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
                     
                     const debt = parseFloat(a.debt) || 0;
@@ -3146,35 +3180,26 @@ checkLimit() {
                         prev: a.prev || {},
                         curr: a.curr || {},
                         services: a.services || [],
-                        // 🚀 Пакуємо тарифи та баланси в одну "кишеню", щоб не чіпати базу!
                         tariffs: { 
                             ...(this.currentData.tariffs || {}), 
-                            _debt: parseFloat(a.debt) || 0, 
-                            _bill: parseFloat(a.bill) || 0, 
-                            _paid: parseFloat(a.paid) || 0 
+                            _debt: debt, 
+                            _bill: bill, 
+                            _paid: paid 
                         }
                     };
 
-                    // Перевіряємо, чи є вже такий рахунок
-                    const { data: existing, error: selErr } = await db.from('bills').select('id').eq('user_id', String(a.id)).eq('period_name', periodName).maybeSingle();
-                    if (selErr) throw selErr;
-
+                    const { data: existing } = await db.from('bills').select('id').eq('user_id', String(a.id)).eq('period_name', periodName).maybeSingle();
                     if (existing) {
-                        const { error: updErr } = await db.from('bills').update(billData).eq('id', existing.id);
-                        if (updErr) throw updErr; // Якщо помилка оновлення - кричимо!
+                        await db.from('bills').update(billData).eq('id', existing.id);
                     } else {
-                        const { error: insErr } = await db.from('bills').insert([billData]);
-                        if (insErr) throw insErr; // Якщо помилка створення - кричимо!
+                        await db.from('bills').insert([billData]);
                     }
-                    console.log("✅ Архів збережено успішно!");
                 }
             } catch (dbErr) {
-                // ТЕПЕР МИ ТОЧНО ПОБАЧИМО, В ЧОМУ БІДА!
-                console.error("❌ SUPABASE ВІДМОВИВ У ЗБЕРЕЖЕННІ:", dbErr);
-                alert("Помилка збереження в базу! Відкрийте консоль (F12) і покажіть мені червоний текст.");
+                console.error("Supabase Save Error:", dbErr);
             }
 
-            // 📨 2. ВІДПРАВЛЯЄМО В ТЕЛЕГРАМ
+            // 2. ВІДПРАВЛЯЄМО В ТЕЛЕГРАМ
             const response = await fetch(FUNCTION_URL, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -3185,18 +3210,18 @@ checkLimit() {
                 })
             });
 
-            if (!response.ok) throw new Error("Помилка Telegram API");
+            if (!response.ok) throw new Error("Telegram API Error");
 
             // 3. УСПІШНЕ ЗАВЕРШЕННЯ
-            if (btn && !isSilentMode) {
+            if (btn) {
                 btn.innerText = "✅ OK";
-                setTimeout(() => { btn.innerText = "Надіслати"; btn.disabled = false; }, 2000);
+                setTimeout(() => { btn.innerText = tr.btn_send || "Надіслати"; btn.disabled = false; }, 2000);
             }
             return true;
 
         } catch (e) {
             console.error("Помилка відправки:", e);
-            if (btn && !isSilentMode) { btn.innerText = "❌ Помилка"; btn.disabled = false; }
+            if (btn) { btn.innerText = "❌"; btn.disabled = false; }
             return false;
         }
     }
