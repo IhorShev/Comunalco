@@ -977,7 +977,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '16.5';
+    const APP_VERSION = '16.6';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -2531,7 +2531,7 @@ updateSubscriptionCalc() {
                 list.innerHTML += `
                 <label style="display:flex; align-items:center; gap:10px; padding:10px; cursor:pointer; border-radius:8px; transition:0.2s; border: 1px solid transparent;" onmouseover="this.style.background='var(--card)'; this.style.borderColor='var(--border)'" onmouseout="this.style.background='transparent'; this.style.borderColor='transparent'">
                     <input type="checkbox" class="modal-tg-chk" value="${i}" data-debt="${liveBalance}" style="width:20px; height:20px; cursor:pointer; accent-color:var(--primary);">
-                    <span style="font-size:15px; font-weight:600; color:var(--text);">🚪 ${apt.name}</span>
+                    <span style="font-size:15px; font-weight:600; color:var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 1; max-width: 50%;">🚪 ${apt.name}</span>
                     ${debtHtml}
                 </label>`;
             }
@@ -2593,165 +2593,146 @@ updateSubscriptionCalc() {
 
     // --- А) ВІДПРАВКА КВИТАНЦІЙ (Виправлена) ---
     async sendBatchModal(indices) {
-        let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
-        let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
-        
-        let confirmTxt = tr.tg_send_receipts || "Відправити квитанції";
-        if(!confirm(`🧾 ${confirmTxt} (${indices.length} шт.)?`)) return;
-        
-        // Ховаємо модалку одразу, щоб вона не заважала
-        const modal = document.getElementById('tgActionModal');
-        if (modal) modal.style.display = 'none';
-
-        let successCount = 0;
-
-        for (let index of indices) {
-            // Відправляємо через існуючу функцію (true = тихий режим)
-            const result = await this.sendToBot(index, true);
-
-            if (result) {
-                successCount++;
-                // Зберігаємо повний текст квитанції в Чат
-                const a = this.currentData.apartments[index];
-                if (a) {
-                    const receiptText = this.checks[index] || "🧾 Надіслано квитанцію за поточний місяць.";
-                    this.saveToChatHistory(a.id, `🧾 Квитанція відправлена:\n\n${receiptText}`);
-                }
-            }
-            // Пауза 400мс, щоб Телеграм не заблокував за спам
-            await new Promise(r => setTimeout(r, 400));
-        }
-
-        // Показуємо фінальний звіт
-        let doneTxt = (lang === 'en') ? 'Successfully delivered' : (lang === 'pl' ? 'Pomyślnie dostarczono' : 'Успішно доставлено');
-        alert(`✅ ${confirmTxt}:\n${doneTxt}: ${successCount} / ${indices.length}`);
-    }
-
-    // --- Б) ВЕЛИКЕ ВІКНО ДЛЯ ПОВІДОМЛЕНЬ ---
-    openAnnouncementModal(indices) {
-        document.getElementById('tgActionModal').style.display = 'none';
-        this.announcementTargets = indices; // Запам'ятовуємо, кому слати
-
-        const countEl = document.getElementById('announcement-target-count');
-        if(countEl) countEl.innerText = indices.length;
-
-        const textEl = document.getElementById('announcement-text');
-        if(textEl) {
-            textEl.value = ''; // Очищаємо поле
-            
-            // 🌍 Наші 3 рядки для перекладу плейсхолдера:
-            let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
-            let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
-            textEl.placeholder = tr.ann_placeholder || "Шановні мешканці, завтра буде відключення води...\n(Натискайте Enter для абзаців)";
-        }
-
-        document.getElementById('announcementModal').style.display = 'flex';
-    }
-
-    // --- 🚀 ДОПОМІЖНА ФУНКЦІЯ: Збереження розсилки в історію чату ---
-    async saveToChatHistory(aptId, text) {
         try {
-            if (typeof _supabase !== 'undefined') {
-                await _supabase.from('messages').insert([{
-                    sender_id: 'manager',
-                    recipient_type: String(aptId),
-                    message_text: text,
-                    is_read: false // Щоб світилося як непрочитане
-                }]);
+            let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+            const t = {
+                ask: { uk: "Відправити квитанції", en: "Send receipts", pl: "Wyślij rachunki", de: "Quittungen senden", es: "Enviar recibos", fr: "Envoyer les reçus" },
+                done: { uk: "Успішно доставлено", en: "Successfully delivered", pl: "Pomyślnie dostarczono", de: "Erfolgreich zugestellt", es: "Entregado con éxito", fr: "Livré avec succès" }
+            };
+            const txtAsk = t.ask[lang] || t.ask['uk'];
+            const txtDone = t.done[lang] || t.done['uk'];
+
+            if(!confirm(`🧾 ${txtAsk} (${indices.length})?`)) return;
+            
+            const modal = document.getElementById('tgActionModal');
+            if (modal) modal.style.display = 'none';
+
+            let successCount = 0;
+
+            for (let index of indices) {
+                try {
+                    const result = await this.sendToBot(index, true); 
+                    if (result) {
+                        successCount++;
+                        const a = this.currentData.apartments[index];
+                        if (a) {
+                            const receiptText = this.checks[index] || "🧾";
+                            await this.saveToChatHistory(a.id, `🧾:\n\n${receiptText}`);
+                        }
+                    }
+                } catch(err) {
+                    console.error("Batch error:", err);
+                }
+                await new Promise(r => setTimeout(r, 400));
             }
-        } catch (e) { console.error("Помилка збереження в чат:", e); }
+
+            setTimeout(() => {
+                alert(`✅ ${txtAsk}:\n${txtDone}: ${successCount} / ${indices.length}`);
+            }, 150);
+
+        } catch(e) {
+            console.error("Critical error in sendBatchModal", e);
+        }
     }
     // ---------------------------------------------------------------
 
     async sendAnnouncement() {
-        const textEl = document.getElementById('announcement-text');
-        const text = textEl ? textEl.value.trim() : '';
-
-        if(!text) {
-            // 🌍 Підтягуємо мову для алерту
+        try {
             let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
             let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
-            return alert(tr.alert_empty_msg || "⚠️ Введіть текст повідомлення!");
-        }
-           
-        const indices = this.announcementTargets || [];
-        if(indices.length === 0) return;
+            const t = {
+                empty: { uk: "Введіть текст повідомлення!", en: "Enter message text!", pl: "Wprowadź текст!", de: "Text eingeben!", es: "¡Ingrese texto!", fr: "Entrez le texte !" },
+                done: { uk: "Оголошення надіслано!\nДоставлено:", en: "Announcement sent!\nDelivered:", pl: "Ogłoszenie wysłane!\nDostarczono:", de: "Ankündigung gesendet!\nZugestellt:", es: "¡Anuncio enviado!\nEntregado:", fr: "Annonce envoyée!\nLivré :" }
+            };
 
-        const btn = document.getElementById('btn-send-announcement');
-        if(btn) {
-            btn.disabled = true;
-            btn.innerText = "⏳ Відправка...";
-        }
+            const textEl = document.getElementById('announcement-text');
+            const text = textEl ? textEl.value.trim() : '';
 
-        let successCount = 0;
-        const FUNCTION_URL = "https://aougdxtsmzjgoykaslbt.supabase.co/functions/v1/telegram-bot";
+            if(!text) return alert(`⚠️ ${t.empty[lang] || t.empty['uk']}`);
+               
+            const indices = this.announcementTargets || [];
+            if(indices.length === 0) return;
 
-        for (let i of indices) {
-            const a = this.currentData.apartments[i];
-            const chatId = a.telegram_chat_id || a.tg_id || a.chat_id;
-            if (chatId) {
+            const btn = document.getElementById('btn-send-announcement');
+            if(btn) { btn.disabled = true; btn.innerText = "⏳..."; }
+
+            let successCount = 0;
+            const FUNCTION_URL = "https://aougdxtsmzjgoykaslbt.supabase.co/functions/v1/telegram-bot";
+
+            for (let i of indices) {
                 try {
-                    const response = await fetch(FUNCTION_URL, {
-                        method: "POST", headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ action: "send_message", chat_id: chatId, text: text })
-                    });
-                    if (response.ok) {
-                        successCount++;
-                        // 🚀 ДОДАНО: Копіюємо в Чат
-                        this.saveToChatHistory(a.id, `📢 Оголошення:\n${text}`);
+                    const a = this.currentData.apartments[i];
+                    const chatId = a.telegram_chat_id || a.tg_id || a.chat_id;
+                    if (chatId) {
+                        const response = await fetch(FUNCTION_URL, {
+                            method: "POST", headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ action: "send_message", chat_id: chatId, text: text })
+                        });
+                        if (response.ok) {
+                            successCount++;
+                            await this.saveToChatHistory(a.id, `📢:\n${text}`);
+                        }
                     }
-                } catch (e) {}
+                } catch (innerErr) {}
+                await new Promise(r => setTimeout(r, 300));
             }
-            // Пауза 300мс між відправками (захист від блокування Телеграмом)
-            await new Promise(r => setTimeout(r, 300));
-        }
 
-        if(btn) {
-            btn.innerText = "🚀 Надіслати";
-            btn.disabled = false;
-        }
-        document.getElementById('announcementModal').style.display = 'none';
-        alert(`✅ Оголошення надіслано!\nУспішно доставлено: ${successCount} з ${indices.length}`);
+            if(btn) { btn.innerText = "🚀"; btn.disabled = false; }
+            document.getElementById('announcementModal').style.display = 'none';
+            
+            setTimeout(() => {
+                alert(`✅ ${t.done[lang] || t.done['uk']} ${successCount} / ${indices.length}`);
+            }, 150);
+
+        } catch(e) { console.error(e); }
     }
 
     // --- В) НАГАДУВАННЯ ПРО БОРГ ---
     async remindDebtorsModal(indices) {
-        const debtors = [];
-        indices.forEach(i => {
-            const a = this.currentData.apartments[i];
-            // Бронебійна перевірка: відправляємо ТІЛЬКИ якщо борг більше 100
-            if (parseFloat(a.debt) > 100) {
-                const chatId = a.telegram_chat_id || a.tg_id || a.chat_id;
-                // 🚀 ДОДАНО apt_id, щоб знати, в який чат це зберегти
-                if (chatId) debtors.push({ chat_id: chatId, amount: a.debt, apt_id: a.id });
-            }
-        });
-
-        if (debtors.length === 0) {
-            alert("🤷‍♂️ Серед вибраних квартир немає тих, у кого борг перевищує 100 грн.");
-            return;
-        }
-
-        if(!confirm(`🔔 Виявлено ${debtors.length} квартир з боргом понад 100 грн. Надіслати їм нагадування?`)) return;
-
-        document.getElementById('tgActionModal').style.display = 'none';
-        const FUNCTION_URL = "https://aougdxtsmzjgoykaslbt.supabase.co/functions/v1/telegram-bot";
-
         try {
+            let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+            const t = {
+                none: { uk: "Немає боржників серед обраних", en: "No debtors among selected", pl: "Brak dłużników wśród wybranych", de: "Keine Schuldner unter den Ausgewählten", es: "No hay deudores entre los seleccionados", fr: "Aucun débiteur parmi la sélection" },
+                ask1: { uk: "Виявлено", en: "Found", pl: "Znaleziono", de: "Gefunden", es: "Encontrado", fr: "Trouvé" },
+                ask2: { uk: "боржників. Надіслати нагадування?", en: "debtors. Send reminder?", pl: "dłużników. Wysłać?", de: "Schuldner. Erinnern?", es: "deudores. ¿Recordar?", fr: "débiteurs. Rappeler ?" },
+                done: { uk: "Нагадування успішно відправлено!", en: "Reminder successfully sent!", pl: "Przypomnienie wysłane!", de: "Erinnerung gesendet!", es: "¡Recordatorio enviado!", fr: "Rappel envoyé !" }
+            };
+
+            const debtors = [];
+            indices.forEach(i => {
+                const a = this.currentData.apartments[i];
+                if (parseFloat(a.debt) > 100) {
+                    const chatId = a.telegram_chat_id || a.tg_id || a.chat_id;
+                    if (chatId) debtors.push({ chat_id: chatId, amount: a.debt, apt_id: a.id });
+                }
+            });
+
+            if (debtors.length === 0) return alert(`🤷‍♂️ ${t.none[lang] || t.none['uk']}`);
+
+            const txtAsk = `${t.ask1[lang] || t.ask1['uk']} ${debtors.length} ${t.ask2[lang] || t.ask2['uk']}`;
+            if(!confirm(`🔔 ${txtAsk}`)) return;
+
+            document.getElementById('tgActionModal').style.display = 'none';
+            const FUNCTION_URL = "https://aougdxtsmzjgoykaslbt.supabase.co/functions/v1/telegram-bot";
+
             const response = await fetch(FUNCTION_URL, {
                 method: "POST", headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ action: "remind_debtors", debtors: debtors })
             });
-            if (!response.ok) throw new Error("Помилка сервера");
+            
+            if (!response.ok) throw new Error("Server Error");
 
-            // 🚀 ДОДАНО: Копіюємо в Чат кожному боржнику
-            debtors.forEach(d => {
-                this.saveToChatHistory(d.apt_id, `⚠️ Надіслано нагадування про борг: ${d.amount} грн.`);
-            });
+            for (let d of debtors) {
+                await this.saveToChatHistory(d.apt_id, `⚠️ Борг: ${d.amount}`);
+            }
 
-            alert(`✅ Нагадування успішно відправлено ${debtors.length} боржникам!`);
+            setTimeout(() => {
+                alert(`✅ ${t.done[lang] || t.done['uk']}`);
+            }, 150);
+
         } catch (e) {
-            alert("❌ Помилка: " + e.message);
+            console.error(e);
+            alert("❌ Error: " + e.message);
         }
     }
     
@@ -4416,94 +4397,79 @@ updateChart() {
 
    // --- 1. ВІДПРАВКА ОДНІЄЇ КВИТАНЦІЇ (Оновлена + Архів) ---
     async sendToBot(i, isSilentMode = false) {
-        let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
-        let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
-
-        const FUNCTION_URL = "https://aougdxtsmzjgoykaslbt.supabase.co/functions/v1/telegram-bot";
-        const a = this.currentData.apartments[i];
-
-        const chatId = a.telegram_chat_id || a.tg_id || a.chat_id;
-        if (!chatId) {
-            let msg = tr.alert_no_tg_id || 'Немає Telegram ID. Натисніть "Підключити Телеграм-Бот".';
-            if (!isSilentMode) alert(`⚠️ ${a.name}: ${msg}`);
-            return false;
-        }
-
-        // БЕЗПЕЧНЕ отримання кнопки (щоб не падало в циклах)
-        let btn = null;
-        if (!isSilentMode) {
-            try { 
-                if (window.event && window.event.currentTarget) {
-                    btn = window.event.currentTarget; 
-                }
-            } catch(e) {}
-        }
-
-        if (btn) { btn.disabled = true; btn.innerText = "⏳ ..."; }
-        
         try {
-            // 1. ЗБЕРІГАЄМО В АРХІВ СУПАБЕЙЗ (Формуємо дані)
+            let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+            let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
+            
+            const t = {
+                noId: { uk: "Немає Telegram ID", en: "No Telegram ID", pl: "Brak ID Telegram", de: "Keine Telegram-ID", es: "Sin ID de Telegram", fr: "Aucun ID Telegram" },
+                sent: { uk: "Квитанція успішно надіслана", en: "Receipt successfully sent", pl: "Rachunek pomyślnie wysłany", de: "Quittung erfolgreich gesendet", es: "Recibo enviado con éxito", fr: "Reçu envoyé avec succès" },
+                btn: { uk: "Надіслати", en: "Send", pl: "Wyślij", de: "Senden", es: "Enviar", fr: "Envoyer" }
+            };
+
+            const FUNCTION_URL = "https://aougdxtsmzjgoykaslbt.supabase.co/functions/v1/telegram-bot";
+            const a = this.currentData.apartments[i];
+
+            const chatId = a.telegram_chat_id || a.tg_id || a.chat_id;
+            if (!chatId) {
+                if (!isSilentMode) alert(`⚠️ ${a.name}: ${t.noId[lang] || t.noId['uk']}`);
+                return false;
+            }
+
+            let btn = null;
+            if (!isSilentMode) {
+                try { if (window.event && window.event.currentTarget) btn = window.event.currentTarget; } catch(e) {}
+            }
+            if (btn) { btn.disabled = true; btn.innerText = "⏳ ..."; }
+            
             try {
-                const db = (typeof sbClient !== 'undefined') ? sbClient : (window._supabase || null);
+                const db = window.__sbClient || window._supabase;
                 if (db) {
                     const dateStr = new Date().toLocaleString(lang === 'uk' ? 'uk-UA' : 'en-US', { month: 'long', year: 'numeric' });
                     const periodName = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
-                    
                     const debt = parseFloat(a.debt) || 0;
                     const bill = parseFloat(a.bill) || 0;
                     const paid = parseFloat(a.paid) || 0;
                     const totalToPay = debt + bill - paid;
                     
                     const billData = {
-                        user_id: String(a.id),
-                        period_name: periodName,
-                        amount: Math.max(0, totalToPay).toFixed(2),
-                        is_paid: totalToPay <= 0,
-                        prev: a.prev || {},
-                        curr: a.curr || {},
-                        services: a.services || [],
-                        tariffs: { 
-                            ...(this.currentData.tariffs || {}), 
-                            _debt: debt, 
-                            _bill: bill, 
-                            _paid: paid 
-                        }
+                        user_id: String(a.id), period_name: periodName,
+                        amount: Math.max(0, totalToPay).toFixed(2), is_paid: totalToPay <= 0,
+                        prev: a.prev || {}, curr: a.curr || {}, services: a.services || [],
+                        tariffs: { ...(this.currentData.tariffs || {}), _debt: debt, _bill: bill, _paid: paid }
                     };
 
                     const { data: existing } = await db.from('bills').select('id').eq('user_id', String(a.id)).eq('period_name', periodName).maybeSingle();
-                    if (existing) {
-                        await db.from('bills').update(billData).eq('id', existing.id);
-                    } else {
-                        await db.from('bills').insert([billData]);
-                    }
+                    if (existing) await db.from('bills').update(billData).eq('id', existing.id);
+                    else await db.from('bills').insert([billData]);
                 }
-            } catch (dbErr) {
-                console.error("Supabase Save Error:", dbErr);
-            }
+            } catch (dbErr) {}
 
-            // 2. ВІДПРАВЛЯЄМО В ТЕЛЕГРАМ
+            if (!this.checks[i]) this.calculate(); 
+            let receiptText = this.checks[i] || `🧾 ${a.name}`;
+
             const response = await fetch(FUNCTION_URL, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    action: "send_message",
-                    chat_id: chatId,
-                    text: this.checks[i] || "Ваша квитанція сформована"
-                })
+                method: "POST", headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ action: "send_message", chat_id: chatId, text: receiptText })
             });
 
             if (!response.ok) throw new Error("Telegram API Error");
 
-            // 3. УСПІШНЕ ЗАВЕРШЕННЯ
             if (btn) {
                 btn.innerText = "✅ OK";
-                setTimeout(() => { btn.innerText = tr.btn_send || "Надіслати"; btn.disabled = false; }, 2000);
+                setTimeout(() => { btn.innerText = t.btn[lang] || t.btn['uk']; btn.disabled = false; }, 2000);
+            }
+            
+            if (!isSilentMode) {
+                setTimeout(() => alert(`✅ ${t.sent[lang] || t.sent['uk']} -> ${a.name}!`), 150);
             }
             return true;
 
         } catch (e) {
-            console.error("Помилка відправки:", e);
-            if (btn) { btn.innerText = "❌"; btn.disabled = false; }
+            console.error(e);
+            if (window.event && window.event.currentTarget && !isSilentMode) { 
+                window.event.currentTarget.innerText = "❌"; window.event.currentTarget.disabled = false; 
+            }
             return false;
         }
     }
