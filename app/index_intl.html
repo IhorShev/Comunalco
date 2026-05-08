@@ -977,7 +977,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '16.6';
+    const APP_VERSION = '16.7';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -2593,98 +2593,85 @@ updateSubscriptionCalc() {
 
     // --- А) ВІДПРАВКА КВИТАНЦІЙ (Виправлена) ---
     async sendBatchModal(indices) {
-        try {
-            let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
-            const t = {
-                ask: { uk: "Відправити квитанції", en: "Send receipts", pl: "Wyślij rachunki", de: "Quittungen senden", es: "Enviar recibos", fr: "Envoyer les reçus" },
-                done: { uk: "Успішно доставлено", en: "Successfully delivered", pl: "Pomyślnie dostarczono", de: "Erfolgreich zugestellt", es: "Entregado con éxito", fr: "Livré avec succès" }
-            };
-            const txtAsk = t.ask[lang] || t.ask['uk'];
-            const txtDone = t.done[lang] || t.done['uk'];
+        let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+        let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
+        
+        const t_done = {
+            uk: 'Успішно доставлено', en: 'Successfully delivered', pl: 'Pomyślnie dostarczono',
+            de: 'Erfolgreich zugestellt', es: 'Entregado con éxito', fr: 'Livré avec succès'
+        };
+        
+        let confirmTxt = tr.tg_send_receipts || "Відправити квитанції";
+        if(!confirm(`🧾 ${confirmTxt} (${indices.length})?`)) return;
+        
+        const modal = document.getElementById('tgActionModal');
+        if (modal) modal.style.display = 'none';
 
-            if(!confirm(`🧾 ${txtAsk} (${indices.length})?`)) return;
-            
-            const modal = document.getElementById('tgActionModal');
-            if (modal) modal.style.display = 'none';
+        let successCount = 0;
 
-            let successCount = 0;
-
-            for (let index of indices) {
-                try {
-                    const result = await this.sendToBot(index, true); 
-                    if (result) {
-                        successCount++;
-                        const a = this.currentData.apartments[index];
-                        if (a) {
-                            const receiptText = this.checks[index] || "🧾";
-                            await this.saveToChatHistory(a.id, `🧾:\n\n${receiptText}`);
-                        }
-                    }
-                } catch(err) {
-                    console.error("Batch error:", err);
+        for (let index of indices) {
+            const result = await this.sendToBot(index, true); 
+            if (result) {
+                successCount++;
+                const a = this.currentData.apartments[index];
+                if (a && this.checks[index]) {
+                    await this.saveToChatHistory(a.id, `🧾:\n\n${this.checks[index]}`);
                 }
-                await new Promise(r => setTimeout(r, 400));
             }
-
-            setTimeout(() => {
-                alert(`✅ ${txtAsk}:\n${txtDone}: ${successCount} / ${indices.length}`);
-            }, 150);
-
-        } catch(e) {
-            console.error("Critical error in sendBatchModal", e);
+            await new Promise(r => setTimeout(r, 300));
         }
+
+        let doneTxt = t_done[lang] || t_done['uk'];
+        alert(`✅ ${confirmTxt}:\n${doneTxt}: ${successCount} / ${indices.length}`);
     }
     // ---------------------------------------------------------------
 
     async sendAnnouncement() {
-        try {
-            let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
-            let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
-            const t = {
-                empty: { uk: "Введіть текст повідомлення!", en: "Enter message text!", pl: "Wprowadź текст!", de: "Text eingeben!", es: "¡Ingrese texto!", fr: "Entrez le texte !" },
-                done: { uk: "Оголошення надіслано!\nДоставлено:", en: "Announcement sent!\nDelivered:", pl: "Ogłoszenie wysłane!\nDostarczono:", de: "Ankündigung gesendet!\nZugestellt:", es: "¡Anuncio enviado!\nEntregado:", fr: "Annonce envoyée!\nLivré :" }
-            };
+        let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+        let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
+        
+        const t_done = {
+            uk: 'Оголошення надіслано!\nДоставлено:', en: 'Announcement sent!\nDelivered:', pl: 'Ogłoszenie wysłane!\nDostarczono:',
+            de: 'Ankündigung gesendet!\nZugestellt:', es: '¡Anuncio enviado!\nEntregado:', fr: 'Annonce envoyée !\nLivré :'
+        };
+        
+        const textEl = document.getElementById('announcement-text');
+        const text = textEl ? textEl.value.trim() : '';
 
-            const textEl = document.getElementById('announcement-text');
-            const text = textEl ? textEl.value.trim() : '';
+        if(!text) return alert(tr.alert_empty_msg || "⚠️ Введіть текст повідомлення!");
+           
+        const indices = this.announcementTargets || [];
+        if(indices.length === 0) return;
 
-            if(!text) return alert(`⚠️ ${t.empty[lang] || t.empty['uk']}`);
-               
-            const indices = this.announcementTargets || [];
-            if(indices.length === 0) return;
+        const btn = document.getElementById('btn-send-announcement');
+        if(btn) { btn.disabled = true; btn.innerText = "⏳..."; }
 
-            const btn = document.getElementById('btn-send-announcement');
-            if(btn) { btn.disabled = true; btn.innerText = "⏳..."; }
+        let successCount = 0;
+        const FUNCTION_URL = "https://aougdxtsmzjgoykaslbt.supabase.co/functions/v1/telegram-bot";
 
-            let successCount = 0;
-            const FUNCTION_URL = "https://aougdxtsmzjgoykaslbt.supabase.co/functions/v1/telegram-bot";
-
-            for (let i of indices) {
+        for (let i of indices) {
+            const a = this.currentData.apartments[i];
+            const chatId = a.telegram_chat_id || a.tg_id || a.chat_id;
+            if (chatId) {
                 try {
-                    const a = this.currentData.apartments[i];
-                    const chatId = a.telegram_chat_id || a.tg_id || a.chat_id;
-                    if (chatId) {
-                        const response = await fetch(FUNCTION_URL, {
-                            method: "POST", headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ action: "send_message", chat_id: chatId, text: text })
-                        });
-                        if (response.ok) {
-                            successCount++;
-                            await this.saveToChatHistory(a.id, `📢:\n${text}`);
-                        }
+                    const response = await fetch(FUNCTION_URL, {
+                        method: "POST", headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ action: "send_message", chat_id: chatId, text: text })
+                    });
+                    if (response.ok) {
+                        successCount++;
+                        await this.saveToChatHistory(a.id, `📢:\n${text}`);
                     }
-                } catch (innerErr) {}
-                await new Promise(r => setTimeout(r, 300));
+                } catch (e) {}
             }
+            await new Promise(r => setTimeout(r, 300));
+        }
 
-            if(btn) { btn.innerText = "🚀"; btn.disabled = false; }
-            document.getElementById('announcementModal').style.display = 'none';
-            
-            setTimeout(() => {
-                alert(`✅ ${t.done[lang] || t.done['uk']} ${successCount} / ${indices.length}`);
-            }, 150);
-
-        } catch(e) { console.error(e); }
+        if(btn) { btn.innerText = "🚀"; btn.disabled = false; }
+        document.getElementById('announcementModal').style.display = 'none';
+        
+        let doneTxt = t_done[lang] || t_done['uk'];
+        alert(`✅ ${doneTxt} ${successCount} / ${indices.length}`);
     }
 
     // --- В) НАГАДУВАННЯ ПРО БОРГ ---
@@ -2692,7 +2679,7 @@ updateSubscriptionCalc() {
         try {
             let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
             const t = {
-                none: { uk: "Немає боржників серед обраних", en: "No debtors among selected", pl: "Brak dłużników wśród wybranych", de: "Keine Schuldner unter den Ausgewählten", es: "No hay deudores entre los seleccionados", fr: "Aucun débiteur parmi la sélection" },
+                none: { uk: "Немає боржників серед обраних", en: "No debtors among selected", pl: "Brak dłużników", de: "Keine Schuldner", es: "No hay deudores", fr: "Aucun débiteur" },
                 ask1: { uk: "Виявлено", en: "Found", pl: "Znaleziono", de: "Gefunden", es: "Encontrado", fr: "Trouvé" },
                 ask2: { uk: "боржників. Надіслати нагадування?", en: "debtors. Send reminder?", pl: "dłużników. Wysłać?", de: "Schuldner. Erinnern?", es: "deudores. ¿Recordar?", fr: "débiteurs. Rappeler ?" },
                 done: { uk: "Нагадування успішно відправлено!", en: "Reminder successfully sent!", pl: "Przypomnienie wysłane!", de: "Erinnerung gesendet!", es: "¡Recordatorio enviado!", fr: "Rappel envoyé !" }
@@ -2726,13 +2713,10 @@ updateSubscriptionCalc() {
                 await this.saveToChatHistory(d.apt_id, `⚠️ Борг: ${d.amount}`);
             }
 
-            setTimeout(() => {
-                alert(`✅ ${t.done[lang] || t.done['uk']}`);
-            }, 150);
+            alert(`✅ ${t.done[lang] || t.done['uk']}`);
 
         } catch (e) {
             console.error(e);
-            alert("❌ Error: " + e.message);
         }
     }
     
@@ -4342,111 +4326,89 @@ updateChart() {
         }
     }
     async sendCheck(i, forceMethod = null) {
-        // 🌍 Підтягуємо мову для всіх алертів у цій функції
-        let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
-        let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
+        try {
+            let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+            const t = {
+                no_rec: { uk: "Помилка: Квитанція не знайдена", en: "Error: Receipt not found", pl: "Błąd: Nie znaleziono rachunku", de: "Fehler: Quittung nicht gefunden", es: "Error: Recibo no encontrado", fr: "Erreur : Reçu introuvable" },
+                phone: { uk: "Вкажіть телефон для", en: "Enter phone for", pl: "Podaj telefon dla", de: "Telefonnummer eingeben für", es: "Ingrese teléfono para", fr: "Entrez le téléphone pour" },
+                tg: { uk: "📝 Текст скопійовано!\nВставте його у чат Telegram.", en: "📝 Text copied!\nPaste it in Telegram.", pl: "📝 Tekst skopiowany!\nWklej go na Telegramie.", de: "📝 Text kopiert!\nFügen Sie ihn in Telegram ein.", es: "📝 ¡Texto copiado!\nPégalo en Telegram.", fr: "📝 Texte copié !\nCollez-le dans Telegram." },
+                vb: { uk: "✅ Текст скопійовано! Натисніть 'Вставити' у Viber.", en: "✅ Text copied! Press 'Paste' in Viber.", pl: "✅ Tekst skopiowany! Kliknij 'Wklej' w Viberze.", de: "✅ Text kopiert! Klicken Sie in Viber auf 'Einfügen'.", es: "✅ ¡Texto copiado! Presiona 'Pegar' en Viber.", fr: "✅ Texte copié ! Appuyez sur 'Coller' dans Viber." },
+                cb: { uk: "✅ Квитанцію скопійовано в буфер обміну!", en: "✅ Receipt copied to clipboard!", pl: "✅ Rachunek skopiowany do schowka!", de: "✅ Quittung in die Zwischenablage kopiert!", es: "✅ ¡Recibo copiado al portapapeles!", fr: "✅ Reçu copié dans le presse-papiers !" }
+            };
 
-        const txt = this.checks[i];
-        if (!txt) { alert(tr.err_no_receipt || "Помилка: Квитанція не знайдена"); return; }
-        
-        const a = this.currentData.apartments[i];
-        let phone = (a.phone || "").replace(/\D/g,'');
-        // Якщо телефон починається з 0, додаємо 38
-        if(phone.startsWith('0')) phone = '38' + phone;
-
-        const messenger = forceMethod || a.messenger || 'copy';
-        const encTxt = encodeURIComponent(txt);
-
-        // 1. WhatsApp
-        if (messenger === 'whatsapp') {
-            if(!phone) return alert((tr.alert_enter_phone || "Вкажіть номер телефону для ") + "WhatsApp!");
-            window.location.href = `https://wa.me/${phone}?text=${encTxt}`;
-        }
-        
-        // 2. Telegram
-        else if (messenger === 'telegram') {
-            if(phone) {
-                window.location.href = `https://t.me/+${phone}`; 
-                await this.copyTextToClipboard(txt);
-                alert(tr.alert_copied_tg || "📝 Текст скопійовано!\nВставте його у чат Telegram.");
-            } else {
-                window.location.href = `https://t.me/share/url?url=${encodeURIComponent(' ')}&text=${encTxt}`;
+            // ПРИМУСОВО формуємо текст квитанції
+            this.calculate(); 
+            const txt = this.checks[i];
+            
+            if (!txt) { 
+                alert(t.no_rec[lang] || t.no_rec['uk']); 
+                return; 
             }
-        }
-        
-        // 3. Viber
-        else if (messenger === 'viber') {
-            if(!phone) return alert((tr.alert_enter_phone || "Вкажіть номер телефону для ") + "Viber!");
             
-            await this.copyTextToClipboard(txt);
-            window.location.href = `viber://chat?number=%2B${phone}`;
-            
-            const notification = document.createElement('div');
-            notification.innerText = tr.alert_copied_viber || "✅ Текст скопійовано! Натисніть 'Вставити' у Viber.";
-            notification.style.cssText = "position:fixed; top:20px; left:50%; transform:translateX(-50%); background:#7360f2; color:white; padding:15px; border-radius:30px; z-index:99999; box-shadow: 0 5px 15px rgba(0,0,0,0.3); font-size:14px;";
-            document.body.appendChild(notification);
-            setTimeout(() => document.body.removeChild(notification), 4000);
-        }
-        
-        // 4. Просто копіювання
-        else {
-            await this.copyTextToClipboard(txt);
-            alert(tr.alert_copied_clipboard || "✅ Квитанцію скопійовано в буфер обміну!");
+            const a = this.currentData.apartments[i];
+            let phone = (a.phone || "").replace(/\D/g,'');
+            if(phone.startsWith('0')) phone = '38' + phone;
+
+            const messenger = forceMethod || a.messenger || 'copy';
+            const encTxt = encodeURIComponent(txt);
+
+            try {
+                const ta = document.createElement("textarea");
+                ta.value = txt; 
+                document.body.appendChild(ta); ta.select(); 
+                document.execCommand('copy'); document.body.removeChild(ta);
+            } catch(e) {}
+
+            if (messenger === 'whatsapp') {
+                if(!phone) return alert(`${t.phone[lang] || t.phone['uk']} WhatsApp!`);
+                window.location.href = `https://wa.me/${phone}?text=${encTxt}`;
+            } else if (messenger === 'telegram') {
+                if(phone) {
+                    window.location.href = `https://t.me/+${phone}`; 
+                    alert(t.tg[lang] || t.tg['uk']);
+                } else {
+                    window.location.href = `https://t.me/share/url?url=${encodeURIComponent(' ')}&text=${encTxt}`;
+                }
+            } else if (messenger === 'viber') {
+                if(!phone) return alert(`${t.phone[lang] || t.phone['uk']} Viber!`);
+                window.location.href = `viber://chat?number=%2B${phone}`;
+                alert(t.vb[lang] || t.vb['uk']);
+            } else {
+                alert(t.cb[lang] || t.cb['uk']);
+            }
+        } catch(e) {
+            console.error("sendCheck Error:", e);
         }
     } 
 
    // --- 1. ВІДПРАВКА ОДНІЄЇ КВИТАНЦІЇ (Оновлена + Архів) ---
     async sendToBot(i, isSilentMode = false) {
+        let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+        let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
+        
+        const t_sent = {
+            uk: 'Квитанція успішно надіслана', en: 'Receipt successfully sent', pl: 'Rachunek pomyślnie wysłany',
+            de: 'Quittung erfolgreich gesendet', es: 'Recibo enviado con éxito', fr: 'Reçu envoyé avec succès'
+        };
+        const t_err = {
+            uk: 'Помилка відправки', en: 'Send error', pl: 'Błąd wysyłania',
+            de: 'Sendefehler', es: 'Error de envío', fr: 'Erreur d\'envoi'
+        };
+        
         try {
-            let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
-            let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
-            
-            const t = {
-                noId: { uk: "Немає Telegram ID", en: "No Telegram ID", pl: "Brak ID Telegram", de: "Keine Telegram-ID", es: "Sin ID de Telegram", fr: "Aucun ID Telegram" },
-                sent: { uk: "Квитанція успішно надіслана", en: "Receipt successfully sent", pl: "Rachunek pomyślnie wysłany", de: "Quittung erfolgreich gesendet", es: "Recibo enviado con éxito", fr: "Reçu envoyé avec succès" },
-                btn: { uk: "Надіслати", en: "Send", pl: "Wyślij", de: "Senden", es: "Enviar", fr: "Envoyer" }
-            };
-
             const FUNCTION_URL = "https://aougdxtsmzjgoykaslbt.supabase.co/functions/v1/telegram-bot";
             const a = this.currentData.apartments[i];
-
             const chatId = a.telegram_chat_id || a.tg_id || a.chat_id;
+            
             if (!chatId) {
-                if (!isSilentMode) alert(`⚠️ ${a.name}: ${t.noId[lang] || t.noId['uk']}`);
+                if (!isSilentMode) alert(`⚠️ ${a.name}: ${tr.alert_no_tg_id || "Немає Telegram ID."}`);
                 return false;
             }
 
-            let btn = null;
-            if (!isSilentMode) {
-                try { if (window.event && window.event.currentTarget) btn = window.event.currentTarget; } catch(e) {}
-            }
-            if (btn) { btn.disabled = true; btn.innerText = "⏳ ..."; }
-            
-            try {
-                const db = window.__sbClient || window._supabase;
-                if (db) {
-                    const dateStr = new Date().toLocaleString(lang === 'uk' ? 'uk-UA' : 'en-US', { month: 'long', year: 'numeric' });
-                    const periodName = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
-                    const debt = parseFloat(a.debt) || 0;
-                    const bill = parseFloat(a.bill) || 0;
-                    const paid = parseFloat(a.paid) || 0;
-                    const totalToPay = debt + bill - paid;
-                    
-                    const billData = {
-                        user_id: String(a.id), period_name: periodName,
-                        amount: Math.max(0, totalToPay).toFixed(2), is_paid: totalToPay <= 0,
-                        prev: a.prev || {}, curr: a.curr || {}, services: a.services || [],
-                        tariffs: { ...(this.currentData.tariffs || {}), _debt: debt, _bill: bill, _paid: paid }
-                    };
-
-                    const { data: existing } = await db.from('bills').select('id').eq('user_id', String(a.id)).eq('period_name', periodName).maybeSingle();
-                    if (existing) await db.from('bills').update(billData).eq('id', existing.id);
-                    else await db.from('bills').insert([billData]);
-                }
-            } catch (dbErr) {}
-
-            if (!this.checks[i]) this.calculate(); 
-            let receiptText = this.checks[i] || `🧾 ${a.name}`;
+            // ПРИМУСОВО формуємо текст квитанції
+            this.calculate();
+            let receiptText = this.checks[i];
+            if (!receiptText) receiptText = `🧾 ${a.name}`;
 
             const response = await fetch(FUNCTION_URL, {
                 method: "POST", headers: { "Content-Type": "application/json" },
@@ -4455,21 +4417,12 @@ updateChart() {
 
             if (!response.ok) throw new Error("Telegram API Error");
 
-            if (btn) {
-                btn.innerText = "✅ OK";
-                setTimeout(() => { btn.innerText = t.btn[lang] || t.btn['uk']; btn.disabled = false; }, 2000);
-            }
-            
-            if (!isSilentMode) {
-                setTimeout(() => alert(`✅ ${t.sent[lang] || t.sent['uk']} -> ${a.name}!`), 150);
-            }
+            if (!isSilentMode) alert(`✅ ${t_sent[lang] || t_sent['uk']} -> ${a.name}!`);
             return true;
 
         } catch (e) {
-            console.error(e);
-            if (window.event && window.event.currentTarget && !isSilentMode) { 
-                window.event.currentTarget.innerText = "❌"; window.event.currentTarget.disabled = false; 
-            }
+            console.error("sendToBot Error:", e);
+            if (!isSilentMode) alert(`❌ ${t_err[lang] || t_err['uk']}: ` + e.message);
             return false;
         }
     }
@@ -4916,10 +4869,16 @@ updateChart() {
                     </div>
                 `; 
 
-                    // --- ЛОГІКА КНОПКИ "СКОПІЮВАТИ" ---
+                     // --- ЛОГІКА КНОПКИ "СКОПІЮВАТИ" ---
                     document.getElementById('btn-copy-img').onclick = async () => {
                         let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
-                        let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
+                        const t = {
+                            copied: { uk: "✅ Скопійовано в буфер обміну!", en: "✅ Copied to clipboard!", pl: "✅ Skopiowano do schowka!", de: "✅ In die Zwischenablage kopiert!", es: "✅ ¡Copiado al portapapeles!", fr: "✅ Copié dans le presse-papiers !" },
+                            success: { uk: "Успіх! Відкрийте месенджер, вставте адресату, відправте.", en: "Success! Open messenger, paste to recipient and send.", pl: "Sukces! Otwórz komunikator, wklej odbiorcy i wyślij.", de: "Erfolg! Messenger öffnen, einfügen und senden.", es: "¡Éxito! Abra el mensajero, pegue y envíe.", fr: "Succès ! Ouvrez la messagerie, collez et envoyez." },
+                            btn: { uk: "✅ Скопійовано!", en: "✅ Copied!", pl: "✅ Skopiowano!", de: "✅ Kopiert!", es: "✅ ¡Copiado!", fr: "✅ Copié !" },
+                            err_btn: { uk: "⚠️ Помилка", en: "⚠️ Error", pl: "⚠️ Błąd", de: "⚠️ Fehler", es: "⚠️ Error", fr: "⚠️ Erreur" },
+                            err_txt: { uk: "Браузер не дав доступу. Натисніть на картинку <b>Правою кнопкою -> Копіювати</b>.", en: "Access denied. Right-click the image -> <b>Copy</b>.", pl: "Odmowa dostępu. Kliknij prawym na obraz -> <b>Kopiuj</b>.", de: "Zugriff verweigert. Rechtsklick auf Bild -> <b>Kopieren</b>.", es: "Acceso denegado. Clic derecho en imagen -> <b>Copiar</b>.", fr: "Accès refusé. Clic droit sur l'image -> <b>Copier</b>." }
+                        };
                         
                         const btn = document.getElementById('btn-copy-img');
                         const st = document.getElementById('status-line');
@@ -4928,11 +4887,11 @@ updateChart() {
                             const item = new ClipboardItem({ "image/png": blob });
                             await navigator.clipboard.write([item]);
                             
-                            // 🚀 АВТОМАТИЧНЕ ЗБЕРЕЖЕННЯ В АРХІВ ПРИ КОПІЮВАННІ
+                            // Автоматичне збереження в архів
                             try {
                                 const db = (typeof sbClient !== 'undefined') ? sbClient : (window._supabase || null);
                                 if (db) {
-                                    const dateStr = new Date().toLocaleString('uk-UA', { month: 'long', year: 'numeric' });
+                                    const dateStr = new Date().toLocaleString(lang === 'uk' ? 'uk-UA' : 'en-US', { month: 'long', year: 'numeric' });
                                     const periodName = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
                                     
                                     const debt = parseFloat(apt.debt) || 0;
@@ -4941,37 +4900,31 @@ updateChart() {
                                     const totalToPay = debt + bill - paid;
                                     
                                     const billData = {
-                                        user_id: String(apt.id),
-                                        period_name: periodName,
-                                        amount: Math.max(0, totalToPay).toFixed(2),
-                                        is_paid: totalToPay <= 0,
-                                        prev: apt.prev || {},
-                                        curr: apt.curr || {},
-                                        services: apt.services || [],
+                                        user_id: String(apt.id), period_name: periodName,
+                                        amount: Math.max(0, totalToPay).toFixed(2), is_paid: totalToPay <= 0,
+                                        prev: apt.prev || {}, curr: apt.curr || {}, services: apt.services || [],
                                         tariffs: { ...(this.currentData.tariffs || {}), _debt: debt, _bill: bill, _paid: paid }
                                     };
 
                                     const { data: existing } = await db.from('bills').select('id').eq('user_id', String(apt.id)).eq('period_name', periodName).maybeSingle();
-                                    if (existing) {
-                                        await db.from('bills').update(billData).eq('id', existing.id);
-                                    } else {
-                                        await db.from('bills').insert([billData]);
-                                    }
+                                    if (existing) await db.from('bills').update(billData).eq('id', existing.id);
+                                    else await db.from('bills').insert([billData]);
                                 }
                             } catch (dbErr) { console.error("Помилка збереження архіву при копіюванні:", dbErr); }
                             
-                            // 2. Оновлюємо інтерфейс
+                            // Оновлюємо інтерфейс
                             btn.style.background = '#10b981'; // Зелений
-                            btn.innerHTML = tr.btn_copied || '✅ Скопійовано!';
-                            
-                            // 3. Ваш новий текст
-                            st.innerHTML = `<b style="color:#16a34a">${tr.hint_success_paste || "Успіх! Відкрийте месенджер, вставте адресату, відправте."}</b>`;
+                            btn.innerHTML = t.btn[lang] || t.btn['uk'];
+                            st.innerHTML = `<b style="color:#16a34a">${t.success[lang] || t.success['uk']}</b>`;
+
+                            // 🚀 ДОДАНЕ СПОВІЩЕННЯ ПРО КОПІЮВАННЯ ПДФ
+                            alert(t.copied[lang] || t.copied['uk']);
 
                         } catch (err) {
                             console.error(err);
                             btn.style.background = '#f59e0b';
-                            btn.innerHTML = tr.btn_error || '⚠️ Помилка';
-                            st.innerHTML = tr.hint_copy_err || 'Браузер не дав доступу. Натисніть на картинку <b>Правою кнопкою -> Копіювати</b>.';
+                            btn.innerHTML = t.err_btn[lang] || t.err_btn['uk'];
+                            st.innerHTML = t.err_txt[lang] || t.err_txt['uk'];
                         }
                     };
 
