@@ -977,7 +977,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '16.8';
+    const APP_VERSION = '16.9';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -2583,7 +2583,16 @@ updateSubscriptionCalc() {
     smartAction(type) {
         const indices = this.getTgSelectedIndices();
         if (indices.length === 0) {
-            return alert("⚠️ Спочатку виберіть хоча б одну квартиру зі списку!");
+            let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+            const t_warn = {
+                uk: "⚠️ Спочатку виберіть хоча б одну квартиру зі списку!",
+                en: "⚠️ Select at least one apartment from the list first!",
+                pl: "⚠️ Najpierw wybierz co najmniej jedno mieszkanie z listy!",
+                de: "⚠️ Wählen Sie zuerst mindestens eine Wohnung aus der Liste aus!",
+                es: "⚠️ ¡Seleccione al menos un apartamento de la lista primero!",
+                fr: "⚠️ Sélectionnez d'abord au moins un appartement dans la liste !"
+            };
+            return alert(t_warn[lang] || t_warn['uk']);
         }
 
         if (type === 'receipts') this.sendBatchModal(indices);
@@ -2624,8 +2633,41 @@ updateSubscriptionCalc() {
         let doneTxt = t_done[lang] || t_done['uk'];
         alert(`✅ ${confirmTxt}:\n${doneTxt}: ${successCount} / ${indices.length}`);
     }
-    // ---------------------------------------------------------------
 
+    // --- Б) ВЕЛИКЕ ВІКНО ДЛЯ ПОВІДОМЛЕНЬ (ВІДНОВЛЕНО) ---
+    openAnnouncementModal(indices) {
+        document.getElementById('tgActionModal').style.display = 'none';
+        this.announcementTargets = indices; 
+
+        const countEl = document.getElementById('announcement-target-count');
+        if(countEl) countEl.innerText = indices.length;
+
+        const textEl = document.getElementById('announcement-text');
+        if(textEl) {
+            textEl.value = ''; 
+            let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+            let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
+            textEl.placeholder = tr.ann_placeholder || "Шановні мешканці, завтра буде відключення води...\n(Натискайте Enter для абзаців)";
+        }
+
+        document.getElementById('announcementModal').style.display = 'flex';
+    }
+
+    // --- 🚀 ДОПОМІЖНА ФУНКЦІЯ: Збереження в історію чату (ВІДНОВЛЕНО) ---
+    async saveToChatHistory(aptId, text) {
+        try {
+            if (typeof _supabase !== 'undefined') {
+                await _supabase.from('messages').insert([{
+                    sender_id: 'manager',
+                    recipient_type: String(aptId),
+                    message_text: text,
+                    is_read: false 
+                }]);
+            }
+        } catch (e) { console.error("Помилка збереження в чат:", e); }
+    }
+
+    // --- ВІДПРАВКА ОГОЛОШЕННЯ ---
     async sendAnnouncement() {
         let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
         let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
@@ -2667,11 +2709,13 @@ updateSubscriptionCalc() {
             await new Promise(r => setTimeout(r, 300));
         }
 
-        if(btn) { btn.innerText = "🚀"; btn.disabled = false; }
+        if(btn) { btn.innerText = tr.ann_send || "🚀 Надіслати"; btn.disabled = false; }
         document.getElementById('announcementModal').style.display = 'none';
         
         let doneTxt = t_done[lang] || t_done['uk'];
-        alert(`✅ ${doneTxt} ${successCount} / ${indices.length}`);
+        setTimeout(() => {
+            alert(`✅ ${doneTxt} ${successCount} / ${indices.length}`);
+        }, 150);
     }
 
     // --- В) НАГАДУВАННЯ ПРО БОРГ ---
@@ -2713,7 +2757,9 @@ updateSubscriptionCalc() {
                 await this.saveToChatHistory(d.apt_id, `⚠️ Борг: ${d.amount}`);
             }
 
-            alert(`✅ ${t.done[lang] || t.done['uk']}`);
+            setTimeout(() => {
+                alert(`✅ ${t.done[lang] || t.done['uk']}`);
+            }, 150);
 
         } catch (e) {
             console.error(e);
