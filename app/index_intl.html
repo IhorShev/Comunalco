@@ -977,7 +977,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '16.7';
+    const APP_VERSION = '16.8';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -4283,19 +4283,56 @@ updateChart() {
                     if(label) label.innerText = bal > 0.01 ? "БОРГ" : (bal < -0.01 ? "ПЕРЕПЛАТА" : "ДО СПЛАТИ");
                 }
 
-                // --- ГЕНЕРАЦІЯ ТЕКСТУ КВИТАНЦІЇ (ДЛЯ ТЕЛЕГРАМ) ---
+                // --- ГЕНЕРАЦІЯ ТЕКСТУ КВИТАНЦІЇ (ДЛЯ ТЕЛЕГРАМ) (Багатомовна версія + Валюта) ---
+                let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+                let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
+                
+                // Бронебійне отримання символу валюти прямо з налаштувань
+                let curStr = (this.state && this.state.settings && this.state.settings.currency) 
+                    ? this.state.settings.currency.toLowerCase() 
+                    : (localStorage.getItem('currency') || 'uah').toLowerCase();
+                let sym = { uah:'₴', usd:'$', eur:'€', pln:'zł', gbp:'£', czk:'Kč' }[curStr] || '₴';
+
                 const requisitesTxt = (d.requisites || []).map(r=>`💳 ${r.name}:\n${r.val}`).join('\n\n');
                 let details = "";
-                if(c.ed > 0) details += `⚡ Електр (Д): ${a.prev.ed}➔${a.curr.ed} = ${c.ed} (${cost.ed.toFixed(2)})\n`;
-                if(c.en > 0) details += `🌙 Електр (Н): ${a.prev.en}➔${a.curr.en} = ${c.en} (${cost.en.toFixed(2)})\n`;
-                if(c.w > 0) details += `💧 Вода: ${a.prev.w}➔${a.curr.w} = ${c.w} (${cost.w.toFixed(2)})\n`;
-                if(c.g > 0) details += `🔥 Газ: ${a.prev.g}➔${a.curr.g} = ${c.g} (${cost.g.toFixed(2)})\n`;
+                
+                // Переклади для лічильників
+                let trElD = tr.receipt_el_day || '⚡ Електр (Д)';
+                let trElN = tr.receipt_el_night || '🌙 Електр (Н)';
+                let trW = tr.receipt_water || '💧 Вода';
+                let trG = tr.receipt_gas || '🔥 Газ';
+                
+                if(c.ed > 0) details += `${trElD}: ${a.prev.ed}➔${a.curr.ed} = ${c.ed} (${cost.ed.toFixed(2)} ${sym})\n`;
+                if(c.en > 0) details += `${trElN}: ${a.prev.en}➔${a.curr.en} = ${c.en} (${cost.en.toFixed(2)} ${sym})\n`;
+                if(c.w > 0) details += `${trW}: ${a.prev.w}➔${a.curr.w} = ${c.w} (${cost.w.toFixed(2)} ${sym})\n`;
+                if(c.g > 0) details += `${trG}: ${a.prev.g}➔${a.curr.g} = ${c.g} (${cost.g.toFixed(2)} ${sym})\n`;
 
-                let txt = `🧾 КВИТАНЦІЯ: ${dStr.toUpperCase()}\n🏠 ${a.name}\n\n${details}${custTxt}🏢 МЗК: ${mzkPerApt.toFixed(2)} грн\n${sTxt ? sTxt : ''}--------------------------------\n💰 НАРАХОВАНО: ${currentMonthTotal.toFixed(2)} грн\n${debt > 0 ? `❗️ Борг: ${debt.toFixed(2)} грн\n` : ''}${debt < 0 ? `💚 Переплата: ${Math.abs(debt).toFixed(2)} грн\n` : ''}--------------------------------\n💵 РАЗОМ: ${tot.toFixed(2)} грн\n${paid > 0 ? `✅ Сплачено: -${paid.toFixed(2)} грн\n📉 Залишок: ${bal.toFixed(2)} грн` : ''}\n\n${requisitesTxt}`;
-                // Замінюємо всі грн на потрібну валюту
-                const sym = window.APP_CURRENCY_SYMBOL || '$';
-                txt = txt.replace(/грн/g, sym);          
-				
+                // Збираємо кастомні лічильники та послуги, одразу з валютою
+                let custTxtWithCur = "";
+                (a.custom_counters || []).forEach(cc => {
+                     let diff = Math.max(0, (cc.curr||0) - (cc.prev||0));
+                     let val = diff * (cc.price||0);
+                     if(diff > 0) custTxtWithCur += `🔹 ${cc.name}: ${cc.prev} ➔ ${cc.curr} = ${diff} од.\n   └─ ${diff} x ${cc.price} = ${val.toFixed(2)} ${sym}\n`;
+                });
+
+                let sTxtWithCur = "";
+                (a.services || []).forEach(s=>{
+                    let val = parseFloat(s.val)||0;
+                    if(val > 0) sTxtWithCur += `🛠 ${s.name}: ${val.toFixed(2)} ${sym}\n`;
+                });
+
+                // Переклади для блоків квитанції
+                let txtReceipt = tr.receipt || 'КВИТАНЦІЯ';
+                let txtMzk = tr.receipt_mzk || '🏢 МЗК (Загальні витрати)';
+                let txtAccrued = tr.receipt_accrued || 'НАРАХОВАНО:';
+                let txtDebt = tr.receipt_debt || '❗️ Борг (минулий):';
+                let txtOverpay = tr.receipt_overpay || '💚 Переплата:';
+                let txtTotal = tr.total || 'РАЗОМ';
+                let txtPaid = tr.receipt_paid || '✅ Сплачено:';
+                
+                // Формуємо фінальний текст (БЕЗ милиць типу .replace)
+                let txt = `🧾 ${txtReceipt}: ${dStr.toUpperCase()}\n🏠 ${a.name}\n\n${details}${custTxtWithCur}${txtMzk}: ${mzkPerApt.toFixed(2)} ${sym}\n${sTxtWithCur ? sTxtWithCur : ''}--------------------------------\n💰 ${txtAccrued} ${currentMonthTotal.toFixed(2)} ${sym}\n${debt > 0 ? `${txtDebt} ${debt.toFixed(2)} ${sym}\n` : ''}${debt < 0 ? `${txtOverpay} ${Math.abs(debt).toFixed(2)} ${sym}\n` : ''}--------------------------------\n💵 ${txtTotal}: ${tot.toFixed(2)} ${sym}\n${paid > 0 ? `${txtPaid} -${paid.toFixed(2)} ${sym}\n📉 Залишок: ${bal.toFixed(2)} ${sym}` : ''}\n\n${requisitesTxt}`;
+
                 this.checks[i] = txt; // Зберігаємо готовий текст для кнопки "Надіслати"
 
                 // Повертаємо HTML для списку (зелена кнопка "Квитанції")
