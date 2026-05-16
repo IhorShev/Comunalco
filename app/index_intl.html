@@ -224,22 +224,22 @@
     }
 }
 
-		/* === НОВА ЄДИНА ШАПКА (ПРОФЕСІЙНА З ВЕЛИКИМ ЛОГОТИПОМ) === */
+		/* === НОВА ЄДИНА ШАПКА (UNIFIED HEADER) === */
         .saas-header {
             position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; height: 65px !important;
             background: var(--header-bg) !important;
             border-bottom: 1px solid var(--border) !important;
-            z-index: 9999 !important; 
+            z-index: 9999 !important;
             display: flex !important; align-items: center !important; justify-content: space-between !important;
             padding: 0 15px !important; box-sizing: border-box !important;
-            white-space: nowrap !important;
+            white-space: nowrap !important; /* ЗАБОРОНЯЄМО перенос на новий рядок */
         }
 
         .header-left-wrap, .header-actions {
             display: flex !important; align-items: center !important; gap: 10px; flex-shrink: 0;
         }
 
-        /* Цільний, Великий Логотип */
+        /* Цільний Логотип */
         .header-logo {
             display: flex; align-items: center; justify-content: center;
             text-decoration: none; background: transparent; border-radius: 8px; overflow: hidden;
@@ -262,7 +262,7 @@
         /* Професійні кнопки меню навігації */
         .header-nav-link {
             color: var(--text-sec); font-size: 11px; font-weight: 700; cursor: pointer; padding: 0 10px; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 8px; transition: all 0.2s; border: 1px solid transparent; text-transform: uppercase; letter-spacing: 0.5px;
-            white-space: nowrap;
+            white-space: nowrap; /* Щоб назви кнопок не розривалися */
         }
         .header-nav-link:hover { background: rgba(128,128,128,0.1); color: var(--text); }
         .header-nav-link.premium { color: var(--primary); }
@@ -275,16 +275,16 @@
         .btn-ai:hover { box-shadow: 0 0 15px rgba(139, 92, 246, 0.6); transform: translateY(-1px); }
         .btn-ai:active { transform: scale(0.95); }
 
-        /* Адаптивність: Ховаємо меню раніше, щоб не ламало шапку */
+        /* Адаптивність */
         @media (max-width: 1050px) {
             .desktop-only { display: none !important; }
             .mobile-only { display: flex !important; }
         }
         @media (max-width: 800px) {
             .saas-header { padding: 0 8px !important; }
-            .header-logo-unified { height: 28px; } /* Зменшуємо лого на мобільному, щоб влізло */
+            .header-logo-unified { height: 28px; }
             .header-object-panel input { width: 90px; font-size: 12px; }
-            .btn-ai .ai-text { display: none !important; } /* Лишаємо тільки іконку AI */
+            .btn-ai .ai-text { display: none !important; }
             .btn-ai { padding: 0 8px; }
         }        
         /* --- АДАПТИВНЕ МЕНЮ (PRO версія) --- */
