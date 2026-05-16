@@ -977,7 +977,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '16.9';
+    const APP_VERSION = '17.0';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -3149,41 +3149,38 @@ checkLimit() {
 } 
 
 	_applyUILang() {
-    // 1. Визначаємо мову
-    const lang = this.state?.settings?.lang || localStorage.getItem('lang') || 'uk';
-    const t = translations[lang] || translations['en'];
+        // 1. Визначаємо мову
+        const lang = this.state?.settings?.lang || localStorage.getItem('lang') || 'uk';
+        const t = translations[lang] || translations['en'];
 
-    // 2. Визначаємо валюту
-    const sym = this.state?.settings?.currency
-        ? ({ uah:'₴', usd:'$', eur:'€', pln:'zł', gbp:'£', czk:'Kč' }[this.state.settings.currency] || '$')
-        : (localStorage.getItem('currency') === 'usd' ? '$' :
-           localStorage.getItem('currency') === 'eur' ? '€' :
-           localStorage.getItem('currency') === 'pln' ? 'zł' :
-           localStorage.getItem('currency') === 'gbp' ? '£' :
-           localStorage.getItem('currency') === 'czk' ? 'Kč' : '₴');
+        // 2. БРОНЕБІЙНЕ Визначення валюти (захист від регістру великих/малих літер)
+        const curSetting = (this.state?.settings?.currency || localStorage.getItem('currency') || 'uah').toLowerCase();
+        const symMap = { uah:'₴', usd:'$', eur:'€', pln:'zł', gbp:'£', czk:'Kč' };
+        const sym = symMap[curSetting] || '₴'; // За замовчуванням гривня
 
-    // Зберігаємо глобально
-    window.APP_LANG = lang;
-    window.APP_CURRENCY_SYMBOL = sym;
-    document.title = 'Comunalco';
+        // Зберігаємо глобально
+        window.APP_LANG = lang;
+        window.APP_CURRENCY_SYMBOL = sym;
+        document.title = 'Comunalco';
 
-    if (!t) return;
+        if (!t) return;
 
-    // 3. МАГІЯ: Універсальний переклад
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        if (t[key]) {
-            if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-                if (el.hasAttribute('placeholder')) el.placeholder = t[key];
-                else el.value = t[key];
-            } else {
-                el.innerHTML = t[key]; // Використовуємо innerHTML, щоб працювали емодзі та іконки
+        // 3. МАГІЯ: Універсальний переклад
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if (t[key]) {
+                if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                    if (el.hasAttribute('placeholder')) el.placeholder = t[key];
+                    else el.value = t[key];
+                } else {
+                    el.innerHTML = t[key]; // Використовуємо innerHTML, щоб працювали емодзі та іконки
+                }
             }
-        }
-    });
+        });
 
-    console.log(`🌍 UI language applied: ${lang} | 💰 ${sym}`);
-}
+        // 4. Твій улюблений лог для перевірки в консолі!
+        console.log(`🌍 UI language applied: ${lang} | 💰 ${sym}`);
+    }
 
     // --- 1. ГОЛОВНИЙ РОУТЕР ---
 renderAll() {
@@ -4315,18 +4312,23 @@ updateChart() {
                 let bal = tot - paid;
 
                 // --- 🔥 ОНОВЛЕННЯ UI (ЖИВІ ЦИФРИ НА КАРТЦІ) 🔥 ---
-                a.bill = currentMonthTotal; // Зберігаємо чисте нарахування в пам'ять
+                a.bill = currentMonthTotal; 
                 
                 const uiBill = document.getElementById(`live-bill-${i}`);
                 const uiBal = document.getElementById(`live-balance-${i}`);
                 
-                if (uiBill) uiBill.innerText = currentMonthTotal.toFixed(2);
+                // Підтягуємо правильний символ
+                const curSym = window.APP_CURRENCY_SYMBOL || '₴';
+                
+                if (uiBill) uiBill.innerText = currentMonthTotal.toFixed(2) + " " + curSym;
                 if (uiBal) {
-                    uiBal.innerText = Math.abs(bal).toFixed(2) + " грн";
+                    uiBal.innerText = Math.abs(bal).toFixed(2) + " " + curSym;
                     uiBal.style.color = bal > 0.01 ? "var(--danger)" : (bal < -0.01 ? "var(--success)" : "var(--text)");
-                    // Оновлюємо підпис (Борг/Переплата)
-                    const label = uiBal.previousElementSibling; // Це тег <label> перед сумою
-                    if(label) label.innerText = bal > 0.01 ? "БОРГ" : (bal < -0.01 ? "ПЕРЕПЛАТА" : "ДО СПЛАТИ");
+                    // Оновлюємо підпис багатомовно
+                    const label = uiBal.previousElementSibling; 
+                    let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+                    let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
+                    if(label) label.innerText = bal > 0.01 ? (tr.debt || "БОРГ") : (bal < -0.01 ? (tr.overpay || "ПЕРЕПЛАТА") : (tr.to_pay || "ДО СПЛАТИ"));
                 }
 
                 // --- ГЕНЕРАЦІЯ ТЕКСТУ КВИТАНЦІЇ (ДЛЯ ТЕЛЕГРАМ) (Багатомовна версія + Валюта) ---
@@ -4734,9 +4736,10 @@ updateChart() {
 
     // --- ГЕНЕРАЦІЯ HTML КВИТАНЦІЇ ---
     renderReceiptHTML(i) {
-        // 🌍 Підтягуємо мову
+        // 🌍 Підтягуємо мову та валюту
         let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
         let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
+        const curSym = window.APP_CURRENCY_SYMBOL || '₴'; // 🔥 ДОДАНО: Правильний символ валюти
 
         const a = this.currentData.apartments[i];
         const d = this.currentData;
@@ -4791,26 +4794,27 @@ updateChart() {
         // --- 2. ГЕНЕРУЄМО ТАБЛИЦЮ ---
         let rowsHTML = '';
 
-        if (c.ed > 0 || a.curr.ed > 0) rowsHTML += `<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:12px 8px;"><div style="font-weight:bold; color:#334155;">${tr.receipt_el_day || '⚡ Електрика (День)'}</div><div style="font-size:11px; color:#64748b;">${a.prev.ed} ➔ <b>${a.curr.ed}</b></div></td><td style="padding:12px 8px; text-align:center;">${c.ed}</td><td style="padding:12px 8px; text-align:right;">${cost.ed.toFixed(2)}</td></tr>`;
-        if (c.en > 0 || a.curr.en > 0) rowsHTML += `<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:12px 8px;"><div style="font-weight:bold; color:#334155;">${tr.receipt_el_night || '🌙 Електрика (Ніч)'}</div><div style="font-size:11px; color:#64748b;">${a.prev.en} ➔ <b>${a.curr.en}</b></div></td><td style="padding:12px 8px; text-align:center;">${c.en}</td><td style="padding:12px 8px; text-align:right;">${cost.en.toFixed(2)}</td></tr>`;
-        if (c.w > 0 || a.curr.w > 0) rowsHTML += `<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:12px 8px;"><div style="font-weight:bold; color:#334155;">${tr.receipt_water || '💧 Водопостачання'}</div><div style="font-size:11px; color:#64748b;">${a.prev.w} ➔ <b>${a.curr.w}</b></div></td><td style="padding:12px 8px; text-align:center;">${c.w}</td><td style="padding:12px 8px; text-align:right;">${cost.w.toFixed(2)}</td></tr>`;
-        if (c.g > 0 || a.curr.g > 0) rowsHTML += `<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:12px 8px;"><div style="font-weight:bold; color:#334155;">${tr.receipt_gas || '🔥 Газопостачання'}</div><div style="font-size:11px; color:#64748b;">${a.prev.g} ➔ <b>${a.curr.g}</b></div></td><td style="padding:12px 8px; text-align:center;">${c.g}</td><td style="padding:12px 8px; text-align:right;">${cost.g.toFixed(2)}</td></tr>`;
+        // 🔥 ДОДАНО: ${curSym} біля кожної ціни в таблиці
+        if (c.ed > 0 || a.curr.ed > 0) rowsHTML += `<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:12px 8px;"><div style="font-weight:bold; color:#334155;">${tr.receipt_el_day || '⚡ Електрика (День)'}</div><div style="font-size:11px; color:#64748b;">${a.prev.ed} ➔ <b>${a.curr.ed}</b></div></td><td style="padding:12px 8px; text-align:center;">${c.ed}</td><td style="padding:12px 8px; text-align:right;">${cost.ed.toFixed(2)} ${curSym}</td></tr>`;
+        if (c.en > 0 || a.curr.en > 0) rowsHTML += `<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:12px 8px;"><div style="font-weight:bold; color:#334155;">${tr.receipt_el_night || '🌙 Електрика (Ніч)'}</div><div style="font-size:11px; color:#64748b;">${a.prev.en} ➔ <b>${a.curr.en}</b></div></td><td style="padding:12px 8px; text-align:center;">${c.en}</td><td style="padding:12px 8px; text-align:right;">${cost.en.toFixed(2)} ${curSym}</td></tr>`;
+        if (c.w > 0 || a.curr.w > 0) rowsHTML += `<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:12px 8px;"><div style="font-weight:bold; color:#334155;">${tr.receipt_water || '💧 Водопостачання'}</div><div style="font-size:11px; color:#64748b;">${a.prev.w} ➔ <b>${a.curr.w}</b></div></td><td style="padding:12px 8px; text-align:center;">${c.w}</td><td style="padding:12px 8px; text-align:right;">${cost.w.toFixed(2)} ${curSym}</td></tr>`;
+        if (c.g > 0 || a.curr.g > 0) rowsHTML += `<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:12px 8px;"><div style="font-weight:bold; color:#334155;">${tr.receipt_gas || '🔥 Газопостачання'}</div><div style="font-size:11px; color:#64748b;">${a.prev.g} ➔ <b>${a.curr.g}</b></div></td><td style="padding:12px 8px; text-align:center;">${c.g}</td><td style="padding:12px 8px; text-align:right;">${cost.g.toFixed(2)} ${curSym}</td></tr>`;
 
         let custCost = 0;
         (a.custom_counters || []).forEach(cc => {
             const diff = Math.max(0, cc.curr - cc.prev);
             const val = diff * cc.price;
             custCost += val;
-            if(diff > 0 || cc.curr > 0) rowsHTML += `<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:12px 8px;"><div style="color:#334155;">${cc.name}</div><div style="font-size:11px; color:#64748b;">${cc.prev} ➔ <b>${cc.curr}</b></div></td><td style="padding:12px 8px; text-align:center;">${diff}</td><td style="padding:12px 8px; text-align:right;">${val.toFixed(2)}</td></tr>`;
+            if(diff > 0 || cc.curr > 0) rowsHTML += `<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:12px 8px;"><div style="color:#334155;">${cc.name}</div><div style="font-size:11px; color:#64748b;">${cc.prev} ➔ <b>${cc.curr}</b></div></td><td style="padding:12px 8px; text-align:center;">${diff}</td><td style="padding:12px 8px; text-align:right;">${val.toFixed(2)} ${curSym}</td></tr>`;
         });
 
-        rowsHTML += `<tr style="border-bottom:1px solid #e2e8f0; background-color:#f8fafc;"><td style="padding:12px 8px;" colspan="2"><div style="font-weight:bold; color:#475569;">${tr.receipt_mzk || '🏢 МЗК (Загальні витрати)'}</div><div style="font-size:10px; color:#94a3b8;">${tr.receipt_mzk_desc || 'Світло, прибирання та ін.'}</div></td><td style="padding:12px 8px; text-align:right; font-weight:bold; color:#475569;">${mzkPerApt.toFixed(2)}</td></tr>`;
+        rowsHTML += `<tr style="border-bottom:1px solid #e2e8f0; background-color:#f8fafc;"><td style="padding:12px 8px;" colspan="2"><div style="font-weight:bold; color:#475569;">${tr.receipt_mzk || '🏢 МЗК (Загальні витрати)'}</div><div style="font-size:10px; color:#94a3b8;">${tr.receipt_mzk_desc || 'Світло, прибирання та ін.'}</div></td><td style="padding:12px 8px; text-align:right; font-weight:bold; color:#475569;">${mzkPerApt.toFixed(2)} ${curSym}</td></tr>`;
 
         let sCost = 0;
         (a.services||[]).forEach(s => {
             const val = parseFloat(s.val)||0;
             sCost += val;
-            if(val > 0) rowsHTML += `<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:12px 8px;" colspan="2">${s.name}</td><td style="padding:12px 8px; text-align:right;">${val.toFixed(2)}</td></tr>`;
+            if(val > 0) rowsHTML += `<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:12px 8px;" colspan="2">${s.name}</td><td style="padding:12px 8px; text-align:right;">${val.toFixed(2)} ${curSym}</td></tr>`;
         });
 
         // --- 3. ПІДСУМКИ ТА БАЛАНС ---
@@ -4819,19 +4823,19 @@ updateChart() {
         const paid = parseFloat(a.paid)||0;
         const totalToPay = currentTotal + debt - paid;
 
-        // 🔥 ЛОГІКА ДЛЯ БОРГУ/ПЕРЕПЛАТИ
+        // 🔥 ЛОГІКА ДЛЯ БОРГУ/ПЕРЕПЛАТИ (з валютою)
         let debtRowHTML = '';
         if (debt > 0.01) {
             debtRowHTML = `
             <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:13px; color:#ef4444;">
                 <span>${tr.receipt_debt || '❗️ Борг (минулий):'}</span>
-                <span style="font-weight:bold;">${debt.toFixed(2)}</span>
+                <span style="font-weight:bold;">${debt.toFixed(2)} ${curSym}</span>
             </div>`;
         } else if (debt < -0.01) {
             debtRowHTML = `
             <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:13px; color:#22c55e;">
                 <span>${tr.receipt_overpay || '💚 Переплата (минула):'}</span>
-                <span style="font-weight:bold;">${Math.abs(debt).toFixed(2)}</span>
+                <span style="font-weight:bold;">${Math.abs(debt).toFixed(2)} ${curSym}</span>
             </div>`;
         }
 
@@ -4856,18 +4860,18 @@ updateChart() {
                 <div style="width:250px;">
                     <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:13px;">
                         <span style="color:#64748b;">${tr.receipt_accrued || 'Нараховано (поточний):'}</span>
-                        <span style="font-weight:bold;">${currentTotal.toFixed(2)}</span>
+                        <span style="font-weight:bold;">${currentTotal.toFixed(2)} ${curSym}</span>
                     </div>
                     
                     ${debtRowHTML} ${paid > 0 ? `
                     <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:13px; color:#22c55e;">
                         <span>${tr.receipt_paid || '✅ Сплачено:'}</span>
-                        <span style="font-weight:bold;">-${paid.toFixed(2)}</span>
+                        <span style="font-weight:bold;">-${paid.toFixed(2)} ${curSym}</span>
                     </div>` : ''}
                     
                     <div style="border-top:2px solid #0f172a; margin-top:10px; padding-top:10px; display:flex; justify-content:space-between; align-items:center;">
                         <span style="font-size:12px; font-weight:bold; text-transform:uppercase;">${tr.receipt_to_pay || 'ДО СПЛАТИ'}</span>
-                        <span style="font-size:22px; font-weight:900; color:#0f172a;">${totalToPay.toFixed(2)}</span>
+                        <span style="font-size:22px; font-weight:900; color:#0f172a;">${totalToPay.toFixed(2)} ${curSym}</span>
                     </div>
                 </div>
             </div>
