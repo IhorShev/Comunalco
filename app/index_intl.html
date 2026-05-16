@@ -224,57 +224,68 @@
     }
 }
 
-		/* === НОВА ЄДИНА ШАПКА (UNIFIED HEADER) === */
+		/* === НОВА ЄДИНА ШАПКА (ПРОФЕСІЙНА З ВЕЛИКИМ ЛОГОТИПОМ) === */
         .saas-header {
-            position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; height: 60px !important;
-            background: #0f172a !important; 
-            border-bottom: 1px solid #1e293b !important;
-            z-index: 9999 !important; /* Підняли z-index, щоб завжди була зверху */
+            position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; height: 65px !important;
+            background: var(--header-bg) !important;
+            border-bottom: 1px solid var(--border) !important;
+            z-index: 9999 !important; 
             display: flex !important; align-items: center !important; justify-content: space-between !important;
             padding: 0 15px !important; box-sizing: border-box !important;
-            flex-wrap: nowrap !important; /* ЗАБОРОНЯЄМО перенос на новий рядок */
+            white-space: nowrap !important;
         }
 
         .header-left-wrap, .header-actions {
-            display: flex !important; align-items: center !important; flex-wrap: nowrap !important; gap: 8px;
+            display: flex !important; align-items: center !important; gap: 10px; flex-shrink: 0;
         }
 
-        /* Компактний Логотип */
+        /* Цільний, Великий Логотип */
         .header-logo {
-            display: flex; align-items: center; gap: 8px; text-decoration: none; margin-right: 5px; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            text-decoration: none; background: transparent; border-radius: 8px; overflow: hidden;
+            height: 48px; padding: 0 5px; flex-shrink: 0; transition: 0.2s; margin-right: 5px;
         }
-        .header-logo-icon { width: 30px; height: 30px; object-fit: contain; }
-        .header-logo-wordmark { height: 18px; width: auto; object-fit: contain; margin-top: 2px; }
+        .header-logo:hover { background: rgba(128,128,128,0.05); }
+        .header-logo-unified { height: 44px; width: auto; object-fit: contain; margin-bottom: -2px; }
 
-        /* Панель Об'єкта біля логотипу */
+        /* Панель Об'єкта */
         .header-object-panel {
-            display: flex; align-items: center; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 2px 5px; height: 36px; flex-shrink: 1;
+            display: flex; align-items: center; background: var(--input-bg); border: 1px solid var(--border); border-radius: 8px; padding: 0 5px; height: 38px; flex-shrink: 1;
         }
         .header-object-panel input {
-            background: transparent; border: none; color: #fff; font-weight: 700; font-size: 13px; text-align: center; width: 120px; outline: none; text-transform: uppercase;
+            background: transparent; border: none; color: var(--text); font-weight: 700; font-size: 13px; text-align: center; width: 130px; outline: none; text-transform: uppercase;
         }
-        .header-object-btn {
-            cursor: pointer; color: var(--text-sec); padding: 0 5px; font-size: 16px; transition: 0.2s; display: flex; align-items: center;
-        }
-        .header-object-btn:hover { color: #fff; }
+        .header-object-btn { cursor: pointer; color: var(--text-sec); padding: 0 5px; font-size: 16px; transition: 0.2s; display: flex; align-items: center; }
+        .header-object-btn:hover { color: var(--text); }
         .header-object-btn.add { color: var(--primary); font-weight: 900; font-size: 20px; }
+
+        /* Професійні кнопки меню навігації */
+        .header-nav-link {
+            color: var(--text-sec); font-size: 11px; font-weight: 700; cursor: pointer; padding: 0 10px; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 8px; transition: all 0.2s; border: 1px solid transparent; text-transform: uppercase; letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+        .header-nav-link:hover { background: rgba(128,128,128,0.1); color: var(--text); }
+        .header-nav-link.premium { color: var(--primary); }
+        .header-nav-link.premium:hover { background: rgba(0,153,255,0.1); border-color: rgba(0,153,255,0.3); }
 
         /* Кнопка AI Помічника */
         .btn-ai {
-            background: linear-gradient(135deg, #8b5cf6, #3b82f6); color: white; border: none; border-radius: 8px; height: 34px; padding: 0 10px; font-weight: bold; font-size: 12px; display: flex; align-items: center; gap: 5px; cursor: pointer; transition: 0.3s; box-shadow: 0 0 10px rgba(139, 92, 246, 0.4); flex-shrink: 0; white-space: nowrap;
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6); color: white; border: none; border-radius: 8px; height: 38px; padding: 0 12px; font-weight: bold; font-size: 12px; display: flex; align-items: center; gap: 6px; cursor: pointer; transition: 0.3s; box-shadow: 0 0 10px rgba(139, 92, 246, 0.4); flex-shrink: 0;
         }
         .btn-ai:hover { box-shadow: 0 0 15px rgba(139, 92, 246, 0.6); transform: translateY(-1px); }
         .btn-ai:active { transform: scale(0.95); }
 
+        /* Адаптивність: Ховаємо меню раніше, щоб не ламало шапку */
+        @media (max-width: 1050px) {
+            .desktop-only { display: none !important; }
+            .mobile-only { display: flex !important; }
+        }
         @media (max-width: 800px) {
             .saas-header { padding: 0 8px !important; }
-            .header-logo-wordmark { display: none !important; } /* Ховаємо назву на мобільному */
-            .header-logo { margin-right: 0; }
+            .header-logo-unified { height: 28px; } /* Зменшуємо лого на мобільному, щоб влізло */
             .header-object-panel input { width: 90px; font-size: 12px; }
-            .btn-ai .ai-text { display: none !important; } /* Ховаємо текст AI на мобільному */
+            .btn-ai .ai-text { display: none !important; } /* Лишаємо тільки іконку AI */
             .btn-ai { padding: 0 8px; }
-            .header-actions { gap: 4px; }
-            .chat-btn { padding: 0 8px !important; }
         }        
         /* --- АДАПТИВНЕ МЕНЮ (PRO версія) --- */
         .top-menu-bar { display: flex; justify-content: space-between; align-items: center; position: relative; padding: 10px 0; }
@@ -581,8 +592,7 @@
     
     <div class="header-left-wrap">
         <a href="#" onclick="app.goToLobby()" class="header-logo">
-            <img src="Icon.png" alt="🏠" class="header-logo-icon">
-            <img src="Comunalco.png" alt="Comunalco" class="header-logo-wordmark">
+            <img src="UnifiedLogo.png" id="main-header-logo" alt="Comunalco" class="header-logo-unified">
         </a>
 
         <div class="header-object-panel">
@@ -599,26 +609,30 @@
             <span class="ai-text" data-i18n="btn_ai">AI Помічник</span>
         </button>
 
-        <button class="chat-btn" style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; height:34px; padding:0 10px; color:#fff; cursor:pointer; display:flex; align-items:center; gap:5px; position:relative; outline:none; flex-shrink: 0;" onclick="document.getElementById('chat-modal').style.display='flex'">
+        <button class="chat-btn" style="background:var(--input-bg); border:1px solid var(--border); border-radius:8px; height:38px; padding:0 10px; color:var(--text); cursor:pointer; display:flex; align-items:center; gap:5px; position:relative; outline:none; flex-shrink: 0;" onclick="document.getElementById('chat-modal').style.display='flex'">
             <span style="font-size:16px;">💬</span>
-            <span class="desktop-text-chat" style="font-size:11px; font-weight:bold;" data-i18n="menu_chat_desktop">ЧАТ</span>
+            <span class="desktop-text-chat" style="font-size:11px; font-weight:bold; letter-spacing: 0.5px;" data-i18n="menu_chat_desktop">ЧАТ БУДИНКУ</span>
+            <span class="mobile-text-chat" style="font-size:11px; font-weight:bold; display:none;" data-i18n="menu_chat_mobile">ЧАТ</span>
             <div id="admin-chat-badge" style="display:none; position:absolute; top:-5px; right:-5px; background:#ef4444; color:white; font-size:10px; font-weight:bold; padding:2px 5px; border-radius:10px;" data-i18n="chat_new">Нові</div>
         </button>
 
-        <div class="desktop-only" style="display:flex; align-items:center; gap:10px; margin:0 5px;">
-            <span onclick="app.openMenu('premium')" style="color:var(--primary); font-weight:bold; cursor:pointer; font-size:12px; white-space:nowrap;" data-i18n="menu_tariffs">💎 Тарифи</span>
-            <span onclick="app.openMenu('history')" style="cursor:pointer; font-size:12px; color:#94a3b8; white-space:nowrap;" data-i18n="menu_archive">🕒 Архів</span>
-            <span onclick="app.openChartModal()" style="cursor:pointer; font-size:12px; color:#94a3b8; white-space:nowrap;" data-i18n="menu_analytics">📊 Аналітика</span>
-            <button onclick="app.toggleTheme()" style="background:none; border:none; cursor:pointer; padding:0; display:flex; align-items:center; flex-shrink: 0;">
-                <svg id="theme-icon" viewBox="0 0 24 24" fill="none" stroke="var(--text-sec)" stroke-width="2" width="20" height="20"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        <div class="desktop-only" style="display:flex; align-items:center; gap:4px; margin:0 5px;">
+            <span class="header-nav-link premium" onclick="app.openMenu('premium')"><span style="margin-right:4px;">💎</span> <span data-i18n="menu_tariffs">Тарифи</span></span>
+            <span class="header-nav-link" onclick="app.openMenu('history')" data-i18n="menu_archive">🕒 Архів</span>
+            <span class="header-nav-link" onclick="app.openChartModal()" data-i18n="menu_analytics">📊 Аналітика</span>
+            <span class="header-nav-link" onclick="app.openAccessMenu()" data-i18n="menu_access">👥 Доступ</span>
+            <span class="header-nav-link" onclick="app.openMenu('info')" data-i18n="menu_info">ℹ️ Інфо</span>
+            
+            <button class="header-nav-link" onclick="app.toggleTheme()" style="background:none; margin-left: 5px; padding: 0 8px;">
+                <svg id="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
             </button>
         </div>
 
         <div class="mobile-only" style="position:relative;">
-            <button class="menu-btn" onclick="const m=document.getElementById('mobile-dropdown'); m.style.display=m.style.display==='block'?'none':'block';" style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; cursor:pointer; color:#fff; padding:0 8px; height:34px; display:flex; align-items:center; outline:none;">
-                <span style="font-size:20px;">≡</span>
+            <button class="menu-btn" onclick="const m=document.getElementById('mobile-dropdown'); m.style.display=m.style.display==='block'?'none':'block';" style="background:var(--input-bg); border:1px solid var(--border); border-radius:8px; cursor:pointer; color:var(--text); padding:0 10px; height:38px; display:flex; align-items:center; outline:none;">
+                <span style="font-size:22px;">≡</span>
             </button>
-            <div id="mobile-dropdown" style="display:none; position:absolute; top:42px; right:0; background:#1e293b; border:1px solid var(--border); border-radius:12px; padding:5px; box-shadow:0 10px 25px rgba(0,0,0,0.9); z-index:9999; min-width:180px;">
+            <div id="mobile-dropdown" style="display:none; position:absolute; top:45px; right:0; background:var(--card); border:1px solid var(--border); border-radius:12px; padding:5px; box-shadow:0 10px 25px rgba(0,0,0,0.9); z-index:9999; min-width:180px;">
                 <div onclick="app.openMenu('premium'); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; border-bottom:1px solid var(--border); cursor:pointer; color:var(--primary); font-weight:bold;" data-i18n="menu_tariffs">💎 Тарифи</div>
                 <div onclick="app.openMenu('history'); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; border-bottom:1px solid var(--border); cursor:pointer; color:var(--text);" data-i18n="menu_archive">🕒 Архів</div>
                 <div onclick="app.openChartModal(); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; border-bottom:1px solid var(--border); cursor:pointer; color:var(--text);" data-i18n="menu_analytics">📊 Аналітика</div>
@@ -630,8 +644,8 @@
 
         <div style="position:relative; flex-shrink:0;" id="account-dropdown-wrapper">
             <button onclick="toggleAccountMenu()" id="auth-btn" style="background:transparent; border:none; padding:0; display:flex; align-items:center; cursor:pointer; outline:none; margin-left:5px;">
-                <img id="user-avatar" src="" style="width:34px; height:34px; border-radius:50%; object-fit:cover; border:2px solid var(--primary); display:none;">
-                <div id="default-avatar" style="width:34px; height:34px; border-radius:50%; background:var(--primary); color:white; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:16px;">👤</div>
+                <img id="user-avatar" src="" style="width:38px; height:38px; border-radius:50%; object-fit:cover; border:2px solid var(--primary); display:none;">
+                <div id="default-avatar" style="width:38px; height:38px; border-radius:50%; background:var(--primary); color:white; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:16px;">👤</div>
             </button>
 
             <div id="account-menu" style="display:none; position:absolute; top:45px; right:0; background:var(--card); border:1px solid var(--border); border-radius:16px; box-shadow:0 15px 35px rgba(0,0,0,0.4); z-index:2000; min-width:250px; overflow:hidden;">
@@ -1019,7 +1033,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '17.3';
+    const APP_VERSION = '17.4';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
