@@ -223,7 +223,54 @@
         padding: 0 10px !important;
     }
 }
-        
+
+		/* === НОВА ЄДИНА ШАПКА (UNIFIED HEADER) === */
+        .saas-header {
+            position: fixed; top: 0; left: 0; right: 0; height: 65px;
+            background: #0f172a; /* Темний фон під шапку */
+            border-bottom: 1px solid #1e293b;
+            z-index: 1000; display: flex; align-items: center; justify-content: space-between;
+            padding: 0 15px; box-sizing: border-box; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Компактний Логотип */
+        .header-logo {
+            display: flex; align-items: center; gap: 8px; text-decoration: none; margin-right: 15px;
+        }
+        .header-logo-icon { width: 32px; height: 32px; object-fit: contain; }
+        .header-logo-wordmark { height: 20px; width: auto; object-fit: contain; margin-top: 2px; }
+
+        /* Панель Об'єкта біля логотипу */
+        .header-object-panel {
+            display: flex; align-items: center; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 2px 8px; height: 38px;
+        }
+        .header-object-panel input {
+            background: transparent; border: none; color: #fff; font-weight: 700; font-size: 14px; text-align: center; width: 140px; outline: none; text-transform: uppercase;
+        }
+        .header-object-btn {
+            cursor: pointer; color: var(--text-sec); padding: 0 5px; font-size: 16px; transition: 0.2s; display: flex; align-items: center;
+        }
+        .header-object-btn:hover { color: #fff; }
+        .header-object-btn.add { color: var(--primary); font-weight: 900; font-size: 20px; }
+
+        /* Кнопка AI Помічника */
+        .btn-ai {
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6); color: white; border: none; border-radius: 8px; height: 36px; padding: 0 12px; font-weight: bold; font-size: 13px; display: flex; align-items: center; gap: 6px; cursor: pointer; transition: 0.3s; box-shadow: 0 0 10px rgba(139, 92, 246, 0.4);
+        }
+        .btn-ai:hover { box-shadow: 0 0 15px rgba(139, 92, 246, 0.6); transform: translateY(-1px); }
+        .btn-ai:active { transform: scale(0.95); }
+
+        .header-actions { display: flex; align-items: center; gap: 8px; }
+
+        @media (max-width: 800px) {
+            .saas-header { padding: 0 8px; gap: 5px; }
+            .header-logo-wordmark { display: none; } /* Ховаємо назву на мобільному, лишаємо іконку */
+            .header-object-panel { margin-left: 5px; padding: 2px 4px; }
+            .header-object-panel input { width: 90px; font-size: 12px; }
+            .btn-ai .ai-text { display: none; } /* Ховаємо текст AI на мобільному, лишаємо іконку */
+            .btn-ai { padding: 0 8px; }
+            .header-actions { gap: 4px; }
+        }        
         /* --- АДАПТИВНЕ МЕНЮ (PRO версія) --- */
         .top-menu-bar { display: flex; justify-content: space-between; align-items: center; position: relative; padding: 10px 0; }
         .theme-icon-svg { width: 24px; height: 24px; stroke: var(--text); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.3s ease; }
@@ -525,98 +572,93 @@
 }	
 </style>
 
-<div class="top-menu-bar" style="position:fixed; top:0; left:0; right:0; width:100%; background:#0f172a; z-index:1000; padding:8px 12px; border-bottom:1px solid #1e293b; margin:0; box-sizing:border-box; display:flex; align-items:center; justify-content:space-between; gap:8px; min-height:56px; max-height:56px;">
+<header class="saas-header">
+    
+    <div style="display: flex; align-items: center;">
+        <a href="#" onclick="app.goToLobby()" class="header-logo">
+            <img src="Icon.png" alt="🏠" class="header-logo-icon">
+            <img src="Comunalco.png" alt="Comunalco" class="header-logo-wordmark">
+        </a>
 
-    <!-- ЛІВО: Акаунт -->
-    <div style="position:relative; flex-shrink:0;" id="account-dropdown-wrapper">
-        <button onclick="toggleAccountMenu()" id="auth-btn" style="background:transparent; border:none; padding:4px; display:flex; align-items:center; gap:8px; cursor:pointer; outline:none;">
-            <img id="user-avatar" src="" style="width:36px; height:36px; border-radius:50%; object-fit:cover; border:2px solid var(--primary); display:none;">
-            <div id="default-avatar" style="width:36px; height:36px; border-radius:50%; background:var(--primary); color:white; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:16px;">👤</div>
-            <div style="display:flex; flex-direction:column; align-items:flex-start;">
-                <span id="user-name-display" style="font-weight:700; font-size:14px; color:var(--text);">Вхід</span>
-            </div>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-sec)" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+        <div class="header-object-panel">
+            <span class="header-object-btn" onclick="app.deleteObject()" title="Видалити">🗑️</span>
+            <input type="text" id="object-title" class="object-title" value="" onchange="app.updateObjectName(this.value)" data-i18n="obj_placeholder" placeholder="НАЗВА ОБ'ЄКТУ">
+            <span class="header-object-btn add" onclick="app.addObject()" title="Додати">+</span>
+        </div>
+    </div>
+
+    <div class="header-actions">
+        
+        <button class="btn-ai" onclick="alert('AI помічник у розробці!')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            <span class="ai-text" data-i18n="btn_ai">AI Помічник</span>
         </button>
 
-        <div id="account-menu" style="display:none; position:absolute; top:52px; left:0; background:var(--card); border:1px solid var(--border); border-radius:16px; box-shadow:0 15px 35px rgba(0,0,0,0.4); z-index:2000; min-width:250px; overflow:hidden;">
-            
-            <div style="padding:15px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:12px; background:rgba(0,0,0,0.02);">
-                <img id="menu-large-avatar" src="" style="width:45px; height:45px; border-radius:50%; object-fit:cover; display:none;">
-                <div id="menu-default-avatar" style="width:45px; height:45px; border-radius:50%; background:var(--primary); color:white; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:20px;">👤</div>
-                <div style="overflow:hidden;">
-                    <div id="menu-user-name" style="font-weight:bold; font-size:15px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">...</div>
-                    <div id="menu-user-email" style="font-size:11px; color:var(--text-sec); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">...</div>
+        <button class="chat-btn" style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; height:36px; padding:0 10px; color:#fff; cursor:pointer; display:flex; align-items:center; gap:5px; position:relative; outline:none;" onclick="document.getElementById('chat-modal').style.display='flex'">
+            <span style="font-size:16px;">💬</span>
+            <span class="desktop-text-chat" style="font-size:12px; font-weight:bold;" data-i18n="menu_chat_desktop">ЧАТ БУДИНКУ</span>
+            <span class="mobile-text-chat" style="font-size:12px; font-weight:bold; display:none;" data-i18n="menu_chat_mobile">ЧАТ</span>
+            <div id="admin-chat-badge" style="display:none; position:absolute; top:-5px; right:-5px; background:#ef4444; color:white; font-size:10px; font-weight:bold; padding:2px 5px; border-radius:10px;" data-i18n="chat_new">Нові</div>
+        </button>
+
+        <div class="desktop-only" style="display:flex; align-items:center; gap:12px; margin:0 5px;">
+            <span onclick="app.openMenu('premium')" style="color:var(--primary); font-weight:bold; cursor:pointer; font-size:12px;" data-i18n="menu_tariffs">💎 Тарифи</span>
+            <span onclick="app.openMenu('history')" style="cursor:pointer; font-size:12px; color:#94a3b8;" data-i18n="menu_archive">🕒 Архів</span>
+            <span onclick="app.openChartModal()" style="cursor:pointer; font-size:12px; color:#94a3b8;" data-i18n="menu_analytics">📊 Аналітика</span>
+            <button onclick="app.toggleTheme()" style="background:none; border:none; cursor:pointer; padding:0; display:flex; align-items:center;">
+                <svg id="theme-icon" viewBox="0 0 24 24" fill="none" stroke="var(--text-sec)" stroke-width="2" width="20" height="20"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+            </button>
+        </div>
+
+        <div class="mobile-only" style="position:relative;">
+            <button class="menu-btn" onclick="const m=document.getElementById('mobile-dropdown'); m.style.display=m.style.display==='block'?'none':'block';" style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; cursor:pointer; color:#fff; padding:0 8px; height:36px; display:flex; align-items:center; outline:none;">
+                <span style="font-size:20px;">≡</span>
+            </button>
+            <div id="mobile-dropdown" style="display:none; position:absolute; top:42px; right:0; background:#1e293b; border:1px solid var(--border); border-radius:12px; padding:5px; box-shadow:0 10px 25px rgba(0,0,0,0.9); z-index:9999; min-width:180px;">
+                <div onclick="app.openMenu('premium'); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; border-bottom:1px solid var(--border); cursor:pointer; color:var(--primary); font-weight:bold;" data-i18n="menu_tariffs">💎 Тарифи</div>
+                <div onclick="app.openMenu('history'); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; border-bottom:1px solid var(--border); cursor:pointer; color:var(--text);" data-i18n="menu_archive">🕒 Архів</div>
+                <div onclick="app.openChartModal(); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; border-bottom:1px solid var(--border); cursor:pointer; color:var(--text);" data-i18n="menu_analytics">📊 Аналітика</div>
+                <div onclick="app.openAccessMenu(); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; border-bottom:1px solid var(--border); cursor:pointer; color:var(--text);" data-i18n="menu_access">👥 Доступ</div>
+                <div onclick="document.getElementById('setupModal').style.display='flex'; document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; border-bottom:1px solid var(--border); cursor:pointer; color:var(--text);" data-i18n="menu_setup_region">🌍 Мова та Валюта</div>
+                <div onclick="app.toggleTheme(); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; cursor:pointer; border-top:1px solid var(--border); color:var(--text);" data-i18n="menu_theme">🌓 Змінити тему</div>
+            </div>
+        </div>
+
+        <div style="position:relative; flex-shrink:0;" id="account-dropdown-wrapper">
+            <button onclick="toggleAccountMenu()" id="auth-btn" style="background:transparent; border:none; padding:0; display:flex; align-items:center; cursor:pointer; outline:none; margin-left:5px;">
+                <img id="user-avatar" src="" style="width:36px; height:36px; border-radius:50%; object-fit:cover; border:2px solid var(--primary); display:none;">
+                <div id="default-avatar" style="width:36px; height:36px; border-radius:50%; background:var(--primary); color:white; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:16px;">👤</div>
+            </button>
+
+            <div id="account-menu" style="display:none; position:absolute; top:50px; right:0; background:var(--card); border:1px solid var(--border); border-radius:16px; box-shadow:0 15px 35px rgba(0,0,0,0.4); z-index:2000; min-width:250px; overflow:hidden;">
+                <div style="padding:15px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:12px; background:rgba(0,0,0,0.02);">
+                    <img id="menu-large-avatar" src="" style="width:45px; height:45px; border-radius:50%; object-fit:cover; display:none;">
+                    <div id="menu-default-avatar" style="width:45px; height:45px; border-radius:50%; background:var(--primary); color:white; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:20px;">👤</div>
+                    <div style="overflow:hidden; text-align:left;">
+                        <div id="menu-user-name" style="font-weight:bold; font-size:15px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">...</div>
+                        <div id="menu-user-email" style="font-size:11px; color:var(--text-sec); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">...</div>
+                    </div>
+                </div>
+                <div id="menu-tariff-block" style="padding:15px; border-bottom:1px solid var(--border); display:none; text-align:left;">
+                    <div style="font-size:10px; color:var(--text-sec); text-transform:uppercase; font-weight:800; margin-bottom:4px;" data-i18n="status_tariff">Тариф:</div>
+                    <div id="menu-tariff-name" style="font-size:18px; font-weight:900; color:var(--primary); margin-bottom:4px; letter-spacing:0.5px;">...</div>
+                    <div style="font-size:12px; color:var(--text); font-weight:600;"><span data-i18n="valid_until">Діє до:</span> <span id="menu-tariff-expire">...</span></div>
+                </div>
+                <div onclick="app.openMenu('premium'); toggleAccountMenu();" style="padding:15px; cursor:pointer; font-weight:bold; color:var(--text); transition:0.2s; display:flex; align-items:center; gap:10px;" onmouseover="this.style.background='rgba(0,153,255,0.05)'; this.style.color='var(--primary)';" onmouseout="this.style.background='transparent'; this.style.color='var(--text)';">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.59-9.21l-5.6 5.6"/></svg>
+                    <span data-i18n="menu_extend">Продовжити тариф</span>
+                </div>
+                <div onclick="window.googleLogout();" style="padding:15px; border-top:1px solid var(--border); cursor:pointer; font-weight:bold; color:var(--danger); transition:0.2s; display:flex; align-items:center; gap:10px;" onmouseover="this.style.background='rgba(239,68,68,0.05)';" onmouseout="this.style.background='transparent';">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    <span data-i18n="menu_logout">Вийти</span>
                 </div>
             </div>
-
-            <div id="menu-tariff-block" style="padding:15px; border-bottom:1px solid var(--border); display:none;">
-                <div style="font-size:10px; color:var(--text-sec); text-transform:uppercase; font-weight:800; margin-bottom:4px;" data-i18n="status_tariff">Тариф:</div>
-                <div id="menu-tariff-name" style="font-size:18px; font-weight:900; color:var(--primary); margin-bottom:4px; letter-spacing:0.5px;">...</div>
-                <div style="font-size:12px; color:var(--text); font-weight:600;"><span data-i18n="valid_until">Діє до:</span> <span id="menu-tariff-expire">...</span></div>
-            </div>
-
-            <div onclick="app.openMenu('premium'); toggleAccountMenu();" style="padding:15px; cursor:pointer; font-weight:bold; color:var(--text); transition:0.2s; display:flex; align-items:center; gap:10px;" onmouseover="this.style.background='rgba(0,153,255,0.05)'; this.style.color='var(--primary)';" onmouseout="this.style.background='transparent'; this.style.color='var(--text)';">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.59-9.21l-5.6 5.6"/></svg>
-                <span data-i18n="menu_extend">Продовжити тариф</span>
-            </div>
-            
-            <div onclick="window.googleLogout();" style="padding:15px; border-top:1px solid var(--border); cursor:pointer; font-weight:bold; color:var(--danger); transition:0.2s; display:flex; align-items:center; gap:10px;" onmouseover="this.style.background='rgba(239,68,68,0.05)';" onmouseout="this.style.background='transparent';">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                <span data-i18n="menu_logout">Вийти</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- ПРАВО: колонка (кнопки + тост) -->
-    <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px; margin-left:auto;">
-
-        <!-- Рядок 1: ЧАТ + МЕНЮ (або десктоп меню) -->
-        <div style="display:flex; align-items:center; gap:8px;">
-
-            <div class="chat-btn" style="position:relative; cursor:pointer; display:flex; align-items:center; height:36px; padding:0 15px; background:var(--bg-card); border:1px solid var(--border); border-radius:12px; color:var(--text);" onclick="document.getElementById('chat-modal').style.display='flex'">
-                <span style="font-size:16px;">💬</span>
-                <span class="desktop-text-chat" style="font-size:12px; font-weight:bold; margin-left:5px;" data-i18n="menu_chat_desktop">ЧАТ БУДИНКУ</span>
-<span class="mobile-text-chat" style="font-size:12px; font-weight:bold; margin-left:5px;" data-i18n="menu_chat_mobile">ЧАТ</span>
-<div id="admin-chat-badge" style="display:none; position:absolute; top:-5px; right:-5px; background:#ef4444; color:white; font-size:10px; font-weight:bold; padding:2px 5px; border-radius:10px;" data-i18n="chat_new">Нові</div>
-            </div>
-
-            <div class="desktop-only" style="display:flex; align-items:center; gap:15px;">
-    <span onclick="app.openMenu('premium')" style="color:var(--primary); font-weight:bold; cursor:pointer; font-size:12px;" data-i18n="menu_tariffs">💎 Тарифи</span>
-    <span onclick="app.openMenu('history')" style="cursor:pointer; font-size:12px;" data-i18n="menu_archive">🕒 Архів</span>
-    <span onclick="app.openChartModal()" style="cursor:pointer; font-size:12px;" data-i18n="menu_analytics">📊 Аналітика</span>
-    <span onclick="app.openAccessMenu()" style="cursor:pointer; font-size:12px;" data-i18n="menu_access">👥 Доступ</span>
-    <span onclick="app.openMenu('info')" style="cursor:pointer; font-size:12px;" data-i18n="menu_info">ℹ️ Інфо</span>
-    <span onclick="app.openMenu('backups')" style="cursor:pointer; font-size:12px;" data-i18n="menu_backups">📦 Локальні копії</span>
-    <span onclick="app.openMenu('contacts')" style="cursor:pointer; font-size:12px;" data-i18n="menu_contacts">📞 Контакти</span>
-	<span onclick="document.getElementById('setupModal').style.display='flex'" style="cursor:pointer; font-size:12px; margin-left:15px;" data-i18n="menu_setup_region">🌍 Мова та Валюта</span>			
-    <button onclick="app.toggleTheme()" style="background:none; border:none; cursor:pointer; padding:0; display:flex; align-items:center; margin-left:10px;">
-        <svg id="theme-icon" viewBox="0 0 24 24" fill="none" stroke="var(--text-sec)" stroke-width="2" width="20" height="20"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-    </button>
-</div>
-
-<div class="mobile-only" style="position:relative; flex-shrink:0;">
-    <button class="menu-btn" onclick="const m=document.getElementById('mobile-dropdown'); m.style.display=m.style.display==='block'?'none':'block';" style="background:var(--bg-card); border:1px solid var(--border); border-radius:12px; cursor:pointer; color:var(--text); padding:0 10px; height:36px; display:flex; align-items:center; gap:6px;">
-        <span style="font-size:18px;">≡</span>
-        <span style="font-size:12px; font-weight:bold;" data-i18n="menu_title">МЕНЮ</span>
-    </button>
-    <div id="mobile-dropdown" style="display:none; position:absolute; top:42px; right:0; background:#151928; border:1px solid var(--border); border-radius:12px; padding:5px; box-shadow:0 10px 25px rgba(0,0,0,0.9); z-index:9999; min-width:180px;">
-        <div onclick="app.openMenu('history'); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; border-bottom:1px solid var(--border); cursor:pointer;" data-i18n="menu_archive">🕒 Архів</div>
-        <div onclick="app.openChartModal(); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; border-bottom:1px solid var(--border); cursor:pointer;" data-i18n="menu_analytics">📊 Аналітика</div>
-        <div onclick="app.openAccessMenu(); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; border-bottom:1px solid var(--border); cursor:pointer;" data-i18n="menu_access">👥 Доступ</div>
-        <div onclick="app.openMenu('info'); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; border-bottom:1px solid var(--border); cursor:pointer;" data-i18n="menu_info">ℹ️ Інфо</div>
-		<div onclick="document.getElementById('setupModal').style.display='flex'; document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; border-bottom:1px solid var(--border); cursor:pointer;" data-i18n="menu_setup_region">🌍 Мова та Валюта</div>
-        <div onclick="app.toggleTheme(); document.getElementById('mobile-dropdown').style.display='none'" style="padding:12px 15px; cursor:pointer; display:flex; align-items:center; gap:10px; border-top:1px solid var(--border);" data-i18n="menu_theme">🌓 Змінити тему</div>
-    </div>
-</div>
-
         </div>
 
-        <!-- Рядок 2: Тост синхронізації (під кнопками) -->
-        <div id="header-toast" style="display:none; opacity:0; font-size:12px; font-weight:bold; color:white; padding:4px 12px; border-radius:8px; white-space:nowrap; transition:opacity 0.4s ease; box-shadow:0 2px 8px rgba(0,0,0,0.2); align-self:flex-end;"></div>
-
     </div>
-	
-</div>
+    
+    <div id="header-toast" style="display:none; position:fixed; top:75px; left:50%; transform:translateX(-50%); opacity:0; font-size:12px; font-weight:bold; color:white; padding:6px 16px; border-radius:20px; white-space:nowrap; transition:opacity 0.4s ease; box-shadow:0 4px 12px rgba(0,0,0,0.3); z-index:999;"></div>
+</header>
 
 <script>
     function toggleAccountMenu() {
@@ -631,30 +673,6 @@
         }
     });
 </script>
-
-    <div class="brand-header">
-        <div class="logo-text-wrapper">
-            <div class="brand-top outline-neon">COMUNALCO</div>
-            <div class="brand-bottom">
-                <span class="outline-neon-sub">Комуналк</span><span class="solid-neon-sub">Облік</span>
-            </div>
-        </div>
-    </div>
-
-    <div class="app-header" style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; background:var(--card); padding:10px 15px; border-radius:var(--radius); border:1px solid var(--border); box-shadow:0 4px 10px rgba(0,0,0,0.05);">
-
-    <span onclick="app.deleteObject()" style="color:var(--danger); cursor:pointer; font-size:20px; padding:5px; flex-shrink:0;" title="Видалити">🗑️</span>
-
-    <input type="text" 
-        id="object-title" 
-        class="object-title" 
-        value="" 
-        onchange="app.updateObjectName(this.value)" 
-        data-i18n="obj_placeholder"
-        placeholder="НАЗВА ОБ'ЄКТУ" 
-        style="font-size:16px; font-weight:700; border:none; text-align:center; flex:1; background:transparent; color:var(--text); text-transform:uppercase; font-family:'Montserrat',sans-serif; outline:none;">
-
-    <div onclick="app.addObject()" style="cursor:pointer; color:var(--primary); font-weight:900; font-size:26px; line-height:1; padding:5px; flex-shrink:0;" title="Додати">+</div>
 
 </div>
         </div>
@@ -997,7 +1015,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '17.1';
+    const APP_VERSION = '17.2';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -1161,7 +1179,8 @@ alert_login_required: "Будь ласка, увійдіть в акаунт!",
 alert_calc_error: "Помилка: сума не розрахована",
 alert_promo_success: "✅ Ура! Ваш тариф успішно активовано!", alert_promo_error: "❌ Недійсний формат ключа. Перевірте правильність вводу.",
 confirm_logout: "Вийти з акаунта?",
-valid_until: "Діє до:"		
+valid_until: "Діє до:",
+btn_ai: "AI Помічник"		
 	},
     en: {
         receipt: "INVOICE",
@@ -1308,7 +1327,8 @@ alert_login_required: "Please log in to your account!",
 alert_calc_error: "Error: amount not calculated",
 alert_promo_success: "✅ Yay! Your plan has been successfully activated!", alert_promo_error: "❌ Invalid key format. Please check your input.",
 confirm_logout: "Log out of your account?",
-valid_until: "Valid until:"		
+valid_until: "Valid until:",
+btn_ai: "AI Assistant"		
     },
     pl: {
         receipt: "RACHUNEK",
@@ -1455,7 +1475,8 @@ alert_login_required: "Zaloguj się na swoje konto!",
 alert_calc_error: "Błąd: kwota nie została obliczona",
 alert_promo_success: "✅ Hurra! Twój plan został pomyślnie aktywowany!", alert_promo_error: "❌ Nieprawidłowy format klucza. Sprawdź poprawność.",
 confirm_logout: "Wylogować się z konta?",
-valid_until: "Ważne do:"		
+valid_until: "Ważne do:",
+btn_ai: "Asystent AI"		
     },
     de: {
         receipt: "RECHNUNG",
@@ -1601,7 +1622,8 @@ alert_login_required: "Bitte loggen Sie sich in Ihr Konto ein!",
 alert_calc_error: "Fehler: Betrag nicht berechnet",
 alert_promo_success: "✅ Juhu! Ihr Tarif wurde erfolgreich aktiviert!", alert_promo_error: "❌ Ungültiges Schlüsselformat. Bitte überprüfen Sie Ihre Eingabe.",
 confirm_logout: "Von Ihrem Konto abmelden?",
-valid_until: "Gültig bis:"		
+valid_until: "Gültig bis:",
+btn_ai: "KI-Assistent"		
     },
     es: {
         receipt: "FACTURA",
@@ -1748,7 +1770,8 @@ alert_login_required: "¡Por favor, inicie sesión en su cuenta!",
 alert_calc_error: "Error: importe no calculado",
 alert_promo_success: "✅ ¡Genial! ¡Su plan se ha activado con éxito!", alert_promo_error: "❌ Formato de clave no válido. Verifique su entrada.",
 confirm_logout: "¿Cerrar sesión en su cuenta?",
-valid_until: "Válido hasta:"		
+valid_until: "Válido hasta:",
+btn_ai: "Asistente IA"		
     },
     fr: {
         receipt: "FACTURE",
@@ -1895,7 +1918,8 @@ alert_login_required: "Veuillez vous connecter à votre compte !",
 alert_calc_error: "Erreur : montant non calculé",
 alert_promo_success: "✅ Youpi ! Votre forfait a été activé avec succès !", alert_promo_error: "❌ Format de clé invalide. Veuillez vérifier votre saisie.",
 confirm_logout: "Vous déconnecter de votre compte ?",
-valid_until: "Valable jusqu'au:"		
+valid_until: "Valable jusqu'au:",
+btn_ai: "Assistant IA"		
     }
 };
 	window.translations = translations;
