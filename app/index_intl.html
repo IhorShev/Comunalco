@@ -625,25 +625,25 @@
             
             <div id="main-dropdown" class="main-dropdown-menu">
                 <div class="dropdown-item premium" onclick="app.openMenu('premium'); this.parentNode.style.display='none'">
-                    <span>💎</span> <span data-i18n="menu_tariffs">Тарифи</span>
+                    <span style="font-size: 16px; margin-right: 5px;">💎</span> <span data-i18n="menu_tariffs">Тарифи</span>
                 </div>
                 <div class="dropdown-item" onclick="app.openMenu('history'); this.parentNode.style.display='none'">
-                    <span>🕒</span> <span data-i18n="menu_archive">Архів</span>
+                    <span style="font-size: 16px; margin-right: 5px;">🕒</span> <span data-i18n="menu_archive">Архів</span>
                 </div>
                 <div class="dropdown-item" onclick="app.openChartModal(); this.parentNode.style.display='none'">
-                    <span>📊</span> <span data-i18n="menu_analytics">Аналітика</span>
+                    <span style="font-size: 16px; margin-right: 5px;">📊</span> <span data-i18n="menu_analytics">Аналітика</span>
                 </div>
                 <div class="dropdown-item" onclick="app.openAccessMenu(); this.parentNode.style.display='none'">
-                    <span>👥</span> <span data-i18n="menu_access">Доступ</span>
+                    <span style="font-size: 16px; margin-right: 5px;">👥</span> <span data-i18n="menu_access">Доступ</span>
                 </div>
                 <div class="dropdown-item" onclick="app.openMenu('info'); this.parentNode.style.display='none'">
-                    <span>ℹ️</span> <span data-i18n="menu_info">Інфо</span>
+                    <span style="font-size: 16px; margin-right: 5px;">ℹ️</span> <span data-i18n="menu_info">Інфо</span>
                 </div>
                 <div class="dropdown-item" onclick="document.getElementById('setupModal').style.display='flex'; this.parentNode.style.display='none'">
-                    <span>🌍</span> <span data-i18n="menu_setup_region">Мова та Валюта</span>
+                    <span style="font-size: 16px; margin-right: 5px;">🌍</span> <span data-i18n="menu_setup_region">Мова та Валюта</span>
                 </div>
                 <div class="dropdown-item" onclick="app.toggleTheme(); this.parentNode.style.display='none'" style="border-top: 2px solid var(--border);">
-                    <span>🌓</span> <span data-i18n="menu_theme">Змінити тему</span>
+                    <span style="font-size: 16px; margin-right: 5px;">🌓</span> <span data-i18n="menu_theme">Змінити тему</span>
                 </div>
             </div>
         </div>
@@ -727,12 +727,7 @@
         }
     });
 </script>
-
-</div>
-        </div>
-        <div class="nav-btn" onclick="app.nextObject()">❯</div>
-    </div>
-
+          
     <div id="main-content-wrapper">
         <details open>
             <summary data-i18n="tariffs_title">⚙️ Загальні Тарифи, Витрати, Реквізити</summary>
@@ -763,9 +758,9 @@
     <button class="btn btn-outline" style="width:auto; display:inline-block; padding:10px 20px;" onclick="app.addGroup()" data-i18n="btn_add_mzk">+ Загальнобудинкові (МЗК)</button>
 </div>
 
-<div id="batch-controls" style="display:none; padding:10px 0; align-items:center; justify-content:flex-end;">
-    <label style="font-weight:bold; display:flex; align-items:center; gap:8px; cursor:pointer; background:var(--card); padding:8px 15px; border-radius:8px; border:1px solid var(--primary); color:var(--text);">
-        <input type="checkbox" onchange="app.toggleAllCheckboxes(this)" style="width:18px; height:18px;"> 
+<div id="batch-controls" style="display:none; justify-content: flex-start; margin-bottom: 15px; margin-top: 25px; width: 100%;">
+    <label style="display:flex; align-items:center; gap:8px; cursor:pointer; background:var(--input-bg); border:1px solid var(--border); padding:8px 15px; border-radius:8px; color:var(--text); font-size:13px; font-weight:bold; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: 0.2s;" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">
+        <input type="checkbox" onchange="app.toggleAllCheckboxes(this)" style="width:16px; height:16px; cursor:pointer;">
         <span data-i18n="select_all">Вибрати всі (Telegram)</span>
     </label>
 </div>
@@ -1069,7 +1064,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '17.6';
+    const APP_VERSION = '17.7';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
