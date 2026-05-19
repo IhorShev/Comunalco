@@ -1,23 +1,22 @@
 {
   "name": "Comunalco",
   "short_name": "Comunalco",
-  "start_url": "./index.html",
+  "description": "Сервіс обліку комунальних послуг та управління нерухомістю",
+  "start_url": "index_intl.html",
   "display": "standalone",
   "background_color": "#0f172a",
-  "theme_color": "#0f172a",
+  "theme-color": "#0f172a",
+  "orientation": "portrait",
   "icons": [
     {
-      "src": "icon.png?v=2",
+      "src": "Icon.png",
       "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     },
     {
-      "src": "icon.png?v=2",
+      "src": "Icon.png",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     }
   ]
 }
-
