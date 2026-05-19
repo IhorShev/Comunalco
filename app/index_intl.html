@@ -1066,7 +1066,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '18.0';
+    const APP_VERSION = '18.1';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -6377,13 +6377,13 @@ console.log('🌍 Lang:', APP_LANG, '| 💰 Currency:', APP_CURRENCY, window.APP
             }
 
             if (window.app) {
-                if (window.app.state.objects && window.app.state.objects.length <= 1) {
-                    await window.cloudLoad();
-                }
-                if (typeof window.app.renderAll === 'function') window.app.renderAll();
-                if (typeof window.app.updateStatus === 'function') window.app.updateStatus();
-                setTimeout(() => { if (window.hidePreloader) window.hidePreloader(); }, 3000);	
-            }
+            // ФІКС: ЗАВЖДИ тягнемо свіжі дані з хмари при завантаженні/логіні
+            await window.cloudLoad();
+            
+            if (typeof window.app.renderAll === 'function') window.app.renderAll();
+            if (typeof window.app.updateStatus === 'function') window.app.updateStatus();
+            setTimeout(() => { if (window.hidePreloader) window.hidePreloader(); }, 3000);
+        }
 
             setTimeout(() => {
                 if (window.app && !window.app.state.settings.initialized) {
