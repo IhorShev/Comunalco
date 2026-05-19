@@ -1066,7 +1066,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '18.2';
+    const APP_VERSION = '18.3';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -6376,23 +6376,33 @@ console.log('🌍 Lang:', APP_LANG, '| 💰 Currency:', APP_CURRENCY, window.APP
                 const tName = document.getElementById('menu-tariff-name');
                 const tExp = document.getElementById('menu-tariff-expire');
                 
-                if (tName && tExp && menuTariffBlock) {
-                    menuTariffBlock.style.display = 'block'; 
-                    
-                    let planName = "STANDARD";
-                    if (profile.plan === 'pro') planName = "PRO";
-                    if (profile.plan === 'vip' || profile.expires_at.includes('2140')) planName = "LIFETIME";
-                    
-                    tName.innerText = planName;
+                // --- ПРИВ'ЯЗКА ТАРИФУ ДО МЕНЮ ПРОФІЛЮ ---
+        const menuTariffBlock = document.getElementById('menu-tariff-block');
+        const tName = document.getElementById('menu-tariff-name');
+        const tExp = document.getElementById('menu-tariff-expire');
 
-                    if (profile.expires_at.includes('2140')) {
-                        let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
-                        let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
-                        tExp.innerText = tr.status_unlimited || 'Безліміт';
-                    } else {
-                        tExp.innerText = expDate.toLocaleDateString();
-                    }
-                }
+        if (menuTariffBlock && tName && tExp && typeof profile !== 'undefined') {
+            menuTariffBlock.style.display = 'block';
+            
+            let planName = "STANDARD";
+            if (profile.plan === 'pro') planName = "PRO";
+            if (profile.plan === 'vip' || (profile.expires_at && profile.expires_at.includes('2140'))) planName = "LIFETIME";
+            
+            tName.innerText = planName;
+            
+            if (profile.expires_at && profile.expires_at.includes('2140')) {
+                let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+                let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
+                tExp.innerText = tr.status_unlimited || 'Безліміт';
+            } else if (profile.expires_at) {
+                // Безпечне перетворення дати
+                let safeExp = profile.expires_at.replace(/-/g, '/').replace('T', ' ');
+                let expDate = new Date(safeExp);
+                tExp.innerText = !isNaN(expDate) ? expDate.toLocaleDateString() : profile.expires_at.split(' ')[0];
+            } else {
+                tExp.innerText = "...";
+            }
+        }
                 if (window.app) window.app.state.license = { type: 'pro', exp: profile.expires_at };
             }
 
