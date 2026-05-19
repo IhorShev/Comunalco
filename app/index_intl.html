@@ -1066,7 +1066,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '18.6';
+    const APP_VERSION = '18.7';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -6376,7 +6376,7 @@ console.log('🌍 Lang:', APP_LANG, '| 💰 Currency:', APP_CURRENCY, window.APP
                 const tName = document.getElementById('menu-tariff-name');
                 const tExp = document.getElementById('menu-tariff-expire');
                 
-               // --- ПРИВ'ЯЗКА ТАРИФУ ДО МЕНЮ ПРОФІЛЮ (БЕЗПЕЧНИЙ БЛОК) ---
+            // --- ПРИВ'ЯЗКА ТАРИФУ ДО МЕНЮ ПРОФІЛЮ (БЕЗПЕЧНИЙ БЛОК) ---
         try {
             const profileTariffBlock = document.getElementById('menu-tariff-block');
             const profileTName = document.getElementById('menu-tariff-name');
@@ -6409,28 +6409,29 @@ console.log('🌍 Lang:', APP_LANG, '| 💰 Currency:', APP_CURRENCY, window.APP
             console.warn("Не вдалося відобразити тариф:", e);
         }
 
-        if (window.app) {
-            // ФІКС: ПОВЕРТАЄМО ЗАПОБІЖНИК, щоб пусті об'єкти не дублювалися в хмару!
-            if (window.app.state.objects && window.app.state.objects.length <= 1) {
-                await window.cloudLoad();
+        // --- ЗАВАНТАЖЕННЯ ХМАРИ (АВТОНОМНИЙ БЛОК) ---
+        try {
+            if (window.app) {
+                // ПОВЕРТАЄМО ЗАПОБІЖНИК, щоб пусті об'єкти не дублювалися!
+                if (window.app.state.objects && window.app.state.objects.length <= 1) {
+                    await window.cloudLoad();
+                }
+                
+                if (typeof window.app.renderAll === 'function') window.app.renderAll();
+                if (typeof window.app.updateStatus === 'function') window.app.updateStatus();
+                setTimeout(() => { if (window.hidePreloader) window.hidePreloader(); }, 3000);
             }
-            
-            if (typeof window.app.renderAll === 'function') window.app.renderAll();
-            if (typeof window.app.updateStatus === 'function') window.app.updateStatus();
-            setTimeout(() => { if (window.hidePreloader) window.hidePreloader(); }, 3000);
-        }
 
-        setTimeout(() => {
-            if (window.app && !window.app.state.settings.initialized) {
-                const setupModal = document.getElementById('setupModal');
-                if (setupModal) setupModal.style.display = 'flex';
-                if (typeof window.app.previewSetupLang === 'function') window.app.previewSetupLang('uk');
-            }
-        }, 2500);
-
-    } catch (error) {
-        console.error("Помилка профілю:", error);
-    }
+            setTimeout(() => {
+                if (window.app && !window.app.state.settings.initialized) {
+                    const setupModal = document.getElementById('setupModal');
+                    if (setupModal) setupModal.style.display = 'flex';
+                    if (typeof window.app.previewSetupLang === 'function') window.app.previewSetupLang('uk');
+                }
+            }, 2500);
+        } catch (syncError) {
+            console.error("Помилка синхронізації:", syncError);
+        }   
 
     } else {
         // --- ЯКЩО ЮЗЕР НЕ ЗАЛОГІНЕНИЙ ---
