@@ -1066,7 +1066,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '18.1';
+    const APP_VERSION = '18.2';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -3070,23 +3070,43 @@ updateSubscriptionCalc() {
             return; 
         }
 
-        // 2. Формуємо повідомлення для підтвердження, підставляючи назву
+        // 2. Формуємо повідомлення для підтвердження
         let msgTemplate = tr.confirm_delete_object || "Видалити об'єкт '{objName}' та всі його дані?";
         let msg = msgTemplate.replace('{objName}', this.currentData.name);
 
         if(confirm(msg)) {
-            const houseIdToDelete = this.currentData.id; // Запам'ятовуємо ID перед видаленням
+            const houseIdToDelete = this.currentData.id; 
             
-            // 1. Спочатку фізично знищуємо об'єкт у базі Supabase
-            if (window.__sbClient) {
-                await window.__sbClient.rpc('delete_house_as_admin', { target_house_id: String(houseIdToDelete) });
-            }
-
-            // 2. Тепер прибираємо його з екрана
+            // --- ФІКС: ОПТИМІСТИЧНЕ ОНОВЛЕННЯ ІНТЕРФЕЙСУ ---
+            
+            // 1. МИТТЄВО прибираємо об'єкт з пам'яті та екрана!
             this.state.objects.splice(this.state.currentObjIdx, 1);
             this.state.currentObjIdx = 0;
-            this.save();
-            this.renderAll();
+            if (typeof this.renderAll === 'function') this.renderAll(); // Екран оновлюється без затримок
+            
+            // 2. Жорстко зберігаємо локально, щоб "броня" не повернула об'єкт після F5
+            try {
+                localStorage.setItem(this.STORAGE_KEY || 'comunalco_data', JSON.stringify(this.state));
+            } catch(e) {}
+
+            // 3. Знищуємо в хмарі (обгорнуто в try-catch, щоб помилки не ламали скрипт)
+            try {
+                if (window.__sbClient) {
+                    await window.__sbClient.rpc('delete_house_as_admin', { target_house_id: String(houseIdToDelete) });
+                } else if (window.sbClient) {
+                    // Страховка: якщо __sbClient немає, використовуємо стандартний клієнт
+                    await window.sbClient.from('houses').delete().eq('id', houseIdToDelete);
+                }
+            } catch (error) {
+                console.warn("Помилка видалення з хмари (можливо це локальний об'єкт):", error);
+            }
+
+            // 4. Запускаємо стандартне збереження
+            try {
+                if (typeof this.save === 'function') this.save();
+            } catch(error) {
+                console.warn("Броня заблокувала хмарне збереження, але об'єкт успішно видалено локально.");
+            }
         }
     }
 
