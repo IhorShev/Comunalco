@@ -656,6 +656,8 @@
             <button onclick="toggleAccountMenu()" id="auth-btn" style="background:transparent; border:none; padding:0; display:flex; align-items:center; cursor:pointer; outline:none;">
                 <img id="user-avatar" src="" style="width:38px; height:38px; border-radius:50%; object-fit:cover; border:2px solid var(--primary); display:none;">
                 <div id="default-avatar" style="width:38px; height:38px; border-radius:50%; background:var(--primary); color:white; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:16px;">👤</div>
+
+				<span id="user-name-display" style="display:none;"></span>
             </button>
 
             <div id="account-menu" style="display:none; position:absolute; top:45px; right:0; background:var(--card); border:1px solid var(--border); border-radius:16px; box-shadow:0 15px 35px rgba(0,0,0,0.4); z-index:2000; min-width:250px; overflow:hidden;">
@@ -1064,7 +1066,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '17.8';
+    const APP_VERSION = '17.9';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
