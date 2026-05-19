@@ -1066,7 +1066,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '18.4';
+    const APP_VERSION = '18.5';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -6376,45 +6376,49 @@ console.log('🌍 Lang:', APP_LANG, '| 💰 Currency:', APP_CURRENCY, window.APP
                 const tName = document.getElementById('menu-tariff-name');
                 const tExp = document.getElementById('menu-tariff-expire');
                 
-                // --- ПРИВ'ЯЗКА ТАРИФУ ДО МЕНЮ ПРОФІЛЮ ---
-        // Використовуємо унікальні імена змінних (з префіксом profile_), щоб уникнути конфліктів!
-        const profileTariffBlock = document.getElementById('menu-tariff-block');
-        const profileTName = document.getElementById('menu-tariff-name');
-        const profileTExp = document.getElementById('menu-tariff-expire');
+               // --- ПРИВ'ЯЗКА ТАРИФУ ДО МЕНЮ ПРОФІЛЮ (БЕЗПЕЧНИЙ БЛОК) ---
+        try {
+            const profileTariffBlock = document.getElementById('menu-tariff-block');
+            const profileTName = document.getElementById('menu-tariff-name');
+            const profileTExp = document.getElementById('menu-tariff-expire');
 
-        if (profileTariffBlock && profileTName && profileTExp && typeof profile !== 'undefined') {
-            profileTariffBlock.style.display = 'block';
-            
-            let planName = "STANDARD";
-            if (profile.plan === 'pro') planName = "PRO";
-            if (profile.plan === 'vip' || (profile.expires_at && profile.expires_at.includes('2140'))) planName = "LIFETIME";
-            
-            profileTName.innerText = planName;
-            
-            if (profile.expires_at && profile.expires_at.includes('2140')) {
-                let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
-                let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
-                profileTExp.innerText = tr.status_unlimited || 'Безліміт';
-            } else if (profile.expires_at) {
-                // Безпечне перетворення дати
-                let safeExp = profile.expires_at.replace(/-/g, '/').replace('T', ' ');
-                let expDate = new Date(safeExp);
-                profileTExp.innerText = !isNaN(expDate) ? expDate.toLocaleDateString() : profile.expires_at.split(' ')[0];
-            } else {
-                profileTExp.innerText = "...";
-            }
-        }
+            if (profileTariffBlock && profileTName && profileTExp && typeof profile !== 'undefined' && profile) {
+                profileTariffBlock.style.display = 'block'; 
+                
+                let planName = "STANDARD";
+                if (profile.plan === 'pro') planName = "PRO";
+                if (profile.plan === 'vip' || (profile.expires_at && profile.expires_at.includes('2140'))) planName = "LIFETIME";
+                
+                profileTName.innerText = planName;
+                
+                if (profile.expires_at && profile.expires_at.includes('2140')) {
+                    let lang = window.currentLang || localStorage.getItem('lang') || 'uk';
+                    let tr = window.translations ? (window.translations[lang] || window.translations['uk'] || {}) : {};
+                    profileTExp.innerText = tr.status_unlimited || 'Безліміт';
+                } else if (profile.expires_at) {
+                    let safeExp = profile.expires_at.replace(/-/g, '/').replace('T', ' ');
+                    let expDate = new Date(safeExp);
+                    profileTExp.innerText = !isNaN(expDate) ? expDate.toLocaleDateString() : profile.expires_at.split(' ')[0];
+                } else {
+                    profileTExp.innerText = "...";
+                }
+                
                 if (window.app) window.app.state.license = { type: 'pro', exp: profile.expires_at };
             }
+        } catch (e) {
+            console.warn("Не вдалося відобразити тариф:", e);
+        }
 
-            if (window.app) {
-            // ФІКС: ЗАВЖДИ тягнемо свіжі дані з хмари при завантаженні/логіні
-            await window.cloudLoad();
+        if (window.app) {
+            // ФІКС: ПОВЕРТАЄМО ЗАПОБІЖНИК, щоб пусті об'єкти не дублювалися в хмару!
+            if (window.app.state.objects && window.app.state.objects.length <= 1) {
+                await window.cloudLoad();
+            }
             
             if (typeof window.app.renderAll === 'function') window.app.renderAll();
             if (typeof window.app.updateStatus === 'function') window.app.updateStatus();
             setTimeout(() => { if (window.hidePreloader) window.hidePreloader(); }, 3000);
-        }
+        } 
 
             setTimeout(() => {
                 if (window.app && !window.app.state.settings.initialized) {
