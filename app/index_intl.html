@@ -1066,7 +1066,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '18.8';
+    const APP_VERSION = '18.9';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -6370,13 +6370,7 @@ console.log('🌍 Lang:', APP_LANG, '| 💰 Currency:', APP_CURRENCY, window.APP
                 location.reload(); 
             };
 
-            // Відображення даних тарифу у НОВОМУ меню
-            if (profile && profile.expires_at) {
-                const expDate = new Date(profile.expires_at);
-                const tName = document.getElementById('menu-tariff-name');
-                const tExp = document.getElementById('menu-tariff-expire');
-                
-            // --- ПРИВ'ЯЗКА ТАРИФУ ДО МЕНЮ ПРОФІЛЮ (БЕЗПЕЧНИЙ БЛОК) ---
+            // --- ПРИВ'ЯЗКА ТАРИФУ ДО МЕНЮ ПРОФІЛЮ ---
         try {
             const profileTariffBlock = document.getElementById('menu-tariff-block');
             const profileTName = document.getElementById('menu-tariff-name');
@@ -6429,7 +6423,7 @@ console.log('🌍 Lang:', APP_LANG, '| 💰 Currency:', APP_CURRENCY, window.APP
             }
         }, 2500);
 
-    // 🔥 ОСЬ ВІН! ЗАКРИВАЮЧИЙ БЛОК ДЛЯ ВЕЛИКОГО ЗОВНІШНЬОГО TRY 🔥
+    // ЗАКРИВАЮЧИЙ БЛОК ДЛЯ ЗОВНІШНЬОГО TRY
     } catch (error) {
         console.error("Помилка профілю:", error);
     }   
