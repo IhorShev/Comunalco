@@ -1066,7 +1066,7 @@
     })();
 
     // 2. АВТО-ОНОВЛЕННЯ ВЕРСІЇ
-    const APP_VERSION = '18.5';
+    const APP_VERSION = '18.6';
 	// 🌍 ЗБЕРІГАЄМО МОВУ ДО МОЖЛИВОГО ПЕРЕЗАВАНТАЖЕННЯ
     const _ll = localStorage.getItem('lang');
     const _lc = localStorage.getItem('currency');
@@ -6418,18 +6418,19 @@ console.log('🌍 Lang:', APP_LANG, '| 💰 Currency:', APP_CURRENCY, window.APP
             if (typeof window.app.renderAll === 'function') window.app.renderAll();
             if (typeof window.app.updateStatus === 'function') window.app.updateStatus();
             setTimeout(() => { if (window.hidePreloader) window.hidePreloader(); }, 3000);
-        } 
-
-            setTimeout(() => {
-                if (window.app && !window.app.state.settings.initialized) {
-                    document.getElementById('setupModal').style.display = 'flex';
-                    window.app.previewSetupLang('uk');
-                }
-            }, 2500); 
-
-        } catch (error) {
-            console.error("Помилка профілю:", error);
         }
+
+        setTimeout(() => {
+            if (window.app && !window.app.state.settings.initialized) {
+                const setupModal = document.getElementById('setupModal');
+                if (setupModal) setupModal.style.display = 'flex';
+                if (typeof window.app.previewSetupLang === 'function') window.app.previewSetupLang('uk');
+            }
+        }, 2500);
+
+    } catch (error) {
+        console.error("Помилка профілю:", error);
+    }
 
     } else {
         // --- ЯКЩО ЮЗЕР НЕ ЗАЛОГІНЕНИЙ ---
